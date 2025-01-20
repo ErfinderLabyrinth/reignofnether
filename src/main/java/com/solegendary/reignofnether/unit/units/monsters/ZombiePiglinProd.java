@@ -46,7 +46,7 @@ public class ZombiePiglinProd extends ProductionItem {
                 itemName,
                 new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/zombie_piglin.png"),
                 null,
-                () -> false,
+                () -> SandboxClientEvents.spawnUnitName.equals(itemName),
                 () -> false,
                 () -> true,
                 () -> {

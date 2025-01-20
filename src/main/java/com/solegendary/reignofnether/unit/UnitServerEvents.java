@@ -16,6 +16,7 @@ import com.solegendary.reignofnether.research.researchItems.ResearchHeavyTrident
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.resources.ResourceSource;
 import com.solegendary.reignofnether.resources.ResourceSources;
+import com.solegendary.reignofnether.sandbox.SandboxServer;
 import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.ConvertableUnit;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
@@ -407,7 +408,7 @@ public class UnitServerEvents {
                 .filter(u -> (u instanceof Unit unit1 && unit1.getOwnerName().equals(unit.getOwnerName())))
                 .toList()
                 .size();
-            if (!PlayerServerEvents.isSandboxPlayer(unit.getOwnerName()) &&
+            if (!SandboxServer.isSandboxPlayer(unit.getOwnerName()) &&
                 unitsOwned == 0 && isRTSPlayer(unit.getOwnerName())
                 && BuildingUtils.getTotalCompletedBuildingsOwned(false, unit.getOwnerName()) == 0) {
                 PlayerServerEvents.defeat(unit.getOwnerName(), Component.translatable("server.reignofnether.lost_all").getString());

@@ -17,6 +17,7 @@ import com.solegendary.reignofnether.nether.NetherBlocks;
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
 import com.solegendary.reignofnether.research.ResearchClient;
 import com.solegendary.reignofnether.resources.ResourceSources;
+import com.solegendary.reignofnether.sandbox.SandboxClientEvents;
 import com.solegendary.reignofnether.tutorial.TutorialClientEvents;
 import com.solegendary.reignofnether.unit.Relationship;
 import com.solegendary.reignofnether.unit.UnitClientEvents;
@@ -876,9 +877,10 @@ public class BuildingClientEvents {
             buildingToPlace = null;
         }
         if (evt.getKeyCode() == GLFW.GLFW_KEY_DELETE) {
+            boolean isSandboxPlayer = MC.player != null && SandboxClientEvents.isSandboxPlayer(MC.player.getName().getString());
             Building building = HudClientEvents.hudSelectedBuilding;
-            if (building != null && building.isBuilt
-                && getPlayerToBuildingRelationship(building) == Relationship.OWNED) {
+            if (building != null && building.isBuilt &&
+                (getPlayerToBuildingRelationship(building) == Relationship.OWNED || isSandboxPlayer)) {
                 HudClientEvents.hudSelectedBuilding = null;
                 BuildingServerboundPacket.cancelBuilding(building.minCorner);
             }

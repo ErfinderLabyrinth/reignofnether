@@ -29,6 +29,7 @@ public class ReignOfNetherCommonConfigs {
         UnitCosts.WARDEN.define(BUILDER);
         UnitCosts.ZOMBIE_PIGLIN.define(BUILDER);
         UnitCosts.ZOGLIN.define(BUILDER);
+        UnitCosts.NECROMANCER.define(BUILDER);
         //Villagers
         BUILDER.comment("Villagers");
         UnitCosts.VILLAGER.define(BUILDER);
@@ -39,6 +40,7 @@ public class ReignOfNetherCommonConfigs {
         UnitCosts.WITCH.define(BUILDER);
         UnitCosts.EVOKER.define(BUILDER);
         UnitCosts.RAVAGER.define(BUILDER);
+        UnitCosts.ROYAL_GUARD.define(BUILDER);
         //Piglins
         BUILDER.comment("Piglins");
         UnitCosts.GRUNT.define(BUILDER);
@@ -49,6 +51,7 @@ public class ReignOfNetherCommonConfigs {
         UnitCosts.WITHER_SKELETON.define(BUILDER);
         UnitCosts.GHAST.define(BUILDER);
         UnitCosts.MAGMA_CUBE.define(BUILDER);
+        UnitCosts.PIGLIN_MERCHANT.define(BUILDER);
 
         //*Buildings*
         BUILDER.comment("Building Cost Configurations");

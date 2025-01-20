@@ -1,4 +1,4 @@
-package com.solegendary.reignofnether.unit.units.neutral;
+package com.solegendary.reignofnether.unit.units.piglins;
 
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.building.BuildingServerboundPacket;
@@ -22,17 +22,16 @@ import net.minecraft.world.level.Level;
 
 import java.util.List;
 
-public class EndermanProd extends ProductionItem {
+public class PiglinMerchantProd extends ProductionItem {
 
-    public final static String itemName = "Enderman";
-    public final static ResourceCost cost = ResourceCosts.ENDERMAN;
+    public final static String itemName = "piglin_merchant";
+    public final static ResourceCost cost = ResourceCosts.PIGLIN_MERCHANT;
 
-    public EndermanProd(ProductionBuilding building) {
+    public PiglinMerchantProd(ProductionBuilding building) {
         super(building, cost.ticks);
         this.onComplete = (Level level) -> {
-            if (!level.isClientSide()) {
-                building.produceUnit((ServerLevel) level, EntityRegistrar.ENDERMAN_UNIT.get(), building.ownerName, true);
-            }
+            if (!level.isClientSide())
+                building.produceUnit((ServerLevel) level, EntityRegistrar.PIGLIN_MERCHANT_UNIT.get(), building.ownerName, true);
         };
         this.foodCost = cost.food;
         this.woodCost = cost.wood;
@@ -41,13 +40,13 @@ public class EndermanProd extends ProductionItem {
     }
 
     public String getItemName() {
-        return EndermanProd.itemName;
+        return PiglinMerchantProd.itemName;
     }
 
     public static AbilityButton getPlaceButton() {
         return new AbilityButton(
                 itemName,
-                new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/enderman.png"),
+                new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/piglin_merchant.png"),
                 null,
                 () -> SandboxClientEvents.spawnUnitName.equals(itemName),
                 () -> false,
@@ -58,10 +57,13 @@ public class EndermanProd extends ProductionItem {
                 },
                 null,
                 List.of(
-                        FormattedCharSequence.forward(I18n.get("units.neutral.reignofnether.enderman"), Style.EMPTY.withBold(true)),
+                        FormattedCharSequence.forward(
+                                I18n.get("units.piglins.reignofnether.piglin_merchant") +
+                                        " (" + I18n.get("hud.units.reignofnether.hero") + ")",
+                                Style.EMPTY.withBold(true)),
                         FormattedCharSequence.forward("", Style.EMPTY),
-                        FormattedCharSequence.forward(I18n.get("units.neutral.reignofnether.enderman.tooltip1"), Style.EMPTY),
-                        FormattedCharSequence.forward(I18n.get("units.neutral.reignofnether.enderman.tooltip2"), Style.EMPTY)
+                        FormattedCharSequence.forward(I18n.get("units.piglins.reignofnether.piglin_merchant.tooltip1"), Style.EMPTY),
+                        FormattedCharSequence.forward(I18n.get("units.piglins.reignofnether.piglin_merchant.tooltip2"), Style.EMPTY)
                 ),
                 null
         );
@@ -69,9 +71,9 @@ public class EndermanProd extends ProductionItem {
 
     public static Button getStartButton(ProductionBuilding prodBuilding, Keybinding hotkey) {
         return new Button(
-                EndermanProd.itemName,
+                PiglinMerchantProd.itemName,
                 14,
-                new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/enderman.png"),
+                new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/piglin_merchant.png"),
                 hotkey,
                 () -> false,
                 () -> false,
@@ -79,21 +81,24 @@ public class EndermanProd extends ProductionItem {
                 () -> BuildingServerboundPacket.startProduction(prodBuilding.originPos, itemName),
                 null,
                 List.of(
-                        FormattedCharSequence.forward(I18n.get("units.neutral.reignofnether.enderman"), Style.EMPTY.withBold(true)),
+                        FormattedCharSequence.forward(
+                                I18n.get("units.piglins.reignofnether.piglin_merchant") +
+                                        " (" + I18n.get("hud.units.reignofnether.hero") + ")",
+                                Style.EMPTY.withBold(true)),
                         ResourceCosts.getFormattedCost(cost),
                         ResourceCosts.getFormattedPopAndTime(cost),
                         FormattedCharSequence.forward("", Style.EMPTY),
-                        FormattedCharSequence.forward(I18n.get("units.neutral.reignofnether.enderman.tooltip1"), Style.EMPTY),
-                        FormattedCharSequence.forward(I18n.get("units.neutral.reignofnether.enderman.tooltip2"), Style.EMPTY)
+                        FormattedCharSequence.forward(I18n.get("units.piglins.reignofnether.piglin_merchant.tooltip1"), Style.EMPTY),
+                        FormattedCharSequence.forward(I18n.get("units.piglins.reignofnether.piglin_merchant.tooltip2"), Style.EMPTY)
                 )
         );
     }
 
     public Button getCancelButton(ProductionBuilding prodBuilding, boolean first) {
         return new Button(
-                EndermanProd.itemName,
+                PiglinMerchantProd.itemName,
                 14,
-                new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/enderman.png"),
+                new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/piglin_merchant.png"),
                 (Keybinding) null,
                 () -> false,
                 () -> false,

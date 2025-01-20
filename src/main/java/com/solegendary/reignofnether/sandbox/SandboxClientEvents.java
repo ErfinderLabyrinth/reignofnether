@@ -4,12 +4,14 @@ import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.building.buildings.villagers.*;
 import com.solegendary.reignofnether.cursor.CursorClientEvents;
 import com.solegendary.reignofnether.gamemode.ClientGameModeHelper;
+import com.solegendary.reignofnether.gamemode.GameMode;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.hud.HudClientEvents;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
+import com.solegendary.reignofnether.player.PlayerClientEvents;
 import com.solegendary.reignofnether.research.ResearchClient;
 import com.solegendary.reignofnether.research.ResearchServerboundPacket;
 import com.solegendary.reignofnether.unit.units.monsters.*;
@@ -41,6 +43,11 @@ public class SandboxClientEvents {
 
     public static String spawnUnitName = "";
 
+    public static boolean isSandboxPlayer(String playerName) {
+        return MC.player != null && playerName.equals(MC.player.getName().getString()) &&
+            PlayerClientEvents.isRTSPlayer && ClientGameModeHelper.gameMode == GameMode.SANDBOX;
+    }
+
     public static List<AbilityButton> getNeutralBuildingButtons() {
         return List.of(
             TownCentre.getBuildButton(Keybindings.keyQ)
@@ -59,7 +66,6 @@ public class SandboxClientEvents {
     public static List<AbilityButton> getUnitButtons() {
         return switch (faction) {
             case VILLAGERS -> List.of(
-                    /*
                 VillagerProd.getPlaceButton(),
                 VindicatorProd.getPlaceButton(),
                 PillagerProd.getPlaceButton(),
@@ -68,7 +74,6 @@ public class SandboxClientEvents {
                 EvokerProd.getPlaceButton(),
                 RavagerProd.getPlaceButton(),
                 RoyalGuardProd.getPlaceButton()
-                     */
             );
             case MONSTERS -> List.of(
                 ZombieVillagerProd.getPlaceButton(),
@@ -87,7 +92,6 @@ public class SandboxClientEvents {
                 NecromancerProd.getPlaceButton()
             );
             case PIGLINS -> List.of(
-                    /*
                 GruntProd.getPlaceButton(),
                 BruteProd.getPlaceButton(),
                 HeadhunterProd.getPlaceButton(),
@@ -96,7 +100,6 @@ public class SandboxClientEvents {
                 MagmaCubeProd.getPlaceButton(),
                 GhastProd.getPlaceButton(),
                 PiglinMerchantProd.getPlaceButton()
-                     */
             );
             case NONE -> List.of(
                 EndermanProd.getPlaceButton()
@@ -221,13 +224,19 @@ public class SandboxClientEvents {
 
         if (evt.getButton() == GLFW.GLFW_MOUSE_BUTTON_1) {
            SandboxAction sandboxAction = CursorClientEvents.getLeftClickSandboxAction();
-           if (sandboxAction != null && sandboxAction.name().toLowerCase().contains("spawn_")) {
+           if (sandboxAction != null && sandboxAction.name().toLowerCase().contains("spawn_") && !spawnUnitName.isBlank()) {
                 SandboxServerboundPacket.spawnUnit(CursorClientEvents.getLeftClickSandboxAction(),
-                        MC.player.getName().getString(), CursorClientEvents.getPreselectedBlockPos());
+                        MC.player.getName().getString(), spawnUnitName, CursorClientEvents.getPreselectedBlockPos());
            }
 
-           if (!Keybindings.shiftMod.isDown())
+           if (!Keybindings.shiftMod.isDown()) {
+               spawnUnitName = "";
                CursorClientEvents.setLeftClickSandboxAction(null);
+           }
+        }
+        if (evt.getButton() == GLFW.GLFW_MOUSE_BUTTON_2) {
+            spawnUnitName = "";
+            CursorClientEvents.setLeftClickSandboxAction(null);
         }
     }
 }

@@ -848,7 +848,7 @@ public class HudClientEvents {
                 }
             }
         }
-        else if (PlayerClientEvents.isSandbox() && selUnits.isEmpty() && selBuildings.isEmpty()) {
+        else if (MC.player != null && SandboxClientEvents.isSandboxPlayer(MC.player.getName().getString()) && selUnits.isEmpty() && selBuildings.isEmpty()) {
             blitX = 0;
             blitY = screenHeight - iconFrameSize;
 
@@ -1262,6 +1262,16 @@ public class HudClientEvents {
                                 mouseY
                         );
                         renderedButtons.add(StartButtons.piglinStartButton);
+                    }
+                } else {
+                    if (!StartButtons.sandboxStartButton.isHidden.get()) {
+                        StartButtons.sandboxStartButton.render(evt.getPoseStack(),
+                                (int) (screenWidth - (StartButtons.ICON_SIZE * 4f)),
+                                StartButtons.ICON_SIZE / 2,
+                                mouseX,
+                                mouseY
+                        );
+                        renderedButtons.add(StartButtons.sandboxStartButton);
                     }
                 }
         }

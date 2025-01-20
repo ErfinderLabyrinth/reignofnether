@@ -50,7 +50,7 @@ public class ZombieVillagerProd extends ProductionItem {
                 itemName,
                 new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/zombie_villager.png"),
                 null,
-                () -> false,
+                () -> SandboxClientEvents.spawnUnitName.equals(itemName),
                 () -> false,
                 () -> true,
                 () -> {

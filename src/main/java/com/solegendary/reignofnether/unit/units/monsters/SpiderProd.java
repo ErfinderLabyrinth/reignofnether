@@ -70,7 +70,7 @@ public class SpiderProd extends ProductionItem {
                 itemName,
                 new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/spider.png"),
                 null,
-                () -> false,
+                () -> SandboxClientEvents.spawnUnitName.equals(itemName),
                 () -> false,
                 () -> true,
                 () -> {

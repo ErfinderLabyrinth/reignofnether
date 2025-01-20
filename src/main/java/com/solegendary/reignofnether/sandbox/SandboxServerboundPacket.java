@@ -15,31 +15,31 @@ public class SandboxServerboundPacket {
 
     public SandboxAction sandboxAction;
     public String playerName;
-    public int unitId;
+    public String unitName;
     public BlockPos blockPos;
 
-    public static void spawnUnit(SandboxAction sandboxAction, String playerName, BlockPos blockPos) {
-        PacketHandler.INSTANCE.sendToServer(new SandboxServerboundPacket(sandboxAction, playerName, 0, blockPos));
+    public static void spawnUnit(SandboxAction sandboxAction, String playerName, String unitName, BlockPos blockPos) {
+        PacketHandler.INSTANCE.sendToServer(new SandboxServerboundPacket(sandboxAction, playerName, unitName, blockPos));
     }
 
-    public SandboxServerboundPacket(SandboxAction sandboxAction, String playerName, int unitId, BlockPos blockPos) {
+    public SandboxServerboundPacket(SandboxAction sandboxAction, String playerName, String unitName, BlockPos blockPos) {
         this.sandboxAction = sandboxAction;
         this.playerName = playerName;
-        this.unitId = unitId;
+        this.unitName = unitName;
         this.blockPos = blockPos;
     }
 
     public SandboxServerboundPacket(FriendlyByteBuf buffer) {
         this.sandboxAction = buffer.readEnum(SandboxAction.class);
         this.playerName = buffer.readUtf();
-        this.unitId = buffer.readInt();
+        this.unitName = buffer.readUtf();
         this.blockPos = buffer.readBlockPos();
     }
 
     public void encode(FriendlyByteBuf buffer) {
         buffer.writeEnum(this.sandboxAction);
         buffer.writeUtf(this.playerName);
-        buffer.writeInt(this.unitId);
+        buffer.writeUtf(this.unitName);
         buffer.writeBlockPos(this.blockPos);
     }
 
@@ -48,7 +48,7 @@ public class SandboxServerboundPacket {
         final var success = new AtomicBoolean(false);
         ctx.get().enqueueWork(() -> {
             if (sandboxAction.name().toLowerCase().contains("spawn_")) {
-                SandboxServer.spawnUnit(this.sandboxAction, this.playerName, this.blockPos);
+                SandboxServer.spawnUnit(this.sandboxAction, this.playerName, this.unitName, this.blockPos);
             }
             success.set(true);
         });

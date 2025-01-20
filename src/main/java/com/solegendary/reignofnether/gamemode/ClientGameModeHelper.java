@@ -110,7 +110,7 @@ public class ClientGameModeHelper {
                     () -> false,
                     () -> false,
                     () -> !gameModeLocked,
-                    () -> PlayerServerboundPacket.startRTS(Faction.NONE, 0d,0d,0d),
+                    null,
                     ClientGameModeHelper::cycleGameMode,
                     List.of(
                             FormattedCharSequence.forward(I18n.get("hud.gamemode.reignofnether.sandbox1") +
@@ -120,7 +120,6 @@ public class ClientGameModeHelper {
                             FormattedCharSequence.forward(I18n.get("hud.gamemode.reignofnether.sandbox3"), Style.EMPTY),
                             FormattedCharSequence.forward(I18n.get("hud.gamemode.reignofnether.sandbox4"), Style.EMPTY),
                             FormattedCharSequence.forward("", Style.EMPTY),
-                            FormattedCharSequence.forward(I18n.get("hud.gamemode.reignofnether.sandbox_confirm"), Style.EMPTY),
                             FormattedCharSequence.forward(I18n.get("hud.gamemode.reignofnether.changemode"), Style.EMPTY)
                     )
             );

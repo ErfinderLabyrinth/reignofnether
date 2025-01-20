@@ -50,7 +50,7 @@ public class StrayProd extends ProductionItem {
                 itemName,
                 new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/stray.png"),
                 null,
-                () -> false,
+                () -> SandboxClientEvents.spawnUnitName.equals(itemName),
                 () -> false,
                 () -> true,
                 () -> {

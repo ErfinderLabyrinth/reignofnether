@@ -50,7 +50,7 @@ public class HuskProd extends ProductionItem {
                 itemName,
                 new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/husk.png"),
                 null,
-                () -> false,
+                () -> SandboxClientEvents.spawnUnitName.equals(itemName),
                 () -> false,
                 () -> true,
                 () -> {

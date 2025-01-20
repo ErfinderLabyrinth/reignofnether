@@ -109,13 +109,6 @@ public class PlayerServerEvents {
         serverLevel.getDataStorage().save();
     }
 
-    public static boolean isSandboxPlayer(String playerName) {
-        for (RTSPlayer rtsPlayer : rtsPlayers)
-            if (rtsPlayer.faction == Faction.NONE)
-                return true;
-        return false;
-    }
-
     @SubscribeEvent
     public static void onServerStarted(ServerStartedEvent evt) {
         ServerLevel level = evt.getServer().getLevel(Level.OVERWORLD);
@@ -341,7 +334,10 @@ public class PlayerServerEvents {
 
             if (!TutorialServerEvents.isEnabled()) {
                 serverPlayer.sendSystemMessage(Component.literal(""));
-                sendMessageToAllPlayers("server.reignofnether.started", true, playerName);
+                if (faction == Faction.NONE)
+                    sendMessageToAllPlayers("server.reignofnether.started_sandbox", true, playerName);
+                else
+                    sendMessageToAllPlayers("server.reignofnether.started", true, playerName);
                 sendMessageToAllPlayers("server.reignofnether.total_players", false, rtsPlayers.size());
             }
             PlayerClientboundPacket.syncRtsGameTime(rtsGameTicks);

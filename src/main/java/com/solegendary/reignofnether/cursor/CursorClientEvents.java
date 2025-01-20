@@ -87,7 +87,8 @@ public class CursorClientEvents {
         return leftClickSandboxAction;
     }
     public static void setLeftClickAction(UnitAction actionName) {
-        leftClickSandboxAction = null;
+        if (actionName != null)
+            leftClickSandboxAction = null;
         if (actionName != null &&
             List.of(UnitAction.STARTRTS_VILLAGERS,
                 UnitAction.STARTRTS_MONSTERS,
@@ -100,7 +101,8 @@ public class CursorClientEvents {
             leftClickAction = null;
     }
     public static void setLeftClickSandboxAction(SandboxAction actionName) {
-        leftClickAction = null;
+        if (actionName != null)
+            leftClickAction = null;
         leftClickSandboxAction = actionName;
     }
 
@@ -150,7 +152,7 @@ public class CursorClientEvents {
             RenderSystem.setShaderTexture(0, TEXTURE_SWORD);
         else if (leftClickAction != null && leftClickAction.equals(UnitAction.BUILD_REPAIR))
             RenderSystem.setShaderTexture(0, TEXTURE_SHOVEL);
-        else if (leftClickAction != null) {
+        else if (leftClickAction != null || leftClickSandboxAction != null) {
             RenderSystem.setShaderTexture(0, TEXTURE_CROSS);
             cursorDrawX -= 8;
             cursorDrawY -= 8;
@@ -402,7 +404,7 @@ public class CursorClientEvents {
                 !leftClickDown && ownAnySelected &&
                 UnitClientEvents.getPreselectedUnits().size() == 0 &&
                 BuildingClientEvents.getPreselectedBuilding() == null &&
-                !buildingTargetedByWorker && !buildingTargetedByAttacker) || isLeftClickActionStartRTS) {
+                !buildingTargetedByWorker && !buildingTargetedByAttacker) || isLeftClickActionStartRTS || getLeftClickSandboxAction() != null) {
 
                 if (MC.level.getBlockState(getPreselectedBlockPos().offset(0,1,0)).getBlock() instanceof SnowLayerBlock) {
                     AABB aabb = new AABB(preselectedBlockPos);

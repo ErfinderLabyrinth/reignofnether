@@ -37,10 +37,6 @@ public class PlayerClientEvents {
 
     public static boolean canStartRTS = true;
 
-    public static boolean isSandbox() {
-        return isRTSPlayer && ClientGameModeHelper.gameMode == GameMode.SANDBOX;
-    }
-
     @SubscribeEvent
     public static void onRegisterCommand(RegisterClientCommandsEvent evt) {
 

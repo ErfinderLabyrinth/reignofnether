@@ -9,18 +9,16 @@ import com.solegendary.reignofnether.hud.HudClientEvents;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.resources.ResourceName;
 import com.solegendary.reignofnether.resources.ResourceSources;
-import com.solegendary.reignofnether.survival.Wave;
-import com.solegendary.reignofnether.survival.spawners.IllagerWaveSpawner;
+import com.solegendary.reignofnether.sandbox.SandboxClientEvents;
+import com.solegendary.reignofnether.sandbox.SandboxServer;
 import com.solegendary.reignofnether.unit.goals.*;
 import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.ConvertableUnit;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.interfaces.WorkerUnit;
-import com.solegendary.reignofnether.unit.units.piglins.MagmaCubeUnit;
 import com.solegendary.reignofnether.util.MiscUtil;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -29,8 +27,6 @@ import net.minecraft.world.level.Level;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static com.solegendary.reignofnether.survival.spawners.IllagerWaveSpawner.spawnIllagerWave;
 
 public class UnitActionItem {
     private final String ownerName;
@@ -109,11 +105,17 @@ public class UnitActionItem {
     public void action(Level level) {
         Ability usedAbility = null;
 
+        boolean isSandboxPlayer;
+        if (level.isClientSide())
+            isSandboxPlayer = SandboxClientEvents.isSandboxPlayer(this.ownerName);
+        else
+            isSandboxPlayer = SandboxServer.isSandboxPlayer(this.ownerName);
+
         // filter out unowned units and non-unit entities
         ArrayList<Unit> actionableUnits = new ArrayList<>();
         for (int id : unitIds) {
             Entity entity = level.getEntity(id);
-            if (entity instanceof Unit unit && unit.getOwnerName().equals(this.ownerName)) {
+            if (entity instanceof Unit unit && (unit.getOwnerName().equals(this.ownerName) || isSandboxPlayer)) {
                 actionableUnits.add(unit);
             }
         }

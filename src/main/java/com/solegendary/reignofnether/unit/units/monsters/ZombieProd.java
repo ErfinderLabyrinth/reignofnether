@@ -75,7 +75,7 @@ public class ZombieProd extends ProductionItem {
                 ZombieProd.itemName,
                 new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/zombie.png"),
                 null,
-                () -> false,
+                () -> SandboxClientEvents.spawnUnitName.equals(itemName),
                 () -> false,
                 () -> true,
                 () -> {

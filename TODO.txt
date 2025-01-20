@@ -92,3 +92,6 @@ Localisation
     "hud.faction.reignofnether.neutral": "Neutral",
     "hud.units.reignofnether.hero": "Hero",
     "units.monsters.reignofnether.warden.tooltip2": "Wardens are slowed under sunlight",
+
+    "units.neutral.reignofnether.enderman.tooltip1": "An enigmatic creature from the end. Can teleport ",
+    "units.neutral.reignofnether.enderman.tooltip2": "at will and automatically dodges all projectiles.",

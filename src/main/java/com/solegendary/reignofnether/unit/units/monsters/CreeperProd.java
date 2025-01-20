@@ -47,7 +47,7 @@ public class CreeperProd extends ProductionItem {
                 CreeperProd.itemName,
                 new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/creeper.png"),
                 null,
-                () -> false,
+                () -> SandboxClientEvents.spawnUnitName.equals(itemName),
                 () -> false,
                 () -> true,
                 () -> {

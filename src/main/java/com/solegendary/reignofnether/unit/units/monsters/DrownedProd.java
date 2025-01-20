@@ -50,7 +50,7 @@ public class DrownedProd extends ProductionItem {
                 DrownedProd.itemName,
                 new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/drowned.png"),
                 null,
-                () -> false,
+                () -> SandboxClientEvents.spawnUnitName.equals(itemName),
                 () -> false,
                 () -> true,
                 () -> {

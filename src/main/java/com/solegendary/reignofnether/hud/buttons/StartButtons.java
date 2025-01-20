@@ -5,9 +5,11 @@ import com.solegendary.reignofnether.cursor.CursorClientEvents;
 import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.player.PlayerClientEvents;
+import com.solegendary.reignofnether.player.PlayerServerboundPacket;
 import com.solegendary.reignofnether.tutorial.TutorialClientEvents;
 import com.solegendary.reignofnether.tutorial.TutorialStage;
 import com.solegendary.reignofnether.unit.UnitAction;
+import com.solegendary.reignofnether.util.Faction;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
@@ -18,6 +20,21 @@ import java.util.List;
 public class StartButtons {
 
     public static final int ICON_SIZE = 14;
+
+    public static Button sandboxStartButton = new Button(
+            "Sandbox",
+            ICON_SIZE,
+            new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/sheep.png"),
+            (Keybinding) null,
+            () -> false,
+            () -> false,
+            () -> true,
+            () -> PlayerServerboundPacket.startRTS(Faction.NONE, 0d,0d,0d),
+            null,
+            List.of(
+                    FormattedCharSequence.forward(I18n.get("hud.gamemode.reignofnether.sandbox_confirm"), Style.EMPTY)
+            )
+    );
 
     public static Button villagerStartButton = new Button(
         "Villagers",

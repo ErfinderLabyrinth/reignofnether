@@ -50,7 +50,7 @@ public class NecromancerProd extends ProductionItem {
                 itemName,
                 new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/necromancer.png"),
                 null,
-                () -> false,
+                () -> SandboxClientEvents.spawnUnitName.equals(itemName),
                 () -> false,
                 () -> true,
                 () -> {
@@ -59,7 +59,10 @@ public class NecromancerProd extends ProductionItem {
                 },
                 null,
                 List.of(
-                        FormattedCharSequence.forward(I18n.get("units.monsters.reignofnether.necromancer"), Style.EMPTY.withBold(true)),
+                        FormattedCharSequence.forward(
+                                I18n.get("units.monsters.reignofnether.necromancer") +
+                                        " (" + I18n.get("hud.units.reignofnether.hero") + ")",
+                                Style.EMPTY.withBold(true)),
                         FormattedCharSequence.forward("", Style.EMPTY),
                         FormattedCharSequence.forward(I18n.get("units.monsters.reignofnether.necromancer.tooltip1"), Style.EMPTY),
                         FormattedCharSequence.forward(I18n.get("units.monsters.reignofnether.necromancer.tooltip2"), Style.EMPTY),
@@ -82,7 +85,10 @@ public class NecromancerProd extends ProductionItem {
             () -> BuildingServerboundPacket.startProduction(prodBuilding.originPos, itemName),
             null,
             List.of(
-                FormattedCharSequence.forward(I18n.get("units.monsters.reignofnether.necromancer"), Style.EMPTY.withBold(true)),
+                    FormattedCharSequence.forward(
+                            I18n.get("units.monsters.reignofnether.necromancer") +
+                                    " (" + I18n.get("hud.units.reignofnether.hero") + ")",
+                            Style.EMPTY.withBold(true)),
                 ResourceCosts.getFormattedCost(cost),
                 ResourceCosts.getFormattedPopAndTime(cost),
                 FormattedCharSequence.forward("", Style.EMPTY),
