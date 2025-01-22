@@ -169,6 +169,10 @@ public abstract class Building {
         return name;
     }
 
+    public int captureRange = 40;
+    public boolean capturable = false;
+    public boolean invulnerable = false;
+
     public Building(
         Level level,
         BlockPos originPos,
@@ -445,9 +449,10 @@ public abstract class Building {
     }
 
     public void destroyRandomBlocks(int amount) {
-        if (getLevel().isClientSide()) {
+        if (getLevel().isClientSide())
             return;
-        }
+        if (invulnerable)
+            return;
         ArrayList<BuildingBlock> placedBlocks = new ArrayList<>(blocks.stream()
             .filter(b -> { // avoid destroying blocks adjacent to liquids unless its a bridge or is itself a liquid
                 if (!(this instanceof AbstractBridge) && !(
@@ -856,6 +861,13 @@ public abstract class Building {
                 }
             }
         }
+        if (capturable) {
+            checkIfCaptured();
+        }
+    }
+
+    private void checkIfCaptured() {
+        // TODO: if the owner of the building has no units around, change owners if there is someone else
     }
 
     // if there aren't already too many animals nearby, spawn some random huntable animals

@@ -27,7 +27,7 @@ Features
     [❌] leash range for neutral units
     [❌] Don't destroy neutral buildings on reset
     [❌] Give buildings ability to set flags
-        - Indestructible
+        - Indestructible (also untargetable)
         - Capturable
 
 

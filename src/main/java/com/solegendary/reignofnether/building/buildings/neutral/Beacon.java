@@ -1,20 +1,12 @@
 package com.solegendary.reignofnether.building.buildings.neutral;
 
-import com.solegendary.reignofnether.ability.EnchantAbility;
 import com.solegendary.reignofnether.building.*;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.keybinds.Keybindings;
-import com.solegendary.reignofnether.research.ResearchClient;
 import com.solegendary.reignofnether.research.researchItems.*;
 import com.solegendary.reignofnether.resources.ResourceCost;
-import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.time.TimeClientEvents;
-import com.solegendary.reignofnether.tutorial.TutorialClientEvents;
-import com.solegendary.reignofnether.tutorial.TutorialStage;
-import com.solegendary.reignofnether.unit.units.neutral.EndermanProd;
-import com.solegendary.reignofnether.unit.units.villagers.PillagerProd;
-import com.solegendary.reignofnether.unit.units.villagers.VindicatorProd;
 import com.solegendary.reignofnether.util.Faction;
 import com.solegendary.reignofnether.util.MiscUtil;
 import net.minecraft.client.resources.language.I18n;
@@ -43,6 +35,9 @@ public class Beacon extends ProductionBuilding implements RangeIndicator {
     public final static ResourceCost cost = ResourceCost.Building(0,0,0,0);
 
     public final static int MAX_UPGRADE_LEVEL = 5;
+
+    public boolean capturable = true;
+    public boolean invulnerable = true;
 
     public Beacon(Level level, BlockPos originPos, Rotation rotation, String ownerName) {
         super(level, originPos, rotation, ownerName, getAbsoluteBlockData(getRelativeBlockData(level), level, originPos, rotation), false);
