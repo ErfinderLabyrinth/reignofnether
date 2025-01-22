@@ -258,11 +258,11 @@ public class ReignOfNetherCommonConfigs {
         public static final ResourceCostConfigEntry RESEARCH_CUBE_MAGMA = ResourceCostConfigEntry.Research(300, 0, 300, 140, ResourceCosts.RESEARCH_CUBE_MAGMA, "Cube Magma Research Config");
         public static final ResourceCostConfigEntry RESEARCH_SOUL_FIREBALLS = ResourceCostConfigEntry.Research(0, 350, 350, 150, ResourceCosts.RESEARCH_SOUL_FIREBALLS, "Soul Fireballs Research Config");
 
-        public static final ResourceCostConfigEntry RESEARCH_BEACON_LEVEL1 = ResourceCostConfigEntry.Research(0, 0, 150, 180, ResourceCosts.RESEARCH_BEACON_LEVEL1, "Beacon Level 1 Research Config");
-        public static final ResourceCostConfigEntry RESEARCH_BEACON_LEVEL2 = ResourceCostConfigEntry.Research(0, 0, 300, 180, ResourceCosts.RESEARCH_BEACON_LEVEL2, "Beacon Level 2 Research Config");
-        public static final ResourceCostConfigEntry RESEARCH_BEACON_LEVEL3 = ResourceCostConfigEntry.Research(0, 0, 450, 180, ResourceCosts.RESEARCH_BEACON_LEVEL3, "Beacon Level 3 Research Config");
-        public static final ResourceCostConfigEntry RESEARCH_BEACON_LEVEL4 = ResourceCostConfigEntry.Research(0, 0, 600, 180, ResourceCosts.RESEARCH_BEACON_LEVEL4, "Beacon Level 4 Research Config");
-        public static final ResourceCostConfigEntry RESEARCH_BEACON_LEVEL5 = ResourceCostConfigEntry.Research(0, 0, 750, 180, ResourceCosts.RESEARCH_BEACON_LEVEL5, "Beacon Level 5 Research Config");
+        public static final ResourceCostConfigEntry RESEARCH_BEACON_LEVEL1 = ResourceCostConfigEntry.Research(0, 0, 150, 120, ResourceCosts.RESEARCH_BEACON_LEVEL1, "Beacon Level 1 Research Config");
+        public static final ResourceCostConfigEntry RESEARCH_BEACON_LEVEL2 = ResourceCostConfigEntry.Research(0, 0, 300, 120, ResourceCosts.RESEARCH_BEACON_LEVEL2, "Beacon Level 2 Research Config");
+        public static final ResourceCostConfigEntry RESEARCH_BEACON_LEVEL3 = ResourceCostConfigEntry.Research(0, 0, 450, 120, ResourceCosts.RESEARCH_BEACON_LEVEL3, "Beacon Level 3 Research Config");
+        public static final ResourceCostConfigEntry RESEARCH_BEACON_LEVEL4 = ResourceCostConfigEntry.Research(0, 0, 600, 120, ResourceCosts.RESEARCH_BEACON_LEVEL4, "Beacon Level 4 Research Config");
+        public static final ResourceCostConfigEntry RESEARCH_BEACON_LEVEL5 = ResourceCostConfigEntry.Research(0, 0, 750, 120, ResourceCosts.RESEARCH_BEACON_LEVEL5, "Beacon Level 5 Research Config");
     }
     public static class EnchantmentCosts implements Costs {
         public static final ResourceCostConfigEntry ENCHANT_MAIMING = ResourceCostConfigEntry.Enchantment(0,20, 30, ResourceCosts.ENCHANT_MAIMING, "Maiming Enchantment Config");

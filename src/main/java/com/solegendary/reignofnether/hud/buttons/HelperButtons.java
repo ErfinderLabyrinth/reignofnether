@@ -10,6 +10,7 @@ import com.solegendary.reignofnether.hud.HudClientEvents;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
+import com.solegendary.reignofnether.sandbox.SandboxClientEvents;
 import com.solegendary.reignofnether.unit.Relationship;
 import com.solegendary.reignofnether.unit.UnitClientEvents;
 import com.solegendary.reignofnether.unit.interfaces.WorkerUnit;
@@ -105,7 +106,9 @@ public class HelperButtons {
             () -> {
                 if (hudSelectedBuilding == null)
                     return false;
-                return BuildingUtils.getTotalCompletedBuildingsOwned(true, hudSelectedBuilding.ownerName) == 0;
+                boolean isSandboxPlayer = MC.player != null && SandboxClientEvents.isSandboxPlayer(MC.player.getName().getString());
+                return BuildingUtils.getTotalCompletedBuildingsOwned(true, hudSelectedBuilding.ownerName) == 0 &&
+                        !isSandboxPlayer;
             },
             () -> true,
             () -> {

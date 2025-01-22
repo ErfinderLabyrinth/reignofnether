@@ -52,7 +52,7 @@ public class ResearchBeaconLevel5 extends ProductionItem {
                 () -> BuildingServerboundPacket.startProduction(prodBuilding.originPos, itemName),
                 null,
                 List.of(
-                        FormattedCharSequence.forward(I18n.get("research.reignofnether.beacon_level4"), Style.EMPTY.withBold(true)),
+                        FormattedCharSequence.forward(I18n.get("research.reignofnether.beacon_level5"), Style.EMPTY.withBold(true)),
                         ResourceCosts.getFormattedCost(cost),
                         ResourceCosts.getFormattedTime(cost),
                         FormattedCharSequence.forward("", Style.EMPTY),
