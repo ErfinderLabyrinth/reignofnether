@@ -1,15 +1,15 @@
 package com.solegendary.reignofnether.hud.buttons;
 
 import com.solegendary.reignofnether.ReignOfNether;
-import com.solegendary.reignofnether.building.BuildingClientEvents;
-import com.solegendary.reignofnether.building.BuildingServerEvents;
-import com.solegendary.reignofnether.building.BuildingServerboundPacket;
-import com.solegendary.reignofnether.building.BuildingUtils;
+import com.solegendary.reignofnether.building.*;
+import com.solegendary.reignofnether.building.buildings.neutral.Beacon;
 import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.hud.HudClientEvents;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
+import com.solegendary.reignofnether.player.PlayerClientEvents;
+import com.solegendary.reignofnether.player.RTSPlayer;
 import com.solegendary.reignofnether.sandbox.SandboxClientEvents;
 import com.solegendary.reignofnether.unit.Relationship;
 import com.solegendary.reignofnether.unit.UnitClientEvents;
@@ -17,17 +17,20 @@ import com.solegendary.reignofnether.unit.interfaces.WorkerUnit;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.solegendary.reignofnether.hud.HudClientEvents.hudSelectedBuilding;
 import static com.solegendary.reignofnether.unit.UnitClientEvents.getPlayerToEntityRelationship;
 import static com.solegendary.reignofnether.unit.UnitClientEvents.idleWorkerIds;
+import static com.solegendary.reignofnether.util.MiscUtil.fcs;
 
 public class HelperButtons {
 
@@ -142,4 +145,38 @@ public class HelperButtons {
             null,
             List.of(FormattedCharSequence.forward(I18n.get("hud.helperbuttons.reignofnether.select_all_military_units"), Style.EMPTY))
     );
+
+    private static List<FormattedCharSequence> getBeaconButtonTooltip() {
+        ArrayList<FormattedCharSequence> fcsList = new ArrayList<>();
+        fcsList.add(fcs(I18n.get("hud.helperbuttons.reignofnether.beacon.time_to_win")));
+        for (String playerName : PlayerClientEvents.beaconWinTimes.keySet()) {
+            fcsList.add(fcs(I18n.get("hud.helperbuttons.reignofnether.beacon.player_and_time",
+                    playerName, PlayerClientEvents.beaconWinTimes.get(playerName))));
+        }
+        fcsList.add(fcs(I18n.get("hud.helperbuttons.reignofnether.idle_workers")));
+        return fcsList;
+    }
+
+    // button that tracks all beacons in the game, including how long each player has owned a beacon for
+    // clicking the button should make
+    public static Button getBeaconButton(String buildingName) {
+        return new Button(
+                "Beacon",
+                14,
+                new ResourceLocation("minecraft", "textures/item/nether_star.png"),
+                (Keybinding) null,
+                () -> false,
+                () -> BuildingUtils.beaconExists(true),
+                () -> true,
+                () -> {
+                    List<Building> beacons = BuildingClientEvents.getBuildings().stream().filter(b -> b instanceof Beacon).toList();
+                    if (!beacons.isEmpty()) {
+                        BlockPos bp = beacons.get(0).centrePos;
+                        OrthoviewClientEvents.centreCameraOnPos(bp.getX(), bp.getZ());
+                    }
+                },
+                null,
+                getBeaconButtonTooltip()
+        );
+    }
 }

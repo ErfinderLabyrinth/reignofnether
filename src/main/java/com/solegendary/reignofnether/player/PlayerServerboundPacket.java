@@ -131,6 +131,9 @@ public class PlayerServerboundPacket {
     public static void resetRTS() {
         PacketHandler.INSTANCE.sendToServer(new PlayerServerboundPacket(PlayerAction.RESET_RTS, 0, 0d, 0d, 0d));
     }
+    public static void resetRTSHard() {
+        PacketHandler.INSTANCE.sendToServer(new PlayerServerboundPacket(PlayerAction.RESET_RTS_HARD, 0, 0d, 0d, 0d));
+    }
 
     public static void surrender() {
         Minecraft MC = Minecraft.getInstance();
@@ -215,7 +218,8 @@ public class PlayerServerboundPacket {
                 case START_RTS_SANDBOX ->
                     PlayerServerEvents.startRTS(this.playerId, new Vec3(this.x, this.y, this.z), Faction.NONE);
                 case DEFEAT -> PlayerServerEvents.defeat(this.playerId, Component.translatable("server.reignofnether.surrendered").getString());
-                case RESET_RTS -> PlayerServerEvents.resetRTS();
+                case RESET_RTS -> PlayerServerEvents.resetRTS(false);
+                case RESET_RTS_HARD -> PlayerServerEvents.resetRTS(true);
                 case LOCK_RTS -> PlayerServerEvents.setRTSLock(true);
                 case UNLOCK_RTS -> PlayerServerEvents.setRTSLock(false);
                 case ENABLE_RTS_SYNCING -> PlayerServerEvents.setRTSSyncingEnabled(true);

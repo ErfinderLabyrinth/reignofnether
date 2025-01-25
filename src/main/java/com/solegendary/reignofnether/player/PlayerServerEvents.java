@@ -185,6 +185,11 @@ public class PlayerServerEvents {
                     if (rtsGameTicks % 200 == 0) {
                         PlayerClientboundPacket.syncRtsGameTime(rtsGameTicks);
                     }
+                    if (rtsGameTicks % 20 == 0) {
+                        for (RTSPlayer rtsPlayer : rtsPlayers) {
+                            PlayerClientboundPacket.syncBeaconWinTimes(rtsPlayer.name, rtsPlayer.beaconOwnerTicks);
+                        }
+                    }
                 }
             }
         }
@@ -677,14 +682,9 @@ public class PlayerServerEvents {
     @SubscribeEvent
     public static void onRegisterCommand(RegisterCommandsEvent evt) {
         AllyCommand.register(evt.getDispatcher());
-
-        evt.getDispatcher().register(Commands.literal("rts-reset").executes((command) -> {
-            resetRTS();
-            return 1;
-        }));
     }
 
-    public static void resetRTS() {
+    public static void resetRTS(boolean destroyAllBuildings) {
         synchronized (rtsPlayers) {
             rtsPlayers.clear();
 
@@ -696,7 +696,7 @@ public class PlayerServerEvents {
             for (Building building : BuildingServerEvents.getBuildings()) {
                 if (building instanceof ProductionBuilding productionBuilding)
                     productionBuilding.productionQueue.clear();
-                if (!building.shouldDestroyOnReset)
+                if (!building.shouldDestroyOnReset || destroyAllBuildings)
                     building.destroy((ServerLevel) building.getLevel());
             }
             BuildingServerEvents.getBuildings().clear();

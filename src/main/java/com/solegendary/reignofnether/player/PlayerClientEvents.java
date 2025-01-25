@@ -25,17 +25,18 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class PlayerClientEvents {
 
     public static boolean isRTSPlayer = false;
-
     public static long rtsGameTicks = 0;
-
     private static final Minecraft MC = Minecraft.getInstance();
-
     public static boolean rtsLocked = false;
-
     public static boolean canStartRTS = true;
+
+    public static Map<String, Long> beaconWinTimes = new HashMap<>();
 
     @SubscribeEvent
     public static void onRegisterCommand(RegisterClientCommandsEvent evt) {
@@ -47,6 +48,13 @@ public class PlayerClientEvents {
         evt.getDispatcher().register(Commands.literal("rts-reset").executes((command) -> {
             if (MC.player != null && MC.player.hasPermissions(4)) {
                 PlayerServerboundPacket.resetRTS();
+                return 1;
+            }
+            return 0;
+        }));
+        evt.getDispatcher().register(Commands.literal("rts-hard-reset").executes((command) -> {
+            if (MC.player != null && MC.player.hasPermissions(4)) {
+                PlayerServerboundPacket.resetRTSHard();
                 return 1;
             }
             return 0;
@@ -266,5 +274,9 @@ public class PlayerClientEvents {
 
     public static void setCanStartRTS(boolean canStart) {
         canStartRTS = canStart;
+    }
+
+    public static void syncBeaconWinTime(String playerName, long ticks) {
+        beaconWinTimes.put(playerName, ticks);
     }
 }

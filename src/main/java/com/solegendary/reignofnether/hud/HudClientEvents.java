@@ -1291,6 +1291,9 @@ public class HudClientEvents {
                 renderedButtons.add(nextWaveButton);
             }
         }
+        else if (BuildingUtils.beaconExists(true)) {
+
+        }
 
         // --------------------
         // Tutorial Help button

@@ -14,6 +14,7 @@ public enum PlayerAction {
     DISABLE_RTS,
     ENABLE_RTS,
     RESET_RTS,
+    RESET_RTS_HARD,
     SYNC_RTS_GAME_TIME,
     LOCK_RTS,
     UNLOCK_RTS,
@@ -24,5 +25,6 @@ public enum PlayerAction {
     SYNC_MAX_POPULATION,
     SET_MIN_ORTHOVIEW_Y,
     SYNC_NEUTRAL_AGGRO,
-    ENABLE_SANDBOX
+    ENABLE_SANDBOX,
+    SYNC_BEACON_WIN_TIME
 }

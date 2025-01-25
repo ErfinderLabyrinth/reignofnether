@@ -3,8 +3,10 @@ package com.solegendary.reignofnether.building;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.alliance.AllianceSystem;
 import com.solegendary.reignofnether.building.buildings.monsters.Laboratory;
+import com.solegendary.reignofnether.building.buildings.neutral.Beacon;
 import com.solegendary.reignofnether.building.buildings.piglins.Portal;
 import com.solegendary.reignofnether.building.buildings.shared.AbstractBridge;
 import com.solegendary.reignofnether.building.buildings.villagers.Castle;
@@ -34,7 +36,9 @@ import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
+import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
@@ -59,6 +63,7 @@ import java.util.List;
 
 import static com.solegendary.reignofnether.hud.HudClientEvents.*;
 import static com.solegendary.reignofnether.unit.UnitClientEvents.getSelectedUnits;
+import static com.solegendary.reignofnether.unit.UnitClientEvents.idleWorkerIds;
 
 public class BuildingClientEvents {
 
@@ -1063,15 +1068,9 @@ public class BuildingClientEvents {
     public static boolean hasFinishedBuilding(String buildingName) {
         for (Building building : buildings)
             if (building.name.equals(buildingName) && building.isBuilt && MC.player != null
-                && building.ownerName.equals(MC.player.getName().getString())) {
+                    && building.ownerName.equals(MC.player.getName().getString())) {
                 return true;
             }
         return false;
-    }
-
-    // button that tracks all beacons in the game, including how long each player has owned a beacon for
-    // clicking the button should make
-    public static Button getBeaconStatusButton(String buildingName) {
-        return null;
     }
 }

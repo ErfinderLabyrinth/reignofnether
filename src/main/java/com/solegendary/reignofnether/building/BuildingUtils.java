@@ -79,6 +79,10 @@ public class BuildingUtils {
         if (buildingName.toLowerCase().contains("bridge"))
             ownerName = "";
 
+        if (buildingName.equals(Beacon.buildingName))
+            if (BuildingUtils.beaconExists(false))
+                return null;
+
         Building building = null;
         switch(buildingName) {
             case OakBridge.buildingName -> building = new OakBridge(level, pos, rotation, ownerName, isDiagonalBridge);
@@ -119,7 +123,6 @@ public class BuildingUtils {
             case WitherShrine.buildingName -> building = new WitherShrine(level, pos, rotation, ownerName);
             case BasaltSprings.buildingName -> building = new BasaltSprings(level, pos, rotation, ownerName);
             case Fortress.buildingName -> building = new Fortress(level, pos, rotation, ownerName);
-
             case Beacon.buildingName -> building = new Beacon(level, pos, rotation, ownerName);
         }
         if (building != null)
@@ -316,4 +319,8 @@ public class BuildingUtils {
                 : BuildingServerEvents.getBuildings();
     }
 
+    public static boolean beaconExists(boolean isClientSide) {
+        List<Building> buildings = getBuildingsList(isClientSide);
+        return buildings.stream().filter(b -> b instanceof Beacon).toList().isEmpty();
+    }
 }

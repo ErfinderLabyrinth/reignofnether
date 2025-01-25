@@ -36,8 +36,8 @@ Features
     [🟡] Give buildings ability to set flags
         - invulnerable (also untargetable)
         - Capturable
-    [❌] Only allow one beacon at a time
-    [❌] Prevent the beacon block itself being damaged
+    [🟡] Only allow one beacon at a time
+    [🟡] Prevent the beacon block itself being damaged
     [❌] Allow a beacon to be built in wave survival mode as the only way to truly win
         - Require all upgrades to be researched before the win timer begins
         - Greatly increase the cost and time of upgrades

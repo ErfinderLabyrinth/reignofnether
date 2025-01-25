@@ -19,6 +19,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Rotation;
 
@@ -133,6 +134,13 @@ public class Beacon extends ProductionBuilding implements RangeIndicator {
         return true;
     }
 
+    @Override
+    public boolean canDestroyBlock(BlockPos relativeBp) {
+        BlockPos worldBp = relativeBp.offset(this.originPos);
+        Block block = this.getLevel().getBlockState(worldBp).getBlock();
+        return block != Blocks.BEACON;
+    }
+
     public void changeStructure(int structureLevel) {
         String newStructureName = switch (structureLevel) {
             case 1 -> Beacon.structureNameT1;
@@ -160,14 +168,16 @@ public class Beacon extends ProductionBuilding implements RangeIndicator {
                 hotkey,
                 () -> BuildingClientEvents.getBuildingToPlace() == Beacon.class,
                 () -> false,
-                () -> true,
+                () -> !BuildingClientEvents.getBuildings().stream().filter(b -> b instanceof Beacon).toList().isEmpty(),
                 () -> BuildingClientEvents.setBuildingToPlace(Beacon.class),
                 null,
                 List.of(
                         FormattedCharSequence.forward(I18n.get("buildings.neutral.reignofnether.beacon"), Style.EMPTY.withBold(true)),
                         FormattedCharSequence.forward("", Style.EMPTY),
                         FormattedCharSequence.forward(I18n.get("buildings.neutral.reignofnether.beacon.tooltip1"), Style.EMPTY),
-                        FormattedCharSequence.forward(I18n.get("buildings.neutral.reignofnether.beacon.tooltip2"), Style.EMPTY)
+                        FormattedCharSequence.forward(I18n.get("buildings.neutral.reignofnether.beacon.tooltip2"), Style.EMPTY),
+                        FormattedCharSequence.forward("", Style.EMPTY),
+                        FormattedCharSequence.forward(I18n.get("buildings.neutral.reignofnether.beacon.tooltip3"), Style.EMPTY)
                 ),
                 null
         );
