@@ -17,6 +17,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
@@ -41,6 +42,8 @@ public class Beacon extends ProductionBuilding implements RangeIndicator {
     public final static int MAX_UPGRADE_LEVEL = 5;
 
     public final static int TICKS_TO_WIN = 24000; // 20mins
+
+    private MobEffect auraEffect = null;
 
     public boolean capturable = true;
     public boolean invulnerable = true;
@@ -76,6 +79,14 @@ public class Beacon extends ProductionBuilding implements RangeIndicator {
                     true, ownerName);
             SoundClientboundPacket.playSoundForAllPlayers(SoundAction.CHAT);
         }
+    }
+
+    public MobEffect getAuraEffect() { return auraEffect; }
+
+    public void setAuraEffect(MobEffect effect) {
+        // turn off the beacon
+        // after delay, turn on the beacon and change the effect
+        auraEffect = effect;
     }
 
     @Override
@@ -203,3 +214,14 @@ public class Beacon extends ProductionBuilding implements RangeIndicator {
         return getUpgradeLevel() > 0;
     }
 }
+
+
+
+
+
+
+
+
+
+
+
