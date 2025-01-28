@@ -785,7 +785,8 @@ public class BuildingClientEvents {
                         }
                     }
                     String ownerName = MC.player.getName().getString();
-                    if (SandboxClientEvents.isSandboxPlayer(ownerName) && !hasSelectedWorkers) {
+                    if (SandboxClientEvents.isSandboxPlayer(ownerName) && !hasSelectedWorkers &&
+                        !buildingName.toLowerCase().contains("bridge")) {
                         if (SandboxClientEvents.relationship == Relationship.NEUTRAL)
                             ownerName = "";
                         else if (SandboxClientEvents.relationship == Relationship.HOSTILE)
@@ -898,8 +899,8 @@ public class BuildingClientEvents {
         if (evt.getKeyCode() == GLFW.GLFW_KEY_DELETE) {
             boolean isSandboxPlayer = MC.player != null && SandboxClientEvents.isSandboxPlayer(MC.player.getName().getString());
             Building building = HudClientEvents.hudSelectedBuilding;
-            if (building != null && building.isBuilt &&
-                (getPlayerToBuildingRelationship(building) == Relationship.OWNED || isSandboxPlayer)) {
+            if (building != null &&
+                ((building.isBuilt && getPlayerToBuildingRelationship(building) == Relationship.OWNED) || isSandboxPlayer)) {
                 HudClientEvents.hudSelectedBuilding = null;
                 BuildingServerboundPacket.cancelBuilding(building.minCorner);
             }

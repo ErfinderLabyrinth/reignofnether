@@ -10,43 +10,32 @@ Features
 --------
 
 [❌] Sandbox mode
-    [✔] Should not be allowed to be defeated unless using /rts-surrender
-    [✔] Should lock other players into sandbox too
-    [✔] Allow placement of neutral buildings on bottom left if nothing is selected
     [❌] Add End portal to build endermen
-    [🟡] Add Beacon
-        [🟡] Aura-switch ability
-        [🟡] Activate the beacon beam
-        [🟡] Save upgrade level (refactor save data to have upgrade levels)
-        [🟡] Win when controlling it for long enough
-            - Save time accumulated to RTSPlayer
-        [🟡] Warnings when the beacon is captured or is close to giving a victory
-        [🟡] Track beacon button at top right
-            - Click to centre map on the beacon
-            - Show current owner
-            - Should list how long all players who ever controlled the beacon have to win
-            - BuildingClientEvents.getBeaconStatusButton()
-
     [❌] Add Healing fountain
-    [❌] save status to level - not synced to clientside
-    [✔] add spawn-unit options
-    [❌] leash range for neutral units
-    [🟡] Don't destroy neutral buildings on reset
-        - Change rts-reset to not include neutral buildings placed in sandbox (have a flag for that)
+    [❌] Add option to make neutral units a permanent fixture
+        - add option to reset at bottom left when selected
+        - on /rts-reset, kill and respawn it back at the original location
+        - enforce a leash range
     [🟡] Give buildings ability to set flags
-        - invulnerable (also untargetable)
+        - Invulnerable (also untargetable)
         - Capturable
-    [🟡] Only allow one beacon at a time
-    [🟡] Prevent the beacon block itself being damaged
+    [🟡] Prevent the beacon, or the beacon block itself being damaged
     [❌] Allow a beacon to be built in wave survival mode as the only way to truly win
         - Require all upgrades to be researched before the win timer begins
         - Greatly increase the cost and time of upgrades
         - Remove the invulnerable flag
 
+    [❌] Flatten terrain tool
+
+    [❌] Add polar bears, wolves, llamas and foxes as neutral unit options
+
+
 
 Bugfixes
 --------
-[❌] Make necromancer eye height higher
+
+[❌] Investigate alliance switching bug
+
 
 
 Quality of Life

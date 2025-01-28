@@ -704,9 +704,9 @@ public class PlayerServerEvents {
             PlayerClientboundPacket.resetRTS(destroyAllBuildings);
             if (!TutorialServerEvents.isEnabled()) {
                 if (destroyAllBuildings)
-                    sendMessageToAllPlayers("server.reignofnether.match_reset", true);
-                else
                     sendMessageToAllPlayers("server.reignofnether.match_reset_hard", true);
+                else
+                    sendMessageToAllPlayers("server.reignofnether.match_reset", true);
             }
             ResourcesServerEvents.resourcesList.clear();
             BuildingServerEvents.netherZones.forEach(NetherZone::startRestoring);
