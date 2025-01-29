@@ -13,6 +13,7 @@ import com.solegendary.reignofnether.registrars.GameRuleRegistrar;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
 import com.solegendary.reignofnether.research.researchItems.*;
 import com.solegendary.reignofnether.resources.ResourceCost;
+import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.sounds.SoundAction;
 import com.solegendary.reignofnether.sounds.SoundClientboundPacket;
 import com.solegendary.reignofnether.time.NightUtils;
@@ -60,7 +61,7 @@ public class Beacon extends ProductionBuilding implements RangeIndicator {
     public final static String structureNameT3 = "beacon_t3";
     public final static String structureNameT4 = "beacon_t4";
     public final static String structureNameT5 = "beacon_t5";
-    public final static ResourceCost cost = ResourceCost.Building(0,0,0,0);
+    public final static ResourceCost cost = ResourceCosts.BEACON;
 
     public final static int MAX_UPGRADE_LEVEL = 5;
 
@@ -83,6 +84,7 @@ public class Beacon extends ProductionBuilding implements RangeIndicator {
         this.woodCost = cost.wood;
         this.oreCost = cost.ore;
         this.popSupply = cost.population;
+        this.buildTimeModifier = 2.0f;
 
         this.capturable = true;
         this.invulnerable = true;
@@ -330,6 +332,7 @@ public class Beacon extends ProductionBuilding implements RangeIndicator {
                 null,
                 List.of(
                         FormattedCharSequence.forward(I18n.get("buildings.neutral.reignofnether.beacon"), Style.EMPTY.withBold(true)),
+                        ResourceCosts.getFormattedCost(cost),
                         FormattedCharSequence.forward("", Style.EMPTY),
                         FormattedCharSequence.forward(I18n.get("buildings.neutral.reignofnether.beacon.tooltip1"), Style.EMPTY),
                         FormattedCharSequence.forward(I18n.get("buildings.neutral.reignofnether.beacon.tooltip2"), Style.EMPTY),

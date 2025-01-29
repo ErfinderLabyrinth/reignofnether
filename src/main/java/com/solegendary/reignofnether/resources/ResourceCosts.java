@@ -47,6 +47,7 @@ public class ResourceCosts {
     public static final ResourceCost PIGLIN_MERCHANT = new ResourceCost(ID, "PIGLIN_MERCHANT");
 
     //BUILDINGS
+    public static final ResourceCost BEACON = new ResourceCost(ID, "BEACON");
 
     public static final ResourceCost STOCKPILE = new ResourceCost(ID, "STOCKPILE");
     public static final ResourceCost OAK_BRIDGE = new ResourceCost(ID, "OAK_BRIDGE");
@@ -205,6 +206,8 @@ public class ResourceCosts {
         MAGMA_CUBE.bakeValues(ReignOfNetherCommonConfigs.UnitCosts.MAGMA_CUBE);
         PIGLIN_MERCHANT.bakeValues(ReignOfNetherCommonConfigs.UnitCosts.PIGLIN_MERCHANT);
         // ******************* BUILDINGS ******************* //
+        BEACON.bakeValues(ReignOfNetherCommonConfigs.BuildingCosts.BEACON);
+
         STOCKPILE.bakeValues(ReignOfNetherCommonConfigs.BuildingCosts.STOCKPILE);
         OAK_BRIDGE.bakeValues(ReignOfNetherCommonConfigs.BuildingCosts.OAK_BRIDGE);
         SPRUCE_BRIDGE.bakeValues(ReignOfNetherCommonConfigs.BuildingCosts.SPRUCE_BRIDGE);

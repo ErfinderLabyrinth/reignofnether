@@ -232,7 +232,7 @@ public class BuildingServerEvents {
                 }
             }
 
-            if (newBuilding.canAfford(ownerName) || SandboxServer.isAnyoneASandboxPlayer()) {
+            if (newBuilding.canAfford(ownerName)) {
                 buildings.add(newBuilding);
                 newBuilding.forceChunk(true);
                 int minY = BuildingUtils.getMinCorner(newBuilding.blocks).getY();
