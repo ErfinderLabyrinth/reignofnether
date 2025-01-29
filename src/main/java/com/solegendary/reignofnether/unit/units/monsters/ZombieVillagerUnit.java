@@ -1,6 +1,7 @@
 package com.solegendary.reignofnether.unit.units.monsters;
 
 import com.solegendary.reignofnether.building.buildings.monsters.*;
+import com.solegendary.reignofnether.building.buildings.neutral.Beacon;
 import com.solegendary.reignofnether.building.buildings.villagers.*;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybindings;
@@ -179,7 +180,8 @@ public class ZombieVillagerUnit extends Vindicator implements Unit, WorkerUnit, 
             Laboratory.getBuildButton(Keybindings.keyP),
             Stronghold.getBuildButton(Keybindings.keyL),
             SpruceBridge.getBuildButton(Keybindings.keyC),
-            SculkCatalyst.getBuildButton(Keybindings.keyV)
+            SculkCatalyst.getBuildButton(Keybindings.keyV),
+            Beacon.getBuildButton(null)
         );
     }
 

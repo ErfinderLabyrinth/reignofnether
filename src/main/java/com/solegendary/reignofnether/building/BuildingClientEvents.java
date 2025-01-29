@@ -904,7 +904,7 @@ public class BuildingClientEvents {
             if (building != null &&
                 ((building.isBuilt && getPlayerToBuildingRelationship(building) == Relationship.OWNED) || isSandboxPlayer)) {
                 HudClientEvents.hudSelectedBuilding = null;
-                BuildingServerboundPacket.cancelBuilding(building.minCorner);
+                BuildingServerboundPacket.cancelBuilding(building.minCorner, MC.player.getName().getString());
             }
         }
     }

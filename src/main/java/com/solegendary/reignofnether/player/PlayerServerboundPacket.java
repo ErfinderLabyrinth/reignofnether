@@ -95,7 +95,7 @@ public class PlayerServerboundPacket {
             if (ClientGameModeHelper.gameMode == GameMode.SURVIVAL) {
                 SurvivalServerboundPacket.startSurvivalMode(SurvivalClientEvents.difficulty);
 
-                CompletableFuture.delayedExecutor(3000, TimeUnit.MILLISECONDS).execute(() -> {
+                CompletableFuture.delayedExecutor(2000, TimeUnit.MILLISECONDS).execute(() -> {
                     WaveDifficulty diff = SurvivalClientEvents.difficulty;
                     String diffMsg = I18n.get("hud.gamemode.reignofnether.survival5",
                             diff, SurvivalClientEvents.getMinutesPerDay()).toLowerCase();
@@ -114,7 +114,7 @@ public class PlayerServerboundPacket {
                 Beacon beacon = BuildingUtils.getBeacon(false);
                 boolean isKotB = beacon != null && beacon.capturable;
                 if (isKotB) {
-                    CompletableFuture.delayedExecutor(3000, TimeUnit.MILLISECONDS).execute(() -> {
+                    CompletableFuture.delayedExecutor(2000, TimeUnit.MILLISECONDS).execute(() -> {
                         MC.player.sendSystemMessage(Component.literal(""));
                         MC.player.sendSystemMessage(Component.translatable("hud.gamemode.reignofnether.kotb1")
                                 .withStyle(Style.EMPTY.withBold(true)));
@@ -124,7 +124,7 @@ public class PlayerServerboundPacket {
                         MC.player.sendSystemMessage(Component.literal(""));
                     });
                 } else {
-                    CompletableFuture.delayedExecutor(3000, TimeUnit.MILLISECONDS).execute(() -> {
+                    CompletableFuture.delayedExecutor(2000, TimeUnit.MILLISECONDS).execute(() -> {
                         MC.player.sendSystemMessage(Component.literal(""));
                         MC.player.sendSystemMessage(Component.translatable("hud.gamemode.reignofnether.classic1")
                                 .withStyle(Style.EMPTY.withBold(true)));
@@ -135,7 +135,7 @@ public class PlayerServerboundPacket {
                     });
                 }
             } else if (ClientGameModeHelper.gameMode == GameMode.SANDBOX) {
-                CompletableFuture.delayedExecutor(3000, TimeUnit.MILLISECONDS).execute(() -> {
+                CompletableFuture.delayedExecutor(2000, TimeUnit.MILLISECONDS).execute(() -> {
                     MC.player.sendSystemMessage(Component.literal(""));
                     MC.player.sendSystemMessage(Component.translatable("hud.gamemode.reignofnether.sandbox1")
                             .withStyle(Style.EMPTY.withBold(true)));

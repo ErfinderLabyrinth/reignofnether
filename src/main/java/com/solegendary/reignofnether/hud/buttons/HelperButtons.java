@@ -116,7 +116,8 @@ public class HelperButtons {
             },
             () -> true,
             () -> {
-                BuildingServerboundPacket.cancelBuilding(hudSelectedBuilding.minCorner);
+                if (MC.player != null)
+                    BuildingServerboundPacket.cancelBuilding(hudSelectedBuilding.minCorner, MC.player.getName().getString());
                 hudSelectedBuilding = null;
             },
             null,
@@ -149,11 +150,11 @@ public class HelperButtons {
 
     private static List<FormattedCharSequence> getBeaconButtonTooltip(String ownerName) {
         ArrayList<FormattedCharSequence> fcsList = new ArrayList<>();
-        fcsList.add(fcs(I18n.get("hud.helperbuttons.reignofnether.beacon.time_to_win")));
 
         if (PlayerClientEvents.beaconWinTimes.isEmpty()) {
             fcsList.add(fcs(I18n.get("hud.helperbuttons.reignofnether.beacon.no_controller")));
         } else {
+            fcsList.add(fcs(I18n.get("hud.helperbuttons.reignofnether.beacon.time_to_win")));
             for (String playerName : PlayerClientEvents.beaconWinTimes.keySet()) {
                 long ticksToWin = Math.max(0, Beacon.TICKS_TO_WIN - PlayerClientEvents.beaconWinTimes.get(playerName));
                 String timeToWin = TimeUtils.getTimeStrFromTicks(ticksToWin);

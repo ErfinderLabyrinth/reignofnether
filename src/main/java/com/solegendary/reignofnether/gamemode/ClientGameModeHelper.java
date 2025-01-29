@@ -18,10 +18,10 @@ public class ClientGameModeHelper {
     public static GameMode DEFAULT_GAMEMODE = GameMode.CLASSIC;
     public static GameMode gameMode = DEFAULT_GAMEMODE;
     public static boolean gameModeLocked = false; // locked with startRTS() in any gamemode, unlocked with /rts-reset
-    public static boolean classicModeOnly = false;
+    public static boolean classicAndBeaconModeOnly = false;
 
     public static void cycleGameMode() {
-        if (gameModeLocked || classicModeOnly)
+        if (gameModeLocked || classicAndBeaconModeOnly)
             return;
         switch (gameMode) {
             case CLASSIC -> gameMode = GameMode.SURVIVAL;
@@ -30,9 +30,9 @@ public class ClientGameModeHelper {
         }
     }
 
-    public static void setClassicModeOnly(boolean value) {
-        classicModeOnly = value;
-        if (classicModeOnly) {
+    public static void setClassicAndBeaconModeOnly(boolean value) {
+        classicAndBeaconModeOnly = value;
+        if (classicAndBeaconModeOnly) {
             gameMode = GameMode.CLASSIC;
         }
     }
@@ -48,7 +48,7 @@ public class ClientGameModeHelper {
     }
 
     private static String getLockedString() {
-        return gameModeLocked || classicModeOnly ? " " + I18n.get("hud.gamemode.reignofnether.locked") : "";
+        return gameModeLocked || classicAndBeaconModeOnly ? " " + I18n.get("hud.gamemode.reignofnether.locked") : "";
     }
 
     private static boolean isKotB() {
@@ -64,7 +64,7 @@ public class ClientGameModeHelper {
                 (Keybinding) null,
                 () -> false,
                 () -> false,
-                () -> !gameModeLocked && !classicModeOnly,
+                () -> !gameModeLocked && !classicAndBeaconModeOnly,
                 null,
                 ClientGameModeHelper::cycleGameMode,
                 List.of(
@@ -87,7 +87,7 @@ public class ClientGameModeHelper {
                 (Keybinding) null,
                 () -> false,
                 () -> false,
-                () -> !gameModeLocked && !classicModeOnly,
+                () -> !gameModeLocked && !classicAndBeaconModeOnly,
                 null,
                 ClientGameModeHelper::cycleGameMode,
                 List.of(
@@ -120,7 +120,7 @@ public class ClientGameModeHelper {
                     (Keybinding) null,
                     () -> false,
                     () -> false,
-                    () -> !gameModeLocked && !classicModeOnly,
+                    () -> !gameModeLocked && !classicAndBeaconModeOnly,
                     ClientGameModeHelper::cycleWaveDifficulty,
                     ClientGameModeHelper::cycleGameMode,
                     List.of(
@@ -144,7 +144,7 @@ public class ClientGameModeHelper {
                     (Keybinding) null,
                     () -> false,
                     () -> false,
-                    () -> !gameModeLocked && !classicModeOnly,
+                    () -> !gameModeLocked && !classicAndBeaconModeOnly,
                     null,
                     ClientGameModeHelper::cycleGameMode,
                     List.of(

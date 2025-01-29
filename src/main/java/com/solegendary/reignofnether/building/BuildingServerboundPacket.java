@@ -60,10 +60,10 @@ public class BuildingServerboundPacket {
                 BuildingAction.PLACE_AND_QUEUE,
                 itemName, originPos, BlockPos.ZERO, rotation, ownerName, builderUnitIds, isDiagonalBridge));
     }
-    public static void cancelBuilding(BlockPos buildingPos) {
+    public static void cancelBuilding(BlockPos buildingPos, String ownerName) {
         PacketHandler.INSTANCE.sendToServer(new BuildingServerboundPacket(
                 BuildingAction.DESTROY,
-                "", buildingPos, BlockPos.ZERO, Rotation.NONE, "", new int[0], false));
+                "", buildingPos, BlockPos.ZERO, Rotation.NONE, ownerName, new int[0], false));
     }
     public static void setRallyPoint(BlockPos buildingPos, BlockPos rallyPos) {
         PacketHandler.INSTANCE.sendToServer(new BuildingServerboundPacket(

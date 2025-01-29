@@ -264,6 +264,8 @@ public class PlayerClientEvents {
             building.ownerName = "";
         ResourcesClientEvents.resourcesList.clear();
         ClientGameModeHelper.gameMode = ClientGameModeHelper.DEFAULT_GAMEMODE;
+        ClientGameModeHelper.gameModeLocked = false;
+        PlayerClientEvents.beaconWinTimes.clear();
         SurvivalClientEvents.reset();
     }
 

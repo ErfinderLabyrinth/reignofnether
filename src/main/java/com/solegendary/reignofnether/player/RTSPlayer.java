@@ -97,7 +97,7 @@ public class RTSPlayer {
         for (Building building : BuildingServerEvents.getBuildings()) {
             if (building instanceof Beacon beacon && beacon.isBuilt) {
                 if (building.ownerName.equals(this.name)) {
-                    beaconOwnerTicks += 10;
+                    beaconOwnerTicks += 1;
                     if (beaconOwnerTicks == Beacon.TICKS_TO_WIN / 4 ||
                         beaconOwnerTicks == Beacon.TICKS_TO_WIN / 2 ||
                         beaconOwnerTicks == (Beacon.TICKS_TO_WIN * 3) / 4 ||

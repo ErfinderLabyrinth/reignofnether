@@ -100,9 +100,9 @@ public class PlayerClientboundPacket {
                 new PlayerClientboundPacket(PlayerAction.SYNC_ALLOW_BEACONS, "", allowBeacons ? 1L : 0L));
     }
 
-    public static void syncClassicModeOnly(boolean classicModeOnly) {
+    public static void syncClassicAndBeaconModeOnly(boolean classicAndBeaconModeOnly) {
         PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(),
-                new PlayerClientboundPacket(PlayerAction.SYNC_CLASSIC_MODE_ONLY, "", classicModeOnly ? 1L : 0L));
+                new PlayerClientboundPacket(PlayerAction.SYNC_CLASSIC_MODE_ONLY, "", classicAndBeaconModeOnly ? 1L : 0L));
     }
 
     public PlayerClientboundPacket(PlayerAction playerAction, String playerName, Long value) {
@@ -147,7 +147,7 @@ public class PlayerClientboundPacket {
                             case SYNC_NEUTRAL_AGGRO -> UnitClientEvents.neutralAggro = value == 1L;
                             case SYNC_BEACON_OWNER_TICKS -> PlayerClientEvents.syncBeaconOwnerTicks(playerName, value);
                             case SYNC_ALLOW_BEACONS -> BuildingClientEvents.allowBeacons = value == 1L;
-                            case SYNC_CLASSIC_MODE_ONLY -> ClientGameModeHelper.setClassicModeOnly(value == 1L);
+                            case SYNC_CLASSIC_MODE_ONLY -> ClientGameModeHelper.setClassicAndBeaconModeOnly(value == 1L);
                         }
                         success.set(true);
                     });

@@ -2,13 +2,10 @@ package com.solegendary.reignofnether.gamerules;
 
 import com.mojang.brigadier.context.ParsedArgument;
 import com.mojang.brigadier.context.ParsedCommandNode;
-import com.solegendary.reignofnether.gamemode.GameModeClientboundPacket;
 import com.solegendary.reignofnether.player.PlayerClientboundPacket;
 import com.solegendary.reignofnether.registrars.GameRuleRegistrar;
-import com.solegendary.reignofnether.unit.UnitClientEvents;
 import com.solegendary.reignofnether.unit.UnitServerEvents;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
-import com.solegendary.reignofnether.unit.packets.UnitSyncClientboundPacket;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.LivingEntity;
@@ -66,11 +63,11 @@ public class GameruleServerEvents {
                 boolean value = (boolean) args.get("value").getResult();
                 PlayerClientboundPacket.syncAllowBeacons(value);
             }
-        } else if (nodes.get(1).getNode().getName().equals("classicModeOnly")) {
+        } else if (nodes.get(1).getNode().getName().equals("classicAndBeaconModeOnly")) {
             Map<String, ParsedArgument<CommandSourceStack, ?>> args = evt.getParseResults().getContext().getArguments();
             if (args.containsKey("value")) {
                 boolean value = (boolean) args.get("value").getResult();
-                PlayerClientboundPacket.syncClassicModeOnly(value);
+                PlayerClientboundPacket.syncClassicAndBeaconModeOnly(value);
             }
         }
     }
@@ -85,8 +82,8 @@ public class GameruleServerEvents {
             PlayerClientboundPacket.syncNeutralAggro(neutralAggro);
             boolean allowBeacons = server.getGameRules().getRule(GameRuleRegistrar.ALLOW_BEACONS).get();
             PlayerClientboundPacket.syncAllowBeacons(allowBeacons);
-            boolean classicModeOnly = server.getGameRules().getRule(GameRuleRegistrar.CLASSIC_MODE_ONLY).get();
-            PlayerClientboundPacket.syncClassicModeOnly(classicModeOnly);
+            boolean classicAndBeaconModeOnly = server.getGameRules().getRule(GameRuleRegistrar.CLASSIC_AND_BEACON_MODE_ONLY).get();
+            PlayerClientboundPacket.syncClassicAndBeaconModeOnly(classicAndBeaconModeOnly);
         }
     }
 }
