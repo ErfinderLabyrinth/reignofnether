@@ -16,6 +16,7 @@ import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.sounds.SoundAction;
 import com.solegendary.reignofnether.sounds.SoundClientboundPacket;
+import com.solegendary.reignofnether.survival.SurvivalServerEvents;
 import com.solegendary.reignofnether.time.NightUtils;
 import com.solegendary.reignofnether.time.TimeClientEvents;
 import com.solegendary.reignofnether.tutorial.TutorialClientEvents;
@@ -246,7 +247,12 @@ public class Beacon extends ProductionBuilding implements RangeIndicator {
     @Override
     public void onBuilt() {
         super.onBuilt();
-        sendWarning("completed_warning");
+        if (SurvivalServerEvents.isEnabled()) {
+            PlayerServerEvents.sendMessageToAllPlayers("buildings.neutral.reignofnether.beacon.survival_warning1");
+            PlayerServerEvents.sendMessageToAllPlayers("buildings.neutral.reignofnether.beacon.survival_warning2");
+        } else {
+            sendWarning("completed_warning");
+        }
     }
 
     public void sendWarning(String msg) {

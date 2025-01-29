@@ -186,7 +186,7 @@ public class ReignOfNetherCommonConfigs {
         public static final ResourceCostConfigEntry PIGLIN_MERCHANT = ResourceCostConfigEntry.Unit(0,0,0,30,3, ResourceCosts.PIGLIN_MERCHANT, "Piglin Merchant Config");
     }
     public static class BuildingCosts implements Costs {
-        public static final ResourceCostConfigEntry BEACON = ResourceCostConfigEntry.Building(0,0,1000, 0, ResourceCosts.BEACON, "Beacon Config");
+        public static final ResourceCostConfigEntry BEACON = ResourceCostConfigEntry.Building(0,1000,1000, 0, ResourceCosts.BEACON, "Beacon Config");
 
         public static final ResourceCostConfigEntry STOCKPILE = ResourceCostConfigEntry.Building(0,75,0, 0, ResourceCosts.STOCKPILE, "Stockpile Config");
         public static final ResourceCostConfigEntry OAK_BRIDGE = ResourceCostConfigEntry.Building(0,100,0, 0, ResourceCosts.OAK_BRIDGE, "Oak Bridge Config");
