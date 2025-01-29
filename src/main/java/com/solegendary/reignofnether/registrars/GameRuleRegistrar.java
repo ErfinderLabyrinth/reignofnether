@@ -10,10 +10,12 @@ public class GameRuleRegistrar {
     public static GameRules.Key<GameRules.IntegerValue> MAX_POPULATION;
     public static GameRules.Key<GameRules.BooleanValue> DISALLOW_WAVE_SURVIVAL;
     public static GameRules.Key<GameRules.BooleanValue> DO_UNIT_GRIEFING;
-    public static GameRules.Key<GameRules.BooleanValue> DO_SURVIVAL_GRIEFING;
+    public static GameRules.Key<GameRules.BooleanValue> DO_PLAYER_GRIEFING;
     public static GameRules.Key<GameRules.BooleanValue> IMPROVED_PATHFINDING;
     public static GameRules.Key<GameRules.IntegerValue> GROUND_Y_LEVEL;
     public static GameRules.Key<GameRules.IntegerValue> FLYING_MAX_Y_LEVEL;
+    public static GameRules.Key<GameRules.BooleanValue> ALLOW_BEACONS;
+    public static GameRules.Key<GameRules.BooleanValue> CLASSIC_MODE_ONLY;
 
     public static void init() {
         // do cut trees convert their logs into falling logs?
@@ -37,7 +39,7 @@ public class GameRuleRegistrar {
                 GameRules.BooleanValue.create(false)
         );
         // allow players to break blocks other than buildings and resource blocks
-        DO_SURVIVAL_GRIEFING = GameRules.register("doPlayerGriefing", GameRules.Category.PLAYER,
+        DO_PLAYER_GRIEFING = GameRules.register("doPlayerGriefing", GameRules.Category.PLAYER,
                 GameRules.BooleanValue.create(true)
         );
         // increase pathfinding accuracy in exchange for increased CPU usage
@@ -51,6 +53,14 @@ public class GameRuleRegistrar {
         // locks the camera to a specific Y level instead of it being calculated dynamically
         FLYING_MAX_Y_LEVEL = GameRules.register("flyingMaxYLevel", GameRules.Category.MOBS,
                 GameRules.IntegerValue.create(320)
+        );
+        // allow beacons to be built by workers as a win condition
+        ALLOW_BEACONS = GameRules.register("allowBeacons", GameRules.Category.PLAYER,
+                GameRules.BooleanValue.create(true)
+        );
+        // allow only classic/king of the beacon gamemodes
+        CLASSIC_MODE_ONLY = GameRules.register("classicModeOnly", GameRules.Category.PLAYER,
+                GameRules.BooleanValue.create(false)
         );
     }
 }

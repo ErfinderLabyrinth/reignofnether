@@ -31,16 +31,7 @@ public class GameruleServerEvents {
         if (!nodes.get(0).getNode().getName().equals("gamerule"))
             return;
 
-        if (nodes.get(1).getNode().getName().equals("disallowWaveSurvival")) {
-            Map<String, ParsedArgument<CommandSourceStack, ?>> args = evt.getParseResults().getContext().getArguments();
-            if (args.containsKey("value")) {
-                boolean value = (boolean) args.get("value").getResult();
-                if (value)
-                    GameModeClientboundPacket.disallowSurvival();
-                else
-                    GameModeClientboundPacket.allowSurvival();
-            }
-        } else if (nodes.get(1).getNode().getName().equals("maxPopulation")) {
+        if (nodes.get(1).getNode().getName().equals("maxPopulation")) {
             Map<String, ParsedArgument<CommandSourceStack, ?>> args = evt.getParseResults().getContext().getArguments();
             if (args.containsKey("value")) {
                 UnitServerEvents.maxPopulation = (int) args.get("value").getResult();
@@ -69,6 +60,18 @@ public class GameruleServerEvents {
                 boolean value = (boolean) args.get("value").getResult();
                 PlayerClientboundPacket.syncNeutralAggro(value);
             }
+        } else if (nodes.get(1).getNode().getName().equals("allowBeacons")) {
+            Map<String, ParsedArgument<CommandSourceStack, ?>> args = evt.getParseResults().getContext().getArguments();
+            if (args.containsKey("value")) {
+                boolean value = (boolean) args.get("value").getResult();
+                PlayerClientboundPacket.syncAllowBeacons(value);
+            }
+        } else if (nodes.get(1).getNode().getName().equals("classicModeOnly")) {
+            Map<String, ParsedArgument<CommandSourceStack, ?>> args = evt.getParseResults().getContext().getArguments();
+            if (args.containsKey("value")) {
+                boolean value = (boolean) args.get("value").getResult();
+                PlayerClientboundPacket.syncClassicModeOnly(value);
+            }
         }
     }
 
@@ -80,6 +83,10 @@ public class GameruleServerEvents {
             PlayerClientboundPacket.setOrthoviewMinY(groundYLevel + 30);
             boolean neutralAggro = server.getGameRules().getRule(GameRuleRegistrar.NEUTRAL_AGGRO).get();
             PlayerClientboundPacket.syncNeutralAggro(neutralAggro);
+            boolean allowBeacons = server.getGameRules().getRule(GameRuleRegistrar.ALLOW_BEACONS).get();
+            PlayerClientboundPacket.syncAllowBeacons(allowBeacons);
+            boolean classicModeOnly = server.getGameRules().getRule(GameRuleRegistrar.CLASSIC_MODE_ONLY).get();
+            PlayerClientboundPacket.syncClassicModeOnly(classicModeOnly);
         }
     }
 }

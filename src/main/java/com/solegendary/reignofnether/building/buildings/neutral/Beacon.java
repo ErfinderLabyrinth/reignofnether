@@ -9,6 +9,7 @@ import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.player.PlayerServerEvents;
+import com.solegendary.reignofnether.registrars.GameRuleRegistrar;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
 import com.solegendary.reignofnether.research.researchItems.*;
 import com.solegendary.reignofnether.resources.ResourceCost;
@@ -16,11 +17,13 @@ import com.solegendary.reignofnether.sounds.SoundAction;
 import com.solegendary.reignofnether.sounds.SoundClientboundPacket;
 import com.solegendary.reignofnether.time.NightUtils;
 import com.solegendary.reignofnether.time.TimeClientEvents;
+import com.solegendary.reignofnether.tutorial.TutorialClientEvents;
 import com.solegendary.reignofnether.unit.UnitAction;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.packets.BeaconSyncClientboundPacket;
 import com.solegendary.reignofnether.util.Faction;
 import com.solegendary.reignofnether.util.MiscUtil;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Style;
@@ -310,13 +313,18 @@ public class Beacon extends ProductionBuilding implements RangeIndicator {
         return BuildingBlockData.getBuildingBlocks(structureName, level);
     }
 
+    private static boolean beaconsAllowed() {
+        Level mcLevel = Minecraft.getInstance().level;
+        return mcLevel != null && mcLevel.getGameRules().getRule(GameRuleRegistrar.ALLOW_BEACONS).get();
+    }
+
     public static AbilityButton getBuildButton(Keybinding hotkey) {
         return new AbilityButton(
                 buildingName,
                 new ResourceLocation("minecraft", "textures/item/nether_star.png"),
                 hotkey,
                 () -> BuildingClientEvents.getBuildingToPlace() == Beacon.class,
-                () -> false,
+                () -> TutorialClientEvents.isEnabled() || !beaconsAllowed(),
                 () -> BuildingClientEvents.getBuildings().stream().filter(b -> b instanceof Beacon).toList().isEmpty(),
                 () -> BuildingClientEvents.setBuildingToPlace(Beacon.class),
                 null,
@@ -325,6 +333,8 @@ public class Beacon extends ProductionBuilding implements RangeIndicator {
                         FormattedCharSequence.forward("", Style.EMPTY),
                         FormattedCharSequence.forward(I18n.get("buildings.neutral.reignofnether.beacon.tooltip1"), Style.EMPTY),
                         FormattedCharSequence.forward(I18n.get("buildings.neutral.reignofnether.beacon.tooltip2"), Style.EMPTY),
+                        FormattedCharSequence.forward("", Style.EMPTY),
+                        FormattedCharSequence.forward(I18n.get("buildings.neutral.reignofnether.beacon.tooltip4"), Style.EMPTY),
                         FormattedCharSequence.forward("", Style.EMPTY),
                         FormattedCharSequence.forward(I18n.get("buildings.neutral.reignofnether.beacon.tooltip3"), Style.EMPTY)
                 ),

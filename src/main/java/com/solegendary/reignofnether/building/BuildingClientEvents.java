@@ -66,6 +66,8 @@ public class BuildingClientEvents {
 
     static final Minecraft MC = Minecraft.getInstance();
 
+    public static boolean allowBeacons = true;
+
     public static int getTotalPopulationSupply(String playerName) {
         if (ResearchClient.hasCheat("foodforthought")) {
             return UnitClientEvents.maxPopulation;

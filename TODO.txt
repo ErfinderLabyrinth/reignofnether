@@ -16,15 +16,12 @@ Features
         - add option to reset at bottom left when selected
         - on /rts-reset, kill and respawn it back at the original location
         - enforce a leash range
-    [🟡] Give buildings ability to set flags
-        - Invulnerable (also untargetable)
-        - Capturable
     [🟡] Prevent the beacon, or the beacon block itself being damaged
     [❌] Allow a beacon to be built in wave survival mode as the only way to truly win
         - Require all upgrades to be researched before the win timer begins
         - Greatly increase the cost and time of upgrades
         - Remove the invulnerable flag
-    [❌] Instead of giving infinite resources, add a cheat to ignore resource costs entirely
+    [🟡] Instead of giving infinite resources, add a cheat to ignore resource costs entirely
 
     [❌] Flatten terrain tool
 

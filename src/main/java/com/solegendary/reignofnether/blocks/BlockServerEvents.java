@@ -46,7 +46,7 @@ public class BlockServerEvents {
         boolean isResource = ResourceSources.getFromBlockState(evt.getState()) != null;
         boolean isBuilding = BuildingUtils.isPosInsideAnyBuilding(false, evt.getPos());
 
-        if (!evt.getLevel().getServer().getGameRules().getRule(GameRuleRegistrar.DO_SURVIVAL_GRIEFING).get() &&
+        if (!evt.getLevel().getServer().getGameRules().getRule(GameRuleRegistrar.DO_PLAYER_GRIEFING).get() &&
             !isResource && !isBuilding) {
             evt.setCanceled(true);
         }
