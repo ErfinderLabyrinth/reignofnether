@@ -11,6 +11,7 @@ import com.solegendary.reignofnether.building.buildings.neutral.Beacon;
 import com.solegendary.reignofnether.config.ConfigClientEvents;
 import com.solegendary.reignofnether.gamemode.ClientGameModeHelper;
 import com.solegendary.reignofnether.gamemode.GameMode;
+import com.solegendary.reignofnether.gamerules.GameruleClient;
 import com.solegendary.reignofnether.guiscreen.TopdownGui;
 import com.solegendary.reignofnether.hud.buttons.ActionButtons;
 import com.solegendary.reignofnether.hud.buttons.HelperButtons;
@@ -1248,6 +1249,17 @@ public class HudClientEvents {
                             mouseY
                     );
                     renderedButtons.add(gamemodeButton);
+                }
+
+                Button gamerulesButton = GameruleClient.getGamerulesButton();
+                if (MC.player != null && MC.player.hasPermissions(4) &&
+                    gamemodeButton != null && !gamemodeButton.isHidden.get() && !TutorialClientEvents.isEnabled()) {
+                    int xr = screenWidth - (StartButtons.ICON_SIZE * 8);
+                    int yr = 40;
+                    gamemodeButton.render(evt.getPoseStack(), xr, yr, mouseX, mouseY);
+                    renderedButtons.add(gamemodeButton);
+                    List<Button> gameruleButtons = GameruleClient.renderGamerulesGUI(evt.getPoseStack(), xr, yr);
+                    renderedButtons.addAll(gameruleButtons);
                 }
 
                 if (ClientGameModeHelper.gameMode != GameMode.SANDBOX) {

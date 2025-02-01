@@ -126,7 +126,6 @@ public class PlayerServerEvents {
                 }
             }
             UnitServerEvents.maxPopulation = level.getGameRules().getInt(GameRuleRegistrar.MAX_POPULATION);
-            PlayerClientboundPacket.syncMaxPopulation(UnitServerEvents.maxPopulation);
         }
     }
 
@@ -270,7 +269,6 @@ public class PlayerServerEvents {
         } else {
             PlayerClientboundPacket.disableStartRTS(playerName);
         }
-        PlayerClientboundPacket.syncMaxPopulation(UnitServerEvents.maxPopulation);
     }
 
     @SubscribeEvent

@@ -14,7 +14,7 @@ public class GameRuleRegistrar {
     public static GameRules.Key<GameRules.IntegerValue> GROUND_Y_LEVEL;
     public static GameRules.Key<GameRules.IntegerValue> FLYING_MAX_Y_LEVEL;
     public static GameRules.Key<GameRules.BooleanValue> ALLOW_BEACONS;
-    public static GameRules.Key<GameRules.BooleanValue> CLASSIC_AND_BEACON_MODE_ONLY;
+    public static GameRules.Key<GameRules.BooleanValue> PVP_MODES_ONLY;
 
     public static void init() {
         // do cut trees convert their logs into falling logs?
@@ -54,7 +54,7 @@ public class GameRuleRegistrar {
                 GameRules.BooleanValue.create(true)
         );
         // allow only classic/king of the beacon gamemodes
-        CLASSIC_AND_BEACON_MODE_ONLY = GameRules.register("classicAndBeaconModeOnly", GameRules.Category.PLAYER,
+        PVP_MODES_ONLY = GameRules.register("pvpModesOnly", GameRules.Category.PLAYER,
                 GameRules.BooleanValue.create(false)
         );
     }

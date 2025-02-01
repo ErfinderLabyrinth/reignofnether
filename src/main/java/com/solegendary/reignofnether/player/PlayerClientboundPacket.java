@@ -75,34 +75,9 @@ public class PlayerClientboundPacket {
                 new PlayerClientboundPacket(PlayerAction.ENABLE_START_RTS, playerName, 0L));
     }
 
-    public static void syncMaxPopulation(long maxPopulation) {
-        PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(),
-                new PlayerClientboundPacket(PlayerAction.SYNC_MAX_POPULATION, "", maxPopulation));
-    }
-
-    public static void setOrthoviewMinY(long orthoviewMinY) {
-        PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(),
-                new PlayerClientboundPacket(PlayerAction.SET_MIN_ORTHOVIEW_Y, "", orthoviewMinY));
-    }
-
-    public static void syncNeutralAggro(boolean neutralAggro) {
-        PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(),
-                new PlayerClientboundPacket(PlayerAction.SYNC_NEUTRAL_AGGRO, "", neutralAggro ? 1L : 0L));
-    }
-
     public static void syncBeaconOwnerTicks(String playerName, long ticks) {
         PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(),
                 new PlayerClientboundPacket(PlayerAction.SYNC_BEACON_OWNER_TICKS, playerName, ticks));
-    }
-
-    public static void syncAllowBeacons(boolean allowBeacons) {
-        PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(),
-                new PlayerClientboundPacket(PlayerAction.SYNC_ALLOW_BEACONS, "", allowBeacons ? 1L : 0L));
-    }
-
-    public static void syncClassicAndBeaconModeOnly(boolean classicAndBeaconModeOnly) {
-        PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(),
-                new PlayerClientboundPacket(PlayerAction.SYNC_CLASSIC_MODE_ONLY, "", classicAndBeaconModeOnly ? 1L : 0L));
     }
 
     public PlayerClientboundPacket(PlayerAction playerAction, String playerName, Long value) {
@@ -142,12 +117,7 @@ public class PlayerClientboundPacket {
                             case UNLOCK_RTS -> PlayerClientEvents.setRTSLock(false);
                             case ENABLE_START_RTS -> PlayerClientEvents.setCanStartRTS(true);
                             case DISABLE_START_RTS -> PlayerClientEvents.setCanStartRTS(false);
-                            case SYNC_MAX_POPULATION -> UnitClientEvents.setMaxPopulation(Math.toIntExact(value));
-                            case SET_MIN_ORTHOVIEW_Y -> OrthoviewClientEvents.setMinOrthoviewY(value);
-                            case SYNC_NEUTRAL_AGGRO -> UnitClientEvents.neutralAggro = value == 1L;
                             case SYNC_BEACON_OWNER_TICKS -> PlayerClientEvents.syncBeaconOwnerTicks(playerName, value);
-                            case SYNC_ALLOW_BEACONS -> BuildingClientEvents.allowBeacons = value == 1L;
-                            case SYNC_CLASSIC_MODE_ONLY -> ClientGameModeHelper.setClassicAndBeaconModeOnly(value == 1L);
                         }
                         success.set(true);
                     });

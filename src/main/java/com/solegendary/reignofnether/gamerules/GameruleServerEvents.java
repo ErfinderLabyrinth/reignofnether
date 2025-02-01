@@ -2,7 +2,6 @@ package com.solegendary.reignofnether.gamerules;
 
 import com.mojang.brigadier.context.ParsedArgument;
 import com.mojang.brigadier.context.ParsedCommandNode;
-import com.solegendary.reignofnether.player.PlayerClientboundPacket;
 import com.solegendary.reignofnether.registrars.GameRuleRegistrar;
 import com.solegendary.reignofnether.unit.UnitServerEvents;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
@@ -32,42 +31,43 @@ public class GameruleServerEvents {
             Map<String, ParsedArgument<CommandSourceStack, ?>> args = evt.getParseResults().getContext().getArguments();
             if (args.containsKey("value")) {
                 UnitServerEvents.maxPopulation = (int) args.get("value").getResult();
-                PlayerClientboundPacket.syncMaxPopulation(UnitServerEvents.maxPopulation);
+                GameruleClientboundPacket.syncMaxPopulation(UnitServerEvents.maxPopulation);
             }
         } else if (nodes.get(1).getNode().getName().equals("groundYLevel")) {
             Map<String, ParsedArgument<CommandSourceStack, ?>> args = evt.getParseResults().getContext().getArguments();
             if (args.containsKey("value")) {
                 double groundYLevel = ((Integer) args.get("value").getResult()).doubleValue();
-                PlayerClientboundPacket.setOrthoviewMinY((long) groundYLevel + 30);
+                GameruleClientboundPacket.setOrthoviewMinY((long) groundYLevel + 30);
             }
         } else if (nodes.get(1).getNode().getName().equals("improvedPathfinding")) {
             Map<String, ParsedArgument<CommandSourceStack, ?>> args = evt.getParseResults().getContext().getArguments();
             if (args.containsKey("value")) {
                 boolean value = (boolean) args.get("value").getResult();
                 for (LivingEntity le : UnitServerEvents.getAllUnits()) {
-                    UnitServerEvents.IMPROVED_PATHFINDING = value;
+                    UnitServerEvents.improvedPathfinding = value;
                     AttributeInstance ai = le.getAttribute(Attributes.FOLLOW_RANGE);
                     if (ai != null)
                         ai.setBaseValue(Unit.getFollowRange());
                 }
+                GameruleClientboundPacket.setImprovedPathfinding(value);
             }
         } else if (nodes.get(1).getNode().getName().equals("neutralAggro")) {
             Map<String, ParsedArgument<CommandSourceStack, ?>> args = evt.getParseResults().getContext().getArguments();
             if (args.containsKey("value")) {
                 boolean value = (boolean) args.get("value").getResult();
-                PlayerClientboundPacket.syncNeutralAggro(value);
+                GameruleClientboundPacket.syncNeutralAggro(value);
             }
         } else if (nodes.get(1).getNode().getName().equals("allowBeacons")) {
             Map<String, ParsedArgument<CommandSourceStack, ?>> args = evt.getParseResults().getContext().getArguments();
             if (args.containsKey("value")) {
                 boolean value = (boolean) args.get("value").getResult();
-                PlayerClientboundPacket.syncAllowBeacons(value);
+                GameruleClientboundPacket.syncAllowBeacons(value);
             }
-        } else if (nodes.get(1).getNode().getName().equals("classicAndBeaconModeOnly")) {
+        } else if (nodes.get(1).getNode().getName().equals("pvpModesOnly")) {
             Map<String, ParsedArgument<CommandSourceStack, ?>> args = evt.getParseResults().getContext().getArguments();
             if (args.containsKey("value")) {
                 boolean value = (boolean) args.get("value").getResult();
-                PlayerClientboundPacket.syncClassicAndBeaconModeOnly(value);
+                GameruleClientboundPacket.syncClassicAndBeaconModeOnly(value);
             }
         }
     }
@@ -76,14 +76,16 @@ public class GameruleServerEvents {
     public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent evt) {
         MinecraftServer server = evt.getEntity().getLevel().getServer();
         if (server != null) {
+            int maxPopulation = server.getGameRules().getInt(GameRuleRegistrar.MAX_POPULATION);
+            GameruleClientboundPacket.syncMaxPopulation(maxPopulation);
             int groundYLevel = server.getGameRules().getRule(GameRuleRegistrar.GROUND_Y_LEVEL).get();
-            PlayerClientboundPacket.setOrthoviewMinY(groundYLevel + 30);
+            GameruleClientboundPacket.setOrthoviewMinY(groundYLevel + 30);
             boolean neutralAggro = server.getGameRules().getRule(GameRuleRegistrar.NEUTRAL_AGGRO).get();
-            PlayerClientboundPacket.syncNeutralAggro(neutralAggro);
+            GameruleClientboundPacket.syncNeutralAggro(neutralAggro);
             boolean allowBeacons = server.getGameRules().getRule(GameRuleRegistrar.ALLOW_BEACONS).get();
-            PlayerClientboundPacket.syncAllowBeacons(allowBeacons);
-            boolean classicAndBeaconModeOnly = server.getGameRules().getRule(GameRuleRegistrar.CLASSIC_AND_BEACON_MODE_ONLY).get();
-            PlayerClientboundPacket.syncClassicAndBeaconModeOnly(classicAndBeaconModeOnly);
+            GameruleClientboundPacket.syncAllowBeacons(allowBeacons);
+            boolean pvpModesOnly = server.getGameRules().getRule(GameRuleRegistrar.PVP_MODES_ONLY).get();
+            GameruleClientboundPacket.syncClassicAndBeaconModeOnly(pvpModesOnly);
         }
     }
 }

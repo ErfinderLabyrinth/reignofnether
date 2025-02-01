@@ -70,6 +70,8 @@ public class UnitClientEvents {
 
     private static final Minecraft MC = Minecraft.getInstance();
 
+    public static boolean improvedPathfinding = true;
+
     // max possible pop you can have regardless of buildings, adjustable via /gamerule maxPopulation cheat
     public static int maxPopulation = ResourceCosts.DEFAULT_MAX_POPULATION;
 

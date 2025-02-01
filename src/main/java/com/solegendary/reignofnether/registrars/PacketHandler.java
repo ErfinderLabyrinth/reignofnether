@@ -13,6 +13,8 @@ import com.solegendary.reignofnether.fogofwar.FrozenChunkClientboundPacket;
 import com.solegendary.reignofnether.fogofwar.FrozenChunkServerboundPacket;
 import com.solegendary.reignofnether.gamemode.GameModeClientboundPacket;
 import com.solegendary.reignofnether.gamemode.GameModeServerboundPacket;
+import com.solegendary.reignofnether.gamerules.GameruleClientboundPacket;
+import com.solegendary.reignofnether.gamerules.GameruleServerboundPacket;
 import com.solegendary.reignofnether.guiscreen.TopdownGuiServerboundPacket;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientboundPacket;
 import com.solegendary.reignofnether.player.PlayerClientboundPacket;
@@ -220,6 +222,18 @@ public final class PacketHandler {
                 .encoder(SandboxServerboundPacket::encode)
                 .decoder(SandboxServerboundPacket::new)
                 .consumer(SandboxServerboundPacket::handle)
+                .add();
+
+        INSTANCE.messageBuilder(GameruleServerboundPacket.class, index++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(GameruleServerboundPacket::encode)
+                .decoder(GameruleServerboundPacket::new)
+                .consumer(GameruleServerboundPacket::handle)
+                .add();
+
+        INSTANCE.messageBuilder(GameruleClientboundPacket.class, index++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(GameruleClientboundPacket::encode)
+                .decoder(GameruleClientboundPacket::new)
+                .consumer(GameruleClientboundPacket::handle)
                 .add();
     }
 }
