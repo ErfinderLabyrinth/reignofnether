@@ -1,10 +1,6 @@
 package com.solegendary.reignofnether.player;
 
-import com.solegendary.reignofnether.building.BuildingClientEvents;
-import com.solegendary.reignofnether.gamemode.ClientGameModeHelper;
-import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
 import com.solegendary.reignofnether.registrars.PacketHandler;
-import com.solegendary.reignofnether.unit.UnitClientEvents;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;

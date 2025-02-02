@@ -11,19 +11,45 @@ Features
 
 [✔] Sandbox mode
 
-    [❌] Require a fully upgraded beacon to tick the cooldown
-        - Make the sandbox beacon always place as fully upgraded
-        - Fix warning messages
-        - Test it works in wave survival
+💠 **Beacon** 💠
+The beacon is inspired by the Age of Empires II Wonder, a building that, when fully upgraded, will tick a countdown to victory.
 
-    [🟡]  Also test that beacon team victory works, including in wave survival
+It provides friendly units and players a selection of auras which can be activated after upgrading it:
+💵 Level 1: Wealth: Grants a trickle of free resources
+⛏ Level 2: Haste: Workers in range build faster
+❤ Level 3: Regeneration: Units heal over time
+⚔ Level 4: Strength: Units deal more damage
+🛡️ Level 5: Resistance: Units take less damage
+
+Only one aura can be active at a time.
+
+When built in Wave Survival or Classic mode, it starts as a Stone Beacon and must be upgraded to add auras and achieve victory.
+
+When placed in Sandbox, the beacon is fully upgraded, invulnerable and can be captured by any player with the largest nearby army.
+    - Beacons can't change ownership if the original owner still has any units within a 20-block range
+
+
+
+🏗️ **Sandbox Mode** 🏗️
+Sandbox mode is a gamemode where mapmakers can:
+
+- Place capturable neutral buildings
+- Place any building without workers
+- Spawn any units from any faction
+- Set allegiance of whatever you're placing (owned, neutral, enemy)
+- Toggle cheats with buttons instead of typing
+
+Tips for using sandbox mode:
+- Using /rts-reset won't destroy any neutral buildings placed in sandbox mode, use /rts-hard-reset to do this
+- You can control and delete neutral and enemy units
+- If you're in multiplayer, choosing to start sandbox mode will lock everyone else into sandbox as well
 
 
 
 Bugfixes
 --------
 
-[🟡] Possibly fixed a bug where allying players caused alliances to rapidly switch
+[🟡] Fixed a bug where allying players caused alliances to rapidly switch
 
 [🟡] Fixed camera centering inaccuracies when sensitivity is changed
 
@@ -40,6 +66,7 @@ Quality of Life
     - All players can see the menu, but only server ops can make changes
     - Any changes made will be reflected on all clients
 
+[🟡] Added /gamerule allowBeacons to let workers build beacons
 [🟡] Right-clicking a mountable unit now mounts a ranged unit onto it
 [🟡] Right-clicking a garrison will garrison ranged units into it
 [🟡] Fire and lava blocks in Flame Sanctuaries no longer damage piglin units

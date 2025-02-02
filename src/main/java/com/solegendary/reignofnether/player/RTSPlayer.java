@@ -95,19 +95,20 @@ public class RTSPlayer {
         }
 
         for (Building building : BuildingServerEvents.getBuildings()) {
-            if (building instanceof Beacon beacon && beacon.isBuilt && beacon.getUpgradeLevel() == Beacon.MAX_UPGRADE_LEVEL) {
-                if (building.ownerName.equals(this.name)) {
+            if (building instanceof Beacon beacon && beacon.isBuilt && building.ownerName.equals(this.name)) {
+                if (beacon.getUpgradeLevel() == Beacon.MAX_UPGRADE_LEVEL) {
                     beaconOwnerTicks += 1;
                     if (beaconOwnerTicks == Beacon.TICKS_TO_WIN / 4 ||
-                        beaconOwnerTicks == Beacon.TICKS_TO_WIN / 2 ||
-                        beaconOwnerTicks == (Beacon.TICKS_TO_WIN * 3) / 4 ||
-                        beaconOwnerTicks == Beacon.TICKS_TO_WIN - 1200)
+                            beaconOwnerTicks == Beacon.TICKS_TO_WIN / 2 ||
+                            beaconOwnerTicks == (Beacon.TICKS_TO_WIN * 3) / 4 ||
+                            beaconOwnerTicks == Beacon.TICKS_TO_WIN - 1200)
                         beacon.sendWarning("time_warning");
-                    if (beaconOwnerTicks >= Beacon.TICKS_TO_WIN)
+                    if (beaconOwnerTicks == Beacon.TICKS_TO_WIN)
                         PlayerServerEvents.beaconVictory(this.name);
                 }
-                if (beaconOwnerTicks % 20 == 0 && beacon.getAuraEffect() == MobEffects.LUCK && beacon.isBeaconActive())
+                if (beaconOwnerTicks % 40 == 0 && beacon.getAuraEffect() == MobEffects.LUCK && beacon.isBeaconActive()) {
                     ResourcesServerEvents.addSubtractResources(new Resources(this.name, 1, 1, 1));
+                }
             }
         }
     }

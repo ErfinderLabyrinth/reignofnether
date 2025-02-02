@@ -83,7 +83,7 @@ public class Beacon extends ProductionBuilding implements RangeIndicator {
         this.woodCost = cost.wood;
         this.oreCost = cost.ore;
         this.popSupply = cost.population;
-        this.buildTimeModifier = 1.0f;
+        this.buildTimeModifier = 2.0f;
 
         this.capturable = false;
         this.invulnerable = false;
@@ -246,12 +246,7 @@ public class Beacon extends ProductionBuilding implements RangeIndicator {
     @Override
     public void onBuilt() {
         super.onBuilt();
-        if (SurvivalServerEvents.isEnabled()) {
-            PlayerServerEvents.sendMessageToAllPlayers("buildings.neutral.reignofnether.beacon.survival_warning1");
-            PlayerServerEvents.sendMessageToAllPlayers("buildings.neutral.reignofnether.beacon.survival_warning2");
-        } else {
-            sendWarning("completed_warning");
-        }
+        sendWarning("completed_warning");
     }
 
     public void sendWarning(String msg) {
@@ -277,7 +272,10 @@ public class Beacon extends ProductionBuilding implements RangeIndicator {
                         false, ownerName, PlayerServerEvents.getBeaconWinTime(ownerName));
             }
             PlayerServerEvents.sendMessageToAllPlayersNoNewlines("");
-            SoundClientboundPacket.playSoundForAllPlayers(SoundAction.ENEMY);
+            if (SurvivalServerEvents.isEnabled() && !msg.equals("destroy_warning"))
+                SoundClientboundPacket.playSoundForAllPlayers(SoundAction.ALLY);
+            else
+                SoundClientboundPacket.playSoundForAllPlayers(SoundAction.ENEMY);
         }
     }
 

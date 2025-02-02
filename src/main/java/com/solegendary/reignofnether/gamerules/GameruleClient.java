@@ -46,9 +46,12 @@ public class GameruleClient {
                 () -> true,
                 () -> gamerulesMenuOpen = !gamerulesMenuOpen,
                 null,
-                List.of(
-                        fcs(I18n.get("hud.gamerule.reignofnether.menu"))
-                )
+                MC.player != null && MC.player.hasPermissions(4) ?
+                        List.of(fcs(I18n.get("hud.gamerule.reignofnether.menu"))) :
+                        List.of(
+                                fcs(I18n.get("hud.gamerule.reignofnether.menu")),
+                                fcs(I18n.get("hud.gamerule.reignofnether.warn_not_opped"))
+                        )
         );
     }
 

@@ -662,16 +662,18 @@ public class PlayerServerEvents {
     }
 
     public static void beaconVictory(String playerName) {
-        List<String> defeatedPlayerNames = rtsPlayers.stream().map(p -> p.name).toList();
-        for (String name : defeatedPlayerNames) {
+        List<String> playerNames = rtsPlayers.stream().map(p -> p.name).toList();
+        for (String name : playerNames) {
             if (!name.equals(playerName) && !AlliancesServer.isAllied(playerName, name)) {
                 defeat(name, "server.reignofnether.beacon_defeat");
-                if (SurvivalServerEvents.isEnabled()) {
-                    PlayerClientboundPacket.victory(name);
-                    for (String allyName : AlliancesServer.getAllAllies(playerName)) {
-                        PlayerClientboundPacket.victory(allyName);
-                    }
-                }
+            } else if (SurvivalServerEvents.isEnabled()) {
+                if (AlliancesServer.getAllAllies(playerName).isEmpty())
+                    sendMessageToAllPlayers("server.reignofnether.victorious", true, name);
+                else
+                    sendMessageToAllPlayers("server.reignofnether.victory_alliance", true, name);
+                PlayerClientboundPacket.victory(name);
+                for (String allyName : AlliancesServer.getAllAllies(playerName))
+                    PlayerClientboundPacket.victory(allyName);
             }
         }
     }

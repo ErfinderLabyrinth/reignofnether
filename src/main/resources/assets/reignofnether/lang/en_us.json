@@ -996,7 +996,7 @@
 
     "hud.gamerule.reignofnether.shift_click": "(Hold shift to adjust faster)",
     "hud.gamerule.reignofnether.click": "(Left/right click to adjust)",
-    "hud.gamerule.reignofnether.warn_not_opped": "You must be a server op to change game rules",
+    "hud.gamerule.reignofnether.warn_not_opped": "(Only ops can modify)",
     "hud.gamerule.reignofnether.menu": "Game Rules Menu",
 
     "config.reignofnether.warn_config_change": "Server host has changed configs",
