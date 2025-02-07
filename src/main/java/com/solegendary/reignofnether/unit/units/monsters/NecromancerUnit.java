@@ -175,10 +175,6 @@ public class NecromancerUnit extends Skeleton implements Unit, AttackerUnit, Ran
 
     @Override
     public void resetBehaviours() {
-        //stopAllAnimations();
-        //activeAnimDef = null;
-        //activeAnimState = null;
-        //animateTicks = 0;
         animateScaleReducing = true;
     }
 

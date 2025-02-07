@@ -14,22 +14,22 @@ Features
 Bugfixes
 --------
 [❌] Buildings on minimap are positioned slightly off
-gamerules didn't update when rejoining a different server
+[❌] gamerules didn't update when rejoining a different server
 [❌] Magma cubes are slow during the day
 [❌] Kicked from dragigng on minimap (too many packets)
-
-prevent fortress fires doing damage
-regenerate aura not working for piglin units?
+[❌] regenerate aura not working for piglin units?
+[❌] raise chat slightly so it doesn't clip your build toolbar (mixin somewhere)
 
 Quality of Life
 ---------------
-Add gamerule for beacon win time
-control click (same thing as double click)
+[❌] prevent fortress fires doing damage and spider lairs eggs from being broken
+[❌] Add gamerule for beacon win time
+[❌] control click (same thing as double click)
 
 Balancing
 ---------
-only let military units capture the beacon
-let beacon regenerate allies
+[❌] only let military units capture the beacon
+[❌] let beacon regenerate allies
 
 
 Villagers

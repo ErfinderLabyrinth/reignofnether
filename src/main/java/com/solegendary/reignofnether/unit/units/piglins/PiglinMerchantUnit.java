@@ -6,11 +6,16 @@ import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.unit.Checkpoint;
+import com.solegendary.reignofnether.unit.UnitAnimationAction;
 import com.solegendary.reignofnether.unit.goals.*;
 import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.HeroUnit;
+import com.solegendary.reignofnether.unit.interfaces.KeyframeAnimated;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
+import com.solegendary.reignofnether.unit.modelling.animations.NecromancerAnimations;
+import com.solegendary.reignofnether.unit.modelling.animations.PiglinMerchantAnimations;
 import com.solegendary.reignofnether.util.Faction;
+import net.minecraft.client.animation.AnimationDefinition;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -18,10 +23,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.util.Mth;
 import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.MobSpawnType;
-import net.minecraft.world.entity.SpawnGroupData;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
@@ -29,6 +31,7 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.hoglin.Hoglin;
+import net.minecraft.world.entity.monster.piglin.Piglin;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
@@ -42,7 +45,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class PiglinMerchantUnit extends Hoglin implements Unit, AttackerUnit, HeroUnit {
+public class PiglinMerchantUnit extends Piglin implements Unit, AttackerUnit, HeroUnit, KeyframeAnimated {
     // region
     private final ArrayList<Checkpoint> checkpoints = new ArrayList<>();
     public ArrayList<Checkpoint> getCheckpoints() { return checkpoints; };
@@ -120,16 +123,53 @@ public class PiglinMerchantUnit extends Hoglin implements Unit, AttackerUnit, He
     final static public boolean willRetaliate = true; // will attack when hurt by an enemy
     final static public boolean aggressiveWhenIdle = true;
 
-    final static public float maxHealth = 70.0f;
+    final static public float maxHealth = 100.0f;
     final static public float armorValue = 0.0f;
-    final static public float movementSpeed = 0.30f;
+    final static public float movementSpeed = 0.28f;
     public int maxResources = 100;
 
     private final List<AbilityButton> abilityButtons = new ArrayList<>();
     private final List<Ability> abilities = new ArrayList<>();
     private final List<ItemStack> items = new ArrayList<>();
 
-    public PiglinMerchantUnit(EntityType<? extends Hoglin> entityType, Level level) {
+    public final AnimationState idleAnimState = new AnimationState();
+    public final AnimationState walkAnimState = new AnimationState();
+    public final AnimationState spellChargeAnimState = new AnimationState();
+    public final AnimationState spellActivateAnimState = new AnimationState();
+    public final AnimationState attackAnimState = new AnimationState();
+
+    // animation attack peak starts at 44% the way through, but we need to set it to 22% for some reason?
+    final static private int ATTACK_WINDUP_TICKS = 6; // (int) (NecromancerAnimations.ATTACK.lengthInSeconds() * 20f * 0.22f);
+
+    // non-looping animations
+    public AnimationDefinition activeAnimDef = null;
+    public AnimationState activeAnimState = null;
+
+    public void stopAllAnimations() {
+        idleAnimState.stop();
+        walkAnimState.stop();
+        spellChargeAnimState.stop();
+        spellActivateAnimState.stop();
+        attackAnimState.stop();
+    }
+    public int animateTicks = 0;
+    public float animateScale = 1.0f;
+    public boolean animateScaleReducing = false;
+    public void setAnimateTicksLeft(int ticks) { animateTicks = ticks; }
+    public int getAnimateTicksLeft() { return animateTicks; }
+
+    public void playSingleAnimation(UnitAnimationAction animAction) {
+        switch (animAction) {
+            case ATTACK_UNIT, ATTACK_BUILDING -> {
+                activeAnimDef = PiglinMerchantAnimations.ATTACK;
+                activeAnimState = attackAnimState;
+                animateScale = 1.0f;
+                startAnimation(PiglinMerchantAnimations.ATTACK);
+            }
+        }
+    }
+
+    public PiglinMerchantUnit(EntityType<? extends Piglin> entityType, Level level) {
         super(entityType, level);
 
         Eject ab1 = new Eject(this);
@@ -166,6 +206,21 @@ public class PiglinMerchantUnit extends Hoglin implements Unit, AttackerUnit, He
         super.tick();
         Unit.tick(this);
         AttackerUnit.tick(this);
+
+        if (level.isClientSide()) {
+            if (animateTicks > 0) {
+                animateTicks -= 1;
+            }
+            if (animateScale > 0 && animateScaleReducing) {
+                animateScale -= 0.1f;
+            }
+            if (animateScale <= 0) {
+                activeAnimDef = null;
+                activeAnimState = null;
+                animateScaleReducing = false;
+                stopAllAnimations();
+            }
+        }
     }
 
     public void initialiseGoals() {
@@ -185,7 +240,7 @@ public class PiglinMerchantUnit extends Hoglin implements Unit, AttackerUnit, He
         this.goalSelector.addGoal(2, attackBuildingGoal);
         this.targetSelector.addGoal(2, targetGoal);
         this.goalSelector.addGoal(3, moveGoal);
-        this.goalSelector.addGoal(4, new RandomLookAroundUnitGoal(this));
+        //this.goalSelector.addGoal(4, new RandomLookAroundUnitGoal(this));
     }
 
     @Override

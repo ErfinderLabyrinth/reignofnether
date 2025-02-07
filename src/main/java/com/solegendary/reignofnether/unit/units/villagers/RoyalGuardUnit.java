@@ -7,12 +7,17 @@ import com.solegendary.reignofnether.ability.abilities.PromoteIllager;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.unit.Checkpoint;
+import com.solegendary.reignofnether.unit.UnitAnimationAction;
 import com.solegendary.reignofnether.unit.goals.*;
 import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.HeroUnit;
+import com.solegendary.reignofnether.unit.interfaces.KeyframeAnimated;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
+import com.solegendary.reignofnether.unit.modelling.animations.NecromancerAnimations;
+import com.solegendary.reignofnether.unit.modelling.animations.RoyalGuardAnimations;
 import com.solegendary.reignofnether.unit.packets.UnitSyncClientboundPacket;
 import com.solegendary.reignofnether.util.Faction;
+import net.minecraft.client.animation.AnimationDefinition;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -42,7 +47,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class RoyalGuardUnit extends Vindicator implements Unit, AttackerUnit, HeroUnit {
+public class RoyalGuardUnit extends Vindicator implements Unit, AttackerUnit, HeroUnit, KeyframeAnimated {
     // region
     private final ArrayList<Checkpoint> checkpoints = new ArrayList<>();
     public ArrayList<Checkpoint> getCheckpoints() { return checkpoints; };
@@ -132,6 +137,43 @@ public class RoyalGuardUnit extends Vindicator implements Unit, AttackerUnit, He
     private final List<Ability> abilities = new ArrayList<>();
     private final List<ItemStack> items = new ArrayList<>();
 
+    public final AnimationState idleAnimState = new AnimationState();
+    public final AnimationState walkAnimState = new AnimationState();
+    public final AnimationState spellChargeAnimState = new AnimationState();
+    public final AnimationState spellActivateAnimState = new AnimationState();
+    public final AnimationState attackAnimState = new AnimationState();
+
+    // animation attack peak starts at 44% the way through, but we need to set it to 22% for some reason?
+    final static private int ATTACK_WINDUP_TICKS = 6; // (int) (NecromancerAnimations.ATTACK.lengthInSeconds() * 20f * 0.22f);
+
+    // non-looping animations
+    public AnimationDefinition activeAnimDef = null;
+    public AnimationState activeAnimState = null;
+
+    public void stopAllAnimations() {
+        idleAnimState.stop();
+        walkAnimState.stop();
+        spellChargeAnimState.stop();
+        spellActivateAnimState.stop();
+        attackAnimState.stop();
+    }
+    public int animateTicks = 0;
+    public float animateScale = 1.0f;
+    public boolean animateScaleReducing = false;
+    public void setAnimateTicksLeft(int ticks) { animateTicks = ticks; }
+    public int getAnimateTicksLeft() { return animateTicks; }
+
+    public void playSingleAnimation(UnitAnimationAction animAction) {
+        switch (animAction) {
+            case ATTACK_UNIT, ATTACK_BUILDING -> {
+                activeAnimDef = RoyalGuardAnimations.ATTACK;
+                activeAnimState = attackAnimState;
+                animateScale = 1.0f;
+                startAnimation(RoyalGuardAnimations.ATTACK);
+            }
+        }
+    }
+
     public RoyalGuardUnit(EntityType<? extends Vindicator> entityType, Level level) {
         super(entityType, level);
     }
@@ -154,6 +196,21 @@ public class RoyalGuardUnit extends Vindicator implements Unit, AttackerUnit, He
         Unit.tick(this);
         AttackerUnit.tick(this);
         PromoteIllager.checkAndApplyBuff(this);
+
+        if (level.isClientSide()) {
+            if (animateTicks > 0) {
+                animateTicks -= 1;
+            }
+            if (animateScale > 0 && animateScaleReducing) {
+                animateScale -= 0.1f;
+            }
+            if (animateScale <= 0) {
+                activeAnimDef = null;
+                activeAnimState = null;
+                animateScaleReducing = false;
+                stopAllAnimations();
+            }
+        }
     }
 
     public void initialiseGoals() {
@@ -178,7 +235,6 @@ public class RoyalGuardUnit extends Vindicator implements Unit, AttackerUnit, He
         this.goalSelector.addGoal(2, garrisonGoal);
         this.targetSelector.addGoal(2, targetGoal);
         this.targetSelector.addGoal(3, moveGoal);
-        this.goalSelector.addGoal(4, new RandomLookAroundUnitGoal(this));
     }
 
     @Override
