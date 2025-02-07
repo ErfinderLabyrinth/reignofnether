@@ -3,16 +3,18 @@ package com.solegendary.reignofnether.player;
 import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingClientEvents;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientEvents;
-import com.solegendary.reignofnether.gamemode.GameMode;
 import com.solegendary.reignofnether.gamemode.ClientGameModeHelper;
+import com.solegendary.reignofnether.gamerules.GameruleClient;
 import com.solegendary.reignofnether.hud.HudClientEvents;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
 import com.solegendary.reignofnether.registrars.SoundRegistrar;
 import com.solegendary.reignofnether.research.ResearchClient;
 import com.solegendary.reignofnether.resources.ResourcesClientEvents;
+import com.solegendary.reignofnether.sandbox.SandboxClientEvents;
 import com.solegendary.reignofnether.survival.SurvivalClientEvents;
 import com.solegendary.reignofnether.unit.UnitClientEvents;
+import com.solegendary.reignofnether.unit.interfaces.Unit;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
@@ -25,21 +27,18 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class PlayerClientEvents {
 
     public static boolean isRTSPlayer = false;
-
     public static long rtsGameTicks = 0;
-
     private static final Minecraft MC = Minecraft.getInstance();
-
     public static boolean rtsLocked = false;
-
     public static boolean canStartRTS = true;
 
-    public static boolean isSandbox() {
-        return isRTSPlayer && ClientGameModeHelper.gameMode == GameMode.SANDBOX;
-    }
+    public static Map<String, Long> beaconWinTimes = new HashMap<>();
 
     @SubscribeEvent
     public static void onRegisterCommand(RegisterClientCommandsEvent evt) {
@@ -51,6 +50,13 @@ public class PlayerClientEvents {
         evt.getDispatcher().register(Commands.literal("rts-reset").executes((command) -> {
             if (MC.player != null && MC.player.hasPermissions(4)) {
                 PlayerServerboundPacket.resetRTS();
+                return 1;
+            }
+            return 0;
+        }));
+        evt.getDispatcher().register(Commands.literal("rts-hard-reset").executes((command) -> {
+            if (MC.player != null && MC.player.hasPermissions(4)) {
+                PlayerServerboundPacket.resetRTSHard();
                 return 1;
             }
             return 0;
@@ -93,17 +99,10 @@ public class PlayerClientEvents {
                 MC.player.sendSystemMessage(Component.translatable("commands.reignofnether.toggle_fow","/rts-fog enable/disable"));
                 MC.player.sendSystemMessage(Component.translatable("commands.reignofnether.surrender","/rts-surrender"));
                 MC.player.sendSystemMessage(Component.translatable("commands.reignofnether.reset", "/rts-reset"));
+                MC.player.sendSystemMessage(Component.translatable("commands.reignofnether.hard_reset", "/rts-hard-reset"));
                 MC.player.sendSystemMessage(Component.translatable("commands.reignofnether.lock", "/rts-lock enable/disable"));
                 MC.player.sendSystemMessage(Component.translatable("commands.reignofnether.ally", "/ally"));
                 MC.player.sendSystemMessage(Component.translatable("commands.reignofnether.disband", "/disband"));
-                MC.player.sendSystemMessage(Component.translatable("commands.reignofnether.gamerule.do_log_falling", "/gamerule doLogFalling"));
-                MC.player.sendSystemMessage(Component.translatable("commands.reignofnether.gamerule.neutral_aggro", "/gamerule neutralAggro"));
-                MC.player.sendSystemMessage(Component.translatable("commands.reignofnether.gamerule.max_population", "/gamerule maxPopulation"));
-                MC.player.sendSystemMessage(Component.translatable("commands.reignofnether.gamerule.unit_griefing", "/gamerule doUnitGriefing"));
-                MC.player.sendSystemMessage(Component.translatable("commands.reignofnether.gamerule.player_griefing", "/gamerule doPlayerGriefing"));
-                MC.player.sendSystemMessage(Component.translatable("commands.reignofnether.gamerule.ground_y_level", "/gamerule groundYLevel"));
-                MC.player.sendSystemMessage(Component.translatable("commands.reignofnether.gamerule.flying_max_y_level", "/gamerule flyingMaxYLevel"));
-                MC.player.sendSystemMessage(Component.translatable("commands.reignofnether.gamerule.improved_pathfinding", "/gamerule improvedPathfinding"));
             }
             return 1;
         }));
@@ -113,7 +112,6 @@ public class PlayerClientEvents {
                 MC.player.sendSystemMessage(Component.translatable("controls.reignofnether.toggle_cam"));
                 MC.player.sendSystemMessage(Component.translatable("controls.reignofnether.refresh_chunks"));
                 MC.player.sendSystemMessage(Component.translatable("controls.reignofnether.toggle_fps_tps"));
-                MC.player.sendSystemMessage(Component.translatable("controls.reignofnether.toggle_leaves"));
                 MC.player.sendSystemMessage(Component.translatable("controls.reignofnether.deselect"));
                 MC.player.sendSystemMessage(Component.translatable("controls.reignofnether.command"));
                 MC.player.sendSystemMessage(Component.translatable("controls.reignofnether.create_group"));
@@ -135,32 +133,32 @@ public class PlayerClientEvents {
 
         // remove control of this player's buildings for all players' clients
         for (Building building : BuildingClientEvents.getBuildings())
-            if (building.ownerName.equals(playerName)) {
+            if (building.ownerName.equals(playerName))
                 building.ownerName = "";
-            }
 
-        if (!MC.player.getName().getString().equals(playerName)) {
+        if (!MC.player.getName().getString().equals(playerName))
             return;
-        }
 
         disableRTS(playerName);
-        MC.gui.setTitle(Component.translatable("titles.reignofnether.defeated"));
-        MC.player.playSound(SoundRegistrar.DEFEAT.get(), 0.5f, 1.0f);
-
         ResourcesClientEvents.resourcesList.removeIf(r -> r.ownerName.equals(MC.player.getName().getString()));
+
+        if (!SandboxClientEvents.isSandboxPlayer(playerName)) {
+            MC.gui.setTitle(Component.translatable("titles.reignofnether.defeated"));
+            MC.player.playSound(SoundRegistrar.DEFEAT.get(), 0.5f, 1.0f);
+        }
     }
 
     public static void victory(String playerName) {
         if (MC.player == null || !MC.player.getName().getString().equals(playerName)) {
             return;
         }
-
         MC.gui.setTitle(Component.translatable("titles.reignofnether.victorious"));
-        //MC.player.playSound(SoundRegistrar.VICTORY.get(), 0.5f, 1.0f);
+        MC.player.playSound(SoundRegistrar.VICTORY.get(), 0.5f, 1.0f);
     }
 
     public static void enableRTS(String playerName) {
         if (MC.player != null && MC.player.getName().getString().equals(playerName)) {
+            GameruleClient.gamerulesMenuOpen = false;
             isRTSPlayer = true;
         }
     }
@@ -175,7 +173,7 @@ public class PlayerClientEvents {
     public static void onPlayerLogoutEvent(PlayerEvent.PlayerLoggedOutEvent evt) {
         // LOG OUT FROM SINGLEPLAYER WORLD ONLY
         if (MC.player != null && evt.getEntity().getId() == MC.player.getId()) {
-            resetRTS();
+            resetRTS(true);
             FogOfWarClientEvents.movedToCapitol = false;
             FogOfWarClientEvents.frozenChunks.clear();
             FogOfWarClientEvents.semiFrozenChunks.clear();
@@ -195,7 +193,7 @@ public class PlayerClientEvents {
     public static void onClientLogout(ClientPlayerNetworkEvent.LoggingOut evt) {
         // LOG OUT FROM SERVER WORLD ONLY
         if (MC.player != null && evt.getPlayer() != null && evt.getPlayer().getId() == MC.player.getId()) {
-            resetRTS();
+            resetRTS(true);
             FogOfWarClientEvents.movedToCapitol = false;
             FogOfWarClientEvents.frozenChunks.clear();
             FogOfWarClientEvents.semiFrozenChunks.clear();
@@ -245,23 +243,25 @@ public class PlayerClientEvents {
         rtsGameTicks = gameTicks;
     }
 
-    public static void resetRTS() {
+    public static void resetRTS(boolean hardReset) {
         isRTSPlayer = false;
 
         HudClientEvents.controlGroups.clear();
         UnitClientEvents.getSelectedUnits().clear();
         UnitClientEvents.getPreselectedUnits().clear();
-        UnitClientEvents.getAllUnits().clear();
+        UnitClientEvents.getAllUnits().removeIf(u -> (hardReset || (u instanceof Unit unit && !unit.getOwnerName().isEmpty())));
         UnitClientEvents.idleWorkerIds.clear();
         ResearchClient.removeAllResearch();
         ResearchClient.removeAllCheats();
         BuildingClientEvents.getSelectedBuildings().clear();
-        BuildingClientEvents.getBuildings().clear();
+        BuildingClientEvents.getBuildings().removeIf(b -> b.shouldDestroyOnReset || hardReset);
+        for (Building building : BuildingClientEvents.getBuildings())
+            building.ownerName = "";
         ResourcesClientEvents.resourcesList.clear();
         ClientGameModeHelper.gameMode = ClientGameModeHelper.DEFAULT_GAMEMODE;
+        ClientGameModeHelper.gameModeLocked = false;
+        PlayerClientEvents.beaconWinTimes.clear();
         SurvivalClientEvents.reset();
-        if (!ClientGameModeHelper.disallowSurvival)
-            ClientGameModeHelper.gameModeLocked = false;
     }
 
     public static void setRTSLock(boolean lock) {
@@ -270,5 +270,9 @@ public class PlayerClientEvents {
 
     public static void setCanStartRTS(boolean canStart) {
         canStartRTS = canStart;
+    }
+
+    public static void syncBeaconOwnerTicks(String playerName, long ticks) {
+        beaconWinTimes.put(playerName, ticks);
     }
 }

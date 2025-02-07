@@ -184,13 +184,13 @@ public class TutorialClientEvents {
     public static void checkAndRenderNextAction(PoseStack poseStack, ArrayList<Button> buttons) {
         if (tutorialStage == PAN_CAMERA && MC.screen != null) {
             if (!pannedUp) {
-                TutorialRendering.pointAtWithArrow(poseStack, MC.screen.width / 2, -Button.iconFrameSize, true);
+                TutorialRendering.pointAtWithArrow(poseStack, MC.screen.width / 2, -Button.DEFAULT_ICON_FRAME_SIZE, true);
             }
             if (!pannedDown) {
                 TutorialRendering.pointAtWithArrow(poseStack, MC.screen.width / 2, MC.screen.height, true);
             }
             if (!pannedLeft) {
-                TutorialRendering.pointAtWithArrow(poseStack, -Button.iconFrameSize, MC.screen.height / 2, false);
+                TutorialRendering.pointAtWithArrow(poseStack, -Button.DEFAULT_ICON_FRAME_SIZE, MC.screen.height / 2, false);
             }
             if (!pannedRight) {
                 TutorialRendering.pointAtWithArrow(poseStack, MC.screen.width, MC.screen.height / 2, false);

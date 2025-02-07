@@ -1,6 +1,7 @@
 package com.solegendary.reignofnether.mixin;
 
-import com.solegendary.reignofnether.alliance.AllianceSystem;
+import com.solegendary.reignofnether.alliance.AlliancesClient;
+import com.solegendary.reignofnether.alliance.AlliancesServer;
 import com.solegendary.reignofnether.unit.units.villagers.EvokerUnit;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -9,6 +10,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.monster.Vex;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import org.checkerframework.checker.units.qual.A;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -37,10 +39,18 @@ public abstract class MobMixin extends LivingEntity {
         if (entity instanceof Vex vex &&
             vex.getOwner() instanceof EvokerUnit eu) {
 
+            boolean targetIsAlliedPlayer;
+
+            if (level.isClientSide()) {
+                targetIsAlliedPlayer = pTarget instanceof Player player &&
+                        (AlliancesClient.isAllied(player.getName().getString(), eu.getOwnerName()) ||
+                            player.getName().getString().equals(eu.getOwnerName()));
+            } else {
+                targetIsAlliedPlayer = pTarget instanceof Player player &&
+                        (AlliancesServer.isAllied(player.getName().getString(), eu.getOwnerName()) ||
+                            player.getName().getString().equals(eu.getOwnerName()));
+            }
             boolean outOfRange = eu.distanceTo(pTarget) > eu.getVexTargetRange();
-            boolean targetIsAlliedPlayer = pTarget instanceof Player player &&
-                    (AllianceSystem.isAllied(player.getName().getString(), eu.getOwnerName()) ||
-                    player.getName().getString().equals(eu.getOwnerName()));
             if (outOfRange || targetIsAlliedPlayer)
                 ci.cancel();
         }

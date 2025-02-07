@@ -31,7 +31,7 @@ public class UnitCrossbowAttackGoal<T extends Monster & RangedAttackMob & Crossb
     private int seeTime;
     private int attackCooldown;
     private int attackCooldownMax;
-    private int windupTime = random.nextInt(-4,5);
+    private int windupTime = random.nextInt(0,6);
 
     private static final int GARRISON_BONUS_RANGE_TO_GHASTS = 10;
 
@@ -180,7 +180,7 @@ public class UnitCrossbowAttackGoal<T extends Monster & RangedAttackMob & Crossb
                     this.crossbowState = UnitCrossbowAttackGoal.CrossbowState.CHARGED;
                     this.attackCooldown = attackCooldownMax;
                     this.mob.setChargingCrossbow(false);
-                    windupTime = random.nextInt(-4,5);
+                    windupTime = random.nextInt(0,6);
                 }
             } else if (this.crossbowState == UnitCrossbowAttackGoal.CrossbowState.CHARGED) {
                 --this.attackCooldown;

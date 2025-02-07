@@ -45,7 +45,7 @@ public class EnchantSharpness extends EnchantAbility {
                 hotkey,
                 () -> CursorClientEvents.getLeftClickAction() == ENCHANT_ACTION || library.autoCastEnchant == this,
                 () -> false,
-                library::isUpgraded,
+                () -> library.getUpgradeLevel() > 0,
                 () -> CursorClientEvents.setLeftClickAction(ENCHANT_ACTION),
                 () -> {
                     EnchantAbilityServerboundPacket.setAutocastEnchant(ENCHANT_ACTION, library.originPos);

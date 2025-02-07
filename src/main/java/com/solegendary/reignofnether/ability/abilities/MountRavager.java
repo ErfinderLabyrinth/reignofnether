@@ -70,17 +70,19 @@ public class MountRavager extends Ability {
         return null;
     }
 
-
     // right click
     @Override
     public void use(Level level, Unit unitUsing, BlockPos targetBp) {
-        getMountGoal().autofind = true;
+        MountGoal mountGoal = getMountGoal();
+        if (mountGoal != null)
+            mountGoal.autofind = true;
     }
 
     @Override
     public void use(Level level, Unit unitUsing, LivingEntity targetEntity) {
-        if (targetEntity instanceof RavagerUnit) {
-            getMountGoal().setTarget(targetEntity);
+        MountGoal mountGoal = getMountGoal();
+        if (mountGoal != null && targetEntity instanceof RavagerUnit) {
+            mountGoal.setTarget(targetEntity);
         } else if (level.isClientSide()) {
             HudClientEvents.showTemporaryMessage(I18n.get("abilities.reignofnether.mount_ravager.error1"));
         }

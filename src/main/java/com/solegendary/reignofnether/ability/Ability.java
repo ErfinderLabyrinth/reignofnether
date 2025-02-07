@@ -64,7 +64,7 @@ public class Ability {
     }
 
     public void setCooldown(float cooldown) {
-        if (this.level.isClientSide() && cooldown == cooldownMax) {
+        if (this.level.isClientSide() && cooldown > 0) {
             HudClientEvents.setLowestCdHudEntity();
         }
         this.cooldown = Math.min(cooldown, cooldownMax);

@@ -2,20 +2,19 @@ package com.solegendary.reignofnether.unit;
 
 import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Vector3d;
-import com.solegendary.reignofnether.alliance.AllianceSystem;
 import com.solegendary.reignofnether.ReignOfNether;
+import com.solegendary.reignofnether.alliance.AlliancesServer;
 import com.solegendary.reignofnether.building.*;
 import com.solegendary.reignofnether.building.buildings.monsters.SculkCatalyst;
-import com.solegendary.reignofnether.building.buildings.shared.AbstractBridge;
 import com.solegendary.reignofnether.building.buildings.villagers.IronGolemBuilding;
 import com.solegendary.reignofnether.player.PlayerServerEvents;
 import com.solegendary.reignofnether.registrars.EntityRegistrar;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
-import com.solegendary.reignofnether.research.researchItems.ResearchFireResistance;
 import com.solegendary.reignofnether.research.researchItems.ResearchHeavyTridents;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.resources.ResourceSource;
 import com.solegendary.reignofnether.resources.ResourceSources;
+import com.solegendary.reignofnether.sandbox.SandboxServer;
 import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.ConvertableUnit;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
@@ -25,11 +24,9 @@ import com.solegendary.reignofnether.unit.packets.UnitIdleWorkerClientBoundPacke
 import com.solegendary.reignofnether.unit.packets.UnitSyncClientboundPacket;
 import com.solegendary.reignofnether.unit.packets.UnitSyncWorkerClientBoundPacket;
 import com.solegendary.reignofnether.unit.units.monsters.CreeperUnit;
-import com.solegendary.reignofnether.unit.units.monsters.DrownedUnit;
 import com.solegendary.reignofnether.unit.units.monsters.SlimeUnit;
 import com.solegendary.reignofnether.unit.units.piglins.*;
 import com.solegendary.reignofnether.unit.units.villagers.*;
-import com.solegendary.reignofnether.util.Faction;
 import com.solegendary.reignofnether.util.MiscUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
@@ -42,7 +39,6 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.Chicken;
-import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Fireball;
@@ -78,7 +74,7 @@ import static com.solegendary.reignofnether.player.PlayerServerEvents.isRTSPlaye
 
 public class UnitServerEvents {
 
-    public static boolean IMPROVED_PATHFINDING = true;
+    public static boolean improvedPathfinding = true;
 
     private static final int UNIT_SYNC_TICKS_MAX = 20; // how often we send out unit syncing packets
     private static int unitSyncTicks = UNIT_SYNC_TICKS_MAX;
@@ -299,7 +295,7 @@ public class UnitServerEvents {
         }
 
         // Check if the owners are allied first
-        if (AllianceSystem.isAllied(ownerName1, ownerName2)) {
+        if (AlliancesServer.isAllied(ownerName1, ownerName2)) {
             return Relationship.FRIENDLY;
         }
         // If not allied, check if the owners are the same
@@ -319,7 +315,7 @@ public class UnitServerEvents {
         }
         if (unitOwnerName.equals(buildingOwnerName)) {
             return Relationship.OWNED;
-        } else if (AllianceSystem.isAllied(unitOwnerName, buildingOwnerName)) {
+        } else if (AlliancesServer.isAllied(unitOwnerName, buildingOwnerName)) {
             return Relationship.FRIENDLY;
         } else {
             return Relationship.HOSTILE;
@@ -407,7 +403,7 @@ public class UnitServerEvents {
                 .filter(u -> (u instanceof Unit unit1 && unit1.getOwnerName().equals(unit.getOwnerName())))
                 .toList()
                 .size();
-            if (!PlayerServerEvents.isSandboxPlayer(unit.getOwnerName()) &&
+            if (!SandboxServer.isSandboxPlayer(unit.getOwnerName()) &&
                 unitsOwned == 0 && isRTSPlayer(unit.getOwnerName())
                 && BuildingUtils.getTotalCompletedBuildingsOwned(false, unit.getOwnerName()) == 0) {
                 PlayerServerEvents.defeat(unit.getOwnerName(), Component.translatable("server.reignofnether.lost_all").getString());
@@ -679,8 +675,12 @@ public class UnitServerEvents {
         ArrayList<Entity> entities = UnitServerEvents.spawnMobs(entityType, level, pos,1, ownerName);
         if (entities.isEmpty())
             return null;
-        else
+        else {
+            if (entities.get(0) instanceof SlimeUnit slimeUnit)
+                slimeUnit.setSize(2, true);
             return entities.get(0);
+        }
+
     }
 
     public static ArrayList<Entity> spawnMobs(
@@ -850,20 +850,6 @@ public class UnitServerEvents {
         else if (knockbackIgnoreIds.removeIf(i -> i == evt.getEntity().getId()))
             evt.setCanceled(true);
     }
-
-    // make creepers explode from other explosions, like TNT
-    /*
-    @SubscribeEvent
-    public static void onExplosion(ExplosionEvent.Detonate evt) {
-        for (Entity entity : evt.getAffectedEntities())
-            if (entity instanceof CreeperUnit cUnit) {
-                UnitActionClientboundPacket.reflectUnitAction(cUnit.getOwnerName(),
-                    UnitAction.EXPLODE,
-                    new int[] { cUnit.getId() }
-                );
-            }
-    }
-     */
 
     public static void debug1() {
 

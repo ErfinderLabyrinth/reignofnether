@@ -14,22 +14,23 @@ import com.solegendary.reignofnether.time.NightCircleMode;
 import com.solegendary.reignofnether.time.TimeClientEvents;
 import com.solegendary.reignofnether.unit.Checkpoint;
 import com.solegendary.reignofnether.unit.Relationship;
-import com.solegendary.reignofnether.unit.UnitClientEvents;
 import com.solegendary.reignofnether.unit.UnitServerEvents;
 import com.solegendary.reignofnether.unit.goals.AbstractMeleeAttackUnitGoal;
 import com.solegendary.reignofnether.unit.goals.FlyingMoveToTargetGoal;
-import com.solegendary.reignofnether.unit.goals.MeleeAttackUnitGoal;
 import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.units.piglins.GhastUnit;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntArrayTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.network.chat.Style;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -90,18 +91,19 @@ public class MiscUtil {
     }
 
     public static void addUnitCheckpoint(Unit unit, BlockPos blockPos, boolean green) {
-        boolean clearExisting = true;
-        if (((Entity) unit).getLevel().isClientSide())
-            clearExisting = !Keybindings.shiftMod.isDown();
-        if (clearExisting)
-            unit.getCheckpoints().clear();
-        unit.getCheckpoints().add(new Checkpoint(blockPos, green));
+        if (((Entity) unit).getLevel().isClientSide()) {
+            boolean clearExisting = !Keybindings.shiftMod.isDown();
+            if (clearExisting)
+                unit.getCheckpoints().clear();
+            unit.getCheckpoints().add(new Checkpoint(blockPos, green));
+        }
     }
     public static void addUnitCheckpoint(Unit unit, int id, boolean green) {
         Level level = ((Entity) unit).getLevel();
-        if (level.isClientSide() && !Keybindings.shiftMod.isDown())
+        if (level.isClientSide() && !Keybindings.shiftMod.isDown()) {
             unit.getCheckpoints().clear();
-        unit.getCheckpoints().add(new Checkpoint(level.getEntity(id), green));
+            unit.getCheckpoints().add(new Checkpoint(level.getEntity(id), green));
+        }
     }
 
     // excludes trees and buildings
@@ -281,6 +283,9 @@ public class MiscUtil {
     }
 
     private static boolean isBuildingAttackable(Mob unitMob, Building building) {
+        if (building.invulnerable)
+            return false;
+
         // Get the relationship between the unit and the building's owner
         Relationship relationship = UnitServerEvents.getUnitToBuildingRelationship((Unit) unitMob, building);
 
@@ -441,9 +446,9 @@ public class MiscUtil {
                     BlockState bs;
                     do {
                         bottomBp = topBp.offset(0,-y,0);
-                        bs = level.getBlockState(bottomBp);
+                        bs = level.getBlockState(bottomBp); // TODO: infinite loop negative Y
                         y += 1;
-                    } while (y < 30 && bs.getBlock() instanceof LeavesBlock || !bs.getMaterial().isSolid());
+                    } while (y < 30 && (bs.getBlock() instanceof LeavesBlock || !bs.getMaterial().isSolid()));
                     if (!level.getBlockState(bottomBp.above()).getMaterial().isSolid())
                         bps.add(bottomBp);
                 }
@@ -540,7 +545,6 @@ public class MiscUtil {
                     decisionOver2 += 2 * (z - x) + 1;
                 }
             }
-
             return circleBlocks;
         }
 
@@ -559,5 +563,11 @@ public class MiscUtil {
         }
     }
 
+    public static FormattedCharSequence fcs(String string) {
+        return FormattedCharSequence.forward(string, Style.EMPTY);
+    }
 
+    public static FormattedCharSequence fcs(String string, boolean bold) {
+        return FormattedCharSequence.forward(string, bold ? Style.EMPTY.withBold(true) : Style.EMPTY);
+    }
 }

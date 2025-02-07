@@ -50,7 +50,7 @@ public class TimeClientEvents {
     public static NightCircleMode nightCircleMode = NightCircleMode.NO_OVERLAPS;
 
     private static final Button CLOCK_BUTTON = new Button("Clock",
-        14,
+        10,
         null,
         null,
         null,

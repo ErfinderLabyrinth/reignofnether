@@ -6,5 +6,7 @@ public enum SoundAction {
     ALLY,
     CHAT,
     ENEMY,
-    BELL
+    BELL,
+    BEACON_ACTIVATE,
+    BEACON_DEACTIVATE,
 }

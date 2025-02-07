@@ -51,10 +51,10 @@ public class AllianceClientboundRemovePacket {
         context.enqueueWork(() -> {
             if (isReset) {
                 // Client-side handling for a reset: clear all alliances
-                AllianceSystem.resetAllAlliances();
+                AlliancesClient.resetAllAlliances();
             } else {
                 // Client-side handling for removing a specific alliance
-                AllianceSystem.removeAlliance(owner1, owner2);
+                AlliancesClient.removeAlliance(owner1, owner2);
             }
         });
         context.setPacketHandled(true);

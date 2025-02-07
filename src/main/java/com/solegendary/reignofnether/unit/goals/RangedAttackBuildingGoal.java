@@ -54,19 +54,23 @@ public class RangedAttackBuildingGoal<T extends net.minecraft.world.entity.Mob> 
     public void setBuildingTarget(BlockPos blockPos) {
         if (blockPos != null) {
             if (this.mob.level.isClientSide()) {
-                this.buildingTarget = BuildingUtils.findBuilding(true, blockPos);
-                if (this.buildingTarget != null) {
-                    MiscUtil.addUnitCheckpoint(((Unit) mob), new BlockPos(
-                            buildingTarget.centrePos.getX(),
-                            buildingTarget.originPos.getY() + 1,
-                            buildingTarget.centrePos.getZ()),
-                            false
+                Building b = BuildingUtils.findBuilding(this.mob.level.isClientSide(), blockPos);
+                if (b != null && !b.invulnerable) {
+                    this.buildingTarget = b;
+                        MiscUtil.addUnitCheckpoint(((Unit) mob), new BlockPos(
+                                        buildingTarget.centrePos.getX(),
+                                        buildingTarget.originPos.getY() + 1,
+                                        buildingTarget.centrePos.getZ()),
+                                false
                     );
                 }
             }
             else {
-                this.buildingTarget = BuildingUtils.findBuilding(false, blockPos);
-                setNextBlockTarget();
+                Building b = BuildingUtils.findBuilding(this.mob.level.isClientSide(), blockPos);
+                if (b != null && !b.invulnerable) {
+                    this.buildingTarget = b;
+                    setNextBlockTarget();
+                }
             }
             this.start();
         }

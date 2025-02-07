@@ -1,5 +1,7 @@
 package com.solegendary.reignofnether.player;
 
+import com.solegendary.reignofnether.building.BuildingUtils;
+import com.solegendary.reignofnether.building.buildings.neutral.Beacon;
 import com.solegendary.reignofnether.gamemode.ClientGameModeHelper;
 import com.solegendary.reignofnether.gamemode.GameMode;
 import com.solegendary.reignofnether.gamemode.GameModeClientboundPacket;
@@ -93,32 +95,50 @@ public class PlayerServerboundPacket {
             if (ClientGameModeHelper.gameMode == GameMode.SURVIVAL) {
                 SurvivalServerboundPacket.startSurvivalMode(SurvivalClientEvents.difficulty);
 
-                CompletableFuture.delayedExecutor(3000, TimeUnit.MILLISECONDS).execute(() -> {
+                CompletableFuture.delayedExecutor(2000, TimeUnit.MILLISECONDS).execute(() -> {
                     WaveDifficulty diff = SurvivalClientEvents.difficulty;
-                    String diffMsg = I18n.get("hud.gamemode.reignofnether.survival4",
+                    String diffMsg = I18n.get("hud.gamemode.reignofnether.survival5",
                             diff, SurvivalClientEvents.getMinutesPerDay()).toLowerCase();
                     diffMsg = diffMsg.substring(0,1).toUpperCase() + diffMsg.substring(1);
                     MC.player.sendSystemMessage(Component.literal(""));
-                    MC.player.sendSystemMessage(Component.translatable("hud.gamemode.reignofnether.survival1").withStyle(Style.EMPTY.withBold(true)));
+                    MC.player.sendSystemMessage(Component.translatable("hud.gamemode.reignofnether.survival1")
+                            .withStyle(Style.EMPTY.withBold(true)));
                     MC.player.sendSystemMessage(Component.literal(diffMsg));
                     MC.player.sendSystemMessage(Component.literal(new String(new char[diffMsg.length()]).replace("\0", "-")));
                     MC.player.sendSystemMessage(Component.translatable("hud.gamemode.reignofnether.survival2"));
                     MC.player.sendSystemMessage(Component.translatable("hud.gamemode.reignofnether.survival3"));
+                    MC.player.sendSystemMessage(Component.translatable("hud.gamemode.reignofnether.survival4"));
                     MC.player.sendSystemMessage(Component.literal(""));
                 });
             } else if (ClientGameModeHelper.gameMode == GameMode.CLASSIC) {
-                CompletableFuture.delayedExecutor(3000, TimeUnit.MILLISECONDS).execute(() -> {
-                    MC.player.sendSystemMessage(Component.literal(""));
-                    MC.player.sendSystemMessage(Component.translatable("hud.gamemode.reignofnether.classic1").withStyle(Style.EMPTY.withBold(true)));
-                    MC.player.sendSystemMessage(Component.literal("--------"));
-                    MC.player.sendSystemMessage(Component.translatable("hud.gamemode.reignofnether.classic2"));
-                    MC.player.sendSystemMessage(Component.translatable("hud.gamemode.reignofnether.classic3"));
-                    MC.player.sendSystemMessage(Component.literal(""));
-                });
+                Beacon beacon = BuildingUtils.getBeacon(true);
+                boolean isKotB = beacon != null && beacon.capturable;
+                if (isKotB) {
+                    CompletableFuture.delayedExecutor(2000, TimeUnit.MILLISECONDS).execute(() -> {
+                        MC.player.sendSystemMessage(Component.literal(""));
+                        MC.player.sendSystemMessage(Component.translatable("hud.gamemode.reignofnether.kotb1")
+                                .withStyle(Style.EMPTY.withBold(true)));
+                        MC.player.sendSystemMessage(Component.literal("--------"));
+                        MC.player.sendSystemMessage(Component.translatable("hud.gamemode.reignofnether.kotb2"));
+                        MC.player.sendSystemMessage(Component.translatable("hud.gamemode.reignofnether.kotb3"));
+                        MC.player.sendSystemMessage(Component.literal(""));
+                    });
+                } else {
+                    CompletableFuture.delayedExecutor(2000, TimeUnit.MILLISECONDS).execute(() -> {
+                        MC.player.sendSystemMessage(Component.literal(""));
+                        MC.player.sendSystemMessage(Component.translatable("hud.gamemode.reignofnether.classic1")
+                                .withStyle(Style.EMPTY.withBold(true)));
+                        MC.player.sendSystemMessage(Component.literal("--------"));
+                        MC.player.sendSystemMessage(Component.translatable("hud.gamemode.reignofnether.classic2"));
+                        MC.player.sendSystemMessage(Component.translatable("hud.gamemode.reignofnether.classic3"));
+                        MC.player.sendSystemMessage(Component.literal(""));
+                    });
+                }
             } else if (ClientGameModeHelper.gameMode == GameMode.SANDBOX) {
-                CompletableFuture.delayedExecutor(3000, TimeUnit.MILLISECONDS).execute(() -> {
+                CompletableFuture.delayedExecutor(2000, TimeUnit.MILLISECONDS).execute(() -> {
                     MC.player.sendSystemMessage(Component.literal(""));
-                    MC.player.sendSystemMessage(Component.translatable("hud.gamemode.reignofnether.sandbox1").withStyle(Style.EMPTY.withBold(true)));
+                    MC.player.sendSystemMessage(Component.translatable("hud.gamemode.reignofnether.sandbox1")
+                            .withStyle(Style.EMPTY.withBold(true)));
                     MC.player.sendSystemMessage(Component.literal("--------"));
                     MC.player.sendSystemMessage(Component.translatable("hud.gamemode.reignofnether.sandbox2"));
                     MC.player.sendSystemMessage(Component.translatable("hud.gamemode.reignofnether.sandbox3"));
@@ -130,6 +150,9 @@ public class PlayerServerboundPacket {
 
     public static void resetRTS() {
         PacketHandler.INSTANCE.sendToServer(new PlayerServerboundPacket(PlayerAction.RESET_RTS, 0, 0d, 0d, 0d));
+    }
+    public static void resetRTSHard() {
+        PacketHandler.INSTANCE.sendToServer(new PlayerServerboundPacket(PlayerAction.RESET_RTS_HARD, 0, 0d, 0d, 0d));
     }
 
     public static void surrender() {
@@ -215,7 +238,8 @@ public class PlayerServerboundPacket {
                 case START_RTS_SANDBOX ->
                     PlayerServerEvents.startRTS(this.playerId, new Vec3(this.x, this.y, this.z), Faction.NONE);
                 case DEFEAT -> PlayerServerEvents.defeat(this.playerId, Component.translatable("server.reignofnether.surrendered").getString());
-                case RESET_RTS -> PlayerServerEvents.resetRTS();
+                case RESET_RTS -> PlayerServerEvents.resetRTS(false);
+                case RESET_RTS_HARD -> PlayerServerEvents.resetRTS(true);
                 case LOCK_RTS -> PlayerServerEvents.setRTSLock(true);
                 case UNLOCK_RTS -> PlayerServerEvents.setRTSLock(false);
                 case ENABLE_RTS_SYNCING -> PlayerServerEvents.setRTSSyncingEnabled(true);

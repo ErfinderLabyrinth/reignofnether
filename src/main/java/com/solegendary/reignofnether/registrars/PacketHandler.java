@@ -13,6 +13,8 @@ import com.solegendary.reignofnether.fogofwar.FrozenChunkClientboundPacket;
 import com.solegendary.reignofnether.fogofwar.FrozenChunkServerboundPacket;
 import com.solegendary.reignofnether.gamemode.GameModeClientboundPacket;
 import com.solegendary.reignofnether.gamemode.GameModeServerboundPacket;
+import com.solegendary.reignofnether.gamerules.GameruleClientboundPacket;
+import com.solegendary.reignofnether.gamerules.GameruleServerboundPacket;
 import com.solegendary.reignofnether.guiscreen.TopdownGuiServerboundPacket;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientboundPacket;
 import com.solegendary.reignofnether.player.PlayerClientboundPacket;
@@ -20,6 +22,7 @@ import com.solegendary.reignofnether.player.PlayerServerboundPacket;
 import com.solegendary.reignofnether.research.ResearchClientboundPacket;
 import com.solegendary.reignofnether.research.ResearchServerboundPacket;
 import com.solegendary.reignofnether.resources.ResourcesClientboundPacket;
+import com.solegendary.reignofnether.sandbox.SandboxServerboundPacket;
 import com.solegendary.reignofnether.sounds.SoundClientboundPacket;
 import com.solegendary.reignofnether.survival.SurvivalClientboundPacket;
 import com.solegendary.reignofnether.survival.SurvivalServerboundPacket;
@@ -59,9 +62,9 @@ public final class PacketHandler {
                 .encoder(UnitActionServerboundPacket::encode).decoder(UnitActionServerboundPacket::new)
                 .consumer(UnitActionServerboundPacket::handle).add();
 
-        INSTANCE.messageBuilder(UnitActionClientboundPacket.class, index++, NetworkDirection.PLAY_TO_CLIENT)
-                .encoder(UnitActionClientboundPacket::encode).decoder(UnitActionClientboundPacket::new)
-                .consumer(UnitActionClientboundPacket::handle).add();
+        INSTANCE.messageBuilder(BeaconSyncClientboundPacket.class, index++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(BeaconSyncClientboundPacket::encode).decoder(BeaconSyncClientboundPacket::new)
+                .consumer(BeaconSyncClientboundPacket::handle).add();
 
         INSTANCE.messageBuilder(UnitConvertClientboundPacket.class, index++, NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(UnitConvertClientboundPacket::encode).decoder(UnitConvertClientboundPacket::new)
@@ -213,6 +216,24 @@ public final class PacketHandler {
                 .encoder(ClientboundSyncResourceCostPacket::encode)
                 .decoder(ClientboundSyncResourceCostPacket::decode)
                 .consumer(ClientboundSyncResourceCostPacket::handle)
+                .add();
+
+        INSTANCE.messageBuilder(SandboxServerboundPacket.class, index++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(SandboxServerboundPacket::encode)
+                .decoder(SandboxServerboundPacket::new)
+                .consumer(SandboxServerboundPacket::handle)
+                .add();
+
+        INSTANCE.messageBuilder(GameruleServerboundPacket.class, index++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(GameruleServerboundPacket::encode)
+                .decoder(GameruleServerboundPacket::new)
+                .consumer(GameruleServerboundPacket::handle)
+                .add();
+
+        INSTANCE.messageBuilder(GameruleClientboundPacket.class, index++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(GameruleClientboundPacket::encode)
+                .decoder(GameruleClientboundPacket::new)
+                .consumer(GameruleClientboundPacket::handle)
                 .add();
     }
 }

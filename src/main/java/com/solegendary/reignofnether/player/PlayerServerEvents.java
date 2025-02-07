@@ -1,12 +1,12 @@
 package com.solegendary.reignofnether.player;
 
 import com.solegendary.reignofnether.ReignOfNether;
-import com.solegendary.reignofnether.alliance.AllianceSystem;
+import com.solegendary.reignofnether.alliance.AlliancesServer;
 import com.solegendary.reignofnether.alliance.AllyCommand;
-import com.solegendary.reignofnether.building.Building;
-import com.solegendary.reignofnether.building.BuildingServerEvents;
-import com.solegendary.reignofnether.building.NetherZone;
-import com.solegendary.reignofnether.building.ProductionBuilding;
+import com.solegendary.reignofnether.building.*;
+import com.solegendary.reignofnether.building.buildings.neutral.Beacon;
+import com.solegendary.reignofnether.gamemode.GameMode;
+import com.solegendary.reignofnether.gamemode.GameModeClientboundPacket;
 import com.solegendary.reignofnether.guiscreen.TopdownGuiContainer;
 import com.solegendary.reignofnether.registrars.EntityRegistrar;
 import com.solegendary.reignofnether.registrars.GameRuleRegistrar;
@@ -15,6 +15,7 @@ import com.solegendary.reignofnether.research.ResearchServerEvents;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.Resources;
 import com.solegendary.reignofnether.resources.ResourcesServerEvents;
+import com.solegendary.reignofnether.sandbox.SandboxServer;
 import com.solegendary.reignofnether.survival.SurvivalServerEvents;
 import com.solegendary.reignofnether.time.TimeUtils;
 import com.solegendary.reignofnether.tutorial.TutorialServerEvents;
@@ -25,7 +26,6 @@ import com.solegendary.reignofnether.unit.interfaces.WorkerUnit;
 import com.solegendary.reignofnether.unit.packets.UnitSyncClientboundPacket;
 import com.solegendary.reignofnether.util.Faction;
 import com.solegendary.reignofnether.util.MiscUtil;
-import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
@@ -87,13 +87,15 @@ public class PlayerServerEvents {
     // greedisgood X - gain X of each resource
     // foodforthought - ignore soft population caps
     // thereisnospoon - allow changing survival wave by clicking the wave indicator and using debug commands
+    // slipslopslap - monster units are unaffected by sunlight
     public static final List<String> singleWordCheats = List.of(
         "warpten",
         "operationcwal",
         "modifythephasevariance",
         "medievalman",
         "foodforthought",
-        "thereisnospoon"
+        "thereisnospoon",
+        "slipslopslap"
     );
 
     public static void saveRTSPlayers() {
@@ -107,13 +109,6 @@ public class PlayerServerEvents {
         serverLevel.getDataStorage().save();
     }
 
-    public static boolean isSandboxPlayer(String playerName) {
-        for (RTSPlayer rtsPlayer : rtsPlayers)
-            if (rtsPlayer.faction == Faction.NONE)
-                return true;
-        return false;
-    }
-
     @SubscribeEvent
     public static void onServerStarted(ServerStartedEvent evt) {
         ServerLevel level = evt.getServer().getLevel(Level.OVERWORLD);
@@ -124,8 +119,13 @@ public class PlayerServerEvents {
             rtsPlayers.clear();
             rtsPlayers.addAll(data.rtsPlayers);
 
+            for (RTSPlayer rtsPlayer : rtsPlayers) {
+                if (rtsPlayer.faction == Faction.NONE) {
+                    GameModeClientboundPacket.setAndLockAllClientGameModes(GameMode.SANDBOX);
+                    break;
+                }
+            }
             UnitServerEvents.maxPopulation = level.getGameRules().getInt(GameRuleRegistrar.MAX_POPULATION);
-            PlayerClientboundPacket.syncMaxPopulation(UnitServerEvents.maxPopulation);
         }
     }
 
@@ -179,6 +179,11 @@ public class PlayerServerEvents {
                     rtsGameTicks += 1;
                     if (rtsGameTicks % 200 == 0) {
                         PlayerClientboundPacket.syncRtsGameTime(rtsGameTicks);
+                    }
+                    if (rtsGameTicks % 20 == 0) {
+                        for (RTSPlayer rtsPlayer : rtsPlayers) {
+                            PlayerClientboundPacket.syncBeaconOwnerTicks(rtsPlayer.name, rtsPlayer.beaconOwnerTicks);
+                        }
                     }
                 }
             }
@@ -264,7 +269,6 @@ public class PlayerServerEvents {
         } else {
             PlayerClientboundPacket.disableStartRTS(playerName);
         }
-        PlayerClientboundPacket.syncMaxPopulation(UnitServerEvents.maxPopulation);
     }
 
     @SubscribeEvent
@@ -331,6 +335,9 @@ public class PlayerServerEvents {
             if (faction != Faction.NONE) {
                 if (SurvivalServerEvents.isEnabled()) {
                     level.setDayTime(TimeUtils.DAWN + getWaveSurvivalTimeModifier(SurvivalServerEvents.getDifficulty()));
+                    for (RTSPlayer rtsPlayer : rtsPlayers)
+                        if (!rtsPlayer.name.equals(playerName))
+                            AlliancesServer.addAlliance(rtsPlayer.name, playerName);
                 } else {
                     level.setDayTime(MONSTER_START_TIME_OF_DAY);
                 }
@@ -339,7 +346,10 @@ public class PlayerServerEvents {
 
             if (!TutorialServerEvents.isEnabled()) {
                 serverPlayer.sendSystemMessage(Component.literal(""));
-                sendMessageToAllPlayers("server.reignofnether.started", true, playerName);
+                if (faction == Faction.NONE)
+                    sendMessageToAllPlayers("server.reignofnether.started_sandbox", true, playerName);
+                else
+                    sendMessageToAllPlayers("server.reignofnether.started", true, playerName);
                 sendMessageToAllPlayers("server.reignofnether.total_players", false, rtsPlayers.size());
             }
             PlayerClientboundPacket.syncRtsGameTime(rtsGameTicks);
@@ -435,8 +445,7 @@ public class PlayerServerEvents {
 
             for (String cheatName : singleWordCheats) {
                 if (words.length == 1 && words[0].equalsIgnoreCase(cheatName)) {
-                    if (ResearchServerEvents.playerHasCheat(playerName, cheatName)
-                        && !cheatName.equals("medievalman")) {
+                    if (ResearchServerEvents.playerHasCheat(playerName, cheatName)) {
                         ResearchServerEvents.removeCheat(playerName, cheatName);
                         ResearchClientboundPacket.removeCheat(playerName, cheatName);
                         evt.setCanceled(true);
@@ -581,6 +590,9 @@ public class PlayerServerEvents {
     }
 
     public static void defeat(String playerName, String reason) {
+        if (SandboxServer.isSandboxPlayer(playerName))
+            return;
+
         synchronized (rtsPlayers) {
             // Remove the defeated player from the list
             rtsPlayers.removeIf(rtsPlayer -> {
@@ -630,7 +642,7 @@ public class PlayerServerEvents {
 
                 // Use the first remaining player as a reference to find all connected allies
                 String referencePlayer = remainingPlayers.iterator().next();
-                Set<String> factionGroup = AllianceSystem.getAllConnectedAllies(referencePlayer);
+                Set<String> factionGroup = AlliancesServer.getAllConnectedAllies(referencePlayer);
 
                 // Check if all remaining players are part of the same alliance group
                 if (remainingPlayers.equals(factionGroup)) {
@@ -649,38 +661,64 @@ public class PlayerServerEvents {
         }
     }
 
+    public static void beaconVictory(String playerName) {
+        if (SurvivalServerEvents.isEnabled()) {
+            if (AlliancesServer.getAllAllies(playerName).isEmpty())
+                sendMessageToAllPlayers("server.reignofnether.victorious", true, playerName);
+            else
+                sendMessageToAllPlayers("server.reignofnether.victory_alliance", true, playerName);
+            PlayerClientboundPacket.victory(playerName);
+            for (String allyName : AlliancesServer.getAllAllies(playerName))
+                PlayerClientboundPacket.victory(allyName);
+        } else {
+            List<String> playerNames = rtsPlayers.stream().map(p -> p.name).toList();
+            for (String name : playerNames)
+                if (!name.equals(playerName) && !AlliancesServer.isAllied(playerName, name))
+                    defeat(name, Component.translatable("server.reignofnether.beacon_defeat").getString());
+        }
+    }
+
+    public static String getBeaconWinTime(String playerName) {
+        for (RTSPlayer rtsPlayer : rtsPlayers) {
+            if (rtsPlayer.name.equals(playerName)) {
+                return TimeUtils.getTimeStrFromTicks(Beacon.TICKS_TO_WIN - rtsPlayer.beaconOwnerTicks);
+            }
+        }
+        return TimeUtils.getTimeStrFromTicks(Beacon.TICKS_TO_WIN);
+    }
+
     @SubscribeEvent
     public static void onRegisterCommand(RegisterCommandsEvent evt) {
         AllyCommand.register(evt.getDispatcher());
-
-        evt.getDispatcher().register(Commands.literal("rts-reset").executes((command) -> {
-            resetRTS();
-            return 1;
-        }));
     }
 
-    public static void resetRTS() {
+    public static void resetRTS(boolean hardReset) {
         synchronized (rtsPlayers) {
             rtsPlayers.clear();
 
-            for (LivingEntity entity : UnitServerEvents.getAllUnits())
-                entity.kill();
-
-            UnitServerEvents.getAllUnits().clear();
+            for (LivingEntity entity : UnitServerEvents.getAllUnits()) {
+                if (hardReset || (entity instanceof Unit unit && !unit.getOwnerName().isEmpty()))
+                    entity.kill();
+            }
+            UnitServerEvents.getAllUnits().removeIf(u -> (hardReset || (u instanceof Unit unit && !unit.getOwnerName().isEmpty())));
 
             for (Building building : BuildingServerEvents.getBuildings()) {
-                if (building instanceof ProductionBuilding productionBuilding) {
+                if (building instanceof ProductionBuilding productionBuilding)
                     productionBuilding.productionQueue.clear();
-                }
-                building.destroy((ServerLevel) building.getLevel());
+                if (building.shouldDestroyOnReset || hardReset)
+                    building.destroy((ServerLevel) building.getLevel());
             }
-            BuildingServerEvents.getBuildings().clear();
+            BuildingServerEvents.getBuildings().removeIf(b -> b.shouldDestroyOnReset || hardReset);
+            for (Building building : BuildingServerEvents.getBuildings())
+                building.ownerName = "";
             ResearchServerEvents.removeAllResearch();
             ResearchServerEvents.removeAllCheats();
-            PlayerClientboundPacket.resetRTS();
-
+            PlayerClientboundPacket.resetRTS(hardReset);
             if (!TutorialServerEvents.isEnabled()) {
-                sendMessageToAllPlayers("server.reignofnether.match_reset", true);
+                if (hardReset)
+                    sendMessageToAllPlayers("server.reignofnether.match_reset_hard", true);
+                else
+                    sendMessageToAllPlayers("server.reignofnether.match_reset", true);
             }
             ResourcesServerEvents.resourcesList.clear();
             BuildingServerEvents.netherZones.forEach(NetherZone::startRestoring);
@@ -696,7 +734,7 @@ public class PlayerServerEvents {
 
             if (rtsLocked)
                 setRTSLock(false);
-            AllianceSystem.resetAllAlliances();
+            AlliancesServer.resetAllAlliances();
             SurvivalServerEvents.reset();
         }
     }

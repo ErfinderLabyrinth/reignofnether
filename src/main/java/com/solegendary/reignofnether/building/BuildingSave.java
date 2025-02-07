@@ -16,11 +16,11 @@ public class BuildingSave {
     public BlockPos rallyPoint;
     public boolean isBuilt;
     public boolean isDiagonalBridge;
-    public boolean isUpgraded; // castle flag, lab rod, etc.
+    public int upgradeLevel; // castle flag, lab rod, etc.
     Portal.PortalType portalType;
 
     public BuildingSave(BlockPos originPos, Level level, String name, String ownerName, Rotation rotation, BlockPos rallyPoint,
-                        boolean isDiagonalBridge, boolean isBuilt, boolean isUpgraded, Portal.PortalType portalType) {
+                        boolean isDiagonalBridge, boolean isBuilt, int upgradeLevel, Portal.PortalType portalType) {
         this.originPos = originPos;
         this.level = level;
         this.name = name;
@@ -29,7 +29,7 @@ public class BuildingSave {
         this.rallyPoint = rallyPoint;
         this.isDiagonalBridge = isDiagonalBridge;
         this.isBuilt = isBuilt;
-        this.isUpgraded = isUpgraded;
+        this.upgradeLevel = upgradeLevel;
         this.portalType = portalType;
     }
 }

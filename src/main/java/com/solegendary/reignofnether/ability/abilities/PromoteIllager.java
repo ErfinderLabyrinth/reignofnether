@@ -77,7 +77,7 @@ public class PromoteIllager extends Ability {
             () -> false,
             () -> {
                 if (building instanceof Castle castle) {
-                    return !castle.isUpgraded();
+                    return castle.getUpgradeLevel() == 0;
                 }
                 return true;
             },

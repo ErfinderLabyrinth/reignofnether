@@ -1,7 +1,7 @@
 package com.solegendary.reignofnether.building;
 
-import com.solegendary.reignofnether.alliance.AllianceSystem;
-import com.solegendary.reignofnether.unit.Relationship;
+import com.solegendary.reignofnether.alliance.AlliancesClient;
+import com.solegendary.reignofnether.alliance.AlliancesServer;
 import com.solegendary.reignofnether.unit.UnitClientEvents;
 import com.solegendary.reignofnether.unit.UnitServerEvents;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
@@ -51,8 +51,13 @@ public interface GarrisonableBuilding {
 
         for (Building building : buildings) {
 
-            if ((unit.getOwnerName().equals(building.ownerName) ||
-                    AllianceSystem.isAllied(unit.getOwnerName(), building.ownerName)) &&
+            boolean isAllied;
+            if (((Entity) unit).getLevel().isClientSide())
+                isAllied = AlliancesClient.isAllied(unit.getOwnerName(), building.ownerName);
+            else
+                isAllied = AlliancesServer.isAllied(unit.getOwnerName(), building.ownerName);
+
+            if ((unit.getOwnerName().equals(building.ownerName) || isAllied) &&
                     building instanceof GarrisonableBuilding garr && building.isBuilt &&
                     building.isPosInsideBuilding(((LivingEntity) unit).getOnPos()) &&
                     ((LivingEntity) unit).getOnPos().getY() > building.originPos.getY() + 2) {

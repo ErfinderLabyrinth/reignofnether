@@ -1,12 +1,16 @@
 package com.solegendary.reignofnether.mixin;
 
-import com.solegendary.reignofnether.fogofwar.FogOfWarClientEvents;
+import com.solegendary.reignofnether.building.BuildingUtils;
+import com.solegendary.reignofnether.building.buildings.neutral.Beacon;
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
-import net.minecraft.client.renderer.chunk.ChunkRenderDispatcher;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
+import net.minecraftforge.common.extensions.IForgeBlockEntity;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -26,6 +30,26 @@ public class FrustumMixin {
     ) {
         if (OrthoviewClientEvents.isEnabled()) {
             cir.setReturnValue(true);
+        }
+    }
+
+    @Inject(
+            method = "isVisible(Lnet/minecraft/world/phys/AABB;)Z",
+            at = @At("HEAD"),
+            cancellable = true
+    )
+    public void isVisible(AABB aabb, CallbackInfoReturnable<Boolean> cir) {
+        // aabb is infinite only for structure and beacon blocks
+        boolean couldBeBeacon = aabb.equals(IForgeBlockEntity.INFINITE_EXTENT_AABB);
+
+        Player player = Minecraft.getInstance().player;
+        Beacon beacon = BuildingUtils.getBeacon(true);
+        float zoom = Math.max(30, OrthoviewClientEvents.getZoom()) * 2;
+
+        if (player != null && OrthoviewClientEvents.isEnabled() && couldBeBeacon && beacon != null) {
+            BlockPos equalYBp = new BlockPos(player.getOnPos().getX(), beacon.centrePos.getY(), player.getOnPos().getZ());
+            if (beacon.centrePos.distSqr(equalYBp) < (zoom * zoom))
+                cir.setReturnValue(true);
         }
     }
 }

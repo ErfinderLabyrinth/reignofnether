@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.solegendary.reignofnether.hud.buttons.StartButtons.ICON_SIZE;
+import static com.solegendary.reignofnether.util.MiscUtil.fcs;
 
 public class SurvivalClientEvents {
 
@@ -97,10 +98,6 @@ public class SurvivalClientEvents {
             case NONE -> "";
         };
         return I18n.get(localePrefix + string);
-    }
-
-    private static FormattedCharSequence fcs(String string) {
-        return FormattedCharSequence.forward(string, Style.EMPTY);
     }
 
     private static FormattedCharSequence slimeFcs() {

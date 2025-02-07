@@ -6,8 +6,8 @@ import com.mojang.blaze3d.vertex.*;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3d;
-import com.solegendary.reignofnether.alliance.AllianceSystem;
 import com.solegendary.reignofnether.ReignOfNether;
+import com.solegendary.reignofnether.alliance.AlliancesClient;
 import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingClientEvents;
 import com.solegendary.reignofnether.building.RangeIndicator;
@@ -18,7 +18,6 @@ import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
 import com.solegendary.reignofnether.player.PlayerServerboundPacket;
-import com.solegendary.reignofnether.resources.ResourceSources;
 import com.solegendary.reignofnether.time.NightCircleMode;
 import com.solegendary.reignofnether.time.TimeClientEvents;
 import com.solegendary.reignofnether.tutorial.TutorialClientEvents;
@@ -49,11 +48,12 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.Vec2;
 import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.client.event.ScreenEvent;
-import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 import static com.solegendary.reignofnether.time.TimeClientEvents.getNightCircleModeName;
 import static com.solegendary.reignofnether.time.TimeClientEvents.nightCircleMode;
@@ -68,6 +68,7 @@ public class MinimapClientEvents {
     public static final int BG_OFFSET = 6;
 
     private static boolean largeMap = false;
+    public static boolean isLargeMap() { return largeMap; }
     private static boolean shouldToggleSize = false;
 
     private static final int UNIT_RADIUS = 3;
@@ -221,7 +222,10 @@ public class MinimapClientEvents {
                             ri.updateBorderBps();
                 },
                 null,
-                List.of(FormattedCharSequence.forward(I18n.get("time.reignofnether.night_circles", getNightCircleModeName()), Style.EMPTY))
+                List.of(
+                        FormattedCharSequence.forward(I18n.get("time.reignofnether.night_circles", getNightCircleModeName()), Style.EMPTY),
+                        FormattedCharSequence.forward(I18n.get("time.reignofnether.night_circle_change"), Style.EMPTY)
+                )
         );
     }
 
@@ -594,7 +598,7 @@ public class MinimapClientEvents {
                 relationship = Relationship.OWNED;
             } else if (unitOwnerName.isBlank()) {
                 relationship = Relationship.NEUTRAL;
-            } else if (AllianceSystem.isAllied(playerName, unitOwnerName)) {
+            } else if (AlliancesClient.isAllied(playerName, unitOwnerName)) {
                 relationship = Relationship.FRIENDLY;
             }
 
@@ -659,7 +663,7 @@ public class MinimapClientEvents {
                         x0 < PLAYER_THICKNESS || x0 >= (PLAYER_RADIUS * 2) - PLAYER_THICKNESS ||
                         z0 < PLAYER_THICKNESS || z0 >= (PLAYER_RADIUS * 2) - PLAYER_THICKNESS
                     )) {
-                        if (AllianceSystem.isAllied(thisPlayerName, thatPlayerName))
+                        if (AlliancesClient.isAllied(thisPlayerName, thatPlayerName))
                             rgb = 0x3232FF;
                         else
                             rgb = 0xFF0000;

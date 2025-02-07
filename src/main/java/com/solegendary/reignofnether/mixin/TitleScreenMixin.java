@@ -115,7 +115,7 @@ public class TitleScreenMixin extends Screen {
         this.discordButton = new AbstractWidget(discordX, discordY, 114, 38, Component.empty()) {
             @Override
             public void onClick(double pMouseX, double pMouseY) {
-                openLink("https://discord.gg/uR6FWdUcw3");
+                openLink("https://discord.gg/erBen9CzbD");
             }
 
             @Override

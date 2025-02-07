@@ -1,8 +1,6 @@
 package com.solegendary.reignofnether.player;
 
-import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
 import com.solegendary.reignofnether.registrars.PacketHandler;
-import com.solegendary.reignofnether.unit.UnitClientEvents;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
@@ -38,9 +36,14 @@ public class PlayerClientboundPacket {
                 new PlayerClientboundPacket(PlayerAction.VICTORY, playerName, 0L));
     }
 
-    public static void resetRTS() {
-        PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(),
-                new PlayerClientboundPacket(PlayerAction.RESET_RTS, "", 0L));
+    public static void resetRTS(boolean hard) {
+        if (hard) {
+            PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(),
+                    new PlayerClientboundPacket(PlayerAction.RESET_RTS_HARD, "", 0L));
+        } else {
+            PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(),
+                    new PlayerClientboundPacket(PlayerAction.RESET_RTS, "", 0L));
+        }
     }
 
     public static void syncRtsGameTime(Long rtsGameTicks) {
@@ -68,19 +71,9 @@ public class PlayerClientboundPacket {
                 new PlayerClientboundPacket(PlayerAction.ENABLE_START_RTS, playerName, 0L));
     }
 
-    public static void syncMaxPopulation(long maxPopulation) {
+    public static void syncBeaconOwnerTicks(String playerName, long ticks) {
         PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(),
-                new PlayerClientboundPacket(PlayerAction.SYNC_MAX_POPULATION, "", maxPopulation));
-    }
-
-    public static void setOrthoviewMinY(long orthoviewMinY) {
-        PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(),
-                new PlayerClientboundPacket(PlayerAction.SET_MIN_ORTHOVIEW_Y, "", orthoviewMinY));
-    }
-
-    public static void syncNeutralAggro(boolean neutralAggro) {
-        PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(),
-                new PlayerClientboundPacket(PlayerAction.SYNC_NEUTRAL_AGGRO, "", neutralAggro ? 1L : 0L));
+                new PlayerClientboundPacket(PlayerAction.SYNC_BEACON_OWNER_TICKS, playerName, ticks));
     }
 
     public PlayerClientboundPacket(PlayerAction playerAction, String playerName, Long value) {
@@ -113,15 +106,14 @@ public class PlayerClientboundPacket {
                             case VICTORY -> PlayerClientEvents.victory(playerName);
                             case DISABLE_RTS -> PlayerClientEvents.disableRTS(playerName);
                             case ENABLE_RTS -> PlayerClientEvents.enableRTS(playerName);
-                            case RESET_RTS -> PlayerClientEvents.resetRTS();
+                            case RESET_RTS -> PlayerClientEvents.resetRTS(false);
+                            case RESET_RTS_HARD -> PlayerClientEvents.resetRTS(true);
                             case SYNC_RTS_GAME_TIME -> PlayerClientEvents.syncRtsGameTime(value);
                             case LOCK_RTS -> PlayerClientEvents.setRTSLock(true);
                             case UNLOCK_RTS -> PlayerClientEvents.setRTSLock(false);
                             case ENABLE_START_RTS -> PlayerClientEvents.setCanStartRTS(true);
                             case DISABLE_START_RTS -> PlayerClientEvents.setCanStartRTS(false);
-                            case SYNC_MAX_POPULATION -> UnitClientEvents.setMaxPopulation(Math.toIntExact(value));
-                            case SET_MIN_ORTHOVIEW_Y -> OrthoviewClientEvents.setMinOrthoviewY(value);
-                            case SYNC_NEUTRAL_AGGRO -> UnitClientEvents.neutralAggro = value == 1L;
+                            case SYNC_BEACON_OWNER_TICKS -> PlayerClientEvents.syncBeaconOwnerTicks(playerName, value);
                         }
                         success.set(true);
                     });

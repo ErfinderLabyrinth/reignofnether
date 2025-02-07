@@ -48,7 +48,7 @@ public class ResearchLabLightningRod extends ProductionItem {
             hotkey,
             () -> false,
             () -> prodBuilding.productionQueue.stream().map(ProductionItem::getItemName).toList().contains(itemName) ||
-                    (prodBuilding instanceof Laboratory lab && lab.isUpgraded()),
+                    (prodBuilding instanceof Laboratory lab && lab.getUpgradeLevel() > 0),
             () -> BuildingClientEvents.hasFinishedBuilding(Dungeon.buildingName),
             () -> BuildingServerboundPacket.startProduction(prodBuilding.originPos, itemName),
             null,

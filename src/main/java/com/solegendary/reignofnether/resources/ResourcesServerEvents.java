@@ -5,6 +5,8 @@ import com.solegendary.reignofnether.building.*;
 import com.solegendary.reignofnether.player.PlayerServerEvents;
 import com.solegendary.reignofnether.registrars.BlockRegistrar;
 import com.solegendary.reignofnether.registrars.GameRuleRegistrar;
+import com.solegendary.reignofnether.research.ResearchServerEvents;
+import com.solegendary.reignofnether.sandbox.SandboxServer;
 import com.solegendary.reignofnether.tutorial.TutorialServerEvents;
 import com.solegendary.reignofnether.unit.UnitServerEvents;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
@@ -133,7 +135,7 @@ public class ResourcesServerEvents {
                     resources.food = STARTING_FOOD_TUTORIAL;
                     resources.wood = STARTING_WOOD_TUTORIAL;
                     resources.ore = STARTING_ORE_TUTORIAL;
-                } else if (PlayerServerEvents.isSandboxPlayer(playerName)) {
+                } else if (SandboxServer.isSandboxPlayer(playerName)) {
                     resources.food = STARTING_FOOD_SANDBOX;
                     resources.wood = STARTING_WOOD_SANDBOX;
                     resources.ore = STARTING_ORE_SANDBOX;
@@ -167,7 +169,6 @@ public class ResourcesServerEvents {
         if (cost <= 0) {
             return true;
         }
-
         for (Resources resources : ResourcesServerEvents.resourcesList)
             if (resources.ownerName.equals(ownerName)) {
                 switch (resourceName) {

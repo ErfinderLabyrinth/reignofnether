@@ -5,6 +5,7 @@ import com.mojang.serialization.Dynamic;
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.CallToArmsUnit;
+import com.solegendary.reignofnether.building.buildings.neutral.Beacon;
 import com.solegendary.reignofnether.building.buildings.villagers.*;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybindings;
@@ -281,7 +282,8 @@ public class VillagerUnit extends Vindicator implements Unit, WorkerUnit, Attack
             Library.getBuildButton(Keybindings.keyO),
             Castle.getBuildButton(Keybindings.keyP),
             IronGolemBuilding.getBuildButton(Keybindings.keyL),
-            OakBridge.getBuildButton(Keybindings.keyC)
+            OakBridge.getBuildButton(Keybindings.keyC),
+            Beacon.getBuildButton(null)
         );
     }
 

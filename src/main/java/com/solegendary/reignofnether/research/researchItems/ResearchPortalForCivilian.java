@@ -50,7 +50,7 @@ public class ResearchPortalForCivilian extends ProductionItem {
             hotkey,
             () -> false,
             () -> prodBuilding.productionQueue.size() > 0 || (
-                prodBuilding instanceof Portal portal && portal.isUpgraded()
+                prodBuilding instanceof Portal portal && portal.getUpgradeLevel() > 0
             ),
             () -> true,
             () -> {

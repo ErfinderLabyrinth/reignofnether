@@ -29,7 +29,5 @@ public class GameModeServerEvents {
     public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent evt) {
         if (isGameModeLocked())
             GameModeClientboundPacket.setAndLockAllClientGameModes(getGameMode());
-        if (evt.getEntity().getLevel().getGameRules().getRule(GameRuleRegistrar.DISALLOW_WAVE_SURVIVAL).get())
-            GameModeClientboundPacket.disallowSurvival();
     }
 }

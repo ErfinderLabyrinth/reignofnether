@@ -71,13 +71,16 @@ public class MountSpider extends Ability {
     // right click
     @Override
     public void use(Level level, Unit unitUsing, BlockPos targetBp) {
-        getMountGoal().autofind = true;
+        MountGoal mountGoal = getMountGoal();
+        if (mountGoal != null)
+            mountGoal.autofind = true;
     }
 
     @Override
     public void use(Level level, Unit unitUsing, LivingEntity targetEntity) {
-        if (targetEntity instanceof SpiderUnit || targetEntity instanceof PoisonSpiderUnit) {
-            getMountGoal().setTarget(targetEntity);
+        MountGoal mountGoal = getMountGoal();
+        if (mountGoal != null && targetEntity instanceof SpiderUnit) {
+            mountGoal.setTarget(targetEntity);
         } else if (level.isClientSide()) {
             HudClientEvents.showTemporaryMessage(I18n.get("abilities.reignofnether.mount_spider.error1"));
         }

@@ -4,15 +4,17 @@ import com.mojang.datafixers.util.Pair;
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.CallToArmsUnit;
-import com.solegendary.reignofnether.ability.abilities.SonicBoom;
-import com.solegendary.reignofnether.alliance.AllianceSystem;
+import com.solegendary.reignofnether.alliance.AlliancesClient;
 import com.solegendary.reignofnether.attackwarnings.AttackWarningClientEvents;
 import com.solegendary.reignofnether.building.*;
+import com.solegendary.reignofnether.building.buildings.neutral.Beacon;
 import com.solegendary.reignofnether.config.ConfigClientEvents;
 import com.solegendary.reignofnether.gamemode.ClientGameModeHelper;
 import com.solegendary.reignofnether.gamemode.GameMode;
+import com.solegendary.reignofnether.gamerules.GameruleClient;
 import com.solegendary.reignofnether.guiscreen.TopdownGui;
 import com.solegendary.reignofnether.hud.buttons.ActionButtons;
+import com.solegendary.reignofnether.hud.buttons.HelperButtons;
 import com.solegendary.reignofnether.hud.buttons.StartButtons;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.keybinds.Keybindings;
@@ -23,6 +25,8 @@ import com.solegendary.reignofnether.resources.ResourceName;
 import com.solegendary.reignofnether.resources.ResourceSources;
 import com.solegendary.reignofnether.resources.Resources;
 import com.solegendary.reignofnether.resources.ResourcesClientEvents;
+import com.solegendary.reignofnether.sandbox.SandboxClientEvents;
+import com.solegendary.reignofnether.sandbox.SandboxMenuType;
 import com.solegendary.reignofnether.survival.SurvivalClientEvents;
 import com.solegendary.reignofnether.tutorial.TutorialClientEvents;
 import com.solegendary.reignofnether.tutorial.TutorialStage;
@@ -45,7 +49,6 @@ import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.client.tutorial.TutorialSteps;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
@@ -54,10 +57,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.item.BannerItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.client.event.*;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.RenderNameTagEvent;
 import net.minecraftforge.client.event.ScreenEvent;
@@ -261,7 +262,7 @@ public class HudClientEvents {
         mouseY = evt.getMouseY();
 
         // where to start drawing the centre hud (from left to right: portrait, stats, unit icon buttons)
-        int hudStartingXPos = Button.iconFrameSize * 6 + (Button.iconFrameSize / 2);
+        int hudStartingXPos = Button.DEFAULT_ICON_FRAME_SIZE * 6 + (Button.DEFAULT_ICON_FRAME_SIZE / 2);
 
         ArrayList<LivingEntity> selUnits = UnitClientEvents.getSelectedUnits();
         ArrayList<Building> selBuildings = BuildingClientEvents.getSelectedBuildings();
@@ -271,7 +272,7 @@ public class HudClientEvents {
         int screenHeight = MC.getWindow().getGuiScaledHeight();
 
         int iconSize = 14;
-        int iconFrameSize = Button.iconFrameSize;
+        int iconFrameSize = Button.DEFAULT_ICON_FRAME_SIZE;
 
         // screenWidth ranges roughly between 440-540
         int buttonsPerRow = (int) Math.ceil((float) (screenWidth - 340) / iconFrameSize);
@@ -527,7 +528,7 @@ public class HudClientEvents {
                         .toList();
                 }
                 if (buildingAbilities.size() > 0) {
-                    blitY -= Button.iconFrameSize;
+                    blitY -= Button.DEFAULT_ICON_FRAME_SIZE;
                 }
 
                 // production buttons on bottom row
@@ -536,7 +537,7 @@ public class HudClientEvents {
                         .filter(b -> !b.isHidden.get())
                         .toList();
                     if (visibleProdButtons.size() > MAX_BUTTONS_PER_ROW) {
-                        blitY -= Button.iconFrameSize;
+                        blitY -= Button.DEFAULT_ICON_FRAME_SIZE;
                     }
 
                     int rowButtons = 0;
@@ -545,7 +546,7 @@ public class HudClientEvents {
                         if (rowButtons > MAX_BUTTONS_PER_ROW) {
                             rowButtons = 0;
                             blitX = 0;
-                            blitY += Button.iconFrameSize;
+                            blitY += Button.DEFAULT_ICON_FRAME_SIZE;
                         }
                         prodButton.render(evt.getPoseStack(), blitX, blitY, mouseX, mouseY);
                         productionButtons.add(prodButton);
@@ -553,7 +554,7 @@ public class HudClientEvents {
                         blitX += iconFrameSize;
                     }
                 }
-                blitY += Button.iconFrameSize;
+                blitY += Button.DEFAULT_ICON_FRAME_SIZE;
                 blitX = 0;
                 for (AbilityButton abilityButton : buildingAbilities) {
                     if (!abilityButton.isHidden.get()) {
@@ -850,13 +851,20 @@ public class HudClientEvents {
                 }
             }
         }
-        else if (PlayerClientEvents.isSandbox() && selUnits.isEmpty() && selBuildings.isEmpty()) {
+        else if (MC.player != null && SandboxClientEvents.isSandboxPlayer(MC.player.getName().getString()) && selUnits.isEmpty() && selBuildings.isEmpty()) {
             blitX = 0;
             blitY = screenHeight - iconFrameSize;
 
             ArrayList<Button> actionButtons = new ArrayList<>();
-            actionButtons.add(HudSandboxClientEvents.getToggleBuildingFactionButton());
-            actionButtons.add(HudSandboxClientEvents.getToggleBuildingCheatsButton());
+            actionButtons.add(SandboxClientEvents.getToggleBuildingOrUnitsButton());
+            actionButtons.add(SandboxClientEvents.getToggleFactionButton());
+            actionButtons.add(SandboxClientEvents.getToggleRelationshipButton());
+
+            if (SandboxClientEvents.sandboxMenuType == SandboxMenuType.BUILDINGS) {
+                actionButtons.add(SandboxClientEvents.getToggleBuildingCheatsButton());
+            } else {
+                actionButtons.add(SandboxClientEvents.getToggleUnitCheatsButton());
+            }
 
             for (Button actionButton : actionButtons) {
                 actionButton.render(evt.getPoseStack(), blitX, blitY, mouseX, mouseY);
@@ -866,7 +874,11 @@ public class HudClientEvents {
             blitX = 0;
             blitY = screenHeight - (iconFrameSize * 2) - 4;
 
-            List<AbilityButton> abilityButtons = HudSandboxClientEvents.getBuildingButtons();
+            List<AbilityButton> abilityButtons = switch(SandboxClientEvents.sandboxMenuType) {
+                case BUILDINGS -> SandboxClientEvents.getBuildingButtons();
+                default -> SandboxClientEvents.getUnitButtons();
+            };
+
             List<AbilityButton> shownAbilities = abilityButtons.stream()
                     .filter(ab -> !ab.isHidden.get() && !(ab.ability instanceof CallToArmsUnit))
                     .toList();
@@ -908,7 +920,7 @@ public class HudClientEvents {
         if (selPlayerName != null) {
             resources = ResourcesClientEvents.getResources(selPlayerName);
         }
-        boolean alliedWithSelPlayer = MC.player != null && AllianceSystem.isAllied(MC.player.getName().getString(), selPlayerName);
+        boolean alliedWithSelPlayer = MC.player != null && AlliancesClient.isAllied(MC.player.getName().getString(), selPlayerName);
         boolean isSelPlayer = MC.player != null && MC.player.getName().getString().equals(selPlayerName);
 
         blitX = 0;
@@ -1073,7 +1085,7 @@ public class HudClientEvents {
                 if (resourceName.equals("population")) {
                     tooltip = List.of(FormattedCharSequence.forward(I18n.get("hud.reignofnether.max_resources",
                         I18n.get(key),
-                        maxPopulation
+                        GameruleClient.maxPopulation
                     ), Style.EMPTY));
                 } else {
                     tooltip = List.of(FormattedCharSequence.forward(I18n.get(key), Style.EMPTY));
@@ -1201,63 +1213,93 @@ public class HudClientEvents {
             );
             renderedButtons.add(nightCirclesButton);
         }
+        Button leavesHidingButton = OrthoviewClientEvents.getLeavesHidingButton();
+        if (!leavesHidingButton.isHidden.get()) {
+            leavesHidingButton.render(evt.getPoseStack(),
+                    screenWidth - (camSensitivityButton.iconSize * 6),
+                    screenHeight - (camSensitivityButton.iconSize * 2),
+                    mouseX,
+                    mouseY
+            );
+            renderedButtons.add(leavesHidingButton);
+        }
 
         // ------------------------------
         // Start buttons (spectator only)
         // ------------------------------
         if (!PlayerClientEvents.isRTSPlayer && !PlayerClientEvents.rtsLocked) {
 
-                Button diffsButton = ConfigClientEvents.getDiffsButton();
-                if (!diffsButton.isHidden.get()) {
-                    diffsButton.render(evt.getPoseStack(),
-                            screenWidth - (StartButtons.ICON_SIZE * 10),
+            Button diffsButton = ConfigClientEvents.getDiffsButton();
+            if (!diffsButton.isHidden.get()) {
+                diffsButton.render(evt.getPoseStack(),
+                        screenWidth - (StartButtons.ICON_SIZE * 10),
+                        StartButtons.ICON_SIZE / 2,
+                        mouseX,
+                        mouseY
+                );
+                renderedButtons.add(diffsButton);
+            }
+
+            Button gamemodeButton = ClientGameModeHelper.getButton();
+            if (gamemodeButton != null && !gamemodeButton.isHidden.get() && !TutorialClientEvents.isEnabled()) {
+                gamemodeButton.render(evt.getPoseStack(),
+                        screenWidth - (StartButtons.ICON_SIZE * 8),
+                        StartButtons.ICON_SIZE / 2,
+                        mouseX,
+                        mouseY
+                );
+                renderedButtons.add(gamemodeButton);
+            }
+
+            Button gamerulesButton = GameruleClient.getGamerulesButton();
+            if (MC.player != null && !gamerulesButton.isHidden.get() && !TutorialClientEvents.isEnabled()) {
+                int xr = screenWidth - (StartButtons.ICON_SIZE * 8);
+                int yr = 40;
+                gamerulesButton.render(evt.getPoseStack(), xr, yr, mouseX, mouseY);
+                renderedButtons.add(gamerulesButton);
+                if (GameruleClient.gamerulesMenuOpen) {
+                    List<Button> gameruleButtons = GameruleClient.renderGamerulesGUI(evt.getPoseStack(), xr, yr, mouseX, mouseY);
+                    renderedButtons.addAll(gameruleButtons);
+                }
+            }
+
+            if (ClientGameModeHelper.gameMode != GameMode.SANDBOX) {
+                if (!StartButtons.villagerStartButton.isHidden.get()) {
+                    StartButtons.villagerStartButton.render(evt.getPoseStack(),
+                            screenWidth - (StartButtons.ICON_SIZE * 6),
                             StartButtons.ICON_SIZE / 2,
                             mouseX,
                             mouseY
                     );
-                    renderedButtons.add(diffsButton);
+                    renderedButtons.add(StartButtons.villagerStartButton);
                 }
-
-                Button gamemodeButton = ClientGameModeHelper.getButton();
-                if (gamemodeButton != null && !gamemodeButton.isHidden.get() && !TutorialClientEvents.isEnabled()) {
-                    gamemodeButton.render(evt.getPoseStack(),
-                            screenWidth - (StartButtons.ICON_SIZE * 8),
+                if (!StartButtons.monsterStartButton.isHidden.get()) {
+                    StartButtons.monsterStartButton.render(evt.getPoseStack(),
+                            (int) (screenWidth - (StartButtons.ICON_SIZE * 4f)),
                             StartButtons.ICON_SIZE / 2,
                             mouseX,
                             mouseY
                     );
-                    renderedButtons.add(gamemodeButton);
+                    renderedButtons.add(StartButtons.monsterStartButton);
                 }
-
-                if (ClientGameModeHelper.gameMode != GameMode.SANDBOX) {
-                    if (!StartButtons.villagerStartButton.isHidden.get()) {
-                        StartButtons.villagerStartButton.render(evt.getPoseStack(),
-                                screenWidth - (StartButtons.ICON_SIZE * 6),
-                                StartButtons.ICON_SIZE / 2,
-                                mouseX,
-                                mouseY
-                        );
-                        renderedButtons.add(StartButtons.villagerStartButton);
-                    }
-                    if (!StartButtons.monsterStartButton.isHidden.get()) {
-                        StartButtons.monsterStartButton.render(evt.getPoseStack(),
-                                (int) (screenWidth - (StartButtons.ICON_SIZE * 4f)),
-                                StartButtons.ICON_SIZE / 2,
-                                mouseX,
-                                mouseY
-                        );
-                        renderedButtons.add(StartButtons.monsterStartButton);
-                    }
-                    if (!StartButtons.piglinStartButton.isHidden.get()) {
-                        StartButtons.piglinStartButton.render(evt.getPoseStack(),
-                                screenWidth - (StartButtons.ICON_SIZE * 2),
-                                StartButtons.ICON_SIZE / 2,
-                                mouseX,
-                                mouseY
-                        );
-                        renderedButtons.add(StartButtons.piglinStartButton);
-                    }
+                if (!StartButtons.piglinStartButton.isHidden.get()) {
+                    StartButtons.piglinStartButton.render(evt.getPoseStack(),
+                            screenWidth - (StartButtons.ICON_SIZE * 2),
+                            StartButtons.ICON_SIZE / 2,
+                            mouseX,
+                            mouseY
+                    );
+                    renderedButtons.add(StartButtons.piglinStartButton);
                 }
+            } else if (!StartButtons.sandboxStartButton.isHidden.get()) {
+                StartButtons.sandboxStartButton.render(evt.getPoseStack(),
+                        (int) (screenWidth - (StartButtons.ICON_SIZE * 4f)),
+                        StartButtons.ICON_SIZE / 2,
+                        mouseX,
+                        mouseY
+                );
+                renderedButtons.add(StartButtons.sandboxStartButton);
+            }
         }
         else if (SurvivalClientEvents.isEnabled) {
             Button nextWaveButton = SurvivalClientEvents.getNextWaveButton();
@@ -1270,6 +1312,33 @@ public class HudClientEvents {
                         mouseY
                 );
                 renderedButtons.add(nextWaveButton);
+            }
+        }
+        else if (SandboxClientEvents.isSandboxPlayer(MC.player.getName().getString())) {
+            Button exitButton = SandboxClientEvents.getExitSandboxButton();
+            if (!exitButton.isHidden.get()) {
+                exitButton.render(evt.getPoseStack(),
+                        (int) (screenWidth - (StartButtons.ICON_SIZE * 2f)),
+                        StartButtons.ICON_SIZE / 2,
+                        mouseX,
+                        mouseY
+                );
+                renderedButtons.add(exitButton);
+            }
+        }
+
+        Beacon beacon = BuildingUtils.getBeacon(true);
+        if (beacon != null) {
+            Button beaconButton = HelperButtons.getBeaconButton(beacon.ownerName);
+            if (!beaconButton.isHidden.get()) {
+                beaconButton.tooltipOffsetY = 15;
+                beaconButton.render(evt.getPoseStack(),
+                        screenWidth - (StartButtons.ICON_SIZE * 2),
+                        40,
+                        mouseX,
+                        mouseY
+                );
+                renderedButtons.add(beaconButton);
             }
         }
 

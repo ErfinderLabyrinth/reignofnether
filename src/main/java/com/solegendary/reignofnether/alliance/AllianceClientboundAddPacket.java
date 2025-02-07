@@ -28,7 +28,7 @@ public class AllianceClientboundAddPacket {
         NetworkEvent.Context context = contextSupplier.get();
         context.enqueueWork(() -> {
             // Client-side handling of adding an alliance
-            AllianceSystem.addAlliance(owner1, owner2);
+            AlliancesClient.addAlliance(owner1, owner2);
         });
         return true;
     }

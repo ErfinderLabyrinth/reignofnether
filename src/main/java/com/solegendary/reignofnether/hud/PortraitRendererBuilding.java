@@ -42,7 +42,7 @@ class PortraitRendererBuilding {
 
         String name = building.name;
 
-        if (building.isUpgraded())
+        if (building.getUpgradeLevel() > 0)
             name = building.getUpgradedName();
 
         if (!building.isBuilt)

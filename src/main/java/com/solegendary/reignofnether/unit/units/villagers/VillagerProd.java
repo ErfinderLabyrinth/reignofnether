@@ -1,7 +1,11 @@
 package com.solegendary.reignofnether.unit.units.villagers;
 
 import com.solegendary.reignofnether.building.BuildingUtils;
+import com.solegendary.reignofnether.cursor.CursorClientEvents;
+import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.hud.HudClientEvents;
+import com.solegendary.reignofnether.sandbox.SandboxAction;
+import com.solegendary.reignofnether.sandbox.SandboxClientEvents;
 import net.minecraft.client.resources.language.I18n;
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.building.BuildingServerboundPacket;
@@ -39,6 +43,30 @@ public class VillagerProd extends ProductionItem {
 
     public String getItemName() {
         return VillagerProd.itemName;
+    }
+
+    public static AbilityButton getPlaceButton() {
+        return new AbilityButton(
+                itemName,
+                new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/villager.png"),
+                null,
+                () -> SandboxClientEvents.spawnUnitName.equals(itemName),
+                () -> false,
+                () -> true,
+                () -> {
+                    CursorClientEvents.setLeftClickSandboxAction(SandboxAction.SPAWN_UNIT);
+                    SandboxClientEvents.spawnUnitName = itemName;
+                },
+                null,
+                List.of(
+                        FormattedCharSequence.forward(I18n.get("units.villagers.reignofnether.villager"), Style.EMPTY.withBold(true)),
+                        FormattedCharSequence.forward("", Style.EMPTY),
+                        FormattedCharSequence.forward(I18n.get("units.villagers.reignofnether.villager.tooltip1"), Style.EMPTY),
+                        FormattedCharSequence.forward(I18n.get("units.villagers.reignofnether.villager.tooltip2"), Style.EMPTY),
+                        FormattedCharSequence.forward(I18n.get("units.villagers.reignofnether.villager.tooltip3"), Style.EMPTY)
+                ),
+                null
+        );
     }
 
     public static Button getStartButton(ProductionBuilding prodBuilding, Keybinding hotkey) {

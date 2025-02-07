@@ -74,8 +74,8 @@ public class TutorialRendering {
                 // x1,y1, x2,y2,
                 activeButton.x,
                 activeButton.y,
-                activeButton.x + Button.iconFrameSize,
-                activeButton.y + Button.iconFrameSize,
+                activeButton.x + Button.DEFAULT_ICON_FRAME_SIZE,
+                activeButton.y + Button.DEFAULT_ICON_FRAME_SIZE,
                 0x32FFFFFF
             ); //ARGB(hex); note that alpha ranges between ~0-16, not 0-255
         }

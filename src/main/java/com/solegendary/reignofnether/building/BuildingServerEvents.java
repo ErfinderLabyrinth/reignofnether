@@ -3,6 +3,7 @@ package com.solegendary.reignofnether.building;
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.building.buildings.monsters.Dungeon;
 import com.solegendary.reignofnether.building.buildings.monsters.Laboratory;
+import com.solegendary.reignofnether.building.buildings.neutral.Beacon;
 import com.solegendary.reignofnether.building.buildings.piglins.FlameSanctuary;
 import com.solegendary.reignofnether.building.buildings.piglins.Portal;
 import com.solegendary.reignofnether.building.buildings.shared.AbstractBridge;
@@ -12,9 +13,11 @@ import com.solegendary.reignofnether.building.buildings.villagers.Library;
 import com.solegendary.reignofnether.fogofwar.FrozenChunkClientboundPacket;
 import com.solegendary.reignofnether.nether.NetherBlocks;
 import com.solegendary.reignofnether.player.PlayerServerEvents;
+import com.solegendary.reignofnether.player.RTSPlayer;
 import com.solegendary.reignofnether.registrars.GameRuleRegistrar;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
 import com.solegendary.reignofnether.resources.*;
+import com.solegendary.reignofnether.sandbox.SandboxServer;
 import com.solegendary.reignofnether.survival.SurvivalServerEvents;
 import com.solegendary.reignofnether.unit.Relationship;
 import com.solegendary.reignofnether.unit.UnitAction;
@@ -93,12 +96,10 @@ public class BuildingServerEvents {
         buildingData.buildings.clear();
 
         getBuildings().forEach(b -> {
-            boolean isUpgraded = b.isUpgraded();
             Portal.PortalType portalType = null;
             if (b instanceof Portal portal && portal.portalType != Portal.PortalType.BASIC) {
                 portalType = portal.portalType;
             }
-
             buildingData.buildings.add(new BuildingSave(b.originPos,
                 level,
                 b.name,
@@ -107,7 +108,7 @@ public class BuildingServerEvents {
                 b instanceof ProductionBuilding pb ? pb.getRallyPoint() : b.originPos,
                 b.isDiagonalBridge,
                 b.isBuilt,
-                isUpgraded,
+                b.getUpgradeLevel(),
                 portalType
             ));
             ReignOfNether.LOGGER.info("saved buildings/nether in serverevents: " + b.originPos);
@@ -152,7 +153,7 @@ public class BuildingServerEvents {
                         pb.setRallyPoint(b.rallyPoint);
                     }
 
-                    if (b.isUpgraded) {
+                    if (b.upgradeLevel > 0) {
                         if (building instanceof Castle castle) {
                             castle.changeStructure(Castle.upgradedStructureName);
                         } else if (building instanceof Laboratory lab) {
@@ -161,6 +162,8 @@ public class BuildingServerEvents {
                             portal.changeStructure(b.portalType);
                         } else if (building instanceof Library library) {
                             library.changeStructure(Library.upgradedStructureName);
+                        } else if (building instanceof Beacon beacon) {
+                            beacon.changeStructure(b.upgradeLevel);
                         }
                     }
                     // setNetherZone can only be run once - this supercedes where it normally happens in tick() ->
@@ -251,17 +254,19 @@ public class BuildingServerEvents {
                     ownerName,
                     newBuilding.blockPlaceQueue.size(),
                     isDiagonalBridge,
-                    false,
+                    0,
                     false,
                     Portal.PortalType.BASIC,
                     false
                 );
-
                 ResourcesServerEvents.addSubtractResources(new Resources(ownerName,
                     -newBuilding.foodCost,
                     -newBuilding.woodCost,
                     -newBuilding.oreCost
                 ));
+
+                if (ownerName.isEmpty() || ownerName.equals("Enemy"))
+                    newBuilding.selfBuilding = true;
 
                 assignBuilderUnits(builderUnitIds, queue, newBuilding);
 
@@ -350,10 +355,10 @@ public class BuildingServerEvents {
         }
     }
 
-    public static void cancelBuilding(Building building) {
+    public static void cancelBuilding(Building building, String playerName) {
         if (building == null)
             return;
-        if (building.isBuilt &&
+        if (building.isBuilt && !SandboxServer.isSandboxPlayer(playerName) &&
             BuildingUtils.getTotalCompletedBuildingsOwned(false, building.ownerName) == 1)
             return;
 
@@ -435,8 +440,8 @@ public class BuildingServerEvents {
                 building.ownerName,
                 building.blockPlaceQueue.size(),
                 building instanceof AbstractBridge bridge && bridge.isDiagonalBridge,
+                building.getUpgradeLevel(),
                 building.isBuilt,
-                building.isUpgraded(),
                 building instanceof Portal p ? p.portalType : Portal.PortalType.BASIC,
                 true
             );
@@ -482,7 +487,7 @@ public class BuildingServerEvents {
         if (buildingSyncTicks <= 0) {
             buildingSyncTicks = BUILDING_SYNC_TICKS_MAX;
             for (Building building : buildings)
-                BuildingClientboundPacket.syncBuilding(building.originPos, building.getBlocksPlaced());
+                BuildingClientboundPacket.syncBuilding(building.originPos, building.getBlocksPlaced(), building.ownerName);
         }
 
         // need to remove from the list first as destroy() will read it to check defeats
@@ -658,8 +663,8 @@ public class BuildingServerEvents {
                     building.ownerName,
                     building.blockPlaceQueue.size(),
                     building instanceof AbstractBridge bridge && bridge.isDiagonalBridge,
+                    building.getUpgradeLevel(),
                     building.isBuilt,
-                    building.isUpgraded(),
                     building instanceof Portal p ? p.portalType : Portal.PortalType.BASIC,
                     false
                 );
@@ -674,10 +679,9 @@ public class BuildingServerEvents {
         int netherBlocksBelow = 0;
         int blocksBelow = 0;
         for (BuildingBlock block : blocks) {
-            if (block.getBlockPos().getY() == 0 && level != null) {
-                BlockPos bp = block.getBlockPos().offset(originPos).offset(0, 1, 0);
+            if (block.getBlockPos().getY() == originPos.getY() + 1 && level != null) {
+                BlockPos bp = block.getBlockPos();
                 BlockState bs = block.getBlockState(); // building block
-                BlockState bsBelow = level.getBlockState(bp.below()); // world block
 
                 if (bs.getMaterial().isSolid()) {
                     blocksBelow += 1;

@@ -125,7 +125,7 @@ public class Portal extends ProductionBuilding implements NetherConvertingBuildi
         this.woodCost = cost.wood;
         this.oreCost = cost.ore;
         this.popSupply = cost.population;
-        this.buildTimeModifier = 1.2f;
+        this.buildTimeModifier = 2.0f;
 
         this.canSetRallyPoint = false;
 
@@ -148,6 +148,8 @@ public class Portal extends ProductionBuilding implements NetherConvertingBuildi
             );
         }
     }
+
+    public float getMagicDamageMult() { return 0.5f; }
 
     @Override
     public void setNetherZone(NetherZone nz) {
@@ -234,8 +236,8 @@ public class Portal extends ProductionBuilding implements NetherConvertingBuildi
     }
 
     @Override
-    public boolean isUpgraded() {
-        return portalType != PortalType.BASIC;
+    public int getUpgradeLevel() {
+        return portalType != PortalType.BASIC ? 1 : 0;
     }
 
     public static ArrayList<BuildingBlock> getRelativeBlockData(LevelAccessor level) {

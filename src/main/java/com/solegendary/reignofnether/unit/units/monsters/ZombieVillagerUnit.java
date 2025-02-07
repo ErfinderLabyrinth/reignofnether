@@ -1,6 +1,7 @@
 package com.solegendary.reignofnether.unit.units.monsters;
 
 import com.solegendary.reignofnether.building.buildings.monsters.*;
+import com.solegendary.reignofnether.building.buildings.neutral.Beacon;
 import com.solegendary.reignofnether.building.buildings.villagers.*;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybindings;
@@ -179,7 +180,8 @@ public class ZombieVillagerUnit extends Vindicator implements Unit, WorkerUnit, 
             Laboratory.getBuildButton(Keybindings.keyP),
             Stronghold.getBuildButton(Keybindings.keyL),
             SpruceBridge.getBuildButton(Keybindings.keyC),
-            SculkCatalyst.getBuildButton(Keybindings.keyV)
+            SculkCatalyst.getBuildButton(Keybindings.keyV),
+            Beacon.getBuildButton(null)
         );
     }
 
@@ -247,7 +249,9 @@ public class ZombieVillagerUnit extends Vindicator implements Unit, WorkerUnit, 
         WorkerUnit.tick(this);
 
         // apply slowness level 2 during daytime for a short time repeatedly
-        if (tickCount % 10 == 0 && !this.level.isClientSide() && this.level.isDay() && !NightUtils.isInRangeOfNightSource(this.getEyePosition(), false))
+        if (tickCount % 10 == 0 && !this.level.isClientSide() && this.level.isDay() &&
+                !NightUtils.isInRangeOfNightSource(this.getEyePosition(), false) &&
+                !ResearchServerEvents.playerHasCheat(getOwnerName(), "slipslopslap"))
             this.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 15, 1));
     }
 

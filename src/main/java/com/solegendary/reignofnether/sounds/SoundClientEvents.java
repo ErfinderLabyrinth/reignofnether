@@ -70,5 +70,7 @@ public class SoundClientEvents {
         SOUND_MAP.put(SoundAction.CHAT, SoundRegistrar.CHAT.get());
         SOUND_MAP.put(SoundAction.ENEMY, SoundRegistrar.ENEMY.get());
         SOUND_MAP.put(SoundAction.BELL, SoundEvents.BELL_BLOCK);
+        SOUND_MAP.put(SoundAction.BEACON_DEACTIVATE, SoundEvents.BEACON_DEACTIVATE);
+        SOUND_MAP.put(SoundAction.BEACON_ACTIVATE, SoundEvents.BEACON_ACTIVATE);
     }
 }

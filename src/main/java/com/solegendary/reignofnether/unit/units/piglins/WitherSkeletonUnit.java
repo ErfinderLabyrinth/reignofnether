@@ -2,6 +2,8 @@ package com.solegendary.reignofnether.unit.units.piglins;
 
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.WitherCloud;
+import com.solegendary.reignofnether.building.BuildingUtils;
+import com.solegendary.reignofnether.building.buildings.piglins.FlameSanctuary;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.resources.ResourceCosts;
@@ -258,5 +260,10 @@ public class WitherSkeletonUnit extends WitherSkeleton implements Unit, Attacker
                 applyStackingWither(le);
             return true;
         }
+    }
+
+    @Override
+    public boolean fireImmune() {
+        return super.fireImmune() || BuildingUtils.findBuilding(level.isClientSide(), getOnPos()) instanceof FlameSanctuary;
     }
 }

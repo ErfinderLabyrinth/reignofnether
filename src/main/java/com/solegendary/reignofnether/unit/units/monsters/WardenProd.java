@@ -1,5 +1,9 @@
 package com.solegendary.reignofnether.unit.units.monsters;
 
+import com.solegendary.reignofnether.cursor.CursorClientEvents;
+import com.solegendary.reignofnether.hud.AbilityButton;
+import com.solegendary.reignofnether.sandbox.SandboxAction;
+import com.solegendary.reignofnether.sandbox.SandboxClientEvents;
 import net.minecraft.client.resources.language.I18n;
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.building.BuildingServerboundPacket;
@@ -40,6 +44,30 @@ public class WardenProd extends ProductionItem {
         return WardenProd.itemName;
     }
 
+    public static AbilityButton getPlaceButton() {
+        return new AbilityButton(
+                itemName,
+                new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/warden.png"),
+                null,
+                () -> SandboxClientEvents.spawnUnitName.equals(itemName),
+                () -> false,
+                () -> true,
+                () -> {
+                    CursorClientEvents.setLeftClickSandboxAction(SandboxAction.SPAWN_UNIT);
+                    SandboxClientEvents.spawnUnitName = itemName;
+                },
+                null,
+                List.of(
+                        FormattedCharSequence.forward(I18n.get("units.monsters.reignofnether.warden"), Style.EMPTY.withBold(true)),
+                        FormattedCharSequence.forward("", Style.EMPTY),
+                        FormattedCharSequence.forward(I18n.get("units.monsters.reignofnether.warden.tooltip1"), Style.EMPTY),
+                        FormattedCharSequence.forward("", Style.EMPTY),
+                        FormattedCharSequence.forward(I18n.get("units.monsters.reignofnether.warden.tooltip2"), Style.EMPTY)
+                ),
+                null
+        );
+    }
+
     public static Button getStartButton(ProductionBuilding prodBuilding, Keybinding hotkey) {
         return new Button(
                 WardenProd.itemName,
@@ -56,7 +84,9 @@ public class WardenProd extends ProductionItem {
                         ResourceCosts.getFormattedCost(cost),
                         ResourceCosts.getFormattedPopAndTime(cost),
                         FormattedCharSequence.forward("", Style.EMPTY),
-                        FormattedCharSequence.forward(I18n.get("units.monsters.reignofnether.warden.tooltip1"), Style.EMPTY)
+                        FormattedCharSequence.forward(I18n.get("units.monsters.reignofnether.warden.tooltip1"), Style.EMPTY),
+                        FormattedCharSequence.forward("", Style.EMPTY),
+                        FormattedCharSequence.forward(I18n.get("units.monsters.reignofnether.warden.tooltip2"), Style.EMPTY)
                 )
         );
     }

@@ -55,16 +55,14 @@ public class ResearchServerboundPacket {
     public boolean handle(Supplier<NetworkEvent.Context> ctx) {
         final var success = new AtomicBoolean(false);
         ctx.get().enqueueWork(() -> {
-            if (Minecraft.getInstance().player != null && Minecraft.getInstance().player.getName().getString().equals(this.playerName)) {
-                if (isCheat) {
-                    if (add) {
-                        ResearchServerEvents.addCheat(this.playerName, this.itemName);
-                        ResearchClientboundPacket.addCheat(this.playerName, this.itemName);
-                    }
-                    else {
-                        ResearchServerEvents.removeCheat(this.playerName, this.itemName);
-                        ResearchClientboundPacket.removeCheat(this.playerName, this.itemName);
-                    }
+            if (isCheat) {
+                if (add) {
+                    ResearchServerEvents.addCheat(this.playerName, this.itemName);
+                    ResearchClientboundPacket.addCheat(this.playerName, this.itemName);
+                }
+                else {
+                    ResearchServerEvents.removeCheat(this.playerName, this.itemName);
+                    ResearchClientboundPacket.removeCheat(this.playerName, this.itemName);
                 }
             }
             success.set(true);

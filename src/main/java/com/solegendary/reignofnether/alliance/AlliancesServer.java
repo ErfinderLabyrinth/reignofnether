@@ -5,7 +5,7 @@ import net.minecraftforge.network.PacketDistributor;
 
 import java.util.*;
 
-public class AllianceSystem {
+public class AlliancesServer {
     private static final Map<String, Set<String>> alliances = new HashMap<>();
 
     public static void addAlliance(String owner1, String owner2) {

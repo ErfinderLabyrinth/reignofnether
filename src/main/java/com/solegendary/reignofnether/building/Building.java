@@ -5,6 +5,7 @@ import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.attackwarnings.AttackWarningClientboundPacket;
 import com.solegendary.reignofnether.building.buildings.monsters.DarkWatchtower;
+import com.solegendary.reignofnether.building.buildings.neutral.Beacon;
 import com.solegendary.reignofnether.building.buildings.piglins.Bastion;
 import com.solegendary.reignofnether.building.buildings.piglins.FlameSanctuary;
 import com.solegendary.reignofnether.building.buildings.piglins.Fortress;
@@ -17,12 +18,16 @@ import com.solegendary.reignofnether.fogofwar.*;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.player.PlayerServerEvents;
+import com.solegendary.reignofnether.player.RTSPlayer;
 import com.solegendary.reignofnether.registrars.BlockRegistrar;
 import com.solegendary.reignofnether.registrars.EntityRegistrar;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
 import com.solegendary.reignofnether.research.researchItems.ResearchAdvancedPortals;
 import com.solegendary.reignofnether.research.researchItems.ResearchSilverfish;
 import com.solegendary.reignofnether.resources.*;
+import com.solegendary.reignofnether.sandbox.SandboxServer;
+import com.solegendary.reignofnether.sounds.SoundAction;
+import com.solegendary.reignofnether.sounds.SoundClientboundPacket;
 import com.solegendary.reignofnether.survival.SurvivalServerEvents;
 import com.solegendary.reignofnether.tutorial.TutorialClientEvents;
 import com.solegendary.reignofnether.tutorial.TutorialServerEvents;
@@ -43,6 +48,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -169,6 +175,11 @@ public abstract class Building {
         return name;
     }
 
+    public int captureRange = 20;
+    public boolean capturable = false;
+    public boolean invulnerable = false;
+    public boolean shouldDestroyOnReset = true;
+
     public Building(
         Level level,
         BlockPos originPos,
@@ -210,6 +221,7 @@ public abstract class Building {
         }
     }
 
+    public float getMagicDamageMult() { return 1.0f; }
     public float getMeleeDamageMult() {
         return MELEE_DAMAGE_MULTIPLIER;
     }
@@ -265,6 +277,10 @@ public abstract class Building {
 
 
     public boolean canAfford(String ownerName) {
+        if (SandboxServer.isAnyoneASandboxPlayer() &&
+            (ownerName.isEmpty() || ownerName.equals("Enemy")))
+            return true;
+
         if (SurvivalServerEvents.isEnabled() &&
             SurvivalServerEvents.ENEMY_OWNER_NAME.equals(ownerName))
             return true;
@@ -445,9 +461,10 @@ public abstract class Building {
     }
 
     public void destroyRandomBlocks(int amount) {
-        if (getLevel().isClientSide()) {
+        if (getLevel().isClientSide())
             return;
-        }
+        if (invulnerable)
+            return;
         ArrayList<BuildingBlock> placedBlocks = new ArrayList<>(blocks.stream()
             .filter(b -> { // avoid destroying blocks adjacent to liquids unless its a bridge or is itself a liquid
                 if (!(this instanceof AbstractBridge) && !(
@@ -543,7 +560,8 @@ public abstract class Building {
         }
 
         if (!this.level.isClientSide() && isRTSPlayer(this.ownerName)) {
-            if (BuildingUtils.getTotalCompletedBuildingsOwned(false, this.ownerName) == 0) {
+            if (BuildingUtils.getTotalCompletedBuildingsOwned(false, this.ownerName) == 0 &&
+                !SandboxServer.isSandboxPlayer(this.ownerName)) {
                 PlayerServerEvents.defeat(this.ownerName, Component.translatable("server.reignofnether.lost_buildings").getString());
             } else if (this.isCapitol) {
                 int numCapitolsOwned = BuildingServerEvents.getBuildings()
@@ -763,6 +781,8 @@ public abstract class Building {
                 else
                     builderCount += 1;
             }
+            if (((Mob) workerUnit).getActiveEffectsMap().containsKey(MobEffects.DIG_SPEED))
+                builderCount += 1;
         }
         boolean hasFastBuildCheat = ResearchServerEvents.playerHasCheat(this.ownerName, "warpten");
 
@@ -802,7 +822,7 @@ public abstract class Building {
                 }
 
                 if (hasFastBuildCheat) {
-                    msToNextBuild -= 500;
+                    msToNextBuild -= 1000;
                 } else {
                     msToNextBuild -= 50;
                 }
@@ -854,6 +874,53 @@ public abstract class Building {
                 if (this.getBlocksPlaced() > highestBlockCountReached) {
                     highestBlockCountReached = this.getBlocksPlaced();
                 }
+            }
+        }
+        if (isBuilt && tickAgeAfterBuilt % 10 == 0 && capturable) {
+            checkIfCaptured(serverLevel);
+        }
+    }
+
+    // if the owner of the building has no units around, change owners to the person with the highest total pop in range
+    private void checkIfCaptured(ServerLevel serverLevel) {
+        if (PlayerServerEvents.rtsPlayers.isEmpty())
+            return;
+
+        List<Mob> nearbyUnits = MiscUtil.getEntitiesWithinRange(
+                        new Vector3d(centrePos.getX(), minCorner.getY(), centrePos.getZ()),
+                        captureRange, Mob.class, serverLevel)
+                .stream()
+                .toList();
+
+        Map<String, Integer> playerPopCounts = new HashMap<>();
+        boolean ownerHasUnit = false;
+        for (Mob mob : nearbyUnits) {
+            if (mob instanceof Unit unit) {
+                String uOwner = unit.getOwnerName();
+                if (uOwner.equals(ownerName) && !ownerName.isEmpty()) {
+                    ownerHasUnit = true;
+                }
+                if (!uOwner.isEmpty()) {
+                    if (!playerPopCounts.containsKey(uOwner))
+                        playerPopCounts.put(uOwner, 0);
+                    playerPopCounts.put(uOwner, Math.max(1, unit.getPopCost()) + playerPopCounts.get(uOwner));
+                }
+            }
+        }
+        String highestPopPlayer = null;
+        int highestPop = 0;
+        if (!ownerHasUnit) {
+            for (String playerName : playerPopCounts.keySet()) {
+                if (playerPopCounts.get(playerName) > highestPop) {
+                    highestPop = playerPopCounts.get(playerName);
+                    highestPopPlayer = playerName;
+                }
+            }
+            if (highestPop > 0 && highestPopPlayer != null) {
+                ownerName = highestPopPlayer;
+
+                if (this instanceof Beacon beacon)
+                    beacon.sendWarning("capture_warning");
             }
         }
     }
@@ -1020,7 +1087,7 @@ public abstract class Building {
         }
     }
 
-    public boolean isUpgraded() {
-        return false;
+    public int getUpgradeLevel() {
+        return 0;
     }
 }

@@ -1,10 +1,17 @@
 package com.solegendary.reignofnether.player;
 
+import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingServerEvents;
+import com.solegendary.reignofnether.building.BuildingUtils;
+import com.solegendary.reignofnether.building.buildings.neutral.Beacon;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientboundPacket;
 import com.solegendary.reignofnether.fogofwar.FogOfWarServerEvents;
+import com.solegendary.reignofnether.resources.Resources;
+import com.solegendary.reignofnether.resources.ResourcesServerEvents;
 import com.solegendary.reignofnether.util.Faction;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffects;
 
 import java.util.Collections;
 
@@ -15,6 +22,7 @@ public class RTSPlayer {
     public int id; // for AI, always negative
     public int ticksWithoutCapitol = 0;
     public Faction faction;
+    public int beaconOwnerTicks = 0; // ticks owning a beacon - will win upon reaching
 
     private RTSPlayer(ServerPlayer player, Faction faction) {
         this.name = player.getName().getString();
@@ -84,6 +92,21 @@ public class RTSPlayer {
             }
         } else {
             this.ticksWithoutCapitol = 0;
+        }
+
+        for (Building building : BuildingServerEvents.getBuildings()) {
+            if (building instanceof Beacon beacon && beacon.isBuilt && building.ownerName.equals(this.name)) {
+                if (beacon.getUpgradeLevel() == Beacon.MAX_UPGRADE_LEVEL) {
+                    beaconOwnerTicks += 1;
+                    if (beaconOwnerTicks == Beacon.TICKS_TO_WIN / 4 ||
+                            beaconOwnerTicks == Beacon.TICKS_TO_WIN / 2 ||
+                            beaconOwnerTicks == (Beacon.TICKS_TO_WIN * 3) / 4 ||
+                            beaconOwnerTicks == Beacon.TICKS_TO_WIN - 1200)
+                        beacon.sendWarning("time_warning");
+                    if (beaconOwnerTicks == Beacon.TICKS_TO_WIN)
+                        PlayerServerEvents.beaconVictory(this.name);
+                }
+            }
         }
     }
 

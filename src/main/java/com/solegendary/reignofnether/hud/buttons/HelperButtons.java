@@ -1,32 +1,37 @@
 package com.solegendary.reignofnether.hud.buttons;
 
 import com.solegendary.reignofnether.ReignOfNether;
-import com.solegendary.reignofnether.building.BuildingClientEvents;
-import com.solegendary.reignofnether.building.BuildingServerEvents;
-import com.solegendary.reignofnether.building.BuildingServerboundPacket;
-import com.solegendary.reignofnether.building.BuildingUtils;
+import com.solegendary.reignofnether.building.*;
+import com.solegendary.reignofnether.building.buildings.neutral.Beacon;
 import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.hud.HudClientEvents;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
+import com.solegendary.reignofnether.player.PlayerClientEvents;
+import com.solegendary.reignofnether.player.RTSPlayer;
+import com.solegendary.reignofnether.sandbox.SandboxClientEvents;
+import com.solegendary.reignofnether.time.TimeUtils;
 import com.solegendary.reignofnether.unit.Relationship;
 import com.solegendary.reignofnether.unit.UnitClientEvents;
 import com.solegendary.reignofnether.unit.interfaces.WorkerUnit;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.solegendary.reignofnether.hud.HudClientEvents.hudSelectedBuilding;
 import static com.solegendary.reignofnether.unit.UnitClientEvents.getPlayerToEntityRelationship;
 import static com.solegendary.reignofnether.unit.UnitClientEvents.idleWorkerIds;
+import static com.solegendary.reignofnether.util.MiscUtil.fcs;
 
 public class HelperButtons {
 
@@ -105,11 +110,14 @@ public class HelperButtons {
             () -> {
                 if (hudSelectedBuilding == null)
                     return false;
-                return BuildingUtils.getTotalCompletedBuildingsOwned(true, hudSelectedBuilding.ownerName) == 0;
+                boolean isSandboxPlayer = MC.player != null && SandboxClientEvents.isSandboxPlayer(MC.player.getName().getString());
+                return BuildingUtils.getTotalCompletedBuildingsOwned(true, hudSelectedBuilding.ownerName) == 0 &&
+                        !isSandboxPlayer;
             },
             () -> true,
             () -> {
-                BuildingServerboundPacket.cancelBuilding(hudSelectedBuilding.minCorner);
+                if (MC.player != null)
+                    BuildingServerboundPacket.cancelBuilding(hudSelectedBuilding.minCorner, MC.player.getName().getString());
                 hudSelectedBuilding = null;
             },
             null,
@@ -139,4 +147,62 @@ public class HelperButtons {
             null,
             List.of(FormattedCharSequence.forward(I18n.get("hud.helperbuttons.reignofnether.select_all_military_units"), Style.EMPTY))
     );
+
+    private static List<FormattedCharSequence> getBeaconButtonTooltip(String ownerName) {
+        ArrayList<FormattedCharSequence> fcsList = new ArrayList<>();
+        Beacon beacon = BuildingUtils.getBeacon(true);
+        if (beacon == null)
+            return fcsList;
+
+        fcsList.add(fcs(I18n.get("hud.helperbuttons.reignofnether.beacon.beacon_level_title",
+                beacon.getUpgradeLevel(), Beacon.MAX_UPGRADE_LEVEL)));
+
+        if (beacon.getUpgradeLevel() < Beacon.MAX_UPGRADE_LEVEL) {
+            fcsList.add(fcs(I18n.get("hud.helperbuttons.reignofnether.beacon.player_controls", ownerName), true));
+        } else {
+            boolean noController = true;
+            for (Long time : PlayerClientEvents.beaconWinTimes.values()) {
+                if (time > 0) {
+                    noController = false;
+                    break;
+                }
+            }
+            if (noController) {
+                fcsList.add(fcs(I18n.get("hud.helperbuttons.reignofnether.beacon.no_controller")));
+            } else {
+                for (String playerName : PlayerClientEvents.beaconWinTimes.keySet()) {
+                    long ticksToWin = Math.max(0, Beacon.TICKS_TO_WIN - PlayerClientEvents.beaconWinTimes.get(playerName));
+                    String timeToWin = TimeUtils.getTimeStrFromTicks(ticksToWin);
+                    fcsList.add(fcs(I18n.get("hud.helperbuttons.reignofnether.beacon.player_wins_in",
+                            playerName, timeToWin), ownerName.equals(playerName)));
+                }
+            }
+        }
+
+        fcsList.add(fcs(I18n.get("hud.helperbuttons.reignofnether.beacon.click_to_centre")));
+        return fcsList;
+    }
+
+    // button that tracks all beacons in the game, including how long each player has owned a beacon for
+    // clicking the button should make
+    public static Button getBeaconButton(String ownerName) {
+        return new Button(
+                "Beacon",
+                14,
+                new ResourceLocation("minecraft", "textures/item/nether_star.png"),
+                (Keybinding) null,
+                () -> false,
+                () -> BuildingUtils.getBeacon(true) == null,
+                () -> true,
+                () -> {
+                    List<Building> beacons = BuildingClientEvents.getBuildings().stream().filter(b -> b instanceof Beacon).toList();
+                    if (!beacons.isEmpty()) {
+                        BlockPos bp = beacons.get(0).centrePos;
+                        OrthoviewClientEvents.centreCameraOnPos(bp.getX(), bp.getZ());
+                    }
+                },
+                null,
+                getBeaconButtonTooltip(ownerName)
+        );
+    }
 }

@@ -95,10 +95,9 @@ public class IronGolemBuilding extends Building {
             hotkey,
             () -> BuildingClientEvents.getBuildingToPlace() == IronGolemBuilding.class,
             TutorialClientEvents::isEnabled,
-            () -> BuildingClientEvents.hasFinishedBuilding(Blacksmith.buildingName) && (
-                ResearchClient.hasResearch(ResearchGolemSmithing.itemName) || ResearchClient.hasCheat(
-                    "modifythephasevariance")
-            ),
+            () -> (BuildingClientEvents.hasFinishedBuilding(Blacksmith.buildingName) && (
+                ResearchClient.hasResearch(ResearchGolemSmithing.itemName)) ||
+                ResearchClient.hasCheat("modifythephasevariance")),
             () -> BuildingClientEvents.setBuildingToPlace(IronGolemBuilding.class),
             null,
             List.of(FormattedCharSequence.forward(

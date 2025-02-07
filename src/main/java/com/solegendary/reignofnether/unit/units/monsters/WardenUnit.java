@@ -191,7 +191,9 @@ public class WardenUnit extends Warden implements Unit, AttackerUnit {
         this.sonicBoomGoal.tick();
 
         // apply slowness level 2 during daytime for a short time repeatedly
-        if (tickCount % 10 == 0 && !this.level.isClientSide() && this.level.isDay() && !NightUtils.isInRangeOfNightSource(this.getEyePosition(), false))
+        if (tickCount % 10 == 0 && !this.level.isClientSide() && this.level.isDay() &&
+                !NightUtils.isInRangeOfNightSource(this.getEyePosition(), false) &&
+                !ResearchServerEvents.playerHasCheat(getOwnerName(), "slipslopslap"))
             this.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 15, 1));
     }
 
@@ -285,8 +287,10 @@ public class WardenUnit extends Warden implements Unit, AttackerUnit {
                 if (nearbyEnemies.size() > i)
                     doEntitySonicBoom(nearbyEnemies.get(i), Vec3.atCenterOf(targetBuilding.centrePos));
         }
-        else
-            targetBuilding.destroyRandomBlocks((int) SONIC_BOOM_DAMAGE / 2);
+        else {
+            int damage = (int) ((SONIC_BOOM_DAMAGE / 2) * targetBuilding.getMagicDamageMult());
+            targetBuilding.destroyRandomBlocks(damage);
+        }
     }
 
     public void startSonicBoomAnimation() {

@@ -3,6 +3,8 @@ package com.solegendary.reignofnether.unit.units.piglins;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.Bloodlust;
 import com.solegendary.reignofnether.ability.abilities.ToggleShield;
+import com.solegendary.reignofnether.building.BuildingUtils;
+import com.solegendary.reignofnether.building.buildings.piglins.FlameSanctuary;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
@@ -235,5 +237,10 @@ public class BruteUnit extends PiglinBrute implements Unit, AttackerUnit {
             ItemStack shieldStack = new ItemStack(Items.SHIELD);
             this.setItemSlot(EquipmentSlot.OFFHAND, shieldStack);
         }
+    }
+
+    @Override
+    public boolean fireImmune() {
+        return super.fireImmune() || BuildingUtils.findBuilding(level.isClientSide(), getOnPos()) instanceof FlameSanctuary;
     }
 }

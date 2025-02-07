@@ -50,7 +50,7 @@ public class CallLightning extends Ability {
             new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/lightbulb_on.png"),
             hotkey,
             () -> CursorClientEvents.getLeftClickAction() == UnitAction.CALL_LIGHTNING,
-            () -> !lab.isUpgraded(),
+            () -> lab.getUpgradeLevel() == 0,
             () -> lab.getLightningRodPos() != null,
             () -> CursorClientEvents.setLeftClickAction(UnitAction.CALL_LIGHTNING),
             null,

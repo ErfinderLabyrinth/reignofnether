@@ -46,7 +46,7 @@ public class ResearchGrandLibrary extends ProductionItem {
                 hotkey,
                 () -> false,
                 () -> ProductionItem.itemIsBeingProduced(ResearchGrandLibrary.itemName, prodBuilding.ownerName) ||
-                        (prodBuilding instanceof Library library && library.isUpgraded()),
+                        (prodBuilding instanceof Library library && library.getUpgradeLevel() > 0),
                 () -> true,
                 () -> BuildingServerboundPacket.startProduction(prodBuilding.originPos, itemName),
                 null,

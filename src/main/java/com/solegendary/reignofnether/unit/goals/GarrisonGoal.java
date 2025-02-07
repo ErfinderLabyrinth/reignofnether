@@ -1,6 +1,7 @@
 package com.solegendary.reignofnether.unit.goals;
 
-import com.solegendary.reignofnether.alliance.AllianceSystem;
+import com.solegendary.reignofnether.alliance.AlliancesClient;
+import com.solegendary.reignofnether.alliance.AlliancesServer;
 import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingUtils;
 import com.solegendary.reignofnether.building.GarrisonableBuilding;
@@ -54,12 +55,17 @@ public class GarrisonGoal extends MoveToTargetBlockGoal {
             boolean clientside = this.mob.level.isClientSide();
             Building building = BuildingUtils.findBuilding(clientside, blockPos);
 
-            if (building == null) {
+            if (building == null)
                 return;
-            }
-            else if (!(building instanceof GarrisonableBuilding garrisonableBuilding) ||
-                (!building.ownerName.equals(((Unit) mob).getOwnerName()) &&
-                !AllianceSystem.isAllied(building.ownerName, ((Unit) mob).getOwnerName()))) {
+
+            boolean isAllied;
+            if (clientside)
+                isAllied = AlliancesClient.isAllied(building.ownerName, ((Unit) mob).getOwnerName());
+            else
+                isAllied = AlliancesServer.isAllied(building.ownerName, ((Unit) mob).getOwnerName());
+
+            if (!(building instanceof GarrisonableBuilding garrisonableBuilding) ||
+                (!building.ownerName.equals(((Unit) mob).getOwnerName()) && !isAllied)) {
                 if (clientside)
                     HudClientEvents.showTemporaryMessage(I18n.get("hud.reignofnether.not_garrisonable"));
             }

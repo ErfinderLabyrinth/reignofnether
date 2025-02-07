@@ -14,6 +14,7 @@ import com.solegendary.reignofnether.research.researchItems.ResearchGrandLibrary
 import com.solegendary.reignofnether.research.researchItems.ResearchLingeringPotions;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
+import com.solegendary.reignofnether.time.TimeClientEvents;
 import com.solegendary.reignofnether.tutorial.TutorialClientEvents;
 import com.solegendary.reignofnether.util.Faction;
 import com.solegendary.reignofnether.util.MiscUtil;
@@ -28,13 +29,11 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Rotation;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static com.solegendary.reignofnether.building.BuildingUtils.getAbsoluteBlockData;
 
-public class Library extends ProductionBuilding {
+public class Library extends ProductionBuilding implements RangeIndicator {
 
     public final static String buildingName = "Library";
     public final static String structureName = "library";
@@ -86,7 +85,8 @@ public class Library extends ProductionBuilding {
             this.abilityButtons.add(enchantSharpness.getButton(Keybindings.keyE));
             this.abilityButtons.add(enchantMultishot.getButton(Keybindings.keyR));
             this.abilityButtons.add(enchantVigor.getButton(Keybindings.keyT));
-            this.productionButtons = Arrays.asList(ResearchLingeringPotions.getStartButton(this, Keybindings.keyY),
+            this.productionButtons = Arrays.asList(
+                ResearchLingeringPotions.getStartButton(this, Keybindings.keyY),
                 ResearchEvokerVexes.getStartButton(this, Keybindings.keyU),
                 ResearchGrandLibrary.getStartButton(this, Keybindings.keyI)
             );
@@ -97,7 +97,7 @@ public class Library extends ProductionBuilding {
     public void tick(Level tickLevel) {
         super.tick(tickLevel);
 
-        if (tickAgeAfterBuilt > 0 && tickAgeAfterBuilt % 15 == 0 && isBuilt && autoCastEnchant != null
+        if (tickAgeAfterBuilt > 0 && tickAgeAfterBuilt % 8 == 0 && isBuilt && autoCastEnchant != null
             && autoCastEnchant.isOffCooldown()) {
 
             List<Mob> mobs = MiscUtil.getEntitiesWithinRange(new Vector3d(
@@ -117,11 +117,39 @@ public class Library extends ProductionBuilding {
                 autoCastEnchant.use(tickLevel, this, mobs.get(0));
             }
         }
+        if (tickLevel.isClientSide && tickAgeAfterBuilt > 0 && tickAgeAfterBuilt % 100 == 0)
+            updateBorderBps();
+    }
+
+    public static final int RANGE = EnchantAbility.RANGE;
+    private final Set<BlockPos> borderBps = new HashSet<>();
+
+    private int getBorderRange() {
+        return isBuilt ? RANGE : 0;
+    }
+
+    @Override
+    public void updateBorderBps() {
+        if (!level.isClientSide())
+            return;
+        this.borderBps.clear();
+        this.borderBps.addAll(MiscUtil.getRangeIndicatorCircleBlocks(centrePos,
+                getBorderRange() - TimeClientEvents.VISIBLE_BORDER_ADJ, level));
+    }
+
+    @Override
+    public Set<BlockPos> getBorderBps() {
+        return borderBps;
+    }
+
+    @Override
+    public boolean showOnlyWhenSelected() {
+        return true;
     }
 
     @Override
     public String getUpgradedName() {
-        return "Grand Library";
+        return I18n.get("buildings.villagers.reignofnether.library.upgraded");
     }
 
     public Faction getFaction() {
@@ -170,11 +198,10 @@ public class Library extends ProductionBuilding {
 
     // check that the flag is built based on existing placed blocks
     @Override
-    public boolean isUpgraded() {
+    public int getUpgradeLevel() {
         for (BuildingBlock block : blocks)
-            if (block.getBlockState().getBlock() == Blocks.GLOWSTONE) {
-                return true;
-            }
-        return false;
+            if (block.getBlockState().getBlock() == Blocks.GLOWSTONE)
+                return 1;
+        return 0;
     }
 }

@@ -5,6 +5,7 @@
     "refmap": "reignofnether.refmap.json",
     "mixins": [
         "AbstractArrowMixin",
+        "BeaconBlockEntityMixin",
         "BlazeMixin",
         "EntityMixin",
         "EvokerFangsMixin",
@@ -22,7 +23,6 @@
         "fire.BaseFireBlockMixin",
         "fire.FireBlockMixin",
         "fire.MagmaBlockMixin",
-        "fire.SoulFireBlockMixin",
         "fire.WalkNodeEvaluatorMixin"
     ],
     "minVersion": "0.8",

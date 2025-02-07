@@ -6,6 +6,7 @@ import com.solegendary.reignofnether.building.buildings.shared.AbstractStockpile
 import com.solegendary.reignofnether.building.buildings.villagers.OakStockpile;
 import com.solegendary.reignofnether.hud.HudClientEvents;
 import com.solegendary.reignofnether.registrars.PacketHandler;
+import com.solegendary.reignofnether.sandbox.SandboxServer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -59,10 +60,10 @@ public class BuildingServerboundPacket {
                 BuildingAction.PLACE_AND_QUEUE,
                 itemName, originPos, BlockPos.ZERO, rotation, ownerName, builderUnitIds, isDiagonalBridge));
     }
-    public static void cancelBuilding(BlockPos buildingPos) {
+    public static void cancelBuilding(BlockPos buildingPos, String ownerName) {
         PacketHandler.INSTANCE.sendToServer(new BuildingServerboundPacket(
                 BuildingAction.DESTROY,
-                "", buildingPos, BlockPos.ZERO, Rotation.NONE, "", new int[0], false));
+                "", buildingPos, BlockPos.ZERO, Rotation.NONE, ownerName, new int[0], false));
     }
     public static void setRallyPoint(BlockPos buildingPos, BlockPos rallyPos) {
         PacketHandler.INSTANCE.sendToServer(new BuildingServerboundPacket(
@@ -150,10 +151,11 @@ public class BuildingServerboundPacket {
                 success.set(false);
                 return;
             }
-            else if ((newBuildingAuthActions.contains(this.action) &&
+            else if (((newBuildingAuthActions.contains(this.action) &&
                     !player.getName().getString().equals(ownerName)) ||
                     (existingBuildingAuthActions.contains(this.action) && building != null &&
-                    !player.getName().getString().equals(building.ownerName)) ) {
+                    !player.getName().getString().equals(building.ownerName))) &&
+                    !SandboxServer.isAnyoneASandboxPlayer()) {
 
                 ReignOfNether.LOGGER.warn("Tried to process packet from " + player.getName() + " for " + ownerName);
                 success.set(false);
@@ -167,7 +169,7 @@ public class BuildingServerboundPacket {
                     BuildingServerEvents.placeBuilding(this.itemName, this.buildingPos, this.rotation, this.ownerName, this.builderUnitIds, true, isDiagonalBridge);
                 }
                 case DESTROY -> {
-                    BuildingServerEvents.cancelBuilding(building);
+                    BuildingServerEvents.cancelBuilding(building, this.ownerName);
                 }
                 case SET_RALLY_POINT -> {
                     if (building instanceof ProductionBuilding productionBuilding)

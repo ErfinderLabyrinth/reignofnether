@@ -2,6 +2,8 @@ package com.solegendary.reignofnether.unit.units.piglins;
 
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.*;
+import com.solegendary.reignofnether.building.BuildingUtils;
+import com.solegendary.reignofnether.building.buildings.piglins.FlameSanctuary;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.resources.ResourceCosts;
@@ -231,5 +233,10 @@ public class HoglinUnit extends Hoglin implements Unit, AttackerUnit {
 
     @Override
     public void setupEquipmentAndUpgradesServer() {
+    }
+
+    @Override
+    public boolean fireImmune() {
+        return super.fireImmune() || BuildingUtils.findBuilding(level.isClientSide(), getOnPos()) instanceof FlameSanctuary;
     }
 }

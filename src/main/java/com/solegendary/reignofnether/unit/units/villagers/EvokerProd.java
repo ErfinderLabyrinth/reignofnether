@@ -1,5 +1,9 @@
 package com.solegendary.reignofnether.unit.units.villagers;
 
+import com.solegendary.reignofnether.cursor.CursorClientEvents;
+import com.solegendary.reignofnether.hud.AbilityButton;
+import com.solegendary.reignofnether.sandbox.SandboxAction;
+import com.solegendary.reignofnether.sandbox.SandboxClientEvents;
 import net.minecraft.client.resources.language.I18n;
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.building.*;
@@ -36,6 +40,28 @@ public class EvokerProd extends ProductionItem {
 
     public String getItemName() {
         return EvokerProd.itemName;
+    }
+
+    public static AbilityButton getPlaceButton() {
+        return new AbilityButton(
+                itemName,
+                new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/evoker.png"),
+                null,
+                () -> SandboxClientEvents.spawnUnitName.equals(itemName),
+                () -> false,
+                () -> true,
+                () -> {
+                    CursorClientEvents.setLeftClickSandboxAction(SandboxAction.SPAWN_UNIT);
+                    SandboxClientEvents.spawnUnitName = itemName;
+                },
+                null,
+                List.of(
+                        FormattedCharSequence.forward(I18n.get("units.villagers.reignofnether.evoker"), Style.EMPTY.withBold(true)),
+                        FormattedCharSequence.forward("", Style.EMPTY),
+                        FormattedCharSequence.forward(I18n.get("units.villagers.reignofnether.evoker.tooltip1"), Style.EMPTY)
+                ),
+                null
+        );
     }
 
     public static Button getStartButton(ProductionBuilding prodBuilding, Keybinding hotkey) {

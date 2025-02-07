@@ -71,12 +71,15 @@ public class MountHoglin extends Ability {
     // right click
     @Override
     public void use(Level level, Unit unitUsing, BlockPos targetBp) {
-        getMountGoal().autofind = true;
+        MountGoal mountGoal = getMountGoal();
+        if (mountGoal != null)
+            mountGoal.autofind = true;
     }
 
     @Override
     public void use(Level level, Unit unitUsing, LivingEntity targetEntity) {
-        if (targetEntity instanceof HoglinUnit) {
+        MountGoal mountGoal = getMountGoal();
+        if (mountGoal != null && targetEntity instanceof HoglinUnit) {
             getMountGoal().setTarget(targetEntity);
         } else if (level.isClientSide()) {
             HudClientEvents.showTemporaryMessage(I18n.get("abilities.reignofnether.mount_hoglin.error1"));

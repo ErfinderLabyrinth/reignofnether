@@ -86,6 +86,8 @@ public class SculkCatalyst extends Building implements NightSource, RangeIndicat
         }
     }
 
+    public float getMagicDamageMult() { return 0.5f; }
+
     public int getUncappedNightRange() {
         if (isBuilt || isBuiltServerside) {
             return (int) (sculkBps.size() * RANGE_PER_SCULK) + nightRangeMin;

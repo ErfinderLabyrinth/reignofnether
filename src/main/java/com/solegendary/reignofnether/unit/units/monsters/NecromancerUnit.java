@@ -1,19 +1,15 @@
 package com.solegendary.reignofnether.unit.units.monsters;
 
 import com.solegendary.reignofnether.ability.Ability;
-import com.solegendary.reignofnether.ability.abilities.MountSpider;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientboundPacket;
 import com.solegendary.reignofnether.hud.AbilityButton;
-import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.time.NightUtils;
 import com.solegendary.reignofnether.unit.Checkpoint;
 import com.solegendary.reignofnether.unit.UnitAnimationAction;
-import com.solegendary.reignofnether.unit.UnitSyncAction;
 import com.solegendary.reignofnether.unit.goals.*;
 import com.solegendary.reignofnether.unit.interfaces.*;
 import com.solegendary.reignofnether.unit.modelling.animations.NecromancerAnimations;
-import com.solegendary.reignofnether.unit.packets.UnitSyncClientboundPacket;
 import com.solegendary.reignofnether.util.Faction;
 import net.minecraft.client.animation.AnimationDefinition;
 import net.minecraft.core.BlockPos;
@@ -143,7 +139,7 @@ public class NecromancerUnit extends Skeleton implements Unit, AttackerUnit, Ran
     public final AnimationState attackAnimState = new AnimationState();
 
     // animation attack peak starts at 44% the way through, but we need to set it to 22% for some reason?
-    final static private int ATTACK_WINDUP_TICKS = (int) (NecromancerAnimations.ATTACK.lengthInSeconds() * 20f * 0.22f);
+    final static private int ATTACK_WINDUP_TICKS = 6; // (int) (NecromancerAnimations.ATTACK.lengthInSeconds() * 20f * 0.22f);
 
     // non-looping animations
     public AnimationDefinition activeAnimDef = null;

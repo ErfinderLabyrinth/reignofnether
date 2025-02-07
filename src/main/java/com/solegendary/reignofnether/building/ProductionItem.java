@@ -1,5 +1,6 @@
 package com.solegendary.reignofnether.building;
 
+import com.solegendary.reignofnether.gamerules.GameruleClient;
 import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.research.ResearchClient;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
@@ -8,7 +9,10 @@ import com.solegendary.reignofnether.resources.ResourcesServerEvents;
 import com.solegendary.reignofnether.tps.TPSClientEvents;
 import com.solegendary.reignofnether.unit.UnitClientEvents;
 import com.solegendary.reignofnether.unit.UnitServerEvents;
+import com.solegendary.reignofnether.unit.interfaces.Unit;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.Level;
 
 import java.util.function.Consumer;
@@ -40,6 +44,8 @@ public abstract class ProductionItem {
     public String getItemName() {
         return ProductionItem.itemName;
     }
+
+    public EntityType<? extends Unit> getEntityType() {return null;}
 
     public boolean canAfford(String ownerName) {
         for (Resources resources : ResourcesServerEvents.resourcesList)
@@ -91,7 +97,7 @@ public abstract class ProductionItem {
         for (Resources resources : ResourcesServerEvents.resourcesList) {
             if (resources.ownerName.equals(building.ownerName)) {
                 if (this.building.level.isClientSide())
-                    return (currentPop + popCost) <= UnitClientEvents.maxPopulation;
+                    return (currentPop + popCost) <= GameruleClient.maxPopulation;
                 else
                     return (currentPop + popCost) <= UnitServerEvents.maxPopulation;
             }
@@ -125,9 +131,9 @@ public abstract class ProductionItem {
             if ((level.isClientSide() && ResearchClient.hasCheat("warpten")) ||
                 (!level.isClientSide() && ResearchServerEvents.playerHasCheat(this.building.ownerName, "warpten"))) {
                 if (level.isClientSide())
-                    this.ticksLeft -= (TPSClientEvents.getCappedTPS() / 20D) * 10;
+                    this.ticksLeft -= (TPSClientEvents.getCappedTPS() / 20D) * 20;
                 else
-                    this.ticksLeft -= 10;
+                    this.ticksLeft -= 20;
             }
             else {
                 if (level.isClientSide())

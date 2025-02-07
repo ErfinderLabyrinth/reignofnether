@@ -3,28 +3,32 @@ package com.solegendary.reignofnether.building;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.solegendary.reignofnether.alliance.AllianceSystem;
+import com.solegendary.reignofnether.alliance.AlliancesClient;
 import com.solegendary.reignofnether.building.buildings.monsters.Laboratory;
+import com.solegendary.reignofnether.building.buildings.neutral.Beacon;
 import com.solegendary.reignofnether.building.buildings.piglins.Portal;
 import com.solegendary.reignofnether.building.buildings.shared.AbstractBridge;
 import com.solegendary.reignofnether.building.buildings.villagers.Castle;
 import com.solegendary.reignofnether.building.buildings.villagers.Library;
 import com.solegendary.reignofnether.cursor.CursorClientEvents;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientEvents;
+import com.solegendary.reignofnether.gamerules.GameruleClient;
 import com.solegendary.reignofnether.hud.HudClientEvents;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.nether.NetherBlocks;
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
 import com.solegendary.reignofnether.research.ResearchClient;
-import com.solegendary.reignofnether.resources.ResourceSources;
+import com.solegendary.reignofnether.sandbox.SandboxClientEvents;
 import com.solegendary.reignofnether.tutorial.TutorialClientEvents;
 import com.solegendary.reignofnether.unit.Relationship;
+import com.solegendary.reignofnether.unit.UnitAction;
 import com.solegendary.reignofnether.unit.UnitClientEvents;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.interfaces.WorkerUnit;
 import com.solegendary.reignofnether.util.MiscUtil;
 import com.solegendary.reignofnether.util.MyRenderer;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.inventory.BeaconScreen;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -33,6 +37,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
@@ -64,7 +69,7 @@ public class BuildingClientEvents {
 
     public static int getTotalPopulationSupply(String playerName) {
         if (ResearchClient.hasCheat("foodforthought")) {
-            return UnitClientEvents.maxPopulation;
+            return GameruleClient.maxPopulation;
         }
 
         int totalPopulationSupply = 0;
@@ -73,7 +78,7 @@ public class BuildingClientEvents {
                 totalPopulationSupply += building.popSupply;
             }
 
-        return Math.min(UnitClientEvents.maxPopulation, totalPopulationSupply);
+        return Math.min(GameruleClient.maxPopulation, totalPopulationSupply);
     }
 
     // clientside buildings used for tracking position (for cursor selection)
@@ -773,20 +778,37 @@ public class BuildingClientEvents {
                         }
                     }
                 } else {
+                    boolean hasSelectedWorkers = false;
+                    for (LivingEntity entity : getSelectedUnits()) {
+                        if (entity instanceof WorkerUnit) {
+                            hasSelectedWorkers = true;
+                            break;
+                        }
+                    }
+                    String ownerName = MC.player.getName().getString();
+                    if (SandboxClientEvents.isSandboxPlayer(ownerName) && !hasSelectedWorkers &&
+                        !buildingName.toLowerCase().contains("bridge")) {
+                        if (SandboxClientEvents.relationship == Relationship.NEUTRAL)
+                            ownerName = "";
+                        else if (SandboxClientEvents.relationship == Relationship.HOSTILE)
+                            ownerName = "Enemy";
+                    }
                     BuildingServerboundPacket.placeBuilding(buildingName,
                         isBuildingToPlaceABridge() && bridgePlaceState == 2 ? pos.offset(-5, 0, -5) : pos,
                         buildingRotation,
-                        MC.player.getName().getString(),
+                        ownerName,
                         builderIds.stream().mapToInt(i -> i).toArray(),
                         isBridgeDiagonal()
                     );
                     setBuildingToPlace(null);
 
-                    for (LivingEntity entity : getSelectedUnits()) {
-                        if (entity instanceof Unit unit) {
-                            MiscUtil.addUnitCheckpoint(unit, CursorClientEvents.getPreselectedBlockPos().above(), true);
-                            if (unit instanceof WorkerUnit workerUnit) {
-                                workerUnit.getBuildRepairGoal().ignoreNextCheckpoint = true;
+                    if (hasSelectedWorkers) {
+                        for (LivingEntity entity : getSelectedUnits()) {
+                            if (entity instanceof Unit unit) {
+                                MiscUtil.addUnitCheckpoint(unit, CursorClientEvents.getPreselectedBlockPos().above(), true);
+                                if (unit instanceof WorkerUnit workerUnit) {
+                                    workerUnit.getBuildRepairGoal().ignoreNextCheckpoint = true;
+                                }
                             }
                         }
                     }
@@ -876,11 +898,12 @@ public class BuildingClientEvents {
             buildingToPlace = null;
         }
         if (evt.getKeyCode() == GLFW.GLFW_KEY_DELETE) {
+            boolean isSandboxPlayer = MC.player != null && SandboxClientEvents.isSandboxPlayer(MC.player.getName().getString());
             Building building = HudClientEvents.hudSelectedBuilding;
-            if (building != null && building.isBuilt
-                && getPlayerToBuildingRelationship(building) == Relationship.OWNED) {
+            if (building != null &&
+                ((building.isBuilt && getPlayerToBuildingRelationship(building) == Relationship.OWNED) || isSandboxPlayer)) {
                 HudClientEvents.hudSelectedBuilding = null;
-                BuildingServerboundPacket.cancelBuilding(building.minCorner);
+                BuildingServerboundPacket.cancelBuilding(building.minCorner, MC.player.getName().getString());
             }
         }
     }
@@ -930,6 +953,15 @@ public class BuildingClientEvents {
         }
     }
 
+    @SubscribeEvent
+    public static void onScreenOpen(ScreenEvent.Opening evt) {
+        if (evt.getScreen() instanceof BeaconScreen) {
+            BlockPos bp = Item.getPlayerPOVHitResult(MC.level, MC.player, ClipContext.Fluid.NONE).getBlockPos();
+            if (BuildingUtils.findBuilding(true, bp) instanceof Beacon)
+                evt.setCanceled(true);
+        }
+    }
+
     // on closing a chest screen check that it could be a stockpile chest so they can be consumed for resources
     @SubscribeEvent
     public static void onScreenClose(ScreenEvent.Closing evt) {
@@ -961,7 +993,7 @@ public class BuildingClientEvents {
         String ownerName,
         int numBlocksToPlace,
         boolean isDiagonalBridge,
-        boolean isUpgraded,
+        int upgradeLevel,
         boolean isBuilt,
         Portal.PortalType portalType,
         boolean forPlayerLoggingIn
@@ -992,7 +1024,7 @@ public class BuildingClientEvents {
                 newBuilding.highestBlockCountReached = newBuilding.getBlocksTotal();
             }
 
-            if (isUpgraded) {
+            if (upgradeLevel > 0) {
                 if (newBuilding instanceof Castle castle) {
                     castle.changeStructure(Castle.upgradedStructureName);
                 } else if (newBuilding instanceof Laboratory lab) {
@@ -1001,6 +1033,8 @@ public class BuildingClientEvents {
                     portal.changeStructure(portalType);
                 } else if (newBuilding instanceof Library library) {
                     library.changeStructure(Library.upgradedStructureName);
+                } else if (newBuilding instanceof Beacon beacon) {
+                    beacon.changeStructure(upgradeLevel);
                 }
             }
             buildings.add(newBuilding);
@@ -1029,10 +1063,11 @@ public class BuildingClientEvents {
         }
     }
 
-    public static void syncBuildingBlocks(Building serverBuilding, int blocksPlaced) {
+    public static void syncBuilding(Building serverBuilding, int blocksPlaced, String ownerName) {
         for (Building building : buildings)
             if (building.originPos.equals(serverBuilding.originPos)) {
                 building.setServerBlocksPlaced(blocksPlaced);
+                building.ownerName = ownerName;
             }
     }
 
@@ -1043,7 +1078,7 @@ public class BuildingClientEvents {
 
             if (playerName.equals(buildingOwnerName)) {
                 return Relationship.OWNED;
-            } else if (AllianceSystem.isAllied(playerName, buildingOwnerName)) {
+            } else if (AlliancesClient.isAllied(playerName, buildingOwnerName)) {
                 return Relationship.FRIENDLY;
             } else if (buildingOwnerName.isBlank()) {
                 return Relationship.NEUTRAL;
@@ -1060,9 +1095,23 @@ public class BuildingClientEvents {
     public static boolean hasFinishedBuilding(String buildingName) {
         for (Building building : buildings)
             if (building.name.equals(buildingName) && building.isBuilt && MC.player != null
-                && building.ownerName.equals(MC.player.getName().getString())) {
+                    && building.ownerName.equals(MC.player.getName().getString())) {
                 return true;
             }
         return false;
+    }
+
+    public static void syncBeacon(UnitAction action, BlockPos beaconPos, boolean activate) {
+        Beacon beacon = BuildingUtils.getBeacon(true);
+        if (beacon == null)
+            return;
+
+        if (activate) {
+            MobEffect effect = Beacon.getMobEffectForAction(action);
+            if (effect != null)
+                beacon.activate(effect);
+        } else {
+            beacon.deactivate();
+        }
     }
 }

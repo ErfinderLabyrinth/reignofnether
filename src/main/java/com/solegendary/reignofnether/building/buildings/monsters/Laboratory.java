@@ -82,7 +82,7 @@ public class Laboratory extends ProductionBuilding implements RangeIndicator {
     }
 
     private int getLightningRange() {
-        return isUpgraded() && isBuilt ? CallLightning.RANGE : 0;
+        return getUpgradeLevel() > 0 && isBuilt ? CallLightning.RANGE : 0;
     }
 
     @Override
@@ -118,11 +118,11 @@ public class Laboratory extends ProductionBuilding implements RangeIndicator {
 
     // check that the lightning rod is built based on existing placed blocks
     @Override
-    public boolean isUpgraded() {
+    public int getUpgradeLevel() {
         for (BuildingBlock block : blocks)
             if (block.getBlockState().getBlock() == Blocks.LIGHTNING_ROD)
-                return true;
-        return false;
+                return 1;
+        return 0;
     }
 
     public void changeStructure(String newStructureName) {

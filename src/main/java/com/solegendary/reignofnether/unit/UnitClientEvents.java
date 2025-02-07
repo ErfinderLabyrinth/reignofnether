@@ -3,28 +3,33 @@ package com.solegendary.reignofnether.unit;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Vector3d;
 import com.solegendary.reignofnether.ability.Ability;
-import com.solegendary.reignofnether.alliance.AllianceSystem;
+import com.solegendary.reignofnether.alliance.AlliancesClient;
 import com.solegendary.reignofnether.building.*;
 import com.solegendary.reignofnether.building.buildings.shared.AbstractBridge;
 import com.solegendary.reignofnether.building.buildings.villagers.IronGolemBuilding;
 import com.solegendary.reignofnether.cursor.CursorClientEvents;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientEvents;
+import com.solegendary.reignofnether.gamerules.GameruleClient;
 import com.solegendary.reignofnether.hud.HudClientEvents;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.minimap.MinimapClientEvents;
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
 import com.solegendary.reignofnether.player.PlayerServerboundPacket;
 import com.solegendary.reignofnether.registrars.PacketHandler;
+import com.solegendary.reignofnether.research.ResearchClient;
+import com.solegendary.reignofnether.research.researchItems.ResearchHoglinCavalry;
+import com.solegendary.reignofnether.research.researchItems.ResearchRavagerCavalry;
+import com.solegendary.reignofnether.research.researchItems.ResearchSpiderJockeys;
 import com.solegendary.reignofnether.resources.*;
+import com.solegendary.reignofnether.sandbox.SandboxClientEvents;
 import com.solegendary.reignofnether.tutorial.TutorialClientEvents;
 import com.solegendary.reignofnether.unit.goals.MeleeAttackBuildingGoal;
 import com.solegendary.reignofnether.unit.interfaces.*;
 import com.solegendary.reignofnether.unit.packets.UnitActionServerboundPacket;
-import com.solegendary.reignofnether.unit.units.monsters.CreeperUnit;
-import com.solegendary.reignofnether.unit.units.monsters.WardenUnit;
-import com.solegendary.reignofnether.unit.units.monsters.ZoglinUnit;
+import com.solegendary.reignofnether.unit.units.monsters.*;
 import com.solegendary.reignofnether.unit.units.piglins.BruteUnit;
 import com.solegendary.reignofnether.unit.units.piglins.GhastUnit;
+import com.solegendary.reignofnether.unit.units.piglins.HeadhunterUnit;
 import com.solegendary.reignofnether.unit.units.piglins.HoglinUnit;
 import com.solegendary.reignofnether.unit.units.villagers.*;
 import com.solegendary.reignofnether.util.Faction;
@@ -40,6 +45,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.monster.Skeleton;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -69,9 +75,6 @@ public class UnitClientEvents {
 
     private static final Minecraft MC = Minecraft.getInstance();
 
-    // max possible pop you can have regardless of buildings, adjustable via /gamerule maxPopulation cheat
-    public static int maxPopulation = ResourceCosts.DEFAULT_MAX_POPULATION;
-
     // list of vecs used in RenderChunkRegionMixin to replace leaf rendering
     private static final int WINDOW_RADIUS = 5; // size of area to hide leaves
     public static final int WINDOW_UPDATE_TICKS_MAX = 5; // size of area to hide leaves
@@ -90,8 +93,6 @@ public class UnitClientEvents {
     private static final ArrayList<LivingEntity> allUnits = new ArrayList<>();
 
     @Nullable private static UnitActionItem lastClientUAIActioned = null;
-
-    public static boolean neutralAggro = false;
 
     public static ArrayList<LivingEntity> getPreselectedUnits() { return preselectedUnits; }
     public static ArrayList<LivingEntity> getSelectedUnits() {
@@ -242,12 +243,26 @@ public class UnitClientEvents {
 
     public static void sendUnitCommand(UnitAction action) {
         BlockPos bp = getPreselectedBlockPos();
-        if (action == UnitAction.STARTRTS_VILLAGERS) {
-            PlayerServerboundPacket.startRTS(Faction.VILLAGERS, (double) bp.getX(), (double) bp.getY(), (double) bp.getZ());
-        } else if (action == UnitAction.STARTRTS_MONSTERS) {
-            PlayerServerboundPacket.startRTS(Faction.MONSTERS, (double) bp.getX(), (double) bp.getY(), (double) bp.getZ());
-        } else if (action == UnitAction.STARTRTS_PIGLINS) {
-            PlayerServerboundPacket.startRTS(Faction.PIGLINS, (double) bp.getX(), (double) bp.getY(), (double) bp.getZ());
+
+        if (action.name().toLowerCase().contains("startrts")) {
+            if (action == UnitAction.STARTRTS_VILLAGERS) {
+                PlayerServerboundPacket.startRTS(Faction.VILLAGERS, (double) bp.getX(), (double) bp.getY(), (double) bp.getZ());
+            } else if (action == UnitAction.STARTRTS_MONSTERS) {
+                PlayerServerboundPacket.startRTS(Faction.MONSTERS, (double) bp.getX(), (double) bp.getY(), (double) bp.getZ());
+            } else if (action == UnitAction.STARTRTS_PIGLINS) {
+                PlayerServerboundPacket.startRTS(Faction.PIGLINS, (double) bp.getX(), (double) bp.getY(), (double) bp.getZ());
+            }
+            return;
+        }
+        else if (action.name().toLowerCase().contains("sandbox_spawn")) {
+            if (action == UnitAction.STARTRTS_VILLAGERS) {
+                PlayerServerboundPacket.startRTS(Faction.VILLAGERS, (double) bp.getX(), (double) bp.getY(), (double) bp.getZ());
+            } else if (action == UnitAction.STARTRTS_MONSTERS) {
+                PlayerServerboundPacket.startRTS(Faction.MONSTERS, (double) bp.getX(), (double) bp.getY(), (double) bp.getZ());
+            } else if (action == UnitAction.STARTRTS_PIGLINS) {
+                PlayerServerboundPacket.startRTS(Faction.PIGLINS, (double) bp.getX(), (double) bp.getY(), (double) bp.getZ());
+            }
+            return;
         }
 
         if (MC.player != null) {
@@ -552,7 +567,6 @@ public class UnitClientEvents {
                 sendUnitCommand(CursorClientEvents.getLeftClickAction());
             }
 
-
             // left click -> select a single unit
             // if shift is held, deselect a unit or add it to the selected group
             else if (preselectedUnits.size() == 1 && !isLeftClickAttack()) {
@@ -586,10 +600,26 @@ public class UnitClientEvents {
             if (selectedUnits.size() > 0) {
                 Building preSelBuilding = BuildingClientEvents.getPreselectedBuilding();
 
+                // right click -> mount friendly unit
+                if (preselectedUnits.size() == 1 && canMountUnit(hudSelectedEntity, preselectedUnits.get(0))) {
+                    if (hudSelectedEntity instanceof PillagerUnit && getPreselectedUnits().get(0) instanceof RavagerUnit)
+                        sendUnitCommand(UnitAction.MOUNT_RAVAGER);
+                    if (hudSelectedEntity instanceof HeadhunterUnit && getPreselectedUnits().get(0) instanceof HoglinUnit)
+                        sendUnitCommand(UnitAction.MOUNT_HOGLIN);
+                    if (hudSelectedEntity instanceof Unit && hudSelectedEntity instanceof Skeleton && getPreselectedUnits().get(0) instanceof RavagerUnit)
+                        sendUnitCommand(UnitAction.MOUNT_SPIDER);
+                }
+                // right click -> garrison friendly building
+                else if (preSelBuilding instanceof GarrisonableBuilding garr &&
+                        hudSelectedEntity instanceof RangedAttackerUnit &&
+                        hudSelectedEntity instanceof Unit unit && unit.canGarrison() &&
+                        preSelBuilding.ownerName.equals(unit.getOwnerName())) {
+                    sendUnitCommand(UnitAction.GARRISON);
+                }
                 // right click -> attack unfriendly unit
-                if (preselectedUnits.size() == 1 &&
+                else if (preselectedUnits.size() == 1 &&
                     !targetingSelf() &&
-                    ((neutralAggro && getPlayerToEntityRelationship(preselectedUnits.get(0)) == Relationship.NEUTRAL) ||
+                    ((GameruleClient.neutralAggro && getPlayerToEntityRelationship(preselectedUnits.get(0)) == Relationship.NEUTRAL) ||
                     getPlayerToEntityRelationship(preselectedUnits.get(0)) == Relationship.HOSTILE ||
                      ResourceSources.isHuntableAnimal(preselectedUnits.get(0)))) {
 
@@ -602,8 +632,9 @@ public class UnitClientEvents {
                 // right click -> attack unfriendly building
                 else if (hudSelectedEntity instanceof AttackerUnit &&
                         (preSelBuilding != null) &&
+                        !preSelBuilding.invulnerable &&
                         !(preSelBuilding instanceof AbstractBridge) &&
-                        ((neutralAggro && getPlayerToBuildingRelationship(preSelBuilding) == Relationship.NEUTRAL) ||
+                        ((GameruleClient.neutralAggro && getPlayerToBuildingRelationship(preSelBuilding) == Relationship.NEUTRAL) ||
                         getPlayerToBuildingRelationship(preSelBuilding) == Relationship.HOSTILE)) {
                     sendUnitCommand(UnitAction.ATTACK_BUILDING);
                 }
@@ -748,8 +779,9 @@ public class UnitClientEvents {
     @SubscribeEvent
     public static void onButtonPress(ScreenEvent.KeyPressed.Pre evt) {
         if (evt.getKeyCode() == GLFW.GLFW_KEY_DELETE) {
+            boolean isSandboxPlayer = MC.player != null && SandboxClientEvents.isSandboxPlayer(MC.player.getName().getString());
             LivingEntity entity = hudSelectedEntity;
-            if (entity != null && getPlayerToEntityRelationship(entity) == Relationship.OWNED &&
+            if ((entity != null && getPlayerToEntityRelationship(entity) == Relationship.OWNED || isSandboxPlayer) &&
                     !(entity instanceof CreeperUnit))
                 sendUnitCommand(UnitAction.DELETE);
         }
@@ -776,7 +808,7 @@ public class UnitClientEvents {
 
                 if (playerName.equals(entityName)) {
                     return Relationship.OWNED;
-                } else if (AllianceSystem.isAllied(playerName, entityName)) {
+                } else if (AlliancesClient.isAllied(playerName, entityName)) {
                     return Relationship.FRIENDLY;
                 } else {
                     return Relationship.HOSTILE;
@@ -793,7 +825,7 @@ public class UnitClientEvents {
 
             if (playerName.equals(ownerName)) {
                 return Relationship.OWNED;
-            } else if (AllianceSystem.isAllied(playerName, ownerName)) {
+            } else if (AlliancesClient.isAllied(playerName, ownerName)) {
                 return Relationship.FRIENDLY;
             } else {
                 return Relationship.HOSTILE;
@@ -970,14 +1002,28 @@ public class UnitClientEvents {
         }
     }
 
-    public static void setMaxPopulation(int value) {
-        maxPopulation = value;
-    }
-
     public static void makeVillagerVeteran(int unitId) {
         for (LivingEntity entity : getAllUnits())
             if (entity instanceof VillagerUnit vUnit && unitId == entity.getId())
                 vUnit.isVeteran = true;
+    }
+
+    // used only for right click mounting shortcut
+    public static boolean canMountUnit(LivingEntity passenger, LivingEntity vehicle) {
+        if (!(passenger instanceof Unit) || !(vehicle instanceof Unit))
+            return false;
+        if (!((Unit) passenger).getOwnerName().equals(((Unit) vehicle).getOwnerName()))
+            return false;
+        if (hudSelectedEntity instanceof PillagerUnit && getPreselectedUnits().get(0) instanceof RavagerUnit &&
+            ResearchClient.hasResearch(ResearchRavagerCavalry.itemName))
+            return true;
+        if (hudSelectedEntity instanceof HeadhunterUnit && getPreselectedUnits().get(0) instanceof HoglinUnit &&
+            ResearchClient.hasResearch(ResearchHoglinCavalry.itemName))
+            return true;
+        if (hudSelectedEntity instanceof Unit && hudSelectedEntity instanceof Skeleton && getPreselectedUnits().get(0) instanceof RavagerUnit &&
+            ResearchClient.hasResearch(ResearchSpiderJockeys.itemName))
+            return true;
+        return false;
     }
 
     /*

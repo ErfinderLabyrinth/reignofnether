@@ -46,7 +46,7 @@ public class ResearchCastleFlag extends ProductionItem {
             hotkey,
             () -> false,
             () -> ProductionItem.itemIsBeingProduced(ResearchCastleFlag.itemName, prodBuilding.ownerName) || (
-                prodBuilding instanceof Castle castle && castle.isUpgraded()
+                prodBuilding instanceof Castle castle && castle.getUpgradeLevel() > 0
             ),
             () -> true,
             () -> BuildingServerboundPacket.startProduction(prodBuilding.originPos, itemName),

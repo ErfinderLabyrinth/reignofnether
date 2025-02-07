@@ -3,6 +3,8 @@ package com.solegendary.reignofnether.unit.units.piglins;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.Bloodlust;
 import com.solegendary.reignofnether.ability.abilities.MountHoglin;
+import com.solegendary.reignofnether.building.BuildingUtils;
+import com.solegendary.reignofnether.building.buildings.piglins.FlameSanctuary;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientboundPacket;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybindings;
@@ -268,5 +270,10 @@ public class HeadhunterUnit extends PiglinBrute implements Unit, AttackerUnit, R
             tridentStack.enchant(Enchantments.UNBREAKING, 1);
 
         this.setItemSlot(EquipmentSlot.MAINHAND, tridentStack);
+    }
+
+    @Override
+    public boolean fireImmune() {
+        return super.fireImmune() || BuildingUtils.findBuilding(level.isClientSide(), getOnPos()) instanceof FlameSanctuary;
     }
 }

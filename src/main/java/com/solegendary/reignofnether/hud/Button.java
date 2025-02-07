@@ -26,15 +26,18 @@ import java.util.function.Supplier;
 
 public class Button {
 
-    public static final int itemIconSize = 14;
-
     public String name;
     public int x; // top left
     public int y;
     int iconSize;
-    public static int iconFrameSize = 22;
-    public static int iconFrameSelectedSize = 24;
+    int iconFrameSize;
+    int iconSelectedFrameSize;
+    public static int DEFAULT_ICON_SIZE = 14;
+    public static int DEFAULT_ICON_FRAME_SIZE = 22;
+    public static int DEFAULT_ICON_SELECTED_FRAME_SIZE = 24;
     public int tooltipOffsetY = 0;
+
+    public static final int itemIconSize = DEFAULT_ICON_SIZE;
 
     public ResourceLocation iconResource;
     public ResourceLocation bgIconResource = null; // for rendering a background icon (eg. for mounted unit passengers)
@@ -72,6 +75,8 @@ public class Button {
         this.name = name;
         this.iconResource = iconRl;
         this.iconSize = iconSize;
+        this.iconFrameSize = iconSize + 8;
+        this.iconSelectedFrameSize = iconSize + 10;
         this.hotkey = hotkey;
         this.isSelected = isSelected;
         this.isHidden = isHidden;
@@ -89,6 +94,8 @@ public class Button {
         this.iconResource = iconRl;
         this.frameResource = frameRl;
         this.iconSize = iconSize;
+        this.iconFrameSize = iconSize + 8;
+        this.iconSelectedFrameSize = iconSize + 10;
         this.hotkey = hotkey;
         this.isSelected = isSelected;
         this.isHidden = isHidden;
@@ -105,6 +112,8 @@ public class Button {
         this.name = name;
         this.iconResource = iconRl;
         this.iconSize = iconSize;
+        this.iconFrameSize = iconSize + 8;
+        this.iconSelectedFrameSize = iconSize + 10;
         this.entity = entity;
         this.isSelected = isSelected;
         this.isHidden = isHidden;
@@ -121,6 +130,8 @@ public class Button {
         this.name = name;
         this.iconResource = iconRl;
         this.iconSize = iconSize;
+        this.iconFrameSize = iconSize + 8;
+        this.iconSelectedFrameSize = iconSize + 10;
         this.building = building;
         this.isSelected = isSelected;
         this.isHidden = isHidden;
@@ -146,14 +157,19 @@ public class Button {
     public void render(PoseStack poseStack, int x, int y, int mouseX, int mouseY) {
         this.x = x;
         this.y = y;
-        if (this.frameResource != null)
-            MyRenderer.renderIconFrameWithBg(poseStack, this.frameResource, x, y, iconFrameSize, 0x64000000);
+
+        int xyDiff = (DEFAULT_ICON_SIZE - iconSize) / 2;
+
+        if (this.frameResource != null) {
+            MyRenderer.renderIconFrameWithBg(poseStack, this.frameResource, x + xyDiff, y + xyDiff, iconFrameSize, 0x64000000);
+        }
 
         if (bgIconResource != null) {
             MyRenderer.renderIcon(
                     poseStack,
                     bgIconResource,
-                    x+4 + (7 - iconSize/2), y+4 + (7 - iconSize/2),
+                    frameResource != null ? x+4 + (7 - iconSize/2) : x + (7 - iconSize/2),
+                    frameResource != null ? y+4 + (7 - iconSize/2) : y + (7 - iconSize/2),
                     iconSize
             );
         }
@@ -162,8 +178,8 @@ public class Button {
             MyRenderer.renderIcon(
                     poseStack,
                     iconResource,
-                    x+4 + (7 - iconSize/2), y+4 + (7 - iconSize/2),
-                    iconSize
+                    x+4 + (7 - xyDiff - iconSize/2), y+4 + (7 - xyDiff - iconSize/2),
+                    DEFAULT_ICON_SIZE
             );
         }
         // hotkey letter
@@ -184,20 +200,22 @@ public class Button {
                     (MiscUtil.isRightClickDown(MC) && onRightClick != null))
             ))) {
 
-            ResourceLocation iconFrameSelectedResource = new ResourceLocation(ReignOfNether.MOD_ID, "textures/hud/icon_frame_selected.png");
-            MyRenderer.renderIcon(
-                    poseStack,
-                    iconFrameSelectedResource,
-                    x-1,y-1,
-                    iconFrameSelectedSize
-            );
+            if (frameResource != null) {
+                ResourceLocation iconFrameSelectedResource = new ResourceLocation(ReignOfNether.MOD_ID, "textures/hud/icon_frame_selected.png");
+                MyRenderer.renderIcon(
+                        poseStack,
+                        iconFrameSelectedResource,
+                        x-1 + xyDiff,y-1 + xyDiff,
+                        iconSelectedFrameSize
+                );
+            }
         }
         // light up on hover
         if (isEnabled.get() && isMouseOver(mouseX, mouseY)) {
             GuiComponent.fill(poseStack, // x1,y1, x2,y2,
-                    x, y,
-                    x + iconFrameSize,
-                    y + iconFrameSize,
+                    x + xyDiff, y + xyDiff,
+                    x + xyDiff + iconFrameSize,
+                    y + xyDiff + iconFrameSize,
                     0x32FFFFFF); //ARGB(hex); note that alpha ranges between ~0-16, not 0-255
         }
 
@@ -207,9 +225,10 @@ public class Button {
                 greyHeightPx = 0;
 
             GuiComponent.fill(poseStack, // x1,y1, x2,y2,
-                    x, y + greyHeightPx,
-                    x + iconFrameSize,
-                    y + iconFrameSize,
+                    x + xyDiff,
+                    y + xyDiff + greyHeightPx,
+                    x + xyDiff + iconFrameSize,
+                    y + xyDiff + iconFrameSize,
                     0x99000000); //ARGB(hex); note that alpha ranges between ~0-16, not 0-255
         }
     }
@@ -219,11 +238,11 @@ public class Button {
     }
 
     public boolean isMouseOver(int mouseX, int mouseY) {
-        return (mouseX >= x &&
-                mouseY >= y &&
-                mouseX < x + iconFrameSize &&
-                mouseY < y + iconFrameSize
-        );
+        int xyDiff = (DEFAULT_ICON_SIZE - iconSize) / 2;
+        return (mouseX >= x + xyDiff &&
+                mouseY >= y + xyDiff &&
+                mouseX < x + xyDiff + iconFrameSize &&
+                mouseY < y + xyDiff + iconFrameSize);
     }
 
     // must be done from mouse press event

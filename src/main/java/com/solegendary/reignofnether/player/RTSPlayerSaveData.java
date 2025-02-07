@@ -44,6 +44,7 @@ public class RTSPlayerSaveData extends SavedData {
                 String name = ptag.getString("name");
                 int id = ptag.getInt("id");
                 int ticksWithoutCapitol = ptag.getInt("ticksWithoutCapitol");
+                int beaconOwnerTicks = ptag.getInt("beaconOwnerTicks");
                 Faction faction = Faction.valueOf(ptag.getString("faction"));
 
                 data.rtsPlayers.add(RTSPlayer.getFromSave(name, id, ticksWithoutCapitol, faction));
@@ -64,6 +65,7 @@ public class RTSPlayerSaveData extends SavedData {
             cTag.putString("name", p.name);
             cTag.putInt("id", p.id);
             cTag.putInt("ticksWithoutCapitol", p.ticksWithoutCapitol);
+            cTag.putInt("beaconOwnerTicks", p.beaconOwnerTicks);
             cTag.putString("faction", p.faction.name());
             list.add(cTag);
 

@@ -23,6 +23,7 @@ import com.solegendary.reignofnether.player.PlayerServerEvents;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
 import com.solegendary.reignofnether.resources.ResourcesClientEvents;
 import com.solegendary.reignofnether.resources.ResourcesServerEvents;
+import com.solegendary.reignofnether.sandbox.SandboxClientEvents;
 import com.solegendary.reignofnether.survival.SurvivalClientEvents;
 import com.solegendary.reignofnether.survival.SurvivalServerEvents;
 import com.solegendary.reignofnether.time.TimeClientEvents;
@@ -53,6 +54,7 @@ public class ClientEventRegistrar {
         vanillaEventBus.register(BuildingClientEvents.class); // being first fixes a bug with drawBuildingToPlace()
         vanillaEventBus.register(UnitClientEvents.class);
         vanillaEventBus.register(HealthBarClientEvents.class);
+        vanillaEventBus.register(SandboxClientEvents.class);
         vanillaEventBus.register(HudClientEvents.class); // ensure this is first so cursor is rendered above hud
         vanillaEventBus.register(AttackWarningClientEvents.class);
         vanillaEventBus.register(CursorClientEvents.class);

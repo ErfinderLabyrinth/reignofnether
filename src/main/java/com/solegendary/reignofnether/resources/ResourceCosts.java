@@ -42,7 +42,12 @@ public class ResourceCosts {
     public static final ResourceCost GHAST = new ResourceCost(ID, "GHAST");
     public static final ResourceCost MAGMA_CUBE = new ResourceCost(ID, "MAGMA_CUBE");
 
+    public static final ResourceCost NECROMANCER = new ResourceCost(ID, "NECROMANCER");
+    public static final ResourceCost ROYAL_GUARD = new ResourceCost(ID, "ROYAL_GUARD");
+    public static final ResourceCost PIGLIN_MERCHANT = new ResourceCost(ID, "PIGLIN_MERCHANT");
+
     //BUILDINGS
+    public static final ResourceCost BEACON = new ResourceCost(ID, "BEACON");
 
     public static final ResourceCost STOCKPILE = new ResourceCost(ID, "STOCKPILE");
     public static final ResourceCost OAK_BRIDGE = new ResourceCost(ID, "OAK_BRIDGE");
@@ -114,6 +119,11 @@ public class ResourceCosts {
     public static final ResourceCost RESEARCH_TRANSPORT_PORTAL = new ResourceCost(ID, "RESEARCH_TRANSPORT_PORTAL");
     public static final ResourceCost RESEARCH_CUBE_MAGMA = new ResourceCost(ID, "RESEARCH_CUBE_MAGMA");
     public static final ResourceCost RESEARCH_SOUL_FIREBALLS = new ResourceCost(ID, "RESEARCH_SOUL_FIREBALLS");
+    public static final ResourceCost RESEARCH_BEACON_LEVEL1 = new ResourceCost(ID, "RESEARCH_BEACON_LEVEL1");
+    public static final ResourceCost RESEARCH_BEACON_LEVEL2 = new ResourceCost(ID, "RESEARCH_BEACON_LEVEL2");
+    public static final ResourceCost RESEARCH_BEACON_LEVEL3 = new ResourceCost(ID, "RESEARCH_BEACON_LEVEL3");
+    public static final ResourceCost RESEARCH_BEACON_LEVEL4 = new ResourceCost(ID, "RESEARCH_BEACON_LEVEL4");
+    public static final ResourceCost RESEARCH_BEACON_LEVEL5 = new ResourceCost(ID, "RESEARCH_BEACON_LEVEL5");
 
     // ENCHANTMENTS
 
@@ -172,6 +182,7 @@ public class ResourceCosts {
         POISON_SPIDER.bakeValues(ReignOfNetherCommonConfigs.UnitCosts.POISON_SPIDER);
         SLIME.bakeValues(ReignOfNetherCommonConfigs.UnitCosts.SLIME);
         WARDEN.bakeValues(ReignOfNetherCommonConfigs.UnitCosts.WARDEN);
+        NECROMANCER.bakeValues(ReignOfNetherCommonConfigs.UnitCosts.NECROMANCER);
         ZOMBIE_PIGLIN.bakeValues(ReignOfNetherCommonConfigs.UnitCosts.ZOMBIE_PIGLIN);
         ZOGLIN.bakeValues(ReignOfNetherCommonConfigs.UnitCosts.ZOGLIN);
         // Villagers
@@ -183,6 +194,7 @@ public class ResourceCosts {
         WITCH.bakeValues(ReignOfNetherCommonConfigs.UnitCosts.WITCH);
         EVOKER.bakeValues(ReignOfNetherCommonConfigs.UnitCosts.EVOKER);
         RAVAGER.bakeValues(ReignOfNetherCommonConfigs.UnitCosts.RAVAGER);
+        ROYAL_GUARD.bakeValues(ReignOfNetherCommonConfigs.UnitCosts.ROYAL_GUARD);
         // Piglins
         GRUNT.bakeValues(ReignOfNetherCommonConfigs.UnitCosts.GRUNT);
         BRUTE.bakeValues(ReignOfNetherCommonConfigs.UnitCosts.BRUTE);
@@ -192,7 +204,10 @@ public class ResourceCosts {
         WITHER_SKELETON.bakeValues(ReignOfNetherCommonConfigs.UnitCosts.WITHER_SKELETON);
         GHAST.bakeValues(ReignOfNetherCommonConfigs.UnitCosts.GHAST);
         MAGMA_CUBE.bakeValues(ReignOfNetherCommonConfigs.UnitCosts.MAGMA_CUBE);
+        PIGLIN_MERCHANT.bakeValues(ReignOfNetherCommonConfigs.UnitCosts.PIGLIN_MERCHANT);
         // ******************* BUILDINGS ******************* //
+        BEACON.bakeValues(ReignOfNetherCommonConfigs.BuildingCosts.BEACON);
+
         STOCKPILE.bakeValues(ReignOfNetherCommonConfigs.BuildingCosts.STOCKPILE);
         OAK_BRIDGE.bakeValues(ReignOfNetherCommonConfigs.BuildingCosts.OAK_BRIDGE);
         SPRUCE_BRIDGE.bakeValues(ReignOfNetherCommonConfigs.BuildingCosts.SPRUCE_BRIDGE);
@@ -261,12 +276,16 @@ public class ResourceCosts {
         RESEARCH_TRANSPORT_PORTAL.bakeValues(ReignOfNetherCommonConfigs.ResearchCosts.RESEARCH_TRANSPORT_PORTAL);
         RESEARCH_CUBE_MAGMA.bakeValues(ReignOfNetherCommonConfigs.ResearchCosts.RESEARCH_CUBE_MAGMA);
         RESEARCH_SOUL_FIREBALLS.bakeValues(ReignOfNetherCommonConfigs.ResearchCosts.RESEARCH_SOUL_FIREBALLS);
+        RESEARCH_BEACON_LEVEL1.bakeValues(ReignOfNetherCommonConfigs.ResearchCosts.RESEARCH_BEACON_LEVEL1);
+        RESEARCH_BEACON_LEVEL2.bakeValues(ReignOfNetherCommonConfigs.ResearchCosts.RESEARCH_BEACON_LEVEL2);
+        RESEARCH_BEACON_LEVEL3.bakeValues(ReignOfNetherCommonConfigs.ResearchCosts.RESEARCH_BEACON_LEVEL3);
+        RESEARCH_BEACON_LEVEL4.bakeValues(ReignOfNetherCommonConfigs.ResearchCosts.RESEARCH_BEACON_LEVEL4);
+        RESEARCH_BEACON_LEVEL5.bakeValues(ReignOfNetherCommonConfigs.ResearchCosts.RESEARCH_BEACON_LEVEL5);
         // ******************* ENCHANTMENTS ******************* //
         ENCHANT_MAIMING.bakeValues(ReignOfNetherCommonConfigs.EnchantmentCosts.ENCHANT_MAIMING);
         ENCHANT_QUICK_CHARGE.bakeValues(ReignOfNetherCommonConfigs.EnchantmentCosts.ENCHANT_QUICK_CHARGE);
         ENCHANT_SHARPNESS.bakeValues(ReignOfNetherCommonConfigs.EnchantmentCosts.ENCHANT_SHARPNESS);
         ENCHANT_MULTISHOT.bakeValues(ReignOfNetherCommonConfigs.EnchantmentCosts.ENCHANT_MULTISHOT);
         ENCHANT_VIGOR.bakeValues(ReignOfNetherCommonConfigs.EnchantmentCosts.ENCHANT_VIGOR);
-        
     }
 }

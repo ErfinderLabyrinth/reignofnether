@@ -27,7 +27,7 @@ public class BuildingClientboundPacket {
     public int blocksPlaced; // for syncing out-of-view clientside buildings
     public int numQueuedBlocks; // used for delaying destroy checks clientside
     public boolean isDiagonalBridge;
-    public boolean isUpgraded;
+    public int upgradeLevel;
     public boolean isBuilt;
     public Portal.PortalType portalType;
     public boolean forPlayerLoggingIn; // is this placement for someone logging in currently joined?
@@ -39,7 +39,7 @@ public class BuildingClientboundPacket {
         String ownerName,
         int numQueuedBlocks,
         boolean isDiagonalBridge,
-        boolean isUpgraded,
+        int upgradeLevel,
         boolean isBuilt,
         Portal.PortalType portalType,
         boolean forPlayerLoggingIn
@@ -52,24 +52,24 @@ public class BuildingClientboundPacket {
             0,
             numQueuedBlocks,
             isDiagonalBridge,
-            isUpgraded,
+            upgradeLevel,
             isBuilt,
             portalType,
             forPlayerLoggingIn
         ));
     }
 
-    public static void syncBuilding(BlockPos buildingPos, int blocksPlaced) {
+    public static void syncBuilding(BlockPos buildingPos, int blocksPlaced, String ownerName) {
         PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(),
-            new BuildingClientboundPacket(BuildingAction.SYNC_BLOCKS,
+            new BuildingClientboundPacket(BuildingAction.SYNC_BLOCKS_AND_OWNER,
                 "",
                 buildingPos,
                 Rotation.NONE,
-                "",
+                ownerName,
                 blocksPlaced,
                 0,
                 false,
-                false,
+                0,
                 false,
                 Portal.PortalType.BASIC,
                 false
@@ -87,7 +87,7 @@ public class BuildingClientboundPacket {
                 0,
                 0,
                 false,
-                false,
+                0,
                 false,
                 Portal.PortalType.BASIC,
                 false
@@ -107,7 +107,7 @@ public class BuildingClientboundPacket {
                 0,
                 0,
                 false,
-                false,
+                0,
                 false,
                 Portal.PortalType.BASIC,
                 false
@@ -125,7 +125,7 @@ public class BuildingClientboundPacket {
                 0,
                 0,
                 false,
-                false,
+                0,
                 false,
                 Portal.PortalType.BASIC,
                 false
@@ -143,7 +143,7 @@ public class BuildingClientboundPacket {
                         0,
                         0,
                         false,
-                        false,
+                        0,
                         false,
                         Portal.PortalType.BASIC,
                         false
@@ -161,7 +161,7 @@ public class BuildingClientboundPacket {
                         0,
                         0,
                         false,
-                        false,
+                        0,
                         false,
                         Portal.PortalType.BASIC,
                         false
@@ -178,7 +178,7 @@ public class BuildingClientboundPacket {
         int blocksPlaced,
         int numQueuedBlocks,
         boolean isDiagonalBridge,
-        boolean isUpgraded,
+        int upgradeLevel,
         boolean isBuilt,
         Portal.PortalType portalType,
         boolean forPlayerLoggingIn
@@ -192,7 +192,7 @@ public class BuildingClientboundPacket {
         this.numQueuedBlocks = numQueuedBlocks;
         this.isDiagonalBridge = isDiagonalBridge;
         this.isBuilt = isBuilt;
-        this.isUpgraded = isUpgraded;
+        this.upgradeLevel = upgradeLevel;
         this.portalType = portalType;
         this.forPlayerLoggingIn = forPlayerLoggingIn;
     }
@@ -207,7 +207,7 @@ public class BuildingClientboundPacket {
         this.numQueuedBlocks = buffer.readInt();
         this.isDiagonalBridge = buffer.readBoolean();
         this.isBuilt = buffer.readBoolean();
-        this.isUpgraded = buffer.readBoolean();
+        this.upgradeLevel = buffer.readInt();
         this.portalType = buffer.readEnum(Portal.PortalType.class);
         this.forPlayerLoggingIn = buffer.readBoolean();
     }
@@ -222,7 +222,7 @@ public class BuildingClientboundPacket {
         buffer.writeInt(this.numQueuedBlocks);
         buffer.writeBoolean(this.isDiagonalBridge);
         buffer.writeBoolean(this.isBuilt);
-        buffer.writeBoolean(this.isUpgraded);
+        buffer.writeInt(this.upgradeLevel);
         buffer.writeEnum(this.portalType);
         buffer.writeBoolean(this.forPlayerLoggingIn);
     }
@@ -239,7 +239,7 @@ public class BuildingClientboundPacket {
                     if (building == null) {
 
                         // if the client was missing a building, replace it
-                        if (this.action == BuildingAction.SYNC_BLOCKS) {
+                        if (this.action == BuildingAction.SYNC_BLOCKS_AND_OWNER) {
                             BuildingServerboundPacket.requestReplacement(this.buildingPos);
                             ReignOfNether.LOGGER.warn("Missing building");
                         }
@@ -253,12 +253,12 @@ public class BuildingClientboundPacket {
                         this.ownerName,
                         this.numQueuedBlocks,
                         this.isDiagonalBridge,
+                        this.upgradeLevel,
                         this.isBuilt,
-                        this.isUpgraded,
                         this.portalType,
                         this.forPlayerLoggingIn
                     );
-                    case SYNC_BLOCKS -> BuildingClientEvents.syncBuildingBlocks(building, this.blocksPlaced);
+                    case SYNC_BLOCKS_AND_OWNER -> BuildingClientEvents.syncBuilding(building, this.blocksPlaced, this.ownerName);
                     case START_PRODUCTION -> {
                         ProductionBuilding.startProductionItem(
                             (ProductionBuilding) building,

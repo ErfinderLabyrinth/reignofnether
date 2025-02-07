@@ -1,0 +1,14 @@
+package com.solegendary.reignofnether.gamerules;
+
+public enum GameruleAction {
+    SET_LOG_FALLING,
+    SET_NEUTRAL_AGGRO,
+    SET_MAX_POPULATION,
+    SET_UNIT_GRIEFING,
+    SET_PLAYER_GRIEFING,
+    SET_IMPROVED_PATHFINDING,
+    SET_GROUND_Y_LEVEL,
+    SET_FLYING_MAX_Y_LEVEL,
+    SET_ALLOW_BEACONS,
+    PVP_MODES_ONLY
+}

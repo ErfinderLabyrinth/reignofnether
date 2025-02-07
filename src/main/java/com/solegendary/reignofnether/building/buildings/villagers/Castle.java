@@ -145,14 +145,14 @@ public class Castle extends ProductionBuilding implements GarrisonableBuilding {
 
     // check that the flag is built based on existing placed blocks
     @Override
-    public boolean isUpgraded() {
+    public int getUpgradeLevel() {
         for (BuildingBlock block : blocks)
             if (block.getBlockState().getBlock() == Blocks.WHITE_WOOL
                 || block.getBlockState().getBlock() == Blocks.RED_WOOL
                 || block.getBlockState().getBlock() == Blocks.LIGHT_GRAY_WOOL) {
-                return true;
+                return 1;
             }
-        return false;
+        return 0;
     }
 
     @Override

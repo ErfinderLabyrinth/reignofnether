@@ -1,17 +1,20 @@
 package com.solegendary.reignofnether.orthoview;
 
 import com.mojang.math.Matrix4f;
+import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingClientEvents;
 import com.solegendary.reignofnether.building.RangeIndicator;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientEvents;
 import com.solegendary.reignofnether.guiscreen.TopdownGui;
 import com.solegendary.reignofnether.guiscreen.TopdownGuiServerboundPacket;
+import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.hud.HudClientEvents;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.minimap.MinimapClientEvents;
 import com.solegendary.reignofnether.player.PlayerServerboundPacket;
 import com.solegendary.reignofnether.tutorial.TutorialClientEvents;
+import com.solegendary.reignofnether.tutorial.TutorialStage;
 import com.solegendary.reignofnether.unit.UnitClientEvents;
 import com.solegendary.reignofnether.util.MiscUtil;
 import com.solegendary.reignofnether.util.MyMath;
@@ -23,6 +26,9 @@ import net.minecraft.client.tutorial.TutorialSteps;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.player.Player;
@@ -39,7 +45,9 @@ import org.lwjgl.glfw.GLFW;
 
 import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
+import java.util.List;
 
+import static com.solegendary.reignofnether.util.MiscUtil.fcs;
 import static net.minecraft.util.Mth.sign;
 
 /**
@@ -329,7 +337,7 @@ public class OrthoviewClientEvents {
         // at 0deg by default camera is facing +Z and we want to move it backwards from this
         Vec2 XZRotated = MyMath.rotateCoords(0, -20, OrthoviewClientEvents.getCamRotX());
 
-        float offset = getEdgeCamPanSensitivity();
+        float offset = (float) (Math.sqrt(getZoom()) / (Math.sqrt(ZOOM_MAX)));
 
         Vec2 XZRotatedOffset = MyMath.rotateCoords(0, -(offset * 35), -camRotX - camRotAdjX);
 
@@ -370,27 +378,43 @@ public class OrthoviewClientEvents {
                     toggleEnable();
                 }
             }
-            if (evt.getKey() == Keybindings.getFnum(6).key) {
-                FogOfWarClientEvents.resetFogChunks();
-                UnitClientEvents.windowUpdateTicks = 0;
-
-                if (hideLeavesMethod == LeafHideMethod.NONE) {
-                    hideLeavesMethod = LeafHideMethod.AROUND_UNITS_AND_CURSOR;
-                    HudClientEvents.showTemporaryMessage(I18n.get("hud.orthoview.reignofnether.hiding_leaves_around"));
-                } else if (hideLeavesMethod == LeafHideMethod.AROUND_UNITS_AND_CURSOR) {
-                    hideLeavesMethod = LeafHideMethod.ALL;
-                    HudClientEvents.showTemporaryMessage(I18n.get("hud.orthoview.reignofnether.hiding_leaves_all"));
-                } else if (hideLeavesMethod == LeafHideMethod.ALL) {
-                    hideLeavesMethod = LeafHideMethod.NONE;
-                    HudClientEvents.showTemporaryMessage(I18n.get(
-                        "hud.orthoview.reignofnether" + ".disabled_hiding_leaves"));
-                }
-            }
-
             if (evt.getKey() == Keybindings.reset.key) {
                 reset();
             }
         }
+    }
+
+    public static Button getLeavesHidingButton() {
+        return new Button("Hide Leaves Method",
+                14,
+                switch(hideLeavesMethod) {
+                    case NONE -> new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/blocks/leaves.png");
+                    case AROUND_UNITS_AND_CURSOR -> new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/blocks/lime_stained_glass.png");
+                    case ALL -> new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/blocks/glass.png");
+                },
+                new ResourceLocation(ReignOfNether.MOD_ID, "textures/hud/icon_frame.png"),
+                null,
+                () -> false,
+                () -> !TutorialClientEvents.isAtOrPastStage(TutorialStage.MINIMAP_CLICK) || !MinimapClientEvents.isLargeMap(),
+                () -> true,
+                () -> {
+                    FogOfWarClientEvents.resetFogChunks();
+                    UnitClientEvents.windowUpdateTicks = 0;
+                    if (hideLeavesMethod == LeafHideMethod.NONE) {
+                        hideLeavesMethod = LeafHideMethod.AROUND_UNITS_AND_CURSOR;
+                    } else if (hideLeavesMethod == LeafHideMethod.AROUND_UNITS_AND_CURSOR) {
+                        hideLeavesMethod = LeafHideMethod.ALL;
+                    } else if (hideLeavesMethod == LeafHideMethod.ALL) {
+                        hideLeavesMethod = LeafHideMethod.NONE;
+                    }
+                },
+                null,
+                List.of(
+                        fcs(I18n.get("hud.orthoview.reignofnether.hiding_leaves_around"), hideLeavesMethod == LeafHideMethod.AROUND_UNITS_AND_CURSOR),
+                        fcs(I18n.get("hud.orthoview.reignofnether.hiding_leaves_all"), hideLeavesMethod == LeafHideMethod.ALL),
+                        fcs(I18n.get("hud.orthoview.reignofnether.disabled_hiding_leaves"), hideLeavesMethod == LeafHideMethod.NONE)
+                )
+        );
     }
 
     // Method to switch difficulty to Easy if it is currently set to Peaceful
