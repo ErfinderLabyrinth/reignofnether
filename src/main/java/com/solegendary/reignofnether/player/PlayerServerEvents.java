@@ -173,6 +173,13 @@ public class PlayerServerEvents {
             if (evt.phase == TickEvent.Phase.END) {
                 for (RTSPlayer rtsPlayer : rtsPlayers)
                     rtsPlayer.tick();
+
+                for (RTSPlayer rtsPlayer : rtsPlayers) {
+                    if (rtsPlayer.beaconOwnerTicks == Beacon.getTicksToWin(serverLevel)) {
+                        PlayerServerEvents.beaconVictory(rtsPlayer.name);
+                        break;
+                    }
+                }
                 if (rtsPlayers.isEmpty()) {
                     rtsGameTicks = 0;
                 } else {

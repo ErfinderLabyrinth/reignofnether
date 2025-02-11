@@ -103,8 +103,6 @@ public class RTSPlayer {
                             beaconOwnerTicks == (Beacon.getTicksToWin(beacon.getLevel()) * 3) / 4 ||
                             beaconOwnerTicks == Beacon.getTicksToWin(beacon.getLevel()) - 1200)
                         beacon.sendWarning("time_warning");
-                    if (beaconOwnerTicks == Beacon.getTicksToWin(beacon.getLevel()))
-                        PlayerServerEvents.beaconVictory(this.name);
                 }
             }
         }

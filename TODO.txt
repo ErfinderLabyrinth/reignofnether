@@ -30,7 +30,7 @@ Features
 
 Bugfixes
 --------
-[❌] Crash on beacon victory against a team?
+[🟡] Crash on beacon victory against a team?
 
 [❌] Walking on powder snow
 [🟡] Magma cubes are slow during the day
