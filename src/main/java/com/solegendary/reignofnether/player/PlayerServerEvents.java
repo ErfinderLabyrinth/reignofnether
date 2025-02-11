@@ -682,10 +682,10 @@ public class PlayerServerEvents {
     public static String getBeaconWinTime(String playerName) {
         for (RTSPlayer rtsPlayer : rtsPlayers) {
             if (rtsPlayer.name.equals(playerName)) {
-                return TimeUtils.getTimeStrFromTicks(Beacon.getTicksToWin() - rtsPlayer.beaconOwnerTicks);
+                return TimeUtils.getTimeStrFromTicks(Beacon.getTicksToWin(serverLevel) - rtsPlayer.beaconOwnerTicks);
             }
         }
-        return TimeUtils.getTimeStrFromTicks(Beacon.getTicksToWin());
+        return TimeUtils.getTimeStrFromTicks(Beacon.getTicksToWin(serverLevel));
     }
 
     @SubscribeEvent

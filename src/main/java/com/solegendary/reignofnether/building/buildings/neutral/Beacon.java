@@ -14,6 +14,7 @@ import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.player.PlayerServerEvents;
+import com.solegendary.reignofnether.registrars.GameRuleRegistrar;
 import com.solegendary.reignofnether.research.ResearchClient;
 import com.solegendary.reignofnether.research.researchItems.*;
 import com.solegendary.reignofnether.resources.ResourceCost;
@@ -67,8 +68,12 @@ public class Beacon extends ProductionBuilding implements RangeIndicator {
 
     public final static int MAX_UPGRADE_LEVEL = 5;
 
-    public static int getTicksToWin() {
-        return (int) (GameruleClient.beaconWinMinutes * 20 * 60);
+    public static int getTicksToWin(Level level) {
+        if (level.isClientSide)
+            return (int) (GameruleClient.beaconWinMinutes * 20 * 60);
+        else if (level.getServer() != null)
+            return level.getServer().getGameRules().getRule(GameRuleRegistrar.BEACON_WIN_MINUTES).get() * 20 * 60;
+        return 24000;
     }
 
     private MobEffect auraEffect = null;

@@ -38,7 +38,7 @@ public class PlayerClientEvents {
     public static boolean rtsLocked = false;
     public static boolean canStartRTS = true;
 
-    public static Map<String, Long> beaconWinTimes = new HashMap<>();
+    public static Map<String, Long> beaconOwnerTicks = new HashMap<>();
 
     @SubscribeEvent
     public static void onRegisterCommand(RegisterClientCommandsEvent evt) {
@@ -260,7 +260,7 @@ public class PlayerClientEvents {
         ResourcesClientEvents.resourcesList.clear();
         ClientGameModeHelper.gameMode = ClientGameModeHelper.DEFAULT_GAMEMODE;
         ClientGameModeHelper.gameModeLocked = false;
-        PlayerClientEvents.beaconWinTimes.clear();
+        PlayerClientEvents.beaconOwnerTicks.clear();
         SurvivalClientEvents.reset();
     }
 
@@ -273,6 +273,6 @@ public class PlayerClientEvents {
     }
 
     public static void syncBeaconOwnerTicks(String playerName, long ticks) {
-        beaconWinTimes.put(playerName, ticks);
+        beaconOwnerTicks.put(playerName, ticks);
     }
 }

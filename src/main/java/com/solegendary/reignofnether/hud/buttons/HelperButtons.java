@@ -9,7 +9,6 @@ import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
 import com.solegendary.reignofnether.player.PlayerClientEvents;
-import com.solegendary.reignofnether.player.RTSPlayer;
 import com.solegendary.reignofnether.sandbox.SandboxClientEvents;
 import com.solegendary.reignofnether.time.TimeUtils;
 import com.solegendary.reignofnether.unit.Relationship;
@@ -161,7 +160,7 @@ public class HelperButtons {
             fcsList.add(fcs(I18n.get("hud.helperbuttons.reignofnether.beacon.player_controls", ownerName), true));
         } else {
             boolean noController = true;
-            for (Long time : PlayerClientEvents.beaconWinTimes.values()) {
+            for (Long time : PlayerClientEvents.beaconOwnerTicks.values()) {
                 if (time > 0) {
                     noController = false;
                     break;
@@ -170,8 +169,8 @@ public class HelperButtons {
             if (noController) {
                 fcsList.add(fcs(I18n.get("hud.helperbuttons.reignofnether.beacon.no_controller")));
             } else {
-                for (String playerName : PlayerClientEvents.beaconWinTimes.keySet()) {
-                    long ticksToWin = Math.max(0, Beacon.getTicksToWin() - PlayerClientEvents.beaconWinTimes.get(playerName));
+                for (String playerName : PlayerClientEvents.beaconOwnerTicks.keySet()) {
+                    long ticksToWin = Math.max(0, Beacon.getTicksToWin(beacon.getLevel()) - PlayerClientEvents.beaconOwnerTicks.get(playerName));
                     String timeToWin = TimeUtils.getTimeStrFromTicks(ticksToWin);
                     fcsList.add(fcs(I18n.get("hud.helperbuttons.reignofnether.beacon.player_wins_in",
                             playerName, timeToWin), ownerName.equals(playerName)));
