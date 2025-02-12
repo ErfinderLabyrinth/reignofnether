@@ -32,24 +32,24 @@ Bugfixes
 --------
 [🟡] Fixed a crash when a player wins by Beacon control
 [🟡] Magma cubes are no longer slowed during the day
-[🟡] Rate-limited the number of packets sent when dragging the minimap to prevent being kicked
+[✔] Rate-limited the number of packets sent when dragging the minimap to prevent being kicked
 
 
 Quality of Life
 ---------------
 [🟡] Fire blocks on Fortresses no longer damage piglin units
-[🟡] Webs in spider lairs no longer slow down monster units
-[🟡] Added /gamerule beaconWinMinutes to control how long it takes to win with a beacon
+[✔] Webs in spider lairs no longer slow down monster units
+[✔] Added /gamerule beaconWinMinutes to control how long it takes to win with a beacon
 [🟡] You can now control-click a unit instead of double-clicking to select all nearby units of the same type
-[🟡] You can now use /rts-camera instead of F12 to toggle the RTS camera
-[🟡] You can now specify a resource when using the greedisgood cheatcode (eg. "greedisgood food 100")
+[✔] You can now use /rts-camera instead of F12 to toggle the RTS camera
+[✔] You can now specify a resource when using the greedisgood cheatcode (eg. "greedisgood food 100")
 
 
 Balancing
 ---------
-[🟡] Worker units can no longer capture beacons
-[🟡] Beacon auras now affect allies
-
+[✔] Worker units can no longer capture beacons
+[✔] Beacon auras now affect allies
+[🟡] All enemy units and portals are destroyed upon a Beacon victory in Wave Survival
 
 Villagers
 ---------

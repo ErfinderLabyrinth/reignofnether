@@ -701,6 +701,7 @@ public class PlayerServerEvents {
             PlayerClientboundPacket.victory(playerName);
             for (String allyName : AlliancesServer.getAllAllies(playerName))
                 PlayerClientboundPacket.victory(allyName);
+            SurvivalServerEvents.endCurrentWave();
         } else {
             List<String> playerNames = rtsPlayers.stream().map(p -> p.name)
                     .filter(n -> !AlliancesServer.isAllied(playerName, n) && !n.equals(playerName))

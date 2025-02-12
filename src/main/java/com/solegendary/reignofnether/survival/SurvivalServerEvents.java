@@ -175,16 +175,7 @@ public class SurvivalServerEvents {
                         if (!ResearchServerEvents.playerHasCheat(name, "thereisnospoon"))
                             return 0;
                     }
-                    if (!isEnabled())
-                        return 0;
-                    PlayerServerEvents.sendMessageToAllPlayers("Ending current wave");
-                    ArrayList<WaveEnemy> enemiesCopy = new ArrayList<>(enemies);
-                    for (WaveEnemy enemy : enemiesCopy)
-                        enemy.getEntity().kill();
-                    ArrayList<WavePortal> portalsCopy = new ArrayList<>(portals);
-                    for (WavePortal portal : portalsCopy)
-                        portal.portal.destroy(serverLevel);
-                    return 1;
+                    return endCurrentWave();
                 }));
         evt.getDispatcher().register(Commands.literal("debug-next-night")
                 .executes((command) -> {
@@ -199,6 +190,18 @@ public class SurvivalServerEvents {
                     serverLevel.setDayTime(12450);
                     return 1;
                 }));
+    }
+
+    public static int endCurrentWave() {
+        if (!isEnabled())
+            return 0;
+        PlayerServerEvents.sendMessageToAllPlayers("Ending current wave");
+        ArrayList<WaveEnemy> enemiesCopy = new ArrayList<>(enemies);
+        for (WaveEnemy enemy : enemiesCopy)
+            enemy.getEntity().kill();
+        ArrayList<WavePortal> portalsCopy = new ArrayList<>(portals);
+        for (WavePortal portal : portalsCopy)
+            portal.portal.destroy(serverLevel);
     }
 
     public static void enable(WaveDifficulty diff) {
