@@ -57,7 +57,11 @@ public class GameruleClientboundPacket {
     }
     public static void setPvpModesOnly(boolean pvpModesOnly) {
         PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(),
-                new GameruleClientboundPacket(GameruleAction.PVP_MODES_ONLY, "", pvpModesOnly ? 1L : 0L));
+                new GameruleClientboundPacket(GameruleAction.SET_PVP_MODES_ONLY, "", pvpModesOnly ? 1L : 0L));
+    }
+    public static void setBeaconWinMinutes(long beaconWinMinutes) {
+        PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(),
+                new GameruleClientboundPacket(GameruleAction.SET_BEACON_WIN_MINUTES, "", beaconWinMinutes));
     }
 
     public GameruleClientboundPacket(GameruleAction action, String playerName, Long value) {
@@ -98,12 +102,13 @@ public class GameruleClientboundPacket {
                             }
                             case SET_FLYING_MAX_Y_LEVEL -> GameruleClient.flyingMaxYLevel = value;
                             case SET_ALLOW_BEACONS -> GameruleClient.allowBeacons = value == 1L;
-                            case PVP_MODES_ONLY -> {
+                            case SET_PVP_MODES_ONLY -> {
                                 GameruleClient.pvpModesOnly = value == 1L;
                                 if (GameruleClient.pvpModesOnly) {
                                     ClientGameModeHelper.gameMode = GameMode.CLASSIC;
                                 }
                             }
+                            case SET_BEACON_WIN_MINUTES -> GameruleClient.beaconWinMinutes = value;
                         }
                         success.set(true);
                     });

@@ -14,6 +14,7 @@ public class GameRuleRegistrar {
     public static GameRules.Key<GameRules.IntegerValue> GROUND_Y_LEVEL;
     public static GameRules.Key<GameRules.IntegerValue> FLYING_MAX_Y_LEVEL;
     public static GameRules.Key<GameRules.BooleanValue> ALLOW_BEACONS;
+    public static GameRules.Key<GameRules.IntegerValue> BEACON_WIN_MINUTES;
     public static GameRules.Key<GameRules.BooleanValue> PVP_MODES_ONLY;
 
     public static void init() {
@@ -56,6 +57,10 @@ public class GameRuleRegistrar {
         // allow only classic/king of the beacon gamemodes
         PVP_MODES_ONLY = GameRules.register("pvpModesOnly", GameRules.Category.PLAYER,
                 GameRules.BooleanValue.create(false)
+        );
+        // ticks to win with a beacon
+        BEACON_WIN_MINUTES = GameRules.register("beaconWinMinutes", GameRules.Category.PLAYER,
+                GameRules.IntegerValue.create(20)
         );
     }
 }

@@ -42,7 +42,7 @@ public class AttackWarningClientEvents {
             () -> lastAttackPos == null || warnDuration <= 0,
             () -> true,
             () -> {
-                OrthoviewClientEvents.centreCameraOnPos(lastAttackPos.getX(), lastAttackPos.getZ());
+                OrthoviewClientEvents.centreCameraOnPos(lastAttackPos);
                 attackWarningCd = ATTACK_WARNING_CD_MAX;
                 lastAttackPos = null;
             },

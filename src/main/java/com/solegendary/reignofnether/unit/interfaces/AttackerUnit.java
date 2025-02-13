@@ -83,6 +83,10 @@ public interface AttackerUnit {
         unit.setUnitAttackTarget(null);
         unit.setAttackMoveTarget(null);
 
+        Goal attackGoal = unit.getAttackGoal();
+        if (attackGoal instanceof MeleeWindupAttackUnitGoal mwaug)
+            mwaug.resetWindup();
+
         Goal attackBuildingGoal = unit.getAttackBuildingGoal();
         if (attackBuildingGoal instanceof RangedAttackBuildingGoal<?> rabg)
             rabg.stop();

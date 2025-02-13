@@ -816,8 +816,8 @@
   "hud.gamemode.reignofnether.survival1": "生存",
   "hud.gamemode.reignofnether.survival2": "在日漸強力的敵人攻勢中存活下來，",
   "hud.gamemode.reignofnether.survival3": "可以單人或與盟友遊玩。",
-  "hud.gamemode.reignofnether.survival4": "%s（每天 %s 分鐘）",
-  "hud.gamemode.reignofnether.survival5": "左鍵點擊變更難度",
+  "hud.gamemode.reignofnether.survival5": "%s（每天 %s 分鐘）",
+  "hud.gamemode.reignofnether.survival6": "左鍵點擊變更難度",
   "hud.gamemode.reignofnether.changemode": "右鍵點擊變更遊戲模式",
   "hud.gamemode.reignofnether.locked": "（已鎖定）"
 }

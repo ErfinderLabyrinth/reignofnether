@@ -6,15 +6,6 @@
 Features
 --------
 
-[❌] Add option to make neutral units a permanent fixture
-    - add option to reset at bottom left when selected
-    - on /rts-reset, kill and respawn it back at the original location
-    - enforce a leash range
-
-[❌] Add End portal to build endermen
-[❌] Add Healing fountain
-[❌] Add polar bears, wolves, llamas and foxes as neutral unit options
-
 [❌] Piglin mines
     - Static defense for piglins, but can also be used to siege
     - When built, can be exploded manaully (or set to autoexplode on nearby enemies approaching)
@@ -30,21 +21,15 @@ Bugfixes
 
 [❌] Central portals sometimes do not ignite (and this somehow makes grunts spawn underground)
 
-[❌] Cobwebs in a spider lair should not slow down anything
-
 [❌] Dying in survival puts you in a bugged survival mode
 
 [❌] Villagers with professions don't use the correct texture for their arms, esp. farmers
 
 [❌] Have too-fast mod be built-in
 
-[❌] Don't kick players for sending too many packets if they drag-move the map
-
 
 Quality of Life Features
 ------------------------
-
-[❌] UI for all gamerules
 
 [❌] Added /gamerule for bridges over void
 
@@ -53,8 +38,6 @@ Quality of Life Features
 [❌] Flatten terrain ability
     - Require that villagers work on it like a building
     - Will need a new flatten zone object (no need to save it)
-
-[❌] Cast spells with the closest unit first
 
 [❌] restore ores on /rts-reset
     - Have to track each ore block when it is mined or converted into nether terrain
@@ -66,3 +49,5 @@ Balancing
 ---------
 
 [❌] Soulfires created by blazes need to be made temporary
+
+[❌] let allied survival players use transport portals

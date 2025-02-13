@@ -60,7 +60,11 @@ public class GameruleServerboundPacket {
     }
     public static void setPvpModesOnly(boolean pvpModesOnly) {
         PacketHandler.INSTANCE.sendToServer(
-            new GameruleServerboundPacket(GameruleAction.PVP_MODES_ONLY, "", pvpModesOnly ? 1L : 0L));
+            new GameruleServerboundPacket(GameruleAction.SET_PVP_MODES_ONLY, "", pvpModesOnly ? 1L : 0L));
+    }
+    public static void setBeaconWinMinutes(long beaconWinMinutes) {
+        PacketHandler.INSTANCE.sendToServer(
+                new GameruleServerboundPacket(GameruleAction.SET_BEACON_WIN_MINUTES, "", beaconWinMinutes));
     }
 
     public GameruleServerboundPacket(GameruleAction action, String playerName, Long value) {
@@ -139,9 +143,13 @@ public class GameruleServerboundPacket {
                     gameRules.getRule(GameRuleRegistrar.ALLOW_BEACONS).set(booleanValue, server);
                     GameruleClientboundPacket.setAllowBeacons(booleanValue);
                 }
-                case PVP_MODES_ONLY -> {
+                case SET_PVP_MODES_ONLY -> {
                     gameRules.getRule(GameRuleRegistrar.PVP_MODES_ONLY).set(booleanValue, server);
                     GameruleClientboundPacket.setPvpModesOnly(booleanValue);
+                }
+                case SET_BEACON_WIN_MINUTES -> {
+                    gameRules.getRule(GameRuleRegistrar.BEACON_WIN_MINUTES).set(Math.toIntExact(value), server);
+                    GameruleClientboundPacket.setBeaconWinMinutes(value);
                 }
             }
             success.set(true);

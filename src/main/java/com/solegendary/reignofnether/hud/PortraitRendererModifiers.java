@@ -4,6 +4,8 @@ import com.mojang.datafixers.util.Pair;
 import com.solegendary.reignofnether.unit.UnitClientEvents;
 import com.solegendary.reignofnether.unit.units.monsters.NecromancerUnit;
 import com.solegendary.reignofnether.unit.units.monsters.PoisonSpiderUnit;
+import com.solegendary.reignofnether.unit.units.piglins.PiglinMerchantUnit;
+import com.solegendary.reignofnether.unit.units.villagers.RoyalGuardUnit;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.*;
 import net.minecraft.world.entity.animal.horse.*;
@@ -93,7 +95,14 @@ public class PortraitRendererModifiers {
             yOffset = -118;
             scale = -37;
         } else if (entity instanceof NecromancerUnit) {
+            yOffset = -3;
             scale = -9;
+        } else if (entity instanceof PiglinMerchantUnit) {
+            yOffset = -33;
+            scale = -27;
+        } else if (entity instanceof RoyalGuardUnit) {
+            yOffset = -32;
+            scale = -16;
         }
 
         return new Pair<>(yOffset, scale);

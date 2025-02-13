@@ -122,7 +122,7 @@ public class ControlGroup {
                         UnitClientEvents.addSelectedUnit(entity);
                     HudClientEvents.setLowestCdHudEntity();
                     if (doubleClicked)
-                        OrthoviewClientEvents.centreCameraOnPos(entities.get(0).getX(), entities.get(0).getZ());
+                        OrthoviewClientEvents.centreCameraOnPos(entities.get(0).position());
                 }
             }
         }
@@ -139,7 +139,7 @@ public class ControlGroup {
                 BlockPos pos = buildingBps.get(0);
                 for (Building building : BuildingClientEvents.getBuildings())
                     if (building.originPos.equals(pos))
-                        OrthoviewClientEvents.centreCameraOnPos(building.centrePos.getX(), building.centrePos.getZ());
+                        OrthoviewClientEvents.centreCameraOnPos(building.centrePos);
             }
         }
 

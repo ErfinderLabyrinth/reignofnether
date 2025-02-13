@@ -3,6 +3,7 @@ package com.solegendary.reignofnether.gamerules;
 import com.mojang.brigadier.context.ParsedArgument;
 import com.mojang.brigadier.context.ParsedCommandNode;
 import com.solegendary.reignofnether.registrars.GameRuleRegistrar;
+import com.solegendary.reignofnether.registrars.PacketHandler;
 import com.solegendary.reignofnether.unit.UnitServerEvents;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import net.minecraft.commands.CommandSourceStack;
@@ -69,6 +70,12 @@ public class GameruleServerEvents {
                 boolean value = (boolean) args.get("value").getResult();
                 GameruleClientboundPacket.setPvpModesOnly(value);
             }
+        } else if (nodes.get(1).getNode().getName().equals("beaconWinMinutes")) {
+            Map<String, ParsedArgument<CommandSourceStack, ?>> args = evt.getParseResults().getContext().getArguments();
+            if (args.containsKey("value")) {
+                double beaconWinMinutes = ((Integer) args.get("value").getResult()).doubleValue();
+                GameruleClientboundPacket.setBeaconWinMinutes((long) beaconWinMinutes);
+            }
         }
     }
 
@@ -96,6 +103,8 @@ public class GameruleServerEvents {
             GameruleClientboundPacket.setAllowBeacons(allowBeacons);
             boolean pvpModesOnly = server.getGameRules().getRule(GameRuleRegistrar.PVP_MODES_ONLY).get();
             GameruleClientboundPacket.setPvpModesOnly(pvpModesOnly);
+            int beaconWinMinutes = server.getGameRules().getRule(GameRuleRegistrar.BEACON_WIN_MINUTES).get();
+            GameruleClientboundPacket.setBeaconWinMinutes(beaconWinMinutes);
         }
     }
 }

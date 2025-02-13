@@ -136,7 +136,7 @@ public class SpiderUnit extends Spider implements Unit, AttackerUnit, Convertabl
 
     public int maxResources = 100;
 
-    private MeleeAttackUnitGoal attackGoal;
+    private AbstractMeleeAttackUnitGoal attackGoal;
     private MeleeAttackBuildingGoal attackBuildingGoal;
     private WebGoal webGoal;
     public WebGoal getWebGoal() { return webGoal; }

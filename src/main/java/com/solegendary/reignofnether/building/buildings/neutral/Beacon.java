@@ -9,10 +9,12 @@ import com.solegendary.reignofnether.building.buildings.monsters.Stronghold;
 import com.solegendary.reignofnether.building.buildings.piglins.Fortress;
 import com.solegendary.reignofnether.building.buildings.villagers.Castle;
 import com.solegendary.reignofnether.gamerules.GameruleClient;
+import com.solegendary.reignofnether.gamerules.GameruleClientboundPacket;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.player.PlayerServerEvents;
+import com.solegendary.reignofnether.registrars.GameRuleRegistrar;
 import com.solegendary.reignofnether.research.ResearchClient;
 import com.solegendary.reignofnether.research.researchItems.*;
 import com.solegendary.reignofnether.resources.ResourceCost;
@@ -26,6 +28,7 @@ import com.solegendary.reignofnether.time.TimeClientEvents;
 import com.solegendary.reignofnether.tutorial.TutorialClientEvents;
 import com.solegendary.reignofnether.unit.UnitAction;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
+import com.solegendary.reignofnether.unit.interfaces.WorkerUnit;
 import com.solegendary.reignofnether.unit.packets.BeaconSyncClientboundPacket;
 import com.solegendary.reignofnether.util.Faction;
 import com.solegendary.reignofnether.util.MiscUtil;
@@ -66,7 +69,13 @@ public class Beacon extends ProductionBuilding implements RangeIndicator {
 
     public final static int MAX_UPGRADE_LEVEL = 5;
 
-    public final static int TICKS_TO_WIN = 24000; // 20mins
+    public static int getTicksToWin(Level level) {
+        if (level.isClientSide)
+            return (int) (GameruleClient.beaconWinMinutes * 20 * 60);
+        else if (level.getServer() != null)
+            return level.getServer().getGameRules().getRule(GameRuleRegistrar.BEACON_WIN_MINUTES).get() * 20 * 60;
+        return 24000;
+    }
 
     private MobEffect auraEffect = null;
     private boolean beaconActive = false;
@@ -235,11 +244,15 @@ public class Beacon extends ProductionBuilding implements RangeIndicator {
                     this.level);
 
             for (LivingEntity le : nearbyEntities) {
-                boolean isOwnedUnit = le instanceof Unit unit && unit.getOwnerName().equals(this.ownerName);
+                boolean isOwnedOrFriendlyUnit = le instanceof Unit unit && (unit.getOwnerName().equals(this.ownerName) ||
+                        AlliancesServer.isAllied(this.ownerName, unit.getOwnerName()));
                 boolean isFriendlyPlayer = le instanceof Player player && !player.isCreative() && !player.isSpectator() &&
                         (player.getName().getString().equals(ownerName) || AlliancesServer.isAllied(player.getName().getString(), ownerName));
 
-                if ((isOwnedUnit || isFriendlyPlayer) && (isFriendlyPlayer || auraEffect != MobEffects.LUCK) && getBeaconBlockEntity() != null) {
+                if ((isOwnedOrFriendlyUnit || isFriendlyPlayer) &&
+                        (isFriendlyPlayer || auraEffect != MobEffects.LUCK) &&
+                        (!(le instanceof WorkerUnit) || auraEffect != MobEffects.DIG_SPEED) &&
+                        getBeaconBlockEntity() != null) {
                     if (auraEffect != MobEffects.REGENERATION)
                         le.addEffect(new MobEffectInstance(auraEffect, 25, 0));
                     else if (tickAgeAfterBuilt % 80 == 0) // only 1hp/4s

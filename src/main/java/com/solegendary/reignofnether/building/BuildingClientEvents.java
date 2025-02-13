@@ -818,9 +818,9 @@ public class BuildingClientEvents {
             else if (buildingToPlace == null) {
 
                 // select all nearby buildings of the same type when the same building is double-clicked
-                if (selectedBuildings.size() == 1 && MC.level != null && !Keybindings.shiftMod.isDown()
-                    && (System.currentTimeMillis() - lastLeftClickTime) < DOUBLE_CLICK_TIME_MS && preSelBuilding != null
-                    && selectedBuildings.contains(preSelBuilding)) {
+                if (selectedBuildings.size() == 1 && MC.level != null && !Keybindings.shiftMod.isDown() &&
+                    ((System.currentTimeMillis() - lastLeftClickTime) < DOUBLE_CLICK_TIME_MS || Keybindings.ctrlMod.isDown()) &&
+                    preSelBuilding != null && selectedBuildings.contains(preSelBuilding)) {
 
                     lastLeftClickTime = 0;
                     Building selBuilding = selectedBuildings.get(0);
@@ -1047,7 +1047,7 @@ public class BuildingClientEvents {
             // they are frozen so move them to their capitol (or any of their buildings if they don't have one)
             if (MC.player != null && forPlayerLoggingIn && ownerName.equals(MC.player.getName().getString())) {
                 if (!FogOfWarClientEvents.movedToCapitol) {
-                    OrthoviewClientEvents.centreCameraOnPos(newBuilding.originPos.getX(), newBuilding.originPos.getZ());
+                    OrthoviewClientEvents.centreCameraOnPos(newBuilding.originPos);
                     if (newBuilding.isCapitol) {
                         FogOfWarClientEvents.movedToCapitol = true;  // Set the AtomicBoolean to true
                     }

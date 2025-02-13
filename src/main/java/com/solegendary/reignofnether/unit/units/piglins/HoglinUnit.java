@@ -2,8 +2,11 @@ package com.solegendary.reignofnether.unit.units.piglins;
 
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.*;
+import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingUtils;
+import com.solegendary.reignofnether.building.buildings.piglins.BasaltSprings;
 import com.solegendary.reignofnether.building.buildings.piglins.FlameSanctuary;
+import com.solegendary.reignofnether.building.buildings.piglins.Fortress;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.resources.ResourceCosts;
@@ -68,7 +71,7 @@ public class HoglinUnit extends Hoglin implements Unit, AttackerUnit {
     private MoveToTargetBlockGoal moveGoal;
     private SelectedTargetGoal<? extends LivingEntity> targetGoal;
     private ReturnResourcesGoal returnResourcesGoal;
-    private MeleeAttackUnitGoal attackGoal;
+    private AbstractMeleeAttackUnitGoal attackGoal;
     private MeleeAttackBuildingGoal attackBuildingGoal;
 
     public LivingEntity getFollowTarget() { return followTarget; }
@@ -237,6 +240,7 @@ public class HoglinUnit extends Hoglin implements Unit, AttackerUnit {
 
     @Override
     public boolean fireImmune() {
-        return super.fireImmune() || BuildingUtils.findBuilding(level.isClientSide(), getOnPos()) instanceof FlameSanctuary;
+        Building building = BuildingUtils.findBuilding(level.isClientSide(), getOnPos());
+        return super.fireImmune() || building instanceof FlameSanctuary || building instanceof BasaltSprings;
     }
 }

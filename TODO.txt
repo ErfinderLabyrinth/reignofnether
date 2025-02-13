@@ -1,33 +1,53 @@
 
-1.19.2-1.1.1b
+1.19.2-1.1.1c
 
 [✔] Done and tested
 [🟡] Partially done and/or needs testing
 [❌] Not done, including unmerged PRs
 
-
-
 Features
 --------
+[❌] Neutral animals:
+    - Grizzly bear
+    - Llama
+    - Wolf
 
+[❌] Leash range for neutral units
+    - Save position to map
+    - Respawn on /rts-reset
+    - Show original marker
+    - Reset to original button
+    - Retreat to position if too far away
+    - Credit resources on kill (instead of dropping resources)
+
+[❌] Add End portal to build endermen
+    - Make endermen not teleport on taking water damage (but still take damage)
+[❌] Add Healing fountain
+[❌] Ancient transport portals
+    - End themed?
 
 Bugfixes
 --------
-- Fixed Beacon Wealth aura granting too many resources
-- Fixed pillagers sometimes not loading their crossbows correctly
-- Neutral units are no longer killed when using /rts-reset
-- Fixed Beacons being capturable by neutral units
+[✔] Fixed a crash when a player wins by Beacon control
+[✔] Magma cubes are no longer slowed during the day
+[✔] Rate-limited the number of packets sent when dragging the minimap to prevent being kicked
+[✔] Fixed a tooltip error in the wave survival helper
 
 Quality of Life
 ---------------
-- Library auto-enchant speed increased
-- Added an exit-sandbox button at the top right
-    - It does the same thing as /rts-reset
-
-
+[✔] The camera more accurately centers on units and buildings at different Y levels
+[✔] Fire and lava blocks in Basalt Springs no longer damage piglin units
+[✔] Webs in spider lairs no longer slow down monster units
+[✔] Added /gamerule beaconWinMinutes to control how long it takes to win with a beacon
+[✔] You can now control-click a unit instead of double-clicking to select all nearby units of the same type
+[✔] You can now use /rts-camera instead of F12 to toggle the RTS camera
+[✔] You can now specify a resource when using the greedisgood cheatcode (eg. "greedisgood food 100")
 
 Balancing
 ---------
+[✔] Worker units can no longer capture beacons
+[✔] Beacon auras now affect allies
+[✔] All enemy units and portals are destroyed upon a Beacon victory in Wave Survival
 
 
 Villagers

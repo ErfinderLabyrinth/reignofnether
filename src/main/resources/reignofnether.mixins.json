@@ -19,6 +19,7 @@
         "ServerLevelMixin",
         "ThrownPotionMixin",
         "VanillaPacketFilterAccessor",
+        "WebBlockMixin",
         "WitchMixin",
         "fire.BaseFireBlockMixin",
         "fire.FireBlockMixin",

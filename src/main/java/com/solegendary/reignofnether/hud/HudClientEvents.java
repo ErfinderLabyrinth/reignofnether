@@ -1457,11 +1457,11 @@ public class HudClientEvents {
                 && buildingPortraitZone.isMouseOver(mouseLeftDownX, mouseLeftDownY) && MC.player != null
                 && hudSelectedBuilding != null) {
                 BlockPos pos = hudSelectedBuilding.centrePos;
-                OrthoviewClientEvents.centreCameraOnPos(pos.getX(), pos.getZ());
+                OrthoviewClientEvents.centreCameraOnPos(pos);
 
             } else if (unitPortraitZone != null && unitPortraitZone.isMouseOver(mouseX, mouseY)
                 && unitPortraitZone.isMouseOver(mouseLeftDownX, mouseLeftDownY) && MC.player != null) {
-                OrthoviewClientEvents.centreCameraOnPos(hudSelectedEntity.getX(), hudSelectedEntity.getZ());
+                OrthoviewClientEvents.centreCameraOnPos(hudSelectedEntity.position());
             }
         }
     }

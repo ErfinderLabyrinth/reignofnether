@@ -134,7 +134,7 @@ public class WardenUnit extends Warden implements Unit, AttackerUnit {
 
     public int maxResources = 100;
 
-    private MeleeAttackUnitGoal attackGoal;
+    private AbstractMeleeAttackUnitGoal attackGoal;
     private MeleeAttackBuildingGoal attackBuildingGoal;
     private SonicBoomGoal sonicBoomGoal;
 

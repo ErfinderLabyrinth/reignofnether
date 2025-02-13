@@ -160,8 +160,8 @@ public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<
 
         Pair<Integer, Integer> yAndScaleOffsets = PortraitRendererModifiers.getPortraitRendererModifiers(entity);
 
-        drawY += yAndScaleOffsets.getFirst();
-        sizeFinal += yAndScaleOffsets.getSecond();
+        drawY += yAndScaleOffsets.getFirst();// + UnitClientEvents.yOffset;
+        sizeFinal += yAndScaleOffsets.getSecond();// + UnitClientEvents.scale;
 
         boolean hasBanner = false;
         ItemStack bannerStack = entity.getItemBySlot(EquipmentSlot.HEAD);

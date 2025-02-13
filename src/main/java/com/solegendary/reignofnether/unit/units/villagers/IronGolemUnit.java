@@ -112,7 +112,7 @@ public class IronGolemUnit extends IronGolem implements Unit, AttackerUnit {
 
     final static public int maxResources = 200;
 
-    private MeleeAttackUnitGoal attackGoal;
+    private AbstractMeleeAttackUnitGoal attackGoal;
     private MeleeAttackBuildingGoal attackBuildingGoal;
 
     private final List<AbilityButton> abilityButtons = new ArrayList<>();

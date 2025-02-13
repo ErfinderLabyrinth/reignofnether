@@ -85,7 +85,7 @@ public class VillagerUnit extends Vindicator implements Unit, WorkerUnit, Attack
     public BuildRepairGoal buildRepairGoal;
     public GatherResourcesGoal gatherResourcesGoal;
     private ReturnResourcesGoal returnResourcesGoal;
-    private MeleeAttackUnitGoal attackGoal;
+    private AbstractMeleeAttackUnitGoal attackGoal;
     public CallToArmsGoal callToArmsGoal;
 
     public LivingEntity getFollowTarget() { return followTarget; }

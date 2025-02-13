@@ -72,7 +72,7 @@ public class GotoPortal extends Ability {
             portal.destination != null) {
             Building targetBuilding = BuildingUtils.findBuilding(level.isClientSide(), portal.destination);
             if (targetBuilding instanceof Portal targetPortal && portal.portalType == Portal.PortalType.TRANSPORT)
-                OrthoviewClientEvents.centreCameraOnPos(targetPortal.centrePos.getX(), targetPortal.centrePos.getZ());
+                OrthoviewClientEvents.centreCameraOnPos(targetPortal.centrePos);
         }
     }
 }

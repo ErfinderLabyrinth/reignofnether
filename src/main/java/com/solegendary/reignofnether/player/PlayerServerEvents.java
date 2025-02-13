@@ -173,6 +173,13 @@ public class PlayerServerEvents {
             if (evt.phase == TickEvent.Phase.END) {
                 for (RTSPlayer rtsPlayer : rtsPlayers)
                     rtsPlayer.tick();
+
+                for (RTSPlayer rtsPlayer : rtsPlayers) {
+                    if (rtsPlayer.beaconOwnerTicks == Beacon.getTicksToWin(serverLevel)) {
+                        PlayerServerEvents.beaconVictory(rtsPlayer.name);
+                        break;
+                    }
+                }
                 if (rtsPlayers.isEmpty()) {
                     rtsGameTicks = 0;
                 } else {
@@ -425,16 +432,40 @@ public class PlayerServerEvents {
                         int amount = Integer.parseInt(words[1]);
                         if (amount > 0) {
                             ResourcesServerEvents.addSubtractResources(new Resources(playerName,
-                                amount,
-                                amount,
-                                amount
+                                    amount,
+                                    amount,
+                                    amount
                             ));
                             evt.setCanceled(true);
                             sendMessageToAllPlayers("server.reignofnether.used_cheat",
-                                false,
-                                playerName,
-                                words[0],
-                                Integer.toString(amount)
+                                    false,
+                                    playerName,
+                                    words[0],
+                                    Integer.toString(amount)
+                            );
+                        }
+                    }
+                } catch (NumberFormatException err) {
+                    ReignOfNether.LOGGER.error(err);
+                }
+            }
+
+            if (words.length == 3) {
+                try {
+                    if (words[0].equalsIgnoreCase("greedisgood")) {
+                        int amount = Integer.parseInt(words[2]);
+                        if (amount > 0 && List.of("food", "wood", "ore").contains(words[1].toLowerCase())) {
+                            switch (words[1].toLowerCase()) {
+                                case "food" -> ResourcesServerEvents.addSubtractResources(new Resources(playerName, amount, 0, 0));
+                                case "wood" -> ResourcesServerEvents.addSubtractResources(new Resources(playerName, 0, amount, 0));
+                                case "ore" -> ResourcesServerEvents.addSubtractResources(new Resources(playerName, 0, 0, amount));
+                            }
+                            evt.setCanceled(true);
+                            sendMessageToAllPlayers("server.reignofnether.used_cheat",
+                                    false,
+                                    playerName,
+                                    words[0] + " " + words[1],
+                                    Integer.toString(amount)
                             );
                         }
                     }
@@ -670,21 +701,23 @@ public class PlayerServerEvents {
             PlayerClientboundPacket.victory(playerName);
             for (String allyName : AlliancesServer.getAllAllies(playerName))
                 PlayerClientboundPacket.victory(allyName);
+            SurvivalServerEvents.endCurrentWave();
         } else {
-            List<String> playerNames = rtsPlayers.stream().map(p -> p.name).toList();
+            List<String> playerNames = rtsPlayers.stream().map(p -> p.name)
+                    .filter(n -> !AlliancesServer.isAllied(playerName, n) && !n.equals(playerName))
+                    .toList();
             for (String name : playerNames)
-                if (!name.equals(playerName) && !AlliancesServer.isAllied(playerName, name))
-                    defeat(name, Component.translatable("server.reignofnether.beacon_defeat").getString());
+                defeat(name, Component.translatable("server.reignofnether.beacon_defeat").getString());
         }
     }
 
     public static String getBeaconWinTime(String playerName) {
         for (RTSPlayer rtsPlayer : rtsPlayers) {
             if (rtsPlayer.name.equals(playerName)) {
-                return TimeUtils.getTimeStrFromTicks(Beacon.TICKS_TO_WIN - rtsPlayer.beaconOwnerTicks);
+                return TimeUtils.getTimeStrFromTicks(Beacon.getTicksToWin(serverLevel) - rtsPlayer.beaconOwnerTicks);
             }
         }
-        return TimeUtils.getTimeStrFromTicks(Beacon.TICKS_TO_WIN);
+        return TimeUtils.getTimeStrFromTicks(Beacon.getTicksToWin(serverLevel));
     }
 
     @SubscribeEvent

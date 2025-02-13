@@ -120,7 +120,7 @@ public class ZombieUnit extends Zombie implements Unit, AttackerUnit, Convertabl
 
     public int maxResources = 100;
 
-    private MeleeAttackUnitGoal attackGoal;
+    private AbstractMeleeAttackUnitGoal attackGoal;
     private MeleeAttackBuildingGoal attackBuildingGoal;
 
     private final List<AbilityButton> abilityButtons = new ArrayList<>();

@@ -48,4 +48,19 @@ public abstract class EntityMixin {
         if (pSource == DamageSource.IN_WALL)
             cir.setReturnValue(true);
     }
+
+    @Shadow public int getTicksRequiredToFreeze() { return 140; }
+    @Shadow public int getTicksFrozen() { return 0; }
+
+    @Inject(
+            method = "getPercentFrozen",
+            at = @At("HEAD"),
+            cancellable = true
+    )
+    protected void getPercentFrozen(CallbackInfoReturnable<Float> cir) {
+        int i = this.getTicksRequiredToFreeze();
+        float percent = (float)Math.min(this.getTicksFrozen(), 140) / (float)i;
+        cir.setReturnValue(Math.min(percent, 0.5f));
+    }
+
 }

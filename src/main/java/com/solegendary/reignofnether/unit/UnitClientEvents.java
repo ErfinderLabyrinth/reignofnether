@@ -53,6 +53,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.SnowLayerBlock;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.event.TickEvent;
@@ -540,7 +541,7 @@ public class UnitClientEvents {
             // select all nearby units of the same type when the same unit is double-clicked
             // only works for owned units
             else if (selectedUnits.size() == 1 && MC.level != null && !Keybindings.shiftMod.isDown() &&
-               (System.currentTimeMillis() - lastLeftClickTime) < DOUBLE_CLICK_TIME_MS &&
+               ((System.currentTimeMillis() - lastLeftClickTime) < DOUBLE_CLICK_TIME_MS || Keybindings.ctrlMod.isDown()) &&
                 preselectedUnits.size() > 0 && selectedUnits.contains(preselectedUnits.get(0))) {
 
                 lastLeftClickTime = 0;
@@ -1051,6 +1052,7 @@ public class UnitClientEvents {
     }
      */
 
+
     /*
 
     public static int yOffset = 0;
@@ -1078,7 +1080,9 @@ public class UnitClientEvents {
         });
     }
 
+     */
 
+/*
 
     public static int option = 0;
 

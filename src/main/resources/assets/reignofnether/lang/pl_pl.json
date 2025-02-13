@@ -842,8 +842,8 @@
     "hud.gamemode.reignofnether.survival1": "PRZETRWANIE FAL",
     "hud.gamemode.reignofnether.survival2": "Przetrwaj coraz trudniejsze noce, ",
     "hud.gamemode.reignofnether.survival3": "samemu lub z sojusznikami.",
-    "hud.gamemode.reignofnether.survival4": "%s (%sminut na dzień)",
-    "hud.gamemode.reignofnether.survival5": "Kliknij lewym przyciskiem myszy, aby zmienić poziom trudności",
+    "hud.gamemode.reignofnether.survival5": "%s (%sminut na dzień)",
+    "hud.gamemode.reignofnether.survival6": "Kliknij lewym przyciskiem myszy, aby zmienić poziom trudności",
     "hud.gamemode.reignofnether.changemode": "Kliknij prawym przyciskiem myszy, aby zmienić tryb gry",
     "hud.gamemode.reignofnether.locked": "(zablokowane)"
   }

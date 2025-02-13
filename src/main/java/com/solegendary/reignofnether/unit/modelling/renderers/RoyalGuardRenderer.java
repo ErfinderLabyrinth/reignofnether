@@ -1,7 +1,9 @@
 package com.solegendary.reignofnether.unit.modelling.renderers;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.unit.modelling.models.RoyalGuardModel;
+import com.solegendary.reignofnether.unit.units.monsters.NecromancerUnit;
 import com.solegendary.reignofnether.unit.units.villagers.RoyalGuardUnit;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -13,6 +15,8 @@ import org.jetbrains.annotations.NotNull;
 
 @OnlyIn(Dist.CLIENT)
 public class RoyalGuardRenderer extends MobRenderer<RoyalGuardUnit, RoyalGuardModel<RoyalGuardUnit>> {
+
+    public static final float SCALE_MULT = 1.25f;
 
     private static final ResourceLocation TEXTURE_LOCATION = new ResourceLocation("reignofnether", "textures/entities/royal_guard_unit.png");
 
@@ -27,5 +31,9 @@ public class RoyalGuardRenderer extends MobRenderer<RoyalGuardUnit, RoyalGuardMo
 
     public RoyalGuardRenderer(EntityRendererProvider.Context pContext, ModelLayerLocation mll) {
         super(pContext, new RoyalGuardModel<>(pContext.bakeLayer(mll)), 0.5F);
+    }
+
+    protected void scale(@NotNull RoyalGuardUnit pLivingEntity, PoseStack pMatrixStack, float pPartialTickTime) {
+        pMatrixStack.scale(SCALE_MULT, SCALE_MULT, SCALE_MULT);
     }
 }

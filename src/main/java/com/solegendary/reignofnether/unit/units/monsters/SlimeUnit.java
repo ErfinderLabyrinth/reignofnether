@@ -360,7 +360,8 @@ public class SlimeUnit extends Slime implements Unit, AttackerUnit {
             }
         }
         // apply slowness level 2 during daytime for a short time repeatedly
-        if (tickCount % 10 == 0 && !this.level.isClientSide() && this.level.isDay() &&
+        if (!(this instanceof MagmaCubeUnit) &&
+                tickCount % 10 == 0 && !this.level.isClientSide() && this.level.isDay() &&
                 !NightUtils.isInRangeOfNightSource(this.getEyePosition(), false) &&
                 !ResearchServerEvents.playerHasCheat(getOwnerName(), "slipslopslap"))
             this.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 15, 1));

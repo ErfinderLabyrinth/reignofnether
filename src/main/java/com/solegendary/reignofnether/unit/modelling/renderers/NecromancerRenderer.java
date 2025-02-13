@@ -32,7 +32,7 @@ public class NecromancerRenderer extends MobRenderer<NecromancerUnit, Necromance
         super(pContext, new NecromancerModel<>(pContext.bakeLayer(mll)), 0.5F);
     }
 
-    protected void scale(NecromancerUnit pLivingEntity, PoseStack pMatrixStack, float pPartialTickTime) {
+    protected void scale(@NotNull NecromancerUnit pLivingEntity, PoseStack pMatrixStack, float pPartialTickTime) {
         pMatrixStack.scale(SCALE_MULT, SCALE_MULT, SCALE_MULT);
     }
 }

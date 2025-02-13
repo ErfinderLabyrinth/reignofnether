@@ -151,7 +151,7 @@ public class SurvivalClientEvents {
         tooltip.add(FormattedCharSequence.forward(I18n.get("survival.reignofnether.next_wave",
                 wave.number, wave.highestUnitTier, faction(wave.faction)), Style.EMPTY.withBold(true)));
 
-        tooltip.add(FormattedCharSequence.forward(I18n.get("hud.gamemode.reignofnether.survival4",
+        tooltip.add(FormattedCharSequence.forward(I18n.get("hud.gamemode.reignofnether.survival5",
                 SurvivalClientEvents.difficulty, SurvivalClientEvents.getMinutesPerDay()), Style.EMPTY));
 
         tooltip.add(FormattedCharSequence.forward("", Style.EMPTY));

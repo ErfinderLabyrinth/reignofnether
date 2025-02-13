@@ -854,8 +854,8 @@
     "hud.gamemode.reignofnether.survival1": "SURVIE D'ONDES",
     "hud.gamemode.reignofnether.survival2": "Survivez à des nuits de plus en plus difficiles,",
     "hud.gamemode.reignofnether.survival3": "seul ou avec des alliés.",
-    "hud.gamemode.reignofnether.survival4": "%s (%s min par jour)",
-    "hud.gamemode.reignofnether.survival5": "Clic gauche pour changer la difficulté",
+    "hud.gamemode.reignofnether.survival5": "%s (%s min par jour)",
+    "hud.gamemode.reignofnether.survival6": "Clic gauche pour changer la difficulté",
     "hud.gamemode.reignofnether.changemode": "Clic droit pour changer le mode de jeu",
     "hud.gamemode.reignofnether.locked": "(verrouillé)",
   

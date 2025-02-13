@@ -1,6 +1,7 @@
 package com.solegendary.reignofnether.orthoview;
 
 import com.mojang.math.Matrix4f;
+import com.mojang.math.Vector3d;
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingClientEvents;
@@ -328,22 +329,28 @@ public class OrthoviewClientEvents {
         TutorialClientEvents.updateStage();
     }
 
+    public static void centreCameraOnPos(BlockPos bp) {
+        centreCameraOnPos(new Vec3(bp.getX(), bp.getY(), bp.getZ()));
+    }
+
     // moves the camera to the position such that x,z is at the centre of the screen
-    public static void centreCameraOnPos(double x, double z) {
+    public static void centreCameraOnPos(Vec3 pos) {
         if (MC.player == null) {
             return;
         }
-        MinimapClientEvents.setMapCentre(x, z);
+        MinimapClientEvents.setMapCentre(pos.x, pos.z);
         // at 0deg by default camera is facing +Z and we want to move it backwards from this
         Vec2 XZRotated = MyMath.rotateCoords(0, -20, OrthoviewClientEvents.getCamRotX());
 
         float offset = (float) (Math.sqrt(getZoom()) / (Math.sqrt(ZOOM_MAX)));
 
-        Vec2 XZRotatedOffset = MyMath.rotateCoords(0, -(offset * 35), -camRotX - camRotAdjX);
+        int yDiff = (int) (MC.player.getY() - pos.y) - 35;
+
+        Vec2 XZRotatedOffset = MyMath.rotateCoords(0, -(offset * 35) - yDiff, -camRotX - camRotAdjX);
 
         PlayerServerboundPacket.teleportPlayer(
-                x + XZRotated.x + XZRotatedOffset.x, MC.player.getY(),
-                z + XZRotated.y + XZRotatedOffset.y
+                pos.x + XZRotated.x + XZRotatedOffset.x, MC.player.getY(),
+                pos.z + XZRotated.y + XZRotatedOffset.y
         );
     }
 
@@ -367,19 +374,24 @@ public class OrthoviewClientEvents {
         // Prevent repeated key actions
         if (evt.getAction() == GLFW.GLFW_PRESS) {
 
-            if (evt.getKey() == Keybindings.getFnum(12).key && !OrthoviewClientEvents.isCameraLocked()
-                && MC.gameMode != null) {
-                if (MC.player != null && (
-                    MC.gameMode.getPlayerMode() == GameType.ADVENTURE
-                        || MC.gameMode.getPlayerMode() == GameType.SURVIVAL
-                )) {
-                    MC.player.sendSystemMessage(Component.literal(I18n.get("hud.orthoview.reignofnether.ortho_error")));
-                } else {
-                    toggleEnable();
-                }
+            if (evt.getKey() == Keybindings.getFnum(12).key) {
+                tryToToggleEnable();
             }
-            if (evt.getKey() == Keybindings.reset.key) {
+            else if (evt.getKey() == Keybindings.reset.key) {
                 reset();
+            }
+        }
+    }
+
+    public static void tryToToggleEnable() {
+        if (!OrthoviewClientEvents.isCameraLocked() && MC.gameMode != null) {
+            if (MC.player != null && (
+                    MC.gameMode.getPlayerMode() == GameType.ADVENTURE
+                            || MC.gameMode.getPlayerMode() == GameType.SURVIVAL
+            )) {
+                MC.player.sendSystemMessage(Component.literal(I18n.get("hud.orthoview.reignofnether.ortho_error")));
+            } else {
+                toggleEnable();
             }
         }
     }

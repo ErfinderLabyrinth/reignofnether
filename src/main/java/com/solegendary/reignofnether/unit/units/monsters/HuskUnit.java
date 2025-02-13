@@ -119,7 +119,7 @@ public class HuskUnit extends Husk implements Unit, AttackerUnit {
 
     public int maxResources = 100;
 
-    private MeleeAttackUnitGoal attackGoal;
+    private AbstractMeleeAttackUnitGoal attackGoal;
     private MeleeAttackBuildingGoal attackBuildingGoal;
 
     private final List<AbilityButton> abilityButtons = new ArrayList<>();

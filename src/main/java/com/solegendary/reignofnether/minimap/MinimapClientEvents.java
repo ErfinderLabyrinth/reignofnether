@@ -78,6 +78,9 @@ public class MinimapClientEvents {
     private static final int BUILDING_RADIUS = 7;
     private static final int BUILDING_THICKNESS = 2;
 
+    // rate-limit teleporting from dragging the minimap to prevent being kicked from packet spamming
+    private static long lastDragTeleportTimestamp = System.currentTimeMillis();
+
     private static DynamicTexture mapTexture = new DynamicTexture(worldRadius * 2, worldRadius * 2, true);
     private static RenderType mapRenderType = RenderType.textSeeThrough(Minecraft.getInstance().textureManager.register(
         ReignOfNether.MOD_ID + "_" + "minimap",
@@ -529,8 +532,8 @@ public class MinimapClientEvents {
             if (!building.isExploredClientside || building instanceof AbstractBridge)
                 continue;
 
-            int xc = building.originPos.getX() + (BUILDING_RADIUS / 2);
-            int zc = building.originPos.getZ() + (BUILDING_RADIUS / 2);
+            int xc = building.centrePos.getX() + (BUILDING_RADIUS / 2);
+            int zc = building.centrePos.getZ() + (BUILDING_RADIUS / 2);
 
             for (int x = xc - BUILDING_RADIUS; x < xc + BUILDING_RADIUS; x++) {
                 for (int z = zc - BUILDING_RADIUS; z < zc + BUILDING_RADIUS; z++) {
@@ -764,8 +767,11 @@ public class MinimapClientEvents {
     @SubscribeEvent
     public static void onMouseDrag(ScreenEvent.MouseDragged.Pre evt) {
         // when clicking on map move player there
-        if (OrthoviewClientEvents.isEnabled() && evt.getMouseButton() == GLFW.GLFW_MOUSE_BUTTON_1
-            && !Keybindings.shiftMod.isDown() && !OrthoviewClientEvents.isCameraLocked()) {
+        if (OrthoviewClientEvents.isEnabled() && evt.getMouseButton() == GLFW.GLFW_MOUSE_BUTTON_1 &&
+            !Keybindings.shiftMod.isDown() && !OrthoviewClientEvents.isCameraLocked() &&
+            lastDragTeleportTimestamp < System.currentTimeMillis() - 100) {
+
+            lastDragTeleportTimestamp = System.currentTimeMillis();
             BlockPos moveTo = getWorldPosOnMinimap((float) evt.getMouseX(), (float) evt.getMouseY(), true);
             if (MC.player != null && moveTo != null) {
                 PlayerServerboundPacket.teleportPlayer(

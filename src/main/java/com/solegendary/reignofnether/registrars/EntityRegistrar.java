@@ -3,6 +3,8 @@ package com.solegendary.reignofnether.registrars;
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.unit.modelling.renderers.GhastUnitRenderer;
 import com.solegendary.reignofnether.unit.modelling.renderers.NecromancerRenderer;
+import com.solegendary.reignofnether.unit.modelling.renderers.PiglinMerchantRenderer;
+import com.solegendary.reignofnether.unit.modelling.renderers.RoyalGuardRenderer;
 import com.solegendary.reignofnether.unit.units.monsters.*;
 import com.solegendary.reignofnether.unit.units.neutral.EndermanUnit;
 import com.solegendary.reignofnether.unit.units.piglins.*;
@@ -213,7 +215,8 @@ public class EntityRegistrar {
 
     public static final RegistryObject<EntityType<RoyalGuardUnit>> ROYAL_GUARD_UNIT = ENTITIES.register("royal_guard_unit",
             () -> EntityType.Builder.of(RoyalGuardUnit::new, MobCategory.CREATURE)
-                    .sized(EntityType.VINDICATOR.getWidth(), EntityType.VINDICATOR.getHeight())
+                    .sized(EntityType.VINDICATOR.getWidth() * RoyalGuardRenderer.SCALE_MULT,
+                            EntityType.VINDICATOR.getHeight() * RoyalGuardRenderer.SCALE_MULT)
                     .clientTrackingRange(UNIT_CLIENT_TRACKING_RANGE)
                     .build(new ResourceLocation(ReignOfNether.MOD_ID, "royal_guard_unit").toString()));
 
@@ -226,7 +229,7 @@ public class EntityRegistrar {
 
     public static final RegistryObject<EntityType<PiglinMerchantUnit>> PIGLIN_MERCHANT_UNIT = ENTITIES.register("piglin_merchant_unit",
             () -> EntityType.Builder.of(PiglinMerchantUnit::new, MobCategory.CREATURE)
-                    .sized(EntityType.PIGLIN_BRUTE.getWidth(), EntityType.PIGLIN_BRUTE.getHeight())
+                    .sized(2.0f, 3.0f)
                     .clientTrackingRange(UNIT_CLIENT_TRACKING_RANGE)
                     .build(new ResourceLocation(ReignOfNether.MOD_ID, "piglin_merchant_unit").toString()));
 
