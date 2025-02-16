@@ -25,6 +25,7 @@ import com.solegendary.reignofnether.resources.ResourceName;
 import com.solegendary.reignofnether.resources.ResourceSources;
 import com.solegendary.reignofnether.resources.Resources;
 import com.solegendary.reignofnether.resources.ResourcesClientEvents;
+import com.solegendary.reignofnether.sandbox.SandboxActionButtons;
 import com.solegendary.reignofnether.sandbox.SandboxClientEvents;
 import com.solegendary.reignofnether.sandbox.SandboxMenuType;
 import com.solegendary.reignofnether.survival.SurvivalClientEvents;
@@ -750,6 +751,28 @@ public class HudClientEvents {
                     }
                 }
                 buttonsRendered += 1;
+            }
+        }
+
+        // ---------------------------
+        // Unit sandbox action buttons
+        // ---------------------------
+        if (selUnits.size() > 0 && getPlayerToEntityRelationship(selUnits.get(0)) == Relationship.NEUTRAL
+                && hudSelectedEntity instanceof Unit unit) {
+
+            blitX = 0;
+            blitY = screenHeight - iconFrameSize;
+            ArrayList<Button> actionButtons = new ArrayList<>();
+
+            if (hudSelectedEntity instanceof AttackerUnit) {
+                actionButtons.add(SandboxActionButtons.SET_ANCHOR);
+                actionButtons.add(SandboxActionButtons.RESET_TO_ANCHOR);
+                actionButtons.add(SandboxActionButtons.REMOVE_ANCHOR);
+            }
+            for (Button actionButton : actionButtons) {
+                actionButton.render(evt.getPoseStack(), blitX, blitY, mouseX, mouseY);
+                renderedButtons.add(actionButton);
+                blitX += iconFrameSize;
             }
         }
 

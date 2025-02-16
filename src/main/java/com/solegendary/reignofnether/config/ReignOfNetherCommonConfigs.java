@@ -52,6 +52,12 @@ public class ReignOfNetherCommonConfigs {
         UnitCosts.GHAST.define(BUILDER);
         UnitCosts.MAGMA_CUBE.define(BUILDER);
         UnitCosts.PIGLIN_MERCHANT.define(BUILDER);
+        //Neutral
+        UnitCosts.ENDERMAN.define(BUILDER);
+        UnitCosts.POLAR_BEAR.define(BUILDER);
+        UnitCosts.GRIZZLY_BEAR.define(BUILDER);
+        UnitCosts.PANDA.define(BUILDER);
+        UnitCosts.WOLF.define(BUILDER);
 
         //*Buildings*
         BUILDER.comment("Building Cost Configurations");
@@ -184,6 +190,12 @@ public class ReignOfNetherCommonConfigs {
         public static final ResourceCostConfigEntry GHAST = ResourceCostConfigEntry.Unit(100,100,250,60,6, ResourceCosts.GHAST, "Ghast Config");
         public static final ResourceCostConfigEntry MAGMA_CUBE = ResourceCostConfigEntry.Unit(40,40,40,25,2, ResourceCosts.MAGMA_CUBE, "Magma Cube Config");
         public static final ResourceCostConfigEntry PIGLIN_MERCHANT = ResourceCostConfigEntry.Unit(0,0,0,30,3, ResourceCosts.PIGLIN_MERCHANT, "Piglin Merchant Config");
+
+        public static final ResourceCostConfigEntry ENDERMAN = ResourceCostConfigEntry.Unit(75,75,75,35,3, ResourceCosts.ENDERMAN, "Enderman Config");
+        public static final ResourceCostConfigEntry POLAR_BEAR = ResourceCostConfigEntry.Unit(250,0,0,40,4, ResourceCosts.POLAR_BEAR, "Polar Bear Config");
+        public static final ResourceCostConfigEntry GRIZZLY_BEAR = ResourceCostConfigEntry.Unit(250,0,0,40,4, ResourceCosts.GRIZZLY_BEAR, "Grizzly Bear Config");
+        public static final ResourceCostConfigEntry PANDA = ResourceCostConfigEntry.Unit(250,0,0,40,4, ResourceCosts.PANDA, "Panda Config");
+        public static final ResourceCostConfigEntry WOLF = ResourceCostConfigEntry.Unit(120,0,0,25,2, ResourceCosts.WOLF, "Wolf Config");
     }
     public static class BuildingCosts implements Costs {
         public static final ResourceCostConfigEntry BEACON = ResourceCostConfigEntry.Building(0,1000,1000, 0, ResourceCosts.BEACON, "Beacon Config");

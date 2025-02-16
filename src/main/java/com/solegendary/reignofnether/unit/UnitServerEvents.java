@@ -550,6 +550,10 @@ public class UnitServerEvents {
                 if (entity instanceof Unit unit) {
                     UnitSyncClientboundPacket.sendSyncResourcesPacket(unit);
                     UnitSyncClientboundPacket.sendSyncStatsPacket(entity);
+                    if (unit.getAnchor() != null)
+                        UnitSyncClientboundPacket.sendSyncAnchorPosPacket(entity, unit.getAnchor());
+                    else
+                        UnitSyncClientboundPacket.sendRemoveAnchorPosPacket(entity);
                     if (entity instanceof VillagerUnit vUnit && vUnit.isVeteran())
                         UnitSyncClientboundPacket.makeVillagerVeteran(vUnit);
                 }

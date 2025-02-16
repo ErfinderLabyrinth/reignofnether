@@ -1,8 +1,6 @@
 package com.solegendary.reignofnether.unit.units.villagers;
 
 import com.solegendary.reignofnether.ability.Ability;
-import com.solegendary.reignofnether.ability.abilities.EnchantMaiming;
-import com.solegendary.reignofnether.ability.abilities.EnchantSharpness;
 import com.solegendary.reignofnether.ability.abilities.PromoteIllager;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.resources.ResourceCosts;
@@ -13,9 +11,7 @@ import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.HeroUnit;
 import com.solegendary.reignofnether.unit.interfaces.KeyframeAnimated;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
-import com.solegendary.reignofnether.unit.modelling.animations.NecromancerAnimations;
 import com.solegendary.reignofnether.unit.modelling.animations.RoyalGuardAnimations;
-import com.solegendary.reignofnether.unit.packets.UnitSyncClientboundPacket;
 import com.solegendary.reignofnether.util.Faction;
 import net.minecraft.client.animation.AnimationDefinition;
 import net.minecraft.core.BlockPos;
@@ -24,31 +20,27 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Vindicator;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 public class RoyalGuardUnit extends Vindicator implements Unit, AttackerUnit, HeroUnit, KeyframeAnimated {
     // region
+    private BlockPos anchorPos = null;
+    public void setAnchor(BlockPos bp) { anchorPos = bp; }
+    public BlockPos getAnchor() { return anchorPos; }
+
     private final ArrayList<Checkpoint> checkpoints = new ArrayList<>();
     public ArrayList<Checkpoint> getCheckpoints() { return checkpoints; };
 

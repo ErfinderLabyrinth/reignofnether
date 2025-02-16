@@ -52,6 +52,10 @@ import static com.solegendary.reignofnether.survival.SurvivalServerEvents.ENEMY_
 
 public class MilitiaUnit extends Vindicator implements Unit, AttackerUnit, VillagerDataHolder, ConvertableUnit {
     // region
+    private BlockPos anchorPos = null;
+    public void setAnchor(BlockPos bp) { anchorPos = bp; }
+    public BlockPos getAnchor() { return anchorPos; }
+
     private final ArrayList<Checkpoint> checkpoints = new ArrayList<>();
     public ArrayList<Checkpoint> getCheckpoints() { return checkpoints; };
 

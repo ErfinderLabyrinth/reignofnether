@@ -46,6 +46,12 @@ public class ResourceCosts {
     public static final ResourceCost ROYAL_GUARD = new ResourceCost(ID, "ROYAL_GUARD");
     public static final ResourceCost PIGLIN_MERCHANT = new ResourceCost(ID, "PIGLIN_MERCHANT");
 
+    public static final ResourceCost ENDERMAN = new ResourceCost(ID, "ENDERMAN");
+    public static final ResourceCost POLAR_BEAR = new ResourceCost(ID, "POLAR_BEAR");
+    public static final ResourceCost GRIZZLY_BEAR = new ResourceCost(ID, "GRIZZLY_BEAR");
+    public static final ResourceCost PANDA = new ResourceCost(ID, "PANDA");
+    public static final ResourceCost WOLF = new ResourceCost(ID, "WOLF");
+
     //BUILDINGS
     public static final ResourceCost BEACON = new ResourceCost(ID, "BEACON");
 
@@ -137,7 +143,6 @@ public class ResourceCosts {
 
     public static final ResourceCost RESEARCH_VINDICATOR_AXES = ResourceCost.Research(0,200,400, 150);
     public static final ResourceCost RESEARCH_PILLAGER_CROSSBOWS = ResourceCost.Research(0,600,300, 180);
-    public static final ResourceCost ENDERMAN = ResourceCost.Unit(100,100,100,30,3);
 
     public static FormattedCharSequence getFormattedCost(ResourceCost resCost) {
         String str = "";
@@ -205,6 +210,13 @@ public class ResourceCosts {
         GHAST.bakeValues(ReignOfNetherCommonConfigs.UnitCosts.GHAST);
         MAGMA_CUBE.bakeValues(ReignOfNetherCommonConfigs.UnitCosts.MAGMA_CUBE);
         PIGLIN_MERCHANT.bakeValues(ReignOfNetherCommonConfigs.UnitCosts.PIGLIN_MERCHANT);
+
+        ENDERMAN.bakeValues(ReignOfNetherCommonConfigs.UnitCosts.ENDERMAN);
+        POLAR_BEAR.bakeValues(ReignOfNetherCommonConfigs.UnitCosts.POLAR_BEAR);
+        GRIZZLY_BEAR.bakeValues(ReignOfNetherCommonConfigs.UnitCosts.GRIZZLY_BEAR);
+        PANDA.bakeValues(ReignOfNetherCommonConfigs.UnitCosts.PANDA);
+        WOLF.bakeValues(ReignOfNetherCommonConfigs.UnitCosts.WOLF);
+
         // ******************* BUILDINGS ******************* //
         BEACON.bakeValues(ReignOfNetherCommonConfigs.BuildingCosts.BEACON);
 

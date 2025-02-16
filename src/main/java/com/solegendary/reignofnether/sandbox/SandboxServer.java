@@ -5,16 +5,21 @@ import com.solegendary.reignofnether.player.RTSPlayer;
 import com.solegendary.reignofnether.registrars.EntityRegistrar;
 import com.solegendary.reignofnether.unit.UnitServerEvents;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
+import com.solegendary.reignofnether.unit.packets.UnitSyncClientboundPacket;
 import com.solegendary.reignofnether.unit.units.monsters.*;
-import com.solegendary.reignofnether.unit.units.neutral.EndermanProd;
+import com.solegendary.reignofnether.unit.units.neutral.*;
 import com.solegendary.reignofnether.unit.units.piglins.*;
 import com.solegendary.reignofnether.unit.units.villagers.*;
 import com.solegendary.reignofnether.util.Faction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.phys.Vec3;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.solegendary.reignofnether.player.PlayerServerEvents.serverLevel;
@@ -35,47 +40,65 @@ public class SandboxServer {
         return false;
     }
 
-    public static void spawnUnit(SandboxAction sandboxAction, String playerName, String unitName, BlockPos blockPos) {
+    private static boolean hasAnchor(Unit unit) {
+        return unit.getAnchor() != null && !unit.getAnchor().equals(new BlockPos(0,0,0));
+    }
+
+    public static void spawnUnit(String playerName, String unitName, BlockPos blockPos) {
         if (serverLevel == null)
             return;
 
-        EntityType<? extends Mob> entityType = switch(unitName) {
-            case CreeperProd.itemName -> EntityRegistrar.CREEPER_UNIT.get();
-            case SkeletonProd.itemName -> EntityRegistrar.SKELETON_UNIT.get();
-            case ZombieProd.itemName -> EntityRegistrar.ZOMBIE_UNIT.get();
-            case StrayProd.itemName -> EntityRegistrar.STRAY_UNIT.get();
-            case HuskProd.itemName -> EntityRegistrar.HUSK_UNIT.get();
-            case DrownedProd.itemName -> EntityRegistrar.DROWNED_UNIT.get();
-            case SpiderProd.itemName -> EntityRegistrar.SPIDER_UNIT.get();
-            case PoisonSpiderProd.itemName -> EntityRegistrar.POISON_SPIDER_UNIT.get();
-            case VillagerProd.itemName -> EntityRegistrar.VILLAGER_UNIT.get();
-            case ZombieVillagerProd.itemName -> EntityRegistrar.ZOMBIE_VILLAGER_UNIT.get();
-            case VindicatorProd.itemName -> EntityRegistrar.VINDICATOR_UNIT.get();
-            case PillagerProd.itemName -> EntityRegistrar.PILLAGER_UNIT.get();
-            case IronGolemProd.itemName -> EntityRegistrar.IRON_GOLEM_UNIT.get();
-            case WitchProd.itemName -> EntityRegistrar.WITCH_UNIT.get();
-            case EvokerProd.itemName -> EntityRegistrar.EVOKER_UNIT.get();
-            case SlimeProd.itemName -> EntityRegistrar.SLIME_UNIT.get();
-            case WardenProd.itemName -> EntityRegistrar.WARDEN_UNIT.get();
-            case RavagerProd.itemName -> EntityRegistrar.RAVAGER_UNIT.get();
-            case GruntProd.itemName -> EntityRegistrar.GRUNT_UNIT.get();
-            case BruteProd.itemName -> EntityRegistrar.BRUTE_UNIT.get();
-            case HeadhunterProd.itemName -> EntityRegistrar.HEADHUNTER_UNIT.get();
-            case HoglinProd.itemName -> EntityRegistrar.HOGLIN_UNIT.get();
-            case BlazeProd.itemName -> EntityRegistrar.BLAZE_UNIT.get();
-            case WitherSkeletonProd.itemName -> EntityRegistrar.WITHER_SKELETON_UNIT.get();
-            case MagmaCubeProd.itemName -> EntityRegistrar.MAGMA_CUBE_UNIT.get();
-            case GhastProd.itemName -> EntityRegistrar.GHAST_UNIT.get();
-            case NecromancerProd.itemName -> EntityRegistrar.NECROMANCER_UNIT.get();
-            case PiglinMerchantProd.itemName -> EntityRegistrar.PIGLIN_MERCHANT_UNIT.get();
-            case RoyalGuardProd.itemName -> EntityRegistrar.ROYAL_GUARD_UNIT.get();
-            case EndermanProd.itemName -> EntityRegistrar.ENDERMAN_UNIT.get();
-            case ZombiePiglinProd.itemName -> EntityRegistrar.ZOMBIE_PIGLIN_UNIT.get();
-            case ZoglinProd.itemName -> EntityRegistrar.ZOGLIN_UNIT.get();
-            default -> null;
-        };
+        EntityType<? extends Mob> entityType = EntityRegistrar.getEntityType(unitName);
 
-        if (entityType != null)
-            UnitServerEvents.spawnMob(entityType, serverLevel, blockPos, playerName);
+        if (entityType != null) {
+            Entity entity = UnitServerEvents.spawnMob(entityType, serverLevel, blockPos, playerName);
+            if (entity instanceof Unit unit && playerName.isEmpty()) {
+                unit.setAnchor(blockPos);
+            }
+        }
+    }
+
+    public static void setAnchor(int entityId, BlockPos blockPos) {
+        for (LivingEntity entity : UnitServerEvents.getAllUnits()) {
+            if (entity.getId() == entityId && entity instanceof Unit unit) {
+                unit.setAnchor(blockPos);
+                UnitSyncClientboundPacket.sendSyncAnchorPosPacket(entity, unit.getAnchor());
+            }
+        }
+    }
+
+    public static void resetToAnchor(int entityId) {
+        for (LivingEntity entity : UnitServerEvents.getAllUnits()) {
+            if (entity.getId() == entityId && entity instanceof Unit unit && hasAnchor(unit)) {
+                entity.moveTo(unit.getAnchor(), entity.getYRot(), entity.getXRot());
+                entity.setHealth(entity.getMaxHealth());
+                entity.removeAllEffects();
+                unit.resetBehaviours();
+            }
+        }
+    }
+
+    public static void removeAnchor(int entityId) {
+        for (LivingEntity entity : UnitServerEvents.getAllUnits()) {
+            if (entity.getId() == entityId && entity instanceof Unit unit) {
+                unit.setAnchor(null);
+                UnitSyncClientboundPacket.sendRemoveAnchorPosPacket(entity);
+            }
+        }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -13,12 +13,13 @@ import com.solegendary.reignofnether.unit.modelling.models.RoyalGuardModel;
 import com.solegendary.reignofnether.unit.modelling.models.VillagerUnitModel;
 import com.solegendary.reignofnether.unit.modelling.renderers.*;
 import com.solegendary.reignofnether.unit.units.monsters.*;
-import com.solegendary.reignofnether.unit.units.neutral.EndermanUnit;
+import com.solegendary.reignofnether.unit.units.neutral.*;
 import com.solegendary.reignofnether.unit.units.piglins.*;
 import com.solegendary.reignofnether.unit.units.villagers.*;
 import com.solegendary.reignofnether.votesystem.VoteCommand;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.entity.*;
+import net.minecraft.world.entity.animal.PolarBear;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -96,10 +97,20 @@ public class CommonModEvents {
         evt.registerEntityRenderer(EntityRegistrar.ROYAL_GUARD_UNIT.get(), RoyalGuardRenderer::new);
         evt.registerEntityRenderer(EntityRegistrar.NECROMANCER_UNIT.get(), NecromancerRenderer::new);
         evt.registerEntityRenderer(EntityRegistrar.PIGLIN_MERCHANT_UNIT.get(), PiglinMerchantRenderer::new);
+
+        evt.registerEntityRenderer(EntityRegistrar.POLAR_BEAR_UNIT.get(), PolarBearRenderer::new);
+        evt.registerEntityRenderer(EntityRegistrar.GRIZZLY_BEAR_UNIT.get(), GrizzlyBearRenderer::new);
+        evt.registerEntityRenderer(EntityRegistrar.PANDA_UNIT.get(), PandaRenderer::new);
+        evt.registerEntityRenderer(EntityRegistrar.WOLF_UNIT.get(), WolfRenderer::new);
     }
 
     @SubscribeEvent
     public static void registerAttributes(EntityAttributeCreationEvent evt) {
+        evt.put(EntityRegistrar.POLAR_BEAR_UNIT.get(), PolarBearUnit.createAttributes().build());
+        evt.put(EntityRegistrar.GRIZZLY_BEAR_UNIT.get(), GrizzlyBearUnit.createAttributes().build());
+        evt.put(EntityRegistrar.PANDA_UNIT.get(), PandaUnit.createAttributes().build());
+        evt.put(EntityRegistrar.WOLF_UNIT.get(), WolfUnit.createAttributes().build());
+
         evt.put(EntityRegistrar.ZOMBIE_UNIT.get(), ZombieUnit.createAttributes().build());
         evt.put(EntityRegistrar.ZOMBIE_PIGLIN_UNIT.get(), ZombiePiglinUnit.createAttributes().build());
         evt.put(EntityRegistrar.ZOGLIN_UNIT.get(), ZoglinUnit.createAttributes().build());
@@ -134,6 +145,7 @@ public class CommonModEvents {
         evt.put(EntityRegistrar.ROYAL_GUARD_UNIT.get(), RoyalGuardUnit.createAttributes().build());
         evt.put(EntityRegistrar.NECROMANCER_UNIT.get(), NecromancerUnit.createAttributes().build());
         evt.put(EntityRegistrar.PIGLIN_MERCHANT_UNIT.get(), PiglinMerchantUnit.createAttributes().build());
+
     }
 
     @SubscribeEvent

@@ -308,7 +308,7 @@ public class PlayerServerEvents {
                 serverPlayer.sendSystemMessage(Component.literal(""));
                 return;
             }
-            if (serverPlayer.getLevel().getWorldBorder().getDistanceToBorder(pos.x, pos.z) < 1) {
+            if (serverPlayer.getLevel().getWorldBorder().getDistanceToBorder(pos.x, pos.z) < 1 && faction != Faction.NONE) {
                 serverPlayer.sendSystemMessage(Component.literal(""));
                 serverPlayer.sendSystemMessage(Component.translatable("server.reignofnether.outside_border"));
                 serverPlayer.sendSystemMessage(Component.literal(""));

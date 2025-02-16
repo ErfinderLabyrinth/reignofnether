@@ -1,49 +1,39 @@
-package com.solegendary.reignofnether.unit.units.piglins;
+package com.solegendary.reignofnether.unit.units.neutral;
 
 import com.solegendary.reignofnether.ability.Ability;
-import com.solegendary.reignofnether.ability.abilities.Bloodlust;
-import com.solegendary.reignofnether.ability.abilities.ToggleShield;
-import com.solegendary.reignofnether.building.Building;
-import com.solegendary.reignofnether.building.BuildingUtils;
-import com.solegendary.reignofnether.building.buildings.piglins.BasaltSprings;
-import com.solegendary.reignofnether.building.buildings.piglins.FlameSanctuary;
-import com.solegendary.reignofnether.building.buildings.piglins.Fortress;
 import com.solegendary.reignofnether.hud.AbilityButton;
-import com.solegendary.reignofnether.keybinds.Keybindings;
-import com.solegendary.reignofnether.research.ResearchServerEvents;
-import com.solegendary.reignofnether.research.researchItems.ResearchBruteShields;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.unit.Checkpoint;
-import com.solegendary.reignofnether.unit.UnitClientEvents;
 import com.solegendary.reignofnether.unit.goals.*;
 import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.util.Faction;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.animal.PolarBear;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.entity.monster.piglin.PiglinBrute;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
-public class BruteUnit extends PiglinBrute implements Unit, AttackerUnit {
+public class GrizzlyBearUnit extends PolarBear implements Unit, AttackerUnit {
     // region
     private BlockPos anchorPos = null;
     public void setAnchor(BlockPos bp) { anchorPos = bp; }
@@ -52,15 +42,14 @@ public class BruteUnit extends PiglinBrute implements Unit, AttackerUnit {
     private final ArrayList<Checkpoint> checkpoints = new ArrayList<>();
     public ArrayList<Checkpoint> getCheckpoints() { return checkpoints; };
 
-    GarrisonGoal garrisonGoal;
-    public GarrisonGoal getGarrisonGoal() { return garrisonGoal; }
+    public GarrisonGoal getGarrisonGoal() { return null; }
     public boolean canGarrison() { return getGarrisonGoal() != null; }
 
     UsePortalGoal usePortalGoal;
     public UsePortalGoal getUsePortalGoal() { return usePortalGoal; }
     public boolean canUsePortal() { return getUsePortalGoal() != null; }
 
-    public Faction getFaction() {return Faction.PIGLINS;}
+    public Faction getFaction() {return Faction.NONE;}
     public List<AbilityButton> getAbilityButtons() {return abilityButtons;};
     public List<Ability> getAbilities() {return abilities;}
     public List<ItemStack> getItems() {return items;};
@@ -89,7 +78,7 @@ public class BruteUnit extends PiglinBrute implements Unit, AttackerUnit {
     public String getOwnerName() { return this.entityData.get(ownerDataAccessor); }
     public void setOwnerName(String name) { this.entityData.set(ownerDataAccessor, name); }
     public static final EntityDataAccessor<String> ownerDataAccessor =
-            SynchedEntityData.defineId(BruteUnit.class, EntityDataSerializers.STRING);
+            SynchedEntityData.defineId(GrizzlyBearUnit.class, EntityDataSerializers.STRING);
 
     @Override
     protected void defineSynchedData() {
@@ -98,17 +87,14 @@ public class BruteUnit extends PiglinBrute implements Unit, AttackerUnit {
     }
 
     // combat stats
-    public float getMovementSpeed() {return isHoldingUpShield ? movementSpeed * SHIELD_MOVE_MULTIPLIER : movementSpeed;}
+    public float getMovementSpeed() {return movementSpeed;}
     public float getUnitMaxHealth() {return maxHealth;}
     public float getUnitArmorValue() {return armorValue;}
     @Nullable
-    public int getPopCost() {return ResourceCosts.BRUTE.population;}
+    public int getPopCost() {return ResourceCosts.HOGLIN.population;}
     public boolean getWillRetaliate() {return willRetaliate;}
-    public float getAttacksPerSecond() {
-        if (bloodlustTicks > 0)
-            return attacksPerSecond * BLOODLUST_MULTIPLIER;
-        return attacksPerSecond;
-    }
+    public int getAttackCooldown() {return (int) (20 / attacksPerSecond);}
+    public float getAttacksPerSecond() {return attacksPerSecond;}
     public float getAggroRange() {return aggroRange;}
     public boolean getAggressiveWhenIdle() {return aggressiveWhenIdle && !isVehicle();}
     public float getAttackRange() {return attackRange;}
@@ -122,51 +108,24 @@ public class BruteUnit extends PiglinBrute implements Unit, AttackerUnit {
 
     // endregion
 
-    public int getAttackCooldown() {
-        if (bloodlustTicks > 0)
-            return (int) (20 / (attacksPerSecond * BLOODLUST_MULTIPLIER));
-        return (int) (20 / attacksPerSecond);
-    }
-
-    final static public float BLOODLUST_MULTIPLIER = 1.5f;
-    final static public float SHIELD_MOVE_MULTIPLIER = 0.5f;
-
-    final static public float attackDamage = 5.0f;
-    final static public float attacksPerSecond = 0.5f;
+    final static public float attackDamage = 9.0f;
+    final static public float attacksPerSecond = 0.35f;
     final static public float attackRange = 2; // only used by ranged units or melee building attackers
     final static public float aggroRange = 10;
     final static public boolean willRetaliate = true; // will attack when hurt by an enemy
     final static public boolean aggressiveWhenIdle = true;
 
-    final static public float maxHealth = 50.0f;
+    final static public float maxHealth = 100.0f;
     final static public float armorValue = 0.0f;
     final static public float movementSpeed = 0.28f;
     public int maxResources = 100;
-
-    public int bloodlustTicks = 0;
-
-    public boolean isHoldingUpShield = false;
 
     private final List<AbilityButton> abilityButtons = new ArrayList<>();
     private final List<Ability> abilities = new ArrayList<>();
     private final List<ItemStack> items = new ArrayList<>();
 
-    public BruteUnit(EntityType<? extends PiglinBrute> entityType, Level level) {
+    public GrizzlyBearUnit(EntityType<? extends PolarBear> entityType, Level level) {
         super(entityType, level);
-
-        ToggleShield toggleShield = new ToggleShield(this);
-        this.abilities.add(toggleShield);
-        Bloodlust bloodlust = new Bloodlust(this);
-        this.abilities.add(bloodlust);
-        if (level.isClientSide()) {
-            this.abilityButtons.add(toggleShield.getButton(Keybindings.keyQ));
-            this.abilityButtons.add(bloodlust.getButton(Keybindings.keyW));
-        }
-    }
-
-    @Override
-    protected boolean onSoulSpeedBlock() {
-        return false;
     }
 
     @Override
@@ -174,19 +133,15 @@ public class BruteUnit extends PiglinBrute implements Unit, AttackerUnit {
 
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes()
-                .add(Attributes.ATTACK_DAMAGE, BruteUnit.attackDamage)
-                .add(Attributes.MOVEMENT_SPEED, BruteUnit.movementSpeed)
-                .add(Attributes.MAX_HEALTH, BruteUnit.maxHealth)
+                .add(Attributes.ATTACK_DAMAGE, GrizzlyBearUnit.attackDamage)
+                .add(Attributes.MOVEMENT_SPEED, GrizzlyBearUnit.movementSpeed)
+                .add(Attributes.MAX_HEALTH, GrizzlyBearUnit.maxHealth)
                 .add(Attributes.FOLLOW_RANGE, Unit.getFollowRange())
-                .add(Attributes.ARMOR, BruteUnit.armorValue);
+                .add(Attributes.ARMOR, GrizzlyBearUnit.armorValue);
     }
 
-    @Override
-    public boolean isLeftHanded() { return false; }
     @Override // prevent vanilla logic for picking up items
     protected void pickUpItem(ItemEntity pItemEntity) { }
-    @Override
-    public boolean isConverting() { return false; }
     @Override
     protected void customServerAiStep() { }
     @Override
@@ -195,24 +150,18 @@ public class BruteUnit extends PiglinBrute implements Unit, AttackerUnit {
     }
 
     public void tick() {
-        this.setCanPickUpLoot(true);
+        this.setCanPickUpLoot(false);
         super.tick();
         Unit.tick(this);
         AttackerUnit.tick(this);
-
-        if (bloodlustTicks > 0)
-            bloodlustTicks -= 1;
     }
 
     public void initialiseGoals() {
         this.usePortalGoal = new UsePortalGoal(this);
         this.moveGoal = new MoveToTargetBlockGoal(this, false, 0);
         this.targetGoal = new SelectedTargetGoal<>(this, true, true);
-        this.garrisonGoal = new GarrisonGoal(this);
         this.attackGoal = new MeleeAttackUnitGoal(this, false);
         this.attackBuildingGoal = new MeleeAttackBuildingGoal(this);
-        this.returnResourcesGoal = new ReturnResourcesGoal(this);
-
     }
 
     @Override
@@ -221,34 +170,15 @@ public class BruteUnit extends PiglinBrute implements Unit, AttackerUnit {
         this.goalSelector.addGoal(2, usePortalGoal);
         this.goalSelector.addGoal(1, new FloatGoal(this));
         this.goalSelector.addGoal(2, attackGoal);
-        this.goalSelector.addGoal(2, returnResourcesGoal);
-        this.goalSelector.addGoal(2, garrisonGoal);
+        this.goalSelector.addGoal(2, attackBuildingGoal);
         this.targetSelector.addGoal(2, targetGoal);
         this.goalSelector.addGoal(3, moveGoal);
         this.goalSelector.addGoal(4, new RandomLookAroundUnitGoal(this));
     }
 
     @Override
-    public void setupEquipmentAndUpgradesClient() {
-
-    }
-
-    @Override
-    public void setupEquipmentAndUpgradesServer() {
-        ItemStack axeStack = new ItemStack(Items.GOLDEN_SWORD);
-        AttributeModifier mod = new AttributeModifier(UUID.randomUUID().toString(), 0, AttributeModifier.Operation.ADDITION);
-        axeStack.addAttributeModifier(Attributes.ATTACK_DAMAGE, mod, EquipmentSlot.MAINHAND);
-        this.setItemSlot(EquipmentSlot.MAINHAND, axeStack);
-
-        if (ResearchServerEvents.playerHasResearch(this.getOwnerName(), ResearchBruteShields.itemName)) {
-            ItemStack shieldStack = new ItemStack(Items.SHIELD);
-            this.setItemSlot(EquipmentSlot.OFFHAND, shieldStack);
-        }
-    }
-
-    @Override
-    public boolean fireImmune() {
-        Building building = BuildingUtils.findBuilding(level.isClientSide(), getOnPos());
-        return super.fireImmune() || building instanceof FlameSanctuary || building instanceof BasaltSprings;
+    @Nullable
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor pLevel, DifficultyInstance pDifficulty, MobSpawnType pReason, @Nullable SpawnGroupData pSpawnData, @Nullable CompoundTag pDataTag) {
+        return pSpawnData;
     }
 }

@@ -30,6 +30,10 @@ import java.util.List;
 
 public class IronGolemUnit extends IronGolem implements Unit, AttackerUnit {
     // region
+    private BlockPos anchorPos = null;
+    public void setAnchor(BlockPos bp) { anchorPos = bp; }
+    public BlockPos getAnchor() { return anchorPos; }
+
     private final ArrayList<Checkpoint> checkpoints = new ArrayList<>();
     public ArrayList<Checkpoint> getCheckpoints() { return checkpoints; };
 

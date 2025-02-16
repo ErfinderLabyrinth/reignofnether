@@ -48,6 +48,7 @@ public class CapturableBeacon extends Beacon {
         this.capturable = true;
         this.invulnerable = true;
         this.shouldDestroyOnReset = false;
+        this.selfBuilding = true;
 
         this.startingBlockTypes.add(Blocks.NETHERITE_BLOCK);
 

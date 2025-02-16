@@ -1,5 +1,5 @@
 
-1.19.2-1.1.1c
+1.19.2-1.1.2
 
 [✔] Done and tested
 [🟡] Partially done and/or needs testing
@@ -13,7 +13,7 @@ Features
     - Wolf
 
 [❌] Leash range for neutral units
-    - Save position to map
+    - Save position to map data
     - Respawn on /rts-reset
     - Show original marker
     - Reset to original button
@@ -26,34 +26,24 @@ Features
 [❌] Ancient transport portals
     - End themed?
 
+
+
 Bugfixes
 --------
-[✔] Fixed a crash when a player wins by Beacon control
-[✔] Magma cubes are no longer slowed during the day
-[✔] Rate-limited the number of packets sent when dragging the minimap to prevent being kicked
-[✔] Fixed a tooltip error in the wave survival helper
+[✔] Fixed not being able to start sandbox mode when a world border is set
+
+
 
 Quality of Life
 ---------------
-[✔] The camera more accurately centers on units and buildings at different Y levels
-[✔] Fire and lava blocks in Basalt Springs no longer damage piglin units
-[✔] Webs in spider lairs no longer slow down monster units
-[✔] Added /gamerule beaconWinMinutes to control how long it takes to win with a beacon
-[✔] You can now control-click a unit instead of double-clicking to select all nearby units of the same type
-[✔] You can now use /rts-camera instead of F12 to toggle the RTS camera
-[✔] You can now specify a resource when using the greedisgood cheatcode (eg. "greedisgood food 100")
+
 
 Balancing
 ---------
-[✔] Worker units can no longer capture beacons
-[✔] Beacon auras now affect allies
-[✔] All enemy units and portals are destroyed upon a Beacon victory in Wave Survival
 
 
 Villagers
 ---------
-
-
 
 Piglins
 -------

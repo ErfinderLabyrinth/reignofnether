@@ -357,7 +357,7 @@
     "buildings.neutral.reignofnether.beacon.capture_warning": "%s has gained control of the Beacon!",
     "buildings.neutral.reignofnether.beacon.destroy_warning": "%s's Beacon has been destroyed!",
     "buildings.neutral.reignofnether.beacon.time_to_win": "%s will win in %s",
-    "buildings.neutral.reignofnether.end_portal": "End Portal (Coming soon!)",
+    "buildings.neutral.reignofnether.end_portal": "End Portal",
     "buildings.neutral.reignofnether.end_portal.tooltip1": "A mysterious portal that can produce ",
     "buildings.neutral.reignofnether.end_portal.tooltip2": "creatures from the end dimension.",
     "buildings.neutral.reignofnether.healing_fountain": "Healing Fountain (Coming soon!)",
@@ -419,6 +419,12 @@
     "hud.actionbuttons.reignofnether.move": "Move",
     "hud.actionbuttons.reignofnether.garrison": "Garrison",
     "hud.actionbuttons.reignofnether.ungarrison": "Ungarrison",
+
+    "hud.actionbuttons.reignofnether.set_anchor": "Set Anchor",
+    "hud.actionbuttons.reignofnether.set_anchor.tooltip1": "Units retreat to an anchor point when too far away.",
+    "hud.actionbuttons.reignofnether.reset_to_anchor": "Reset to Anchor",
+    "hud.actionbuttons.reignofnether.reset_to_anchor.tooltip1": "Also resets health and effects.",
+    "hud.actionbuttons.reignofnether.remove_anchor": "Remove Anchor",
 
     "hud.helperbuttons.reignofnether.chat": "Chat (enter)",
     "hud.helperbuttons.reignofnether.idle_workers": "Idle Workers",
@@ -940,6 +946,7 @@
     "units.neutral.reignofnether.wolf": "Wolf",
     "units.neutral.reignofnether.polar_bear": "Polar Bear",
     "units.neutral.reignofnether.grizzly_bear": "Grizzly Bear",
+    "units.neutral.reignofnether.panda": "Panda",
     "units.neutral.reignofnether.llama": "Llama",
 
     "alliance.reignofnether.sent_request": "\nAlliance request sent to %s.\n",

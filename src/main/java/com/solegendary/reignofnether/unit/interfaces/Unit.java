@@ -48,6 +48,10 @@ public interface Unit {
     static int FOLLOW_RANGE_IMPROVED = 64;
     static int FOLLOW_RANGE = 16;
 
+    // position that neutral units run back to when past leash range
+    public void setAnchor(BlockPos bp);
+    public BlockPos getAnchor();
+
     public static int getFollowRange() {
         return UnitServerEvents.improvedPathfinding ? FOLLOW_RANGE_IMPROVED : FOLLOW_RANGE;
     }

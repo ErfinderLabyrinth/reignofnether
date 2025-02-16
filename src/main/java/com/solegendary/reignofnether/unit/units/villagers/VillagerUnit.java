@@ -58,6 +58,10 @@ import static com.solegendary.reignofnether.unit.units.villagers.VillagerUnitPro
 
 public class VillagerUnit extends Vindicator implements Unit, WorkerUnit, AttackerUnit, ArmSwingingUnit, VillagerDataHolder, ConvertableUnit {
     // region
+    private BlockPos anchorPos = null;
+    public void setAnchor(BlockPos bp) { anchorPos = bp; }
+    public BlockPos getAnchor() { return anchorPos; }
+
     private final ArrayList<Checkpoint> checkpoints = new ArrayList<>();
     public ArrayList<Checkpoint> getCheckpoints() { return checkpoints; };
 

@@ -38,19 +38,20 @@ public class EndPortal extends ProductionBuilding {
         super(level, originPos, rotation, ownerName, getAbsoluteBlockData(getRelativeBlockData(level), level, originPos, rotation), false);
         this.name = buildingName;
         this.ownerName = ownerName;
-        this.portraitBlock = Blocks.END_PORTAL;
+        this.portraitBlock = Blocks.END_PORTAL_FRAME;
         this.icon = new ResourceLocation("minecraft", "textures/block/end_portal_frame_top.png");
 
         this.foodCost = cost.food;
         this.woodCost = cost.wood;
         this.oreCost = cost.ore;
         this.popSupply = cost.population;
+        this.selfBuilding = true;
 
         this.capturable = true;
         this.invulnerable = true;
         this.shouldDestroyOnReset = false;
 
-        this.startingBlockTypes.add(Blocks.PURPUR_BLOCK);
+        this.startingBlockTypes.add(Blocks.DARK_PRISMARINE_STAIRS);
 
         this.explodeChance = 0.2f;
 
@@ -58,6 +59,22 @@ public class EndPortal extends ProductionBuilding {
             this.productionButtons = Arrays.asList(
                     EndermanProd.getStartButton(this, Keybindings.keyQ)
             );
+    }
+
+    @Override
+    public void onBuilt() {
+        super.onBuilt();
+        if (!level.isClientSide()) {
+            level.setBlockAndUpdate(centrePos.above(), Blocks.END_PORTAL.defaultBlockState());
+            level.setBlockAndUpdate(centrePos.above().north(), Blocks.END_PORTAL.defaultBlockState());
+            level.setBlockAndUpdate(centrePos.above().south(), Blocks.END_PORTAL.defaultBlockState());
+            level.setBlockAndUpdate(centrePos.above().east(), Blocks.END_PORTAL.defaultBlockState());
+            level.setBlockAndUpdate(centrePos.above().west(), Blocks.END_PORTAL.defaultBlockState());
+            level.setBlockAndUpdate(centrePos.above().north().east(), Blocks.END_PORTAL.defaultBlockState());
+            level.setBlockAndUpdate(centrePos.above().north().west(), Blocks.END_PORTAL.defaultBlockState());
+            level.setBlockAndUpdate(centrePos.above().south().east(), Blocks.END_PORTAL.defaultBlockState());
+            level.setBlockAndUpdate(centrePos.above().south().west(), Blocks.END_PORTAL.defaultBlockState());
+        }
     }
 
     public Faction getFaction() {return Faction.NONE;}
@@ -73,7 +90,7 @@ public class EndPortal extends ProductionBuilding {
                 hotkey,
                 () -> BuildingClientEvents.getBuildingToPlace() == EndPortal.class,
                 () -> false,
-                () -> false,
+                () -> true,
                 () -> BuildingClientEvents.setBuildingToPlace(EndPortal.class),
                 null,
                 List.of(

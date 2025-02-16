@@ -6,11 +6,12 @@ import com.solegendary.reignofnether.unit.modelling.renderers.NecromancerRendere
 import com.solegendary.reignofnether.unit.modelling.renderers.PiglinMerchantRenderer;
 import com.solegendary.reignofnether.unit.modelling.renderers.RoyalGuardRenderer;
 import com.solegendary.reignofnether.unit.units.monsters.*;
-import com.solegendary.reignofnether.unit.units.neutral.EndermanUnit;
+import com.solegendary.reignofnether.unit.units.neutral.*;
 import com.solegendary.reignofnether.unit.units.piglins.*;
 import com.solegendary.reignofnether.unit.units.villagers.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.RegistryObject;
@@ -233,7 +234,73 @@ public class EntityRegistrar {
                     .clientTrackingRange(UNIT_CLIENT_TRACKING_RANGE)
                     .build(new ResourceLocation(ReignOfNether.MOD_ID, "piglin_merchant_unit").toString()));
 
+    public static final RegistryObject<EntityType<PolarBearUnit>> POLAR_BEAR_UNIT = ENTITIES.register("polar_bear_unit",
+            () -> EntityType.Builder.of(PolarBearUnit::new, MobCategory.CREATURE)
+                    .sized(EntityType.POLAR_BEAR.getWidth(), EntityType.POLAR_BEAR.getHeight())
+                    .clientTrackingRange(UNIT_CLIENT_TRACKING_RANGE)
+                    .build(new ResourceLocation(ReignOfNether.MOD_ID, "polar_bear_unit").toString()));
+
+    public static final RegistryObject<EntityType<GrizzlyBearUnit>> GRIZZLY_BEAR_UNIT = ENTITIES.register("grizzly_bear_unit",
+            () -> EntityType.Builder.of(GrizzlyBearUnit::new, MobCategory.CREATURE)
+                    .sized(EntityType.POLAR_BEAR.getWidth(), EntityType.POLAR_BEAR.getHeight())
+                    .clientTrackingRange(UNIT_CLIENT_TRACKING_RANGE)
+                    .build(new ResourceLocation(ReignOfNether.MOD_ID, "grizzly_bear_unit").toString()));
+
+    public static final RegistryObject<EntityType<PandaUnit>> PANDA_UNIT = ENTITIES.register("panda_unit",
+            () -> EntityType.Builder.of(PandaUnit::new, MobCategory.CREATURE)
+                    .sized(EntityType.PANDA.getWidth(), EntityType.PANDA.getHeight())
+                    .clientTrackingRange(UNIT_CLIENT_TRACKING_RANGE)
+                    .build(new ResourceLocation(ReignOfNether.MOD_ID, "panda_unit").toString()));
+
+    public static final RegistryObject<EntityType<WolfUnit>> WOLF_UNIT = ENTITIES.register("wolf_unit",
+            () -> EntityType.Builder.of(WolfUnit::new, MobCategory.CREATURE)
+                    .sized(EntityType.WOLF.getWidth(), EntityType.WOLF.getHeight())
+                    .clientTrackingRange(UNIT_CLIENT_TRACKING_RANGE)
+                    .build(new ResourceLocation(ReignOfNether.MOD_ID, "wolf_unit").toString()));
+
     public static void init() {
         ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
+    }
+
+    public static EntityType<? extends Mob> getEntityType(String unitName) {
+        return switch(unitName) {
+            case CreeperProd.itemName -> EntityRegistrar.CREEPER_UNIT.get();
+            case SkeletonProd.itemName -> EntityRegistrar.SKELETON_UNIT.get();
+            case ZombieProd.itemName -> EntityRegistrar.ZOMBIE_UNIT.get();
+            case StrayProd.itemName -> EntityRegistrar.STRAY_UNIT.get();
+            case HuskProd.itemName -> EntityRegistrar.HUSK_UNIT.get();
+            case DrownedProd.itemName -> EntityRegistrar.DROWNED_UNIT.get();
+            case SpiderProd.itemName -> EntityRegistrar.SPIDER_UNIT.get();
+            case PoisonSpiderProd.itemName -> EntityRegistrar.POISON_SPIDER_UNIT.get();
+            case VillagerProd.itemName -> EntityRegistrar.VILLAGER_UNIT.get();
+            case ZombieVillagerProd.itemName -> EntityRegistrar.ZOMBIE_VILLAGER_UNIT.get();
+            case VindicatorProd.itemName -> EntityRegistrar.VINDICATOR_UNIT.get();
+            case PillagerProd.itemName -> EntityRegistrar.PILLAGER_UNIT.get();
+            case IronGolemProd.itemName -> EntityRegistrar.IRON_GOLEM_UNIT.get();
+            case WitchProd.itemName -> EntityRegistrar.WITCH_UNIT.get();
+            case EvokerProd.itemName -> EntityRegistrar.EVOKER_UNIT.get();
+            case SlimeProd.itemName -> EntityRegistrar.SLIME_UNIT.get();
+            case WardenProd.itemName -> EntityRegistrar.WARDEN_UNIT.get();
+            case RavagerProd.itemName -> EntityRegistrar.RAVAGER_UNIT.get();
+            case GruntProd.itemName -> EntityRegistrar.GRUNT_UNIT.get();
+            case BruteProd.itemName -> EntityRegistrar.BRUTE_UNIT.get();
+            case HeadhunterProd.itemName -> EntityRegistrar.HEADHUNTER_UNIT.get();
+            case HoglinProd.itemName -> EntityRegistrar.HOGLIN_UNIT.get();
+            case BlazeProd.itemName -> EntityRegistrar.BLAZE_UNIT.get();
+            case WitherSkeletonProd.itemName -> EntityRegistrar.WITHER_SKELETON_UNIT.get();
+            case MagmaCubeProd.itemName -> EntityRegistrar.MAGMA_CUBE_UNIT.get();
+            case GhastProd.itemName -> EntityRegistrar.GHAST_UNIT.get();
+            case NecromancerProd.itemName -> EntityRegistrar.NECROMANCER_UNIT.get();
+            case PiglinMerchantProd.itemName -> EntityRegistrar.PIGLIN_MERCHANT_UNIT.get();
+            case RoyalGuardProd.itemName -> EntityRegistrar.ROYAL_GUARD_UNIT.get();
+            case EndermanProd.itemName -> EntityRegistrar.ENDERMAN_UNIT.get();
+            case ZombiePiglinProd.itemName -> EntityRegistrar.ZOMBIE_PIGLIN_UNIT.get();
+            case ZoglinProd.itemName -> EntityRegistrar.ZOGLIN_UNIT.get();
+            case PolarBearProd.itemName -> EntityRegistrar.POLAR_BEAR_UNIT.get();
+            case GrizzlyBearProd.itemName -> EntityRegistrar.GRIZZLY_BEAR_UNIT.get();
+            case PandaProd.itemName -> EntityRegistrar.PANDA_UNIT.get();
+            case WolfProd.itemName -> EntityRegistrar.WOLF_UNIT.get();
+            default -> null;
+        };
     }
 }

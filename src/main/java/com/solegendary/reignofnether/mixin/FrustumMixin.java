@@ -1,7 +1,10 @@
 package com.solegendary.reignofnether.mixin;
 
+import com.solegendary.reignofnether.building.Building;
+import com.solegendary.reignofnether.building.BuildingClientEvents;
 import com.solegendary.reignofnether.building.BuildingUtils;
 import com.solegendary.reignofnether.building.buildings.neutral.Beacon;
+import com.solegendary.reignofnether.building.buildings.neutral.EndPortal;
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.culling.Frustum;
@@ -33,23 +36,28 @@ public class FrustumMixin {
         }
     }
 
+    // see IForgeBlockEntity.getRenderBoundingBox()
     @Inject(
             method = "isVisible(Lnet/minecraft/world/phys/AABB;)Z",
             at = @At("HEAD"),
             cancellable = true
     )
     public void isVisible(AABB aabb, CallbackInfoReturnable<Boolean> cir) {
-        // aabb is infinite only for structure and beacon blocks
-        boolean couldBeBeacon = aabb.equals(IForgeBlockEntity.INFINITE_EXTENT_AABB);
+        // aabb is infinite only for some block entities: structure, beacon, end portal
+        boolean infAABB = aabb.equals(IForgeBlockEntity.INFINITE_EXTENT_AABB);
 
         Player player = Minecraft.getInstance().player;
-        Beacon beacon = BuildingUtils.getBeacon(true);
         float zoom = Math.max(30, OrthoviewClientEvents.getZoom()) * 2;
 
-        if (player != null && OrthoviewClientEvents.isEnabled() && couldBeBeacon && beacon != null) {
-            BlockPos equalYBp = new BlockPos(player.getOnPos().getX(), beacon.centrePos.getY(), player.getOnPos().getZ());
-            if (beacon.centrePos.distSqr(equalYBp) < (zoom * zoom))
-                cir.setReturnValue(true);
+        if (player != null && OrthoviewClientEvents.isEnabled() && infAABB) {
+            for (Building building : BuildingClientEvents.getBuildings()) {
+                if (building instanceof Beacon beacon ||
+                    building instanceof EndPortal endPortal) {
+                    BlockPos equalYBp = new BlockPos(player.getOnPos().getX(), building.centrePos.getY(), player.getOnPos().getZ());
+                    if (building.centrePos.distSqr(equalYBp) < (zoom * zoom))
+                        cir.setReturnValue(true);
+                }
+            }
         }
     }
 }

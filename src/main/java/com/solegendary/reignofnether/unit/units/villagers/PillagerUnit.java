@@ -49,6 +49,10 @@ import java.util.Optional;
 // we just implement this for fog reveal methods
 public class PillagerUnit extends Pillager implements Unit, AttackerUnit, RangedAttackerUnit {
     // region
+    private BlockPos anchorPos = null;
+    public void setAnchor(BlockPos bp) { anchorPos = bp; }
+    public BlockPos getAnchor() { return anchorPos; }
+
     private final ArrayList<Checkpoint> checkpoints = new ArrayList<>();
     public ArrayList<Checkpoint> getCheckpoints() { return checkpoints; };
 

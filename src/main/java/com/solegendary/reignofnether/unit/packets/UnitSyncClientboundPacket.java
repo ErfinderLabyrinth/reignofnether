@@ -81,6 +81,24 @@ public class UnitSyncClientboundPacket {
         );
     }
 
+    public static void sendSyncAnchorPosPacket(LivingEntity entity, BlockPos bp) {
+        PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(),
+                new UnitSyncClientboundPacket(
+                        UnitSyncAction.SYNC_ANCHOR_POS,
+                        entity.getId(), 0,
+                        0, bp.getX(), bp.getY(), bp.getZ(),0,0,0, "")
+        );
+    }
+
+    public static void sendRemoveAnchorPosPacket(LivingEntity entity) {
+        PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(),
+                new UnitSyncClientboundPacket(
+                        UnitSyncAction.SYNC_ANCHOR_POS,
+                        entity.getId(), 0,
+                        0,0,0,0,0,0,0, "")
+        );
+    }
+
     // packet-handler functions
     public UnitSyncClientboundPacket(
         UnitSyncAction syncAction,
@@ -151,11 +169,18 @@ public class UnitSyncClientboundPacket {
                                 this.entityId,
                                 this.health,
                                 new Vec3(this.posX, this.posY, this.posZ),
-                                this.ownerName);
+                                this.ownerName
+                        );
                         case SYNC_RESOURCES -> UnitClientEvents.syncUnitResources(
                                 this.entityId,
-                                new Resources("", this.food, this.wood, this.ore));
+                                new Resources("", this.food, this.wood, this.ore)
+                        );
                         case MAKE_VILLAGER_VETERAN -> UnitClientEvents.makeVillagerVeteran(this.entityId);
+                        case SYNC_ANCHOR_POS -> UnitClientEvents.syncAnchorPos(
+                                this.entityId,
+                                new BlockPos(this.posX, this.posY, this.posZ)
+                        );
+                        case REMOVE_ANCHOR_POS -> UnitClientEvents.removeAnchorPos(this.entityId);
                     }
                 });
         });

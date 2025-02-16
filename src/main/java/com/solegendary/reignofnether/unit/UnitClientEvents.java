@@ -398,6 +398,28 @@ public class UnitClientEvents {
         }
     }
 
+    public static void syncAnchorPos(int entityId, BlockPos bp) {
+        for(LivingEntity entity : allUnits) {
+            if (entity.getId() == entityId && MC.level != null) {
+                if (entity instanceof Unit unit) {
+                    unit.setAnchor(bp);
+                    break;
+                }
+            }
+        }
+    }
+
+    public static void removeAnchorPos(int entityId) {
+        for(LivingEntity entity : allUnits) {
+            if (entity.getId() == entityId && MC.level != null) {
+                if (entity instanceof Unit unit) {
+                    unit.setAnchor(null);
+                    break;
+                }
+            }
+        }
+    }
+
     /*
     private static double variance = 0;
     @SubscribeEvent
@@ -740,9 +762,9 @@ public class UnitClientEvents {
             // draw unit checkpoints
             for (LivingEntity entity : getSelectedUnits()) {
                 if (entity instanceof Unit unit) {
-
                     float entityYOffset1 = 1.74f - ((LivingEntity) unit).getEyeHeight() - 1;
-                    Vec3 lastPos = ((LivingEntity) unit).getEyePosition().add(0, entityYOffset1,0);
+                    Vec3 firstPos = ((LivingEntity) unit).getEyePosition().add(0, entityYOffset1,0);
+                    Vec3 lastPos = firstPos;
 
                     for (Checkpoint cp : unit.getCheckpoints()) {
                         int ticksUnderFade = Math.min(cp.ticksLeft, CHECKPOINT_TICKS_FADE);
@@ -763,6 +785,24 @@ public class UnitClientEvents {
                             lastPos = cp.getPos();
                         }
                     }
+
+                    // draw anchor pos
+                    if (unit.getAnchor() != null && !unit.getAnchor().equals(new BlockPos(0,0,0))) {
+                        BlockPos ap = unit.getAnchor();
+                        float a = MiscUtil.getOscillatingFloat(0.25f, 0.75f);
+                        Vec3 apVec3 = new Vec3(ap.getX() + 0.5f, ap.getY() + 1.0f, ap.getZ() + 0.5f);
+                        MyRenderer.drawLine(evt.getPoseStack(), firstPos, apVec3, 1, 1, 0, a);
+
+                        if (MC.level.getBlockState(ap.offset(0,1,0)).getBlock() instanceof SnowLayerBlock) {
+                            AABB aabb = new AABB(ap);
+                            aabb = aabb.setMaxY(aabb.maxY + 0.13f);
+                            MyRenderer.drawSolidBox(evt.getPoseStack(), aabb, Direction.UP, 1, 1, 0, a,
+                                    new ResourceLocation("forge:textures/white.png"));
+                        } else {
+                            MyRenderer.drawBlockFace(evt.getPoseStack(), Direction.UP, ap, 1, 1, 0, a);
+                        }
+                    }
+
                     // draw path nodes
                     /*
                     if (unit instanceof Mob mob && mob.getNavigation().getPath() != null) {
