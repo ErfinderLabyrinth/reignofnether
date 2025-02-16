@@ -770,9 +770,11 @@ public class HudClientEvents {
                 actionButtons.add(SandboxActionButtons.REMOVE_ANCHOR);
             }
             for (Button actionButton : actionButtons) {
-                actionButton.render(evt.getPoseStack(), blitX, blitY, mouseX, mouseY);
-                renderedButtons.add(actionButton);
-                blitX += iconFrameSize;
+                if (!actionButton.isHidden.get()) {
+                    actionButton.render(evt.getPoseStack(), blitX, blitY, mouseX, mouseY);
+                    renderedButtons.add(actionButton);
+                    blitX += iconFrameSize;
+                }
             }
         }
 

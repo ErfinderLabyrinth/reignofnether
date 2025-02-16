@@ -129,7 +129,7 @@ public class UnitServerEvents {
         getAllUnits().forEach(e -> {
             if (e instanceof Unit unit) {
                 // Save unit data as usual
-                data.units.add(new UnitSave(e.getName().getString(), unit.getOwnerName(), e.getStringUUID()));
+                data.units.add(new UnitSave(e.getName().getString(), unit.getOwnerName(), e.getStringUUID(), unit.getAnchor()));
             }
         });
         data.save();
@@ -344,8 +344,10 @@ public class UnitServerEvents {
                 savedUnits.removeIf(su -> {
                     if (su.uuid.equals(entity.getStringUUID())) {
                         unit.setOwnerName(su.ownerName);
+                        unit.setAnchor(su.anchorPos);
                         UnitSyncClientboundPacket.sendSyncResourcesPacket(unit);
                         UnitSyncClientboundPacket.sendSyncOwnerNamePacket(unit);
+                        UnitSyncClientboundPacket.sendSyncAnchorPosPacket(entity, unit.getAnchor());
                         ReignOfNether.LOGGER.info(
                                 "loaded unit in serverevents: " + su.ownerName + "|" + su.name + "|" + su.uuid);
                         return true;

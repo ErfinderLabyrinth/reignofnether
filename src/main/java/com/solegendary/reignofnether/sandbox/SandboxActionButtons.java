@@ -3,18 +3,12 @@ package com.solegendary.reignofnether.sandbox;
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.cursor.CursorClientEvents;
 import com.solegendary.reignofnether.hud.Button;
-import com.solegendary.reignofnether.hud.HudClientEvents;
 import com.solegendary.reignofnether.keybinds.Keybindings;
-import com.solegendary.reignofnether.unit.UnitAction;
 import com.solegendary.reignofnether.unit.UnitClientEvents;
-import com.solegendary.reignofnether.unit.goals.BuildRepairGoal;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
-import com.solegendary.reignofnether.unit.interfaces.WorkerUnit;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.LivingEntity;
 
 import java.util.List;
@@ -45,7 +39,7 @@ public class SandboxActionButtons {
             new ResourceLocation("minecraft", "textures/block/respawn_anchor_side4.png"),
             Keybindings.keyQ,
             () -> CursorClientEvents.getLeftClickSandboxAction() == SandboxAction.SET_ANCHOR,
-            () -> !neutralUnitsSelected(),
+            () -> !neutralUnitsSelected() || !SandboxClientEvents.isSandboxPlayer(),
             () -> true,
             () -> CursorClientEvents.setLeftClickSandboxAction(SandboxAction.SET_ANCHOR),
             null,
@@ -61,11 +55,16 @@ public class SandboxActionButtons {
             new ResourceLocation("minecraft", "textures/block/respawn_anchor_top_off.png"),
             Keybindings.keyW,
             () -> CursorClientEvents.getLeftClickSandboxAction() == SandboxAction.RESET_TO_ANCHOR,
-            () -> !neutralUnitsSelected() || !selectedUnitsHaveAnchor(),
-            () -> true,
+            () -> !neutralUnitsSelected() || !SandboxClientEvents.isSandboxPlayer(),
+            () -> selectedUnitsHaveAnchor(),
             () -> {
-                if (!UnitClientEvents.getSelectedUnits().isEmpty())
-                    SandboxServerboundPacket.resetToAnchor(UnitClientEvents.getSelectedUnits().get(0).getId());
+                if (!UnitClientEvents.getSelectedUnits().isEmpty()) {
+                    LivingEntity entity = UnitClientEvents.getSelectedUnits().get(0);
+                    if (entity instanceof Unit unit) {
+                        SandboxServerboundPacket.resetToAnchor(entity.getId());
+                        Unit.fullResetBehaviours(unit);
+                    }
+                }
             },
             null,
             List.of(
@@ -80,8 +79,8 @@ public class SandboxActionButtons {
             new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/barrier.png"),
             Keybindings.keyE,
             () -> CursorClientEvents.getLeftClickSandboxAction() == SandboxAction.REMOVE_ANCHOR,
-            () -> !neutralUnitsSelected() || !selectedUnitsHaveAnchor(),
-            () -> true,
+            () -> !neutralUnitsSelected() || !SandboxClientEvents.isSandboxPlayer(),
+            () -> selectedUnitsHaveAnchor(),
             () -> {
                 if (!UnitClientEvents.getSelectedUnits().isEmpty())
                     SandboxServerboundPacket.removeAnchor(UnitClientEvents.getSelectedUnits().get(0).getId());

@@ -86,20 +86,6 @@ public class UnitActionItem {
         this.selectedBuildingPos = selectedBuildingPos;
     }
 
-    public static void resetBehaviours(Unit unit) {
-        if (((Entity) unit).getLevel().isClientSide() && !Keybindings.shiftMod.isDown())
-            unit.getCheckpoints().clear();
-        unit.resetBehaviours();
-        Unit.resetBehaviours(unit);
-        if (unit instanceof WorkerUnit workerUnit) {
-            WorkerUnit.resetBehaviours(workerUnit);
-        }
-        if (unit instanceof AttackerUnit attackerUnit) {
-            AttackerUnit.resetBehaviours(attackerUnit);
-        }
-
-    }
-
     // can be done server or clientside - but only serverside will have an effect on the world
     // clientside actions are purely for tracking data
     public void action(Level level) {
@@ -145,7 +131,7 @@ public class UnitActionItem {
                 if (unit instanceof WorkerUnit workerUnit) {
                     GatherResourcesGoal goal = workerUnit.getGatherResourceGoal();
                     ResourceName targetResourceName = goal.getTargetResourceName();
-                    resetBehaviours(unit);
+                    Unit.fullResetBehaviours(unit);
                     switch (targetResourceName) {
                         case NONE -> goal.setTargetResourceName(ResourceName.FOOD);
                         case FOOD -> goal.setTargetResourceName(ResourceName.WOOD);
@@ -176,7 +162,7 @@ public class UnitActionItem {
                     //}
 
                     if (shouldResetBehaviours && (nonAbilityActions.contains(action) || foundAbility)) {
-                        resetBehaviours(unit);
+                        Unit.fullResetBehaviours(unit);
                     }
                 }
             }
@@ -184,7 +170,7 @@ public class UnitActionItem {
                 case STOP -> {
                     Entity passenger = ((Entity) unit).getFirstPassenger();
                     if (passenger instanceof Unit unitPassenger) {
-                        resetBehaviours(unitPassenger);
+                        Unit.fullResetBehaviours(unitPassenger);
                     }
                 }
                 case HOLD -> {

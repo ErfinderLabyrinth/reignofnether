@@ -3,6 +3,7 @@ package com.solegendary.reignofnether.unit.interfaces;
 import com.solegendary.reignofnether.building.BuildingUtils;
 import com.solegendary.reignofnether.building.buildings.shared.AbstractBridge;
 import com.solegendary.reignofnether.hud.AbilityButton;
+import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.nether.NetherBlocks;
 import com.solegendary.reignofnether.research.ResearchClient;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
@@ -23,6 +24,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.TicketType;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -223,6 +225,19 @@ public interface Unit {
     public default boolean hasLivingTarget() {
         Mob unitMob = (Mob) this;
         return unitMob.getTarget() != null && unitMob.getTarget().isAlive();
+    }
+
+    public static void fullResetBehaviours(Unit unit) {
+        if (((Entity) unit).getLevel().isClientSide() && !Keybindings.shiftMod.isDown())
+            unit.getCheckpoints().clear();
+        unit.resetBehaviours();
+        Unit.resetBehaviours(unit);
+        if (unit instanceof WorkerUnit workerUnit) {
+            WorkerUnit.resetBehaviours(workerUnit);
+        }
+        if (unit instanceof AttackerUnit attackerUnit) {
+            AttackerUnit.resetBehaviours(attackerUnit);
+        }
     }
 
     public static void resetBehaviours(Unit unit) {

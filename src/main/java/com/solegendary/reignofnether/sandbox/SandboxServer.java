@@ -70,10 +70,10 @@ public class SandboxServer {
     public static void resetToAnchor(int entityId) {
         for (LivingEntity entity : UnitServerEvents.getAllUnits()) {
             if (entity.getId() == entityId && entity instanceof Unit unit && hasAnchor(unit)) {
-                entity.moveTo(unit.getAnchor(), entity.getYRot(), entity.getXRot());
+                entity.moveTo(Vec3.atCenterOf(unit.getAnchor()).add(0, 0.5d, 0));
                 entity.setHealth(entity.getMaxHealth());
                 entity.removeAllEffects();
-                unit.resetBehaviours();
+                Unit.fullResetBehaviours(unit);
             }
         }
     }

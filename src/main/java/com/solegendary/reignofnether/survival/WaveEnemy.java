@@ -4,7 +4,6 @@ import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.*;
 import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingServerEvents;
-import com.solegendary.reignofnether.building.BuildingUtils;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
 import com.solegendary.reignofnether.research.researchItems.ResearchBruteShields;
 import com.solegendary.reignofnether.research.researchItems.ResearchSpiderWebs;
@@ -110,7 +109,7 @@ public class WaveEnemy {
             for (Ability ability : ravagerUnit.getAbilities()) {
                 if (ability instanceof Roar roar && roar.isOffCooldown() &&
                         ravagerUnit.getHealth() < ravagerUnit.getMaxHealth() / 2) {
-                    UnitActionItem.resetBehaviours(ravagerUnit);
+                    Unit.fullResetBehaviours(ravagerUnit);
                     roar.use(getEntity().level, unit, (BlockPos) null);
                 }
             }
@@ -120,7 +119,7 @@ public class WaveEnemy {
             for (Ability ability : wardenUnit.getAbilities()) {
                 if (ability instanceof SonicBoom boom && boom.isOffCooldown() && target != null &&
                         wardenUnit.distanceToSqr(target) <= (boom.range * boom.range)) {
-                    UnitActionItem.resetBehaviours(wardenUnit);
+                    Unit.fullResetBehaviours(wardenUnit);
                     boom.use(getEntity().level, unit, target);
                 }
             }
@@ -130,7 +129,7 @@ public class WaveEnemy {
             for (Ability ability : evokerUnit.getAbilities()) {
                 if (ability instanceof CastSummonVexes summon && summon.isOffCooldown() && target != null &&
                         evokerUnit.distanceToSqr(target) <= (evokerUnit.getAttackRange() * evokerUnit.getAttackRange())) {
-                    UnitActionItem.resetBehaviours(evokerUnit);
+                    Unit.fullResetBehaviours(evokerUnit);
                     summon.use(getEntity().level, unit, target);
                 }
             }

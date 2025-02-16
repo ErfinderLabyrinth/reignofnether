@@ -40,7 +40,7 @@ import java.util.List;
 
 public class BlazeUnit extends Blaze implements Unit, AttackerUnit, RangedAttackerUnit {
     // region
-    private BlockPos anchorPos = null;
+    private BlockPos anchorPos = new BlockPos(0,0,0);
     public void setAnchor(BlockPos bp) { anchorPos = bp; }
     public BlockPos getAnchor() { return anchorPos; }
 
