@@ -3,6 +3,8 @@ package com.solegendary.reignofnether.startpos;
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.blocks.RTSStartBlock;
 import com.solegendary.reignofnether.player.PlayerServerEvents;
+import com.solegendary.reignofnether.sounds.SoundAction;
+import com.solegendary.reignofnether.sounds.SoundClientboundPacket;
 import com.solegendary.reignofnether.util.Faction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -80,10 +82,12 @@ public class StartPosServerEvents {
         if (startingGame) {
             if (ticksToStart % 20 == 0) {
                 int secondsLeft = ticksToStart / 20;
-                if (secondsLeft > 0)
-                    PlayerServerEvents.sendMessageToAllPlayersNoNewlines("startpos.reignofnether.starting_game");
-                else {
+                if (secondsLeft > 0) {
+                    PlayerServerEvents.sendMessageToAllPlayersNoNewlines("startpos.reignofnether.starting_game", false, secondsLeft);
+                    SoundClientboundPacket.playSoundForAllPlayers(SoundAction.CHAT);
+                } else {
                     PlayerServerEvents.sendMessageToAllPlayersNoNewlines("startpos.reignofnether.started_game", true);
+                    SoundClientboundPacket.playSoundForAllPlayers(SoundAction.ALLY);
                     for (ServerPlayer serverPlayer : PlayerServerEvents.players) {
                         for (StartPos startPos : startPoses) {
                             if (startPos.playerName.equals(serverPlayer.getName().getString()) && startPos.faction != Faction.NONE) {
@@ -92,6 +96,7 @@ public class StartPosServerEvents {
                             }
                         }
                     }
+                    StartPosClientboundPacket.reset();
                     PlayerServerEvents.setRTSLock(true, true);
                     startingGame = false;
                 }

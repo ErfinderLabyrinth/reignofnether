@@ -4,7 +4,10 @@ import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.alliance.AlliancesServer;
 import com.solegendary.reignofnether.alliance.AllyCommand;
 import com.solegendary.reignofnether.building.*;
+import com.solegendary.reignofnether.building.buildings.monsters.Mausoleum;
 import com.solegendary.reignofnether.building.buildings.neutral.Beacon;
+import com.solegendary.reignofnether.building.buildings.piglins.CentralPortal;
+import com.solegendary.reignofnether.building.buildings.villagers.TownCentre;
 import com.solegendary.reignofnether.gamemode.GameMode;
 import com.solegendary.reignofnether.gamemode.GameModeClientboundPacket;
 import com.solegendary.reignofnether.guiscreen.TopdownGuiContainer;
@@ -39,6 +42,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.inventory.MenuConstructor;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.ServerChatEvent;
@@ -336,6 +340,7 @@ public class PlayerServerEvents {
             PlayerClientboundPacket.enableRTSStatus(playerName);
 
             ServerLevel level = serverPlayer.getLevel();
+            ArrayList<Entity> workers = new ArrayList<>();
             for (int i = -1; i <= 1; i++) {
                 Entity entity = entityType != null ? entityType.create(level) : null;
                 if (entity != null) {
@@ -345,8 +350,23 @@ public class PlayerServerEvents {
                     ((Unit) entity).setOwnerName(playerName);
                     entity.moveTo(bp, 0, 0);
                     level.addFreshEntity(entity);
+                    workers.add(entity);
                 }
             }
+            if (readiedStart) {
+                String buildingName = switch (faction) {
+                    case VILLAGERS -> TownCentre.buildingName;
+                    case MONSTERS -> Mausoleum.buildingName;
+                    case PIGLINS -> CentralPortal.buildingName;
+                    case NONE -> null;
+                };
+                if (buildingName != null) {
+                    BlockPos bp = new BlockPos(pos.x, pos.y, pos.z);
+                    int[] workerIds = workers.stream().map(Entity::getId).mapToInt(Integer::intValue).toArray();
+                    BuildingServerEvents.placeBuilding(buildingName, bp, Rotation.NONE, playerName, workerIds, false, false);
+                }
+            }
+
             if (faction != Faction.NONE) {
                 if (SurvivalServerEvents.isEnabled()) {
                     level.setDayTime(TimeUtils.DAWN + getWaveSurvivalTimeModifier(SurvivalServerEvents.getDifficulty()));

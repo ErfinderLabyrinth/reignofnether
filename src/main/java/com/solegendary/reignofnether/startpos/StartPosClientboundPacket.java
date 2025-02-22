@@ -40,6 +40,11 @@ public class StartPosClientboundPacket {
                 new StartPosClientboundPacket(StartPosAction.UNRESERVE, pos, Faction.NONE, "", 0));
     }
 
+    public static void reset() {
+        PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(),
+                new StartPosClientboundPacket(StartPosAction.RESET, new BlockPos(0,0,0), Faction.NONE, "", 0));
+    }
+
     public StartPosClientboundPacket(StartPosAction action, BlockPos blockPos, Faction faction, String playerName, int colorId) {
         this.action = action;
         this.blockPos = blockPos;
@@ -97,6 +102,7 @@ public class StartPosClientboundPacket {
                                     }
                                 }
                             }
+                            case RESET -> StartPosClientEvents.reset();
                         }
                         success.set(true);
                     });

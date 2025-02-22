@@ -4,5 +4,6 @@ public enum StartPosAction {
     ADD,
     REMOVE,
     RESERVE,
-    UNRESERVE
+    UNRESERVE,
+    RESET
 }
