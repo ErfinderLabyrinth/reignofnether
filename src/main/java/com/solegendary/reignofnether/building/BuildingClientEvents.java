@@ -259,13 +259,19 @@ public class BuildingClientEvents {
             matrix.translate( // bp is center of block whereas render is corner, so offset by 0.5
                 bp.getX() - cam.getX(), bp.getY() - cam.getY() - 0.6, bp.getZ() - cam.getZ());
 
+            int overlayColour = valid ? OverlayTexture.pack(0, 0) : OverlayTexture.pack(0, 3);
+            if (forceColour == 1) {
+                overlayColour = OverlayTexture.pack(0, 0);
+            } else if (forceColour == 2) {
+                overlayColour = OverlayTexture.pack(0, 3);
+            }
             renderer.renderSingleBlock(bs,
                 matrix,
                 MC.renderBuffers().crumblingBufferSource(),
                 // don't render over other stuff
                 15728880,
                 // red if invalid, else green
-                valid || forceColour == 1 ? OverlayTexture.pack(0, 0) : OverlayTexture.pack(0, 3),
+                overlayColour,
                 net.minecraftforge.client.model.data.ModelData.EMPTY,
                 null
             );

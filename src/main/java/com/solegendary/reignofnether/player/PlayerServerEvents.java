@@ -19,6 +19,7 @@ import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.Resources;
 import com.solegendary.reignofnether.resources.ResourcesServerEvents;
 import com.solegendary.reignofnether.sandbox.SandboxServer;
+import com.solegendary.reignofnether.startpos.StartPosClientboundPacket;
 import com.solegendary.reignofnether.survival.SurvivalServerEvents;
 import com.solegendary.reignofnether.time.TimeUtils;
 import com.solegendary.reignofnether.tutorial.TutorialServerEvents;
@@ -30,6 +31,7 @@ import com.solegendary.reignofnether.unit.packets.UnitSyncClientboundPacket;
 import com.solegendary.reignofnether.util.Faction;
 import com.solegendary.reignofnether.util.MiscUtil;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.server.level.ServerLevel;
@@ -354,14 +356,27 @@ public class PlayerServerEvents {
                 }
             }
             if (readiedStart) {
-                String buildingName = switch (faction) {
-                    case VILLAGERS -> TownCentre.buildingName;
-                    case MONSTERS -> Mausoleum.buildingName;
-                    case PIGLINS -> CentralPortal.buildingName;
-                    case NONE -> null;
+                String buildingName = null;
+                ArrayList<BuildingBlock> blocks = null;
+
+                switch (faction) {
+                    case VILLAGERS -> {
+                        buildingName = TownCentre.buildingName;
+                        blocks = TownCentre.getRelativeBlockData(level);
+                    }
+                    case MONSTERS -> {
+                        buildingName = Mausoleum.buildingName;
+                        blocks = Mausoleum.getRelativeBlockData(level);
+                    }
+                    case PIGLINS -> {
+                        buildingName = CentralPortal.buildingName;
+                        blocks = CentralPortal.getRelativeBlockData(level);
+                    }
                 };
                 if (buildingName != null) {
-                    BlockPos bp = new BlockPos(pos.x, pos.y, pos.z);
+                    BlockPos bp = getBuildingOriginPos(new BlockPos(pos.x, pos.y, pos.z), blocks);
+                    for (int i = 0; i < workers.size(); i++)
+                        workers.get(i).moveTo(bp.offset(i,0,0), 0, 0);
                     int[] workerIds = workers.stream().map(Entity::getId).mapToInt(Integer::intValue).toArray();
                     BuildingServerEvents.placeBuilding(buildingName, bp, Rotation.NONE, playerName, workerIds, false, false);
                 }
@@ -389,7 +404,15 @@ public class PlayerServerEvents {
             }
             PlayerClientboundPacket.syncRtsGameTime(rtsGameTicks);
             saveRTSPlayers();
+            StartPosClientboundPacket.reset();
         }
+    }
+
+    public static BlockPos getBuildingOriginPos(BlockPos bp, ArrayList<BuildingBlock> blocks) {
+        Vec3i buildingDimensions = BuildingUtils.getBuildingSize(blocks);
+        int xRadius = buildingDimensions.getX() / 2;
+        int zRadius = buildingDimensions.getZ() / 2;
+        return bp.offset(-xRadius, 0 , -zRadius);
     }
 
     public static void startRTSBot(String name, Vec3 pos, Faction faction) {

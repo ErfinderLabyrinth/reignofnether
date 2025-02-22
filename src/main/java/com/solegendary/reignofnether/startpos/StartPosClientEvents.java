@@ -5,9 +5,12 @@ import com.solegendary.reignofnether.building.BuildingClientEvents;
 import com.solegendary.reignofnether.building.buildings.monsters.Mausoleum;
 import com.solegendary.reignofnether.building.buildings.piglins.CentralPortal;
 import com.solegendary.reignofnether.building.buildings.villagers.TownCentre;
+import com.solegendary.reignofnether.gamemode.ClientGameModeHelper;
+import com.solegendary.reignofnether.gamemode.GameMode;
 import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
+import com.solegendary.reignofnether.player.PlayerClientEvents;
 import com.solegendary.reignofnether.player.PlayerServerboundPacket;
 import com.solegendary.reignofnether.util.Faction;
 import net.minecraft.client.Minecraft;
@@ -30,6 +33,10 @@ public class StartPosClientEvents {
     public static ArrayList<StartPos> startPoses = new ArrayList<>();
     public static int startPosIndex = -1;
     public static Faction selectedFaction = Faction.NONE;
+
+    public static boolean isEnabled() {
+        return ClientGameModeHelper.gameMode == GameMode.CLASSIC && !startPoses.isEmpty();
+    }
 
     public static boolean isSelectedPosReservedByOther() {
         return getPos() != null &&
@@ -54,7 +61,7 @@ public class StartPosClientEvents {
                 new ResourceLocation(ReignOfNether.MOD_ID, "textures/hud/icon_frame.png"),
                 Keybindings.stop,
                 () -> false,
-                () -> startPoses.isEmpty(),
+                () -> !isEnabled(),
                 () -> true,
                 () -> cycleStartBlock(true),
                 () -> cycleStartBlock(false),
@@ -87,8 +94,8 @@ public class StartPosClientEvents {
                 new ResourceLocation(ReignOfNether.MOD_ID, "textures/hud/icon_frame.png"),
                 null,
                 () -> false,
-                () -> startPoses.isEmpty(),
-                () -> startPoses.stream().filter(sp -> sp.faction != Faction.NONE).toList().size() > 1,
+                () -> !isEnabled(),
+                () -> !PlayerClientEvents.rtsLocked && startPoses.stream().filter(sp -> sp.faction != Faction.NONE).toList().size() > 1,
                 PlayerServerboundPacket::startRTSEveryone,
                 null,
                 List.of(
@@ -166,9 +173,10 @@ public class StartPosClientEvents {
     private static final Minecraft MC = Minecraft.getInstance();
 
     public static void reset() {
-        startPoses.clear();
         startPosIndex = -1;
         selectedFaction = Faction.NONE;
+        for (StartPos startPos : startPoses)
+            startPos.reset();
     }
 
     @SubscribeEvent
@@ -176,6 +184,7 @@ public class StartPosClientEvents {
         // LOG OUT FROM SERVER WORLD ONLY
         if (MC.player != null && evt.getPlayer() != null && evt.getPlayer().getId() == MC.player.getId()) {
             reset();
+            startPoses.clear();
         }
     }
 
@@ -184,6 +193,7 @@ public class StartPosClientEvents {
         // LOG OUT FROM SINGLEPLAYER WORLD ONLY
         if (MC.player != null && evt.getEntity().getId() == MC.player.getId()) {
             reset();
+            startPoses.clear();
         }
     }
 }

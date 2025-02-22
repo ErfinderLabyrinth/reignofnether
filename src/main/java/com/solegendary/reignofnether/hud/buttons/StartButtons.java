@@ -100,7 +100,7 @@ public class StartButtons {
             new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/villager.png"),
             (Keybinding) null,
             () -> StartPosClientEvents.selectedFaction == Faction.VILLAGERS,
-            () -> TutorialClientEvents.isEnabled() || !PlayerClientEvents.canStartRTS,
+            () -> TutorialClientEvents.isEnabled() || !PlayerClientEvents.canStartRTS || !StartPosClientEvents.isEnabled(),
             () -> !StartPosClientEvents.isSelectedPosReservedByOther(),
             () -> {
                 StartPos startPos = StartPosClientEvents.getPos();
@@ -127,7 +127,7 @@ public class StartButtons {
             new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/creeper.png"),
             (Keybinding) null,
             () -> StartPosClientEvents.selectedFaction == Faction.MONSTERS,
-            () -> TutorialClientEvents.isEnabled() || !PlayerClientEvents.canStartRTS,
+            () -> TutorialClientEvents.isEnabled() || !PlayerClientEvents.canStartRTS || !StartPosClientEvents.isEnabled(),
             () -> !StartPosClientEvents.isSelectedPosReservedByOther(),
             () -> {
                 StartPos startPos = StartPosClientEvents.getPos();
@@ -154,7 +154,7 @@ public class StartButtons {
             new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/grunt.png"),
             (Keybinding) null,
             () -> StartPosClientEvents.selectedFaction == Faction.PIGLINS,
-            () -> TutorialClientEvents.isEnabled() || !PlayerClientEvents.canStartRTS,
+            () -> TutorialClientEvents.isEnabled() || !PlayerClientEvents.canStartRTS || !StartPosClientEvents.isEnabled(),
             () -> !StartPosClientEvents.isSelectedPosReservedByOther(),
             () -> {
                 StartPos startPos = StartPosClientEvents.getPos();

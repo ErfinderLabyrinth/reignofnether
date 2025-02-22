@@ -50,6 +50,8 @@ Quality of Life
     - behave like /rts-lock when at max capacity
         - different warning message though
 
+    [❌] syncing not working when joining a game that's started
+
 
 Balancing
 ---------

@@ -43,7 +43,7 @@ public class StartPosServerEvents {
                 evt.setCanceled(true);
                 for (Player player : PlayerServerEvents.players)
                     if (player.distanceToSqr(Vec3.atCenterOf(evt.getPos())) < 100)
-                        player.sendSystemMessage(Component.translatable("Max starting positions reached (16)"));
+                        player.sendSystemMessage(Component.translatable("startpos.reignofnether.max_positions"));
             }
             if (evt.getLevel() instanceof ServerLevel serverLevel)
                 saveResearch(serverLevel);
@@ -70,8 +70,10 @@ public class StartPosServerEvents {
     }
 
     public static void startGameCountdown() {
-        ticksToStart = TICKS_TO_START_MAX;
-        startingGame = true;
+        if (!startingGame) {
+            ticksToStart = TICKS_TO_START_MAX;
+            startingGame = true;
+        }
     }
 
     @SubscribeEvent
@@ -86,7 +88,7 @@ public class StartPosServerEvents {
                     PlayerServerEvents.sendMessageToAllPlayersNoNewlines("startpos.reignofnether.starting_game", false, secondsLeft);
                     SoundClientboundPacket.playSoundForAllPlayers(SoundAction.CHAT);
                 } else {
-                    PlayerServerEvents.sendMessageToAllPlayersNoNewlines("startpos.reignofnether.started_game", true);
+                    PlayerServerEvents.sendMessageToAllPlayers("startpos.reignofnether.started_game", true);
                     SoundClientboundPacket.playSoundForAllPlayers(SoundAction.ALLY);
                     for (ServerPlayer serverPlayer : PlayerServerEvents.players) {
                         for (StartPos startPos : startPoses) {
@@ -96,7 +98,6 @@ public class StartPosServerEvents {
                             }
                         }
                     }
-                    StartPosClientboundPacket.reset();
                     PlayerServerEvents.setRTSLock(true, true);
                     startingGame = false;
                 }

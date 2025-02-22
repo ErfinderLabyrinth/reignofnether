@@ -1313,7 +1313,7 @@ public class HudClientEvents {
 
             if (ClientGameModeHelper.gameMode != GameMode.SANDBOX) {
 
-                if (StartPosClientEvents.startPoses.isEmpty() && ClientGameModeHelper.gameMode == GameMode.CLASSIC) {
+                if (!StartPosClientEvents.isEnabled()) {
                     if (!StartButtons.villagerStartButton.isHidden.get()) {
                         StartButtons.villagerStartButton.render(evt.getPoseStack(),
                                 screenWidth - (StartButtons.ICON_SIZE * 6),

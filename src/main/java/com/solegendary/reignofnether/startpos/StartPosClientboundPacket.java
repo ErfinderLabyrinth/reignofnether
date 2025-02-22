@@ -96,8 +96,7 @@ public class StartPosClientboundPacket {
                             case UNRESERVE -> {
                                 for (StartPos startPos : StartPosClientEvents.startPoses) {
                                     if (startPos.pos.equals(blockPos)) {
-                                        startPos.faction = Faction.NONE;
-                                        startPos.playerName = "";
+                                        startPos.reset();
                                         break;
                                     }
                                 }

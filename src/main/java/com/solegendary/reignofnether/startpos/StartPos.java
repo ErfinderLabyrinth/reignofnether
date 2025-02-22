@@ -23,6 +23,11 @@ public class StartPos {
         this.colorId = colorId;
     }
 
+    public void reset() {
+        this.faction = Faction.NONE;
+        this.playerName = "";
+    }
+
     public ResourceLocation getIcon() {
         if (colorId == MaterialColor.COLOR_MAGENTA.id) return getIcon("magenta");
         else if (colorId == MaterialColor.COLOR_LIGHT_BLUE.id) return getIcon("light_blue");

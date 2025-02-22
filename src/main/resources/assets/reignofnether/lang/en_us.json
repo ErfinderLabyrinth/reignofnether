@@ -1063,6 +1063,7 @@
     "startpos.reignofnether.positions_button.tooltip5": "Reserved by you",
     "startpos.reignofnether.start_button.tooltip1": "Start the game",
     "startpos.reignofnether.start_button.tooltip2": "(%d players)",
-    "startpos.reignofnether.starting_game": "Game starting in % seconds",
-    "startpos.reignofnether.started_game": "Game started!"
+    "startpos.reignofnether.starting_game": "Game starting in %d seconds",
+    "startpos.reignofnether.started_game": "Game started!",
+    "startpos.reignofnether.max_positions": "Max starting positions reached (16)"
 }
