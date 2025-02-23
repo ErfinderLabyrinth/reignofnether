@@ -34,7 +34,7 @@ public class WaveSpawner {
     private static final Random random = new Random();
 
     public static int getModifiedPopCost(Unit unit) {
-        return Math.max(1, unit.getPopCost() - 1);
+        return Math.max(1, unit.getCost().population - 1);
     }
 
     public static void clearBuildingArea(Building building) {

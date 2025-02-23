@@ -11,9 +11,7 @@ import com.solegendary.reignofnether.player.PlayerServerEvents;
 import com.solegendary.reignofnether.registrars.EntityRegistrar;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
 import com.solegendary.reignofnether.research.researchItems.ResearchHeavyTridents;
-import com.solegendary.reignofnether.resources.ResourceCosts;
-import com.solegendary.reignofnether.resources.ResourceSource;
-import com.solegendary.reignofnether.resources.ResourceSources;
+import com.solegendary.reignofnether.resources.*;
 import com.solegendary.reignofnether.sandbox.SandboxServer;
 import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.ConvertableUnit;
@@ -71,6 +69,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 
 import static com.solegendary.reignofnether.player.PlayerServerEvents.isRTSPlayer;
+import static com.solegendary.reignofnether.resources.ResourcesServerEvents.NEUTRAL_UNIT_BOUNTY_PERCENT;
 
 public class UnitServerEvents {
 
@@ -213,7 +212,7 @@ public class UnitServerEvents {
         for (LivingEntity entity : allUnits)
             if (entity instanceof Unit unit) {
                 if (unit.getOwnerName().equals(ownerName)) {
-                    currentPopulation += unit.getPopCost();
+                    currentPopulation += unit.getCost().population;
                 }
             }
         for (Building building : BuildingServerEvents.getBuildings())
@@ -496,7 +495,7 @@ public class UnitServerEvents {
                     false
                 );
                 if (entity instanceof SlimeUnit sUnit && evt.getEntity() instanceof Unit originalEntity) {
-                    sUnit.setSize(Mth.clamp(originalEntity.getPopCost() - 1, 1, 5), true);
+                    sUnit.setSize(Mth.clamp(originalEntity.getCost().population - 1, 1, 5), true);
                 }
                 if (entity instanceof Unit convertedUnit) {
                     convertedUnit.setOwnerName(unit.getOwnerName());
@@ -510,6 +509,21 @@ public class UnitServerEvents {
             vUnit.incrementHunterExp();
             if (!(evt.getEntity() instanceof Chicken))
                 vUnit.incrementHunterExp();
+        }
+
+        if (evt.getEntity() instanceof Unit unitKilled && unitKilled.getOwnerName().isEmpty()) {
+            if (evt.getSource().getEntity() instanceof Unit unit) {
+                ResourceCost cost = unitKilled.getCost();
+                Resources resources = new Resources(unit.getOwnerName(),
+                        (int) (cost.food * NEUTRAL_UNIT_BOUNTY_PERCENT),
+                        (int) (cost.wood * NEUTRAL_UNIT_BOUNTY_PERCENT),
+                        (int) (cost.ore * NEUTRAL_UNIT_BOUNTY_PERCENT)
+                );
+                if (resources.getTotalValue() > 0) {
+                    ResourcesClientboundPacket.showFloatingText(resources, evt.getEntity().getOnPos());
+                    ResourcesServerEvents.addSubtractResources(resources);
+                }
+            }
         }
     }
 

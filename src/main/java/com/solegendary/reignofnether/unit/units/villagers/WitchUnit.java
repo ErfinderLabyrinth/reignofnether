@@ -96,7 +96,7 @@ public class WitchUnit extends Witch implements Unit {
     public float getUnitMaxHealth() {return maxHealth;}
     public float getUnitArmorValue() {return armorValue;}
     @Nullable
-    public int getPopCost() {return ResourceCosts.WITCH.population;}
+    public ResourceCost getCost() {return ResourceCosts.WITCH;}
 
     public void setFollowTarget(@Nullable LivingEntity target) { this.followTarget = target; }
 

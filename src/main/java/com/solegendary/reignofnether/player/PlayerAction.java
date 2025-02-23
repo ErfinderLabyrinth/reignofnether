@@ -3,6 +3,7 @@ package com.solegendary.reignofnether.player;
 // actions that can be done to Player entities serverside
 public enum PlayerAction {
     START_RTS_EVERYONE,
+    CANCEL_START_RTS_EVERYONE,
     TELEPORT,
     ENABLE_ORTHOVIEW,
     DISABLE_ORTHOVIEW,

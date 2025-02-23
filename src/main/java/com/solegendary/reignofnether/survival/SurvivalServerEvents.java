@@ -302,7 +302,7 @@ public class SurvivalServerEvents {
     public static int getTotalEnemyPopulation() {
         int pop = 0;
         for (WaveEnemy waveEnemy : getCurrentEnemies())
-            pop += waveEnemy.unit.getPopCost();
+            pop += waveEnemy.unit.getCost().population;
         return pop;
     }
 

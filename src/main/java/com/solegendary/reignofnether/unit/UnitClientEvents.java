@@ -149,7 +149,7 @@ public class UnitClientEvents {
             for (LivingEntity entity : allUnits) {
                 if (entity instanceof Unit unit)
                     if (unit.getOwnerName().equals(playerName))
-                        currentPopulation += unit.getPopCost();
+                        currentPopulation += unit.getCost().population;
             }
             for (Building building : BuildingClientEvents.getBuildings())
                 if (building.ownerName.equals(playerName))

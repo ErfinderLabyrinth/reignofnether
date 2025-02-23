@@ -20,6 +20,7 @@ import com.solegendary.reignofnether.resources.Resources;
 import com.solegendary.reignofnether.resources.ResourcesServerEvents;
 import com.solegendary.reignofnether.sandbox.SandboxServer;
 import com.solegendary.reignofnether.startpos.StartPosClientboundPacket;
+import com.solegendary.reignofnether.startpos.StartPosServerEvents;
 import com.solegendary.reignofnether.survival.SurvivalServerEvents;
 import com.solegendary.reignofnether.time.TimeUtils;
 import com.solegendary.reignofnether.tutorial.TutorialServerEvents;
@@ -777,6 +778,8 @@ public class PlayerServerEvents {
     }
 
     public static void resetRTS(boolean hardReset) {
+        StartPosServerEvents.cancelStartGameCountdown();
+
         synchronized (rtsPlayers) {
             rtsPlayers.clear();
 

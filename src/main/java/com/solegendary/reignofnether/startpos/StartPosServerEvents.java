@@ -76,6 +76,13 @@ public class StartPosServerEvents {
         }
     }
 
+    public static void cancelStartGameCountdown() {
+        if (startingGame) {
+            ticksToStart = TICKS_TO_START_MAX;
+            startingGame = false;
+        }
+    }
+
     @SubscribeEvent
     public static void onServerTick(TickEvent.ServerTickEvent evt) {
         if (evt.phase != TickEvent.Phase.END)

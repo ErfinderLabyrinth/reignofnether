@@ -7,6 +7,7 @@ import com.solegendary.reignofnether.building.GarrisonableBuilding;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientboundPacket;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybindings;
+import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.unit.Checkpoint;
 import com.solegendary.reignofnether.unit.UnitClientEvents;
@@ -97,7 +98,7 @@ public class BlazeUnit extends Blaze implements Unit, AttackerUnit, RangedAttack
     public float getUnitMaxHealth() {return maxHealth;}
     public float getUnitArmorValue() {return armorValue;}
     @Nullable
-    public int getPopCost() {return ResourceCosts.BLAZE.population;}
+    public ResourceCost getCost() {return ResourceCosts.BLAZE;}
     public boolean getWillRetaliate() {return willRetaliate;}
     public int getAttackCooldown() { return (int) (20 / (attacksPerSecond)); }
     public float getAttacksPerSecond() {return attacksPerSecond;}

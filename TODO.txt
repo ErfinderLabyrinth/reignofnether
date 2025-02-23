@@ -16,7 +16,7 @@ Features
     [✔] Show original marker
     [✔] Reset to original button
     [❌] Retreat to position if too far away
-    [❌] Credit resources on kill (instead of dropping resources)
+    [✔] Credit resources on kill (instead of dropping resources)
 
 [✔] Add End portal to build endermen
 [❌] Add Healing fountain
@@ -26,15 +26,6 @@ Features
     - Allow vanilla players to use them, on onEntityTravelToDimension
 
 
-
-Bugfixes
---------
-[✔] Fixed not being able to start sandbox mode when a world border is set
-
-
-
-Quality of Life
----------------
 [❌] Starting blocks
     - locations saved to world data when placed or broken
     - limit of 16 total (any additional placed are cancelled)
@@ -51,6 +42,17 @@ Quality of Life
         - different warning message though
 
     [❌] syncing not working when joining a game that's started
+
+
+Bugfixes
+--------
+[✔] Fixed not being able to start sandbox mode when a world border is set
+
+
+
+Quality of Life
+---------------
+
 
 
 Balancing

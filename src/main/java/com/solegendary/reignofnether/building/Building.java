@@ -903,7 +903,7 @@ public abstract class Building {
                 if (!uOwner.isEmpty()) {
                     if (!playerPopCounts.containsKey(uOwner))
                         playerPopCounts.put(uOwner, 0);
-                    playerPopCounts.put(uOwner, Math.max(1, unit.getPopCost()) + playerPopCounts.get(uOwner));
+                    playerPopCounts.put(uOwner, Math.max(1, unit.getCost().population) + playerPopCounts.get(uOwner));
                 }
             }
         }

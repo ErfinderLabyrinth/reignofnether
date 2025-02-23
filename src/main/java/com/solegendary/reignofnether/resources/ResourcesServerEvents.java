@@ -45,6 +45,8 @@ public class ResourcesServerEvents {
     public static final int STARTING_WOOD = 450;
     public static final int STARTING_ORE = 250;
 
+    public static final float NEUTRAL_UNIT_BOUNTY_PERCENT = 0.25f;
+
     // to avoid having to save units too often add on all unit resources here too and just add directly on load
     public static void saveResources(ServerLevel serverLevel) {
         if (serverLevel == null) {

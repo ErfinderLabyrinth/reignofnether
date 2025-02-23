@@ -7,6 +7,8 @@ import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
 import com.solegendary.reignofnether.research.researchItems.ResearchSlimeConversion;
+import com.solegendary.reignofnether.resources.ResourceCost;
+import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.time.NightUtils;
 import com.solegendary.reignofnether.unit.Checkpoint;
 import com.solegendary.reignofnether.unit.UnitClientEvents;
@@ -116,11 +118,16 @@ public class SlimeUnit extends Slime implements Unit, AttackerUnit {
     public float getAttackRange() { return ((getSize() + 1) * 0.5f); }
     public float getMovementSpeed() {return movementSpeed;}
     public float getUnitArmorValue() {return armorValue;}
-    public int getPopCost() {
+    public ResourceCost getCost() {
+        int popCost = getSize();
         if (getSize() == 1)
-            return 0;
-        return getSize();
+            popCost = 0;
+
+        ResourceCost cost = ResourceCosts.SLIME;
+        cost.population = popCost;
+        return cost;
     }
+
     public boolean canAttackBuildings() {return getAttackBuildingGoal() != null;}
 
     public void setAttackMoveTarget(@Nullable BlockPos bp) { this.attackMoveTarget = bp; }

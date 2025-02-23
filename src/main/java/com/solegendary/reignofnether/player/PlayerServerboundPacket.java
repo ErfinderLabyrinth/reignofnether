@@ -154,6 +154,8 @@ public class PlayerServerboundPacket {
     public static void resetRTS() {
         PacketHandler.INSTANCE.sendToServer(new PlayerServerboundPacket(PlayerAction.RESET_RTS, 0, 0d, 0d, 0d));
     }
+
+    // resets and also removes all neutral units and buildings
     public static void resetRTSHard() {
         PacketHandler.INSTANCE.sendToServer(new PlayerServerboundPacket(PlayerAction.RESET_RTS_HARD, 0, 0d, 0d, 0d));
     }
@@ -241,6 +243,7 @@ public class PlayerServerboundPacket {
                 case START_RTS_SANDBOX ->
                     PlayerServerEvents.startRTS(this.playerId, new Vec3(this.x, this.y, this.z), Faction.NONE);
                 case START_RTS_EVERYONE -> StartPosServerEvents.startGameCountdown();
+                case CANCEL_START_RTS_EVERYONE -> StartPosServerEvents.cancelStartGameCountdown();
                 case DEFEAT -> PlayerServerEvents.defeat(this.playerId, Component.translatable("server.reignofnether.surrendered").getString());
                 case RESET_RTS -> PlayerServerEvents.resetRTS(false);
                 case RESET_RTS_HARD -> PlayerServerEvents.resetRTS(true);

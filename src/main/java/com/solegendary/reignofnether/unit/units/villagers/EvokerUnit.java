@@ -120,7 +120,7 @@ public class EvokerUnit extends Evoker implements Unit, AttackerUnit, RangedAtta
     public float getUnitMaxHealth() {return maxHealth;}
     public float getUnitArmorValue() {return armorValue;}
     @Nullable
-    public int getPopCost() {return ResourceCosts.EVOKER.population;}
+    public ResourceCost getCost() {return ResourceCosts.EVOKER;}
 
     public void setAttackMoveTarget(@Nullable BlockPos bp) { this.attackMoveTarget = bp; }
     public void setFollowTarget(@Nullable LivingEntity target) { this.followTarget = target; }

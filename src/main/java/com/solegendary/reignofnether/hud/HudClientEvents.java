@@ -1265,7 +1265,6 @@ public class HudClientEvents {
                 );
                 renderedButtons.add(startPosButton);
             }
-
             Button startButton = StartPosClientEvents.getStartButton();
             if (!startButton.isHidden.get()) {
                 startButton.render(evt.getPoseStack(),
@@ -1275,6 +1274,16 @@ public class HudClientEvents {
                         mouseY
                 );
                 renderedButtons.add(startButton);
+            }
+            Button cancelStartButton = StartPosClientEvents.getCancelStartButton();
+            if (!cancelStartButton.isHidden.get()) {
+                cancelStartButton.render(evt.getPoseStack(),
+                        screenWidth - (StartButtons.ICON_SIZE * 4),
+                        40,
+                        mouseX,
+                        mouseY
+                );
+                renderedButtons.add(cancelStartButton);
             }
 
             Button diffsButton = ConfigClientEvents.getDiffsButton();

@@ -81,7 +81,7 @@ public interface Unit {
     public float getMovementSpeed();
     public float getUnitMaxHealth();
     public float getUnitArmorValue();
-    public int getPopCost();
+    public ResourceCost getCost();
 
     public LivingEntity getFollowTarget();
     public boolean getHoldPosition();

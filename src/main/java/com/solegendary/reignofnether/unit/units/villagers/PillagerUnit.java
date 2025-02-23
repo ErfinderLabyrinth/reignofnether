@@ -6,6 +6,7 @@ import com.solegendary.reignofnether.ability.abilities.PromoteIllager;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientboundPacket;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybindings;
+import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.unit.Checkpoint;
 import com.solegendary.reignofnether.unit.UnitClientEvents;
@@ -124,7 +125,7 @@ public class PillagerUnit extends Pillager implements Unit, AttackerUnit, Ranged
     public float getUnitMaxHealth() { return maxHealth; }
     public float getUnitArmorValue() { return armorValue; }
     @Nullable
-    public int getPopCost() { return ResourceCosts.PILLAGER.population;}
+    public ResourceCost getCost() {return ResourceCosts.PILLAGER;}
 
     public boolean canAttackBuildings() { return getAttackBuildingGoal() != null && isPassenger(); }
     public void setAttackMoveTarget(@Nullable BlockPos bp) { this.attackMoveTarget = bp; }
