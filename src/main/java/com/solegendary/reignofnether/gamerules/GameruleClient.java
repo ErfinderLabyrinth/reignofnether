@@ -34,6 +34,7 @@ public class GameruleClient {
     public static boolean allowBeacons = true;
     public static boolean pvpModesOnly = false;
     public static double beaconWinMinutes = 20;
+    public static boolean slantedBuilding = true;
 
     public static boolean gamerulesMenuOpen = false;
 
@@ -43,7 +44,7 @@ public class GameruleClient {
                 14,
                 new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/blocks/repeating_command_block_back.png"),
                 (Keybinding) null,
-                () -> false,
+                () -> gamerulesMenuOpen,
                 () -> false,
                 () -> !StartPosClientEvents.isStarting,
                 () -> gamerulesMenuOpen = !gamerulesMenuOpen,
@@ -150,6 +151,10 @@ public class GameruleClient {
         buttons.add(new GameruleBooleanButton("pvpModesOnly", pvpModesOnly,
             () -> GameruleServerboundPacket.setPvpModesOnly(!pvpModesOnly),
             I18n.get("commands.reignofnether.gamerule.pvp_modes_only")
+        ));
+        buttons.add(new GameruleBooleanButton("slantedBuilding", slantedBuilding,
+            () -> GameruleServerboundPacket.setSlantedBuilding(!slantedBuilding),
+            I18n.get("commands.reignofnether.gamerule.slanted_buildings")
         ));
         buttons.add(new GameruleIntegerButton("maxPopulation: " + Math.round(maxPopulation),
             () -> {

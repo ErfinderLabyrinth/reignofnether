@@ -266,7 +266,7 @@ public class PlayerClientEvents {
         ClientGameModeHelper.gameModeLocked = false;
         PlayerClientEvents.beaconOwnerTicks.clear();
         SurvivalClientEvents.reset();
-        StartPosClientEvents.reset();
+        StartPosClientEvents.resetAll();
     }
 
     public static void setRTSLock(boolean lock) {

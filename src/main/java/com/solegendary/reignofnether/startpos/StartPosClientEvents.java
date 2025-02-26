@@ -100,7 +100,7 @@ public class StartPosClientEvents {
                 null,
                 () -> false,
                 () -> !isEnabled() || isStarting,
-                () -> !PlayerClientEvents.rtsLocked && startPoses.stream().filter(sp -> sp.faction != Faction.NONE).toList().size() > 1,
+                () -> !PlayerClientEvents.rtsLocked && startPoses.stream().filter(sp -> sp.faction != Faction.NONE).toList().size() > 0,
                 PlayerServerboundPacket::startRTSEveryone,
                 null,
                 getStartButtonTooltip()
@@ -128,7 +128,7 @@ public class StartPosClientEvents {
                 null,
                 () -> false,
                 () -> !isEnabled() || !isStarting,
-                () -> startPoses.stream().filter(sp -> sp.faction != Faction.NONE).toList().size() > 1,
+                () -> startPoses.stream().filter(sp -> sp.faction != Faction.NONE).toList().size() > 0,
                 PlayerServerboundPacket::cancelStartRTSEveryone,
                 null,
                 List.of(
@@ -179,6 +179,15 @@ public class StartPosClientEvents {
     }
 
     @SubscribeEvent
+    public static void onChangeGamemode(PlayerEvent.PlayerChangeGameModeEvent evt) {
+        StartPos startPos = getPos();
+        if (evt.getEntity() == MC.player && startPos != null && MC.player != null) {
+            selectedFaction = Faction.NONE;
+            StartPosServerboundPacket.unreservePos(startPos.pos);
+        }
+    }
+
+    @SubscribeEvent
     public static void onRenderLevel(RenderLevelStageEvent evt) {
         if (evt.getStage() != RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS)
             return;
@@ -203,7 +212,7 @@ public class StartPosClientEvents {
 
     private static final Minecraft MC = Minecraft.getInstance();
 
-    public static void reset() {
+    public static void resetAll() {
         startPosIndex = -1;
         selectedFaction = Faction.NONE;
         isStarting = false;
@@ -215,7 +224,7 @@ public class StartPosClientEvents {
     public static void onClientLogout(ClientPlayerNetworkEvent.LoggingOut evt) {
         // LOG OUT FROM SERVER WORLD ONLY
         if (MC.player != null && evt.getPlayer() != null && evt.getPlayer().getId() == MC.player.getId()) {
-            reset();
+            resetAll();
             startPoses.clear();
         }
     }
@@ -224,7 +233,7 @@ public class StartPosClientEvents {
     public static void onPlayerLogoutEvent(PlayerEvent.PlayerLoggedOutEvent evt) {
         // LOG OUT FROM SINGLEPLAYER WORLD ONLY
         if (MC.player != null && evt.getEntity().getId() == MC.player.getId()) {
-            reset();
+            resetAll();
             startPoses.clear();
         }
     }

@@ -1,6 +1,9 @@
 package com.solegendary.reignofnether.gamemode;
 
 import com.solegendary.reignofnether.registrars.PacketHandler;
+import com.solegendary.reignofnether.startpos.StartPosClientEvents;
+import com.solegendary.reignofnether.startpos.StartPosServerboundPacket;
+import com.solegendary.reignofnether.util.Faction;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
@@ -43,6 +46,10 @@ public class GameModeClientboundPacket {
                         if (gameMode != GameMode.NONE) {
                             ClientGameModeHelper.gameModeLocked = true;
                             ClientGameModeHelper.gameMode = this.gameMode;
+                            if (gameMode != GameMode.CLASSIC && StartPosClientEvents.hasReservedPos()) {
+                                StartPosClientEvents.selectedFaction = Faction.NONE;
+                                StartPosServerboundPacket.unreservePos(StartPosClientEvents.getPos().pos);
+                            }
                         } else {
                             ClientGameModeHelper.gameModeLocked = false;
                         }

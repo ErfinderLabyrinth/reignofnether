@@ -105,6 +105,8 @@ public class GameruleServerEvents {
             GameruleClientboundPacket.setPvpModesOnly(pvpModesOnly);
             int beaconWinMinutes = server.getGameRules().getRule(GameRuleRegistrar.BEACON_WIN_MINUTES).get();
             GameruleClientboundPacket.setBeaconWinMinutes(beaconWinMinutes);
+            boolean slantedBuilding = server.getGameRules().getRule(GameRuleRegistrar.SLANTED_BUILDING).get();
+            GameruleClientboundPacket.setSlantedBuilding(slantedBuilding);
         }
     }
 }

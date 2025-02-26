@@ -14,9 +14,12 @@ import com.solegendary.reignofnether.hud.HudClientEvents;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.minimap.MinimapClientEvents;
 import com.solegendary.reignofnether.player.PlayerServerboundPacket;
+import com.solegendary.reignofnether.startpos.StartPosClientEvents;
+import com.solegendary.reignofnether.startpos.StartPosServerboundPacket;
 import com.solegendary.reignofnether.tutorial.TutorialClientEvents;
 import com.solegendary.reignofnether.tutorial.TutorialStage;
 import com.solegendary.reignofnether.unit.UnitClientEvents;
+import com.solegendary.reignofnether.util.Faction;
 import com.solegendary.reignofnether.util.MiscUtil;
 import com.solegendary.reignofnether.util.MyMath;
 import net.minecraft.client.CameraType;
@@ -322,9 +325,12 @@ public class OrthoviewClientEvents {
             MC.options.setCameraType(CameraType.FIRST_PERSON);
             switchToEasyIfPeaceful();
         } else {
-
             PlayerServerboundPacket.disableOrthoview();
             TopdownGuiServerboundPacket.closeTopdownGui(MC.player.getId());
+            if (StartPosClientEvents.hasReservedPos()) {
+                StartPosClientEvents.selectedFaction = Faction.NONE;
+                StartPosServerboundPacket.unreservePos(StartPosClientEvents.getPos().pos);
+            }
         }
         TutorialClientEvents.updateStage();
     }

@@ -1,5 +1,5 @@
 
-1.19.2-1.1.2
+1.19.2-1.1.2b
 
 [✔] Done and tested
 [🟡] Partially done and/or needs testing
@@ -7,52 +7,22 @@
 
 Features
 --------
-[✔] Neutral animals: panda, grizzly, wolf, polar bear
-
-[❌] Neutral animal den
-
-[🟡] Leash range for neutral units
-    [✔] Save position to map data
-    [✔] Show original marker
-    [✔] Reset to original button
-    [✔] Retreat to position if too far away
-    [✔] Credit resources on kill (instead of dropping resources)
-
-[✔] Add End portal to build endermen
-[❌] Add Healing fountain
-[❌] Ancient transport portals
-    - Always neutral, usable by anyone
-    - Should look slightly different to piglin ones
-    - Allow vanilla players to use them, on onEntityTravelToDimension
-
-[❌] Starting blocks
-    - locations saved to world data when placed or broken
-    - limit of 16 total (any additional placed are cancelled)
-    - if any are detected, forces RTS players to select them to start
-        - Have a button that cycles through them
-        - when announcing a player joining, announce x/y RTS players in the game
-        - change regular start buttons
-            - when clicked, shows a placement of the capitol at the location and reserves the spot
-            - spawn workers when game starts
-    - add button to start the game after a 5 second countdown
-        - add tooltip to show how many players have reserved a starting spot
-    - behave like /rts-lock when at max capacity
-        - different warning message though
-
-    [❌] syncing not working when joining a game that's started
-
+[❌] Healing fountains
+[❌] Neutral Transport portals
 
 
 Bugfixes
 --------
-[✔] Fixed being unable to start sandbox mode when a world border is set
-[✔] Fixed being unable to upgrade multiple libraries, labs or castles at the same time
-
+[🟡] Production % numbers no longer tick up when the game is paused in singleplayer
+    - does this apply to any other ClientTickEvent stuff?
+[❌] are alliances synced for newly logging in players?
+[❌] reset player research after being defeated
 
 Quality of Life
 ---------------
 
-
+[❌] save alliances to world data
+[❌] save transport portal links to world data
 
 Balancing
 ---------

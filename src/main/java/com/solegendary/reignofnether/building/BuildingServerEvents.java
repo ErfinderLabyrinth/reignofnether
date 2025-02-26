@@ -1,6 +1,7 @@
 package com.solegendary.reignofnether.building;
 
 import com.solegendary.reignofnether.ReignOfNether;
+import com.solegendary.reignofnether.alliance.AlliancesServer;
 import com.solegendary.reignofnether.building.buildings.monsters.Dungeon;
 import com.solegendary.reignofnether.building.buildings.monsters.Laboratory;
 import com.solegendary.reignofnether.building.buildings.neutral.Beacon;
@@ -11,6 +12,7 @@ import com.solegendary.reignofnether.building.buildings.villagers.Castle;
 import com.solegendary.reignofnether.building.buildings.villagers.IronGolemBuilding;
 import com.solegendary.reignofnether.building.buildings.villagers.Library;
 import com.solegendary.reignofnether.fogofwar.FrozenChunkClientboundPacket;
+import com.solegendary.reignofnether.gamerules.GameruleServerEvents;
 import com.solegendary.reignofnether.nether.NetherBlocks;
 import com.solegendary.reignofnether.player.PlayerServerEvents;
 import com.solegendary.reignofnether.player.RTSPlayer;
@@ -18,6 +20,8 @@ import com.solegendary.reignofnether.registrars.GameRuleRegistrar;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
 import com.solegendary.reignofnether.resources.*;
 import com.solegendary.reignofnether.sandbox.SandboxServer;
+import com.solegendary.reignofnether.sounds.SoundAction;
+import com.solegendary.reignofnether.sounds.SoundClientboundPacket;
 import com.solegendary.reignofnether.survival.SurvivalServerEvents;
 import com.solegendary.reignofnether.unit.Relationship;
 import com.solegendary.reignofnether.unit.UnitAction;
@@ -29,18 +33,21 @@ import com.solegendary.reignofnether.unit.units.piglins.GhastUnit;
 import com.solegendary.reignofnether.unit.units.villagers.PillagerUnit;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.EntityDamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.item.PrimedTnt;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.LargeFireball;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
@@ -234,6 +241,10 @@ public class BuildingServerEvents {
             }
 
             if (newBuilding.canAfford(ownerName)) {
+                if (serverLevel.getGameRules().getRule(GameRuleRegistrar.SLANTED_BUILDING).get() &&
+                    !(newBuilding instanceof AbstractBridge)) {
+                    BuildingUtils.clearBuildingArea(newBuilding);
+                }
                 buildings.add(newBuilding);
                 newBuilding.forceChunk(true);
                 int minY = BuildingUtils.getMinCorner(newBuilding.blocks).getY();
@@ -637,10 +648,23 @@ public class BuildingServerEvents {
 
     @SubscribeEvent
     public static void onEntityTravelToDimension(EntityTravelToDimensionEvent evt) {
-        if (BuildingUtils.isPosInsideAnyBuilding(evt.getEntity().getLevel().isClientSide(),
-            evt.getEntity().getOnPos()
-        )) {
+        Building building = BuildingUtils.findBuilding(evt.getEntity().getLevel().isClientSide(), evt.getEntity().getOnPos());
+        if (building != null) {
             evt.setCanceled(true);
+
+            if (evt.getEntity() instanceof Player player &&
+                !player.isSpectator() && !player.isCreative() &&
+                AlliancesServer.isAllied(player.getName().getString(), building.ownerName) &&
+                building instanceof Portal portal &&
+                portal.portalType == Portal.PortalType.TRANSPORT &&
+                portal.destination != null) {
+
+                player.moveTo(Vec3.atCenterOf(portal.destination));
+                building.level.playSound(null, building.centrePos, SoundEvents.ENDERMAN_TELEPORT,
+                        player.getSoundSource(), 1.0F, 1.0F);
+                building.level.playSound(null, portal.destination, SoundEvents.ENDERMAN_TELEPORT,
+                        player.getSoundSource(), 1.0F, 1.0F);
+            }
         }
     }
 

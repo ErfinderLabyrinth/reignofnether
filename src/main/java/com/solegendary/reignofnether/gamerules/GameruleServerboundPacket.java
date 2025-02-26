@@ -66,6 +66,10 @@ public class GameruleServerboundPacket {
         PacketHandler.INSTANCE.sendToServer(
                 new GameruleServerboundPacket(GameruleAction.SET_BEACON_WIN_MINUTES, "", beaconWinMinutes));
     }
+    public static void setSlantedBuilding(boolean slantedBuilding) {
+        PacketHandler.INSTANCE.sendToServer(
+                new GameruleServerboundPacket(GameruleAction.SET_SLANTED_BUILDING, "", slantedBuilding ? 1L : 0L));
+    }
 
     public GameruleServerboundPacket(GameruleAction action, String playerName, Long value) {
         this.action = action;
@@ -150,6 +154,10 @@ public class GameruleServerboundPacket {
                 case SET_BEACON_WIN_MINUTES -> {
                     gameRules.getRule(GameRuleRegistrar.BEACON_WIN_MINUTES).set(Math.toIntExact(value), server);
                     GameruleClientboundPacket.setBeaconWinMinutes(value);
+                }
+                case SET_SLANTED_BUILDING -> {
+                    gameRules.getRule(GameRuleRegistrar.SLANTED_BUILDING).set(booleanValue, server);
+                    GameruleClientboundPacket.setSlantedBuilding(booleanValue);
                 }
             }
             success.set(true);

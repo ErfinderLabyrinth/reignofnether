@@ -63,6 +63,10 @@ public class GameruleClientboundPacket {
         PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(),
                 new GameruleClientboundPacket(GameruleAction.SET_BEACON_WIN_MINUTES, "", beaconWinMinutes));
     }
+    public static void setSlantedBuilding(boolean slantedBuilding) {
+        PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(),
+                new GameruleClientboundPacket(GameruleAction.SET_SLANTED_BUILDING, "", slantedBuilding ? 1L : 0L));
+    }
 
     public GameruleClientboundPacket(GameruleAction action, String playerName, Long value) {
         this.action = action;
@@ -109,6 +113,7 @@ public class GameruleClientboundPacket {
                                 }
                             }
                             case SET_BEACON_WIN_MINUTES -> GameruleClient.beaconWinMinutes = value;
+                            case SET_SLANTED_BUILDING -> GameruleClient.slantedBuilding = value == 1L;
                         }
                         success.set(true);
                     });

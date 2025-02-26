@@ -16,6 +16,7 @@ public class GameRuleRegistrar {
     public static GameRules.Key<GameRules.BooleanValue> ALLOW_BEACONS;
     public static GameRules.Key<GameRules.IntegerValue> BEACON_WIN_MINUTES;
     public static GameRules.Key<GameRules.BooleanValue> PVP_MODES_ONLY;
+    public static GameRules.Key<GameRules.BooleanValue> SLANTED_BUILDING;
 
     public static void init() {
         // do cut trees convert their logs into falling logs?
@@ -23,8 +24,8 @@ public class GameRuleRegistrar {
                 GameRules.BooleanValue.create(true)
         );
         // treat neutral units as enemies? this includes auto attacks, right clicks and attack moving
-        NEUTRAL_AGGRO = GameRules.register("neutralAggro", GameRules.Category.MISC,
-                GameRules.BooleanValue.create(false)
+        NEUTRAL_AGGRO = GameRules.register("neutralAggro", GameRules.Category.MOBS,
+                GameRules.BooleanValue.create(true)
         );
         // set hard cap on population (max even with infinite houses)
         MAX_POPULATION = GameRules.register("maxPopulation", GameRules.Category.MISC,
@@ -61,6 +62,10 @@ public class GameRuleRegistrar {
         // ticks to win with a beacon
         BEACON_WIN_MINUTES = GameRules.register("beaconWinMinutes", GameRules.Category.PLAYER,
                 GameRules.IntegerValue.create(20)
+        );
+        // buildings ignore ground flatness
+        SLANTED_BUILDING = GameRules.register("slantedBuilding", GameRules.Category.PLAYER,
+                GameRules.BooleanValue.create(false)
         );
     }
 }

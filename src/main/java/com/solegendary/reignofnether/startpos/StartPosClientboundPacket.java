@@ -111,7 +111,7 @@ public class StartPosClientboundPacket {
                                     }
                                 }
                             }
-                            case RESET -> StartPosClientEvents.reset();
+                            case RESET -> StartPosClientEvents.resetAll();
                             case SET_GAME_STARTING -> StartPosClientEvents.isStarting = true;
                             case UNSET_GAME_STARTING -> StartPosClientEvents.isStarting = false;
                         }

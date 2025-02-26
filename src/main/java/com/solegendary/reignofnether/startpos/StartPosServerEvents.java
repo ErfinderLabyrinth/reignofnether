@@ -18,7 +18,6 @@ import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-import java.awt.*;
 import java.util.ArrayList;
 
 // manages start block and readied start (startRTSEveryone) actions
@@ -145,6 +144,17 @@ public class StartPosServerEvents {
             startPoses.clear();
             startPoses.addAll(startPosData.startPoses);
             ReignOfNether.LOGGER.info("loaded " + startPoses.size() + " start positions in serverevents");
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerLeave(PlayerEvent.PlayerLoggedOutEvent evt) {
+        for (StartPos startPos : startPoses) {
+            if (evt.getEntity() instanceof ServerPlayer player &&
+                    startPos.playerName.equals(player.getName().getString())) {
+                StartPosClientboundPacket.unreservePos(startPos.pos);
+                startPos.reset();
+            }
         }
     }
 }

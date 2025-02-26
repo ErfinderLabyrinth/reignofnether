@@ -35,10 +35,6 @@ Quality of Life Features
 
 [❌] Save transport portal links between server restarts
 
-[❌] Flatten terrain ability
-    - Require that villagers work on it like a building
-    - Will need a new flatten zone object (no need to save it)
-
 [❌] restore ores on /rts-reset
     - Have to track each ore block when it is mined or converted into nether terrain
 

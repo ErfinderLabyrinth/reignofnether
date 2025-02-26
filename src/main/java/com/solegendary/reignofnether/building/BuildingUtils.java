@@ -17,6 +17,7 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -331,5 +332,14 @@ public class BuildingUtils {
             if (building instanceof Beacon beacon)
                 return beacon;
         return null;
+    }
+
+    public static void clearBuildingArea(Building building) {
+        if (building != null) {
+            for (int x = building.minCorner.getX() - 1; x < building.maxCorner.getX() + 2; x++)
+                for (int y = building.minCorner.getY(); y < building.maxCorner.getY() + 2; y++)
+                    for (int z = building.minCorner.getZ() - 1; z < building.maxCorner.getZ() + 2; z++)
+                        building.getLevel().setBlockAndUpdate(new BlockPos(x,y,z), Blocks.AIR.defaultBlockState());
+        }
     }
 }

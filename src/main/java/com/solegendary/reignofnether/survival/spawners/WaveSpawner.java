@@ -37,15 +37,6 @@ public class WaveSpawner {
         return Math.max(1, unit.getCost().population - 1);
     }
 
-    public static void clearBuildingArea(Building building) {
-        if (building != null) {
-            for (int x = building.minCorner.getX() - 1; x < building.maxCorner.getX() + 2; x++)
-                for (int y = building.minCorner.getY(); y < building.maxCorner.getY() + 2; y++)
-                    for (int z = building.minCorner.getZ() - 1; z < building.maxCorner.getZ() + 2; z++)
-                        building.getLevel().setBlockAndUpdate(new BlockPos(x,y,z), Blocks.AIR.defaultBlockState());
-        }
-    }
-
     // used to determine how flat an area is
     public static double getYVariance(Level level, BlockPos bp, int radius) {
         ArrayList<BlockPos> bps = new ArrayList<>();
@@ -208,7 +199,7 @@ public class WaveSpawner {
         );
         if (building != null)
             building.selfBuilding = true;
-        clearBuildingArea(building);
+        BuildingUtils.clearBuildingArea(building);
         return building;
     }
 }

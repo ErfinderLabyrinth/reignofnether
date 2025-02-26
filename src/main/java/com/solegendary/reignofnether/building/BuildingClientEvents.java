@@ -19,6 +19,7 @@ import com.solegendary.reignofnether.nether.NetherBlocks;
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
 import com.solegendary.reignofnether.research.ResearchClient;
 import com.solegendary.reignofnether.sandbox.SandboxClientEvents;
+import com.solegendary.reignofnether.startpos.StartPosClientEvents;
 import com.solegendary.reignofnether.tutorial.TutorialClientEvents;
 import com.solegendary.reignofnether.unit.Relationship;
 import com.solegendary.reignofnether.unit.UnitAction;
@@ -321,12 +322,14 @@ public class BuildingClientEvents {
             r = 1;
             g = 0;
         }
-
+        if (minY < 0) {
+            minY -= 1;
+        }
         ResourceLocation rl = new ResourceLocation("forge:textures/white.png");
         AABB aabb = new AABB(minX, minY, minZ, maxX, minY, maxZ);
         MyRenderer.drawLineBox(matrix, aabb, r, g, 0, 0.5f);
         MyRenderer.drawSolidBox(matrix, aabb, Direction.UP, r, g, 0, 0.5f, rl);
-        AABB aabb2 = new AABB(minX, 0, minZ, maxX, minY, maxZ);
+        AABB aabb2 = new AABB(minX, -64, minZ, maxX, minY, maxZ);
         MyRenderer.drawLineBox(matrix, aabb2, r, g, 0, 0.25f);
     }
 
@@ -364,8 +367,7 @@ public class BuildingClientEvents {
         if (MC.level == null) {
             return false;
         }
-
-        if (isBuildingToPlaceABridge()) {
+        if (isBuildingToPlaceABridge() || GameruleClient.slantedBuilding) {
             return false;
         }
 
@@ -383,10 +385,9 @@ public class BuildingClientEvents {
     // 90% all solid blocks at the base of the building must be on top of solid blocks to be placeable
     // excluding those under blocks which aren't solid anyway
     private static boolean isBuildingPlacementInAir(BlockPos originPos) {
-        if (isBuildingToPlaceABridge()) {
+        if (isBuildingToPlaceABridge() || GameruleClient.slantedBuilding) {
             return false;
         }
-
         int solidBlocksBelow = 0;
         int blocksBelow = 0;
         for (BuildingBlock block : blocksToDraw) {
@@ -955,7 +956,8 @@ public class BuildingClientEvents {
         }
         if (MC.level != null && MC.level.dimension() == Level.OVERWORLD) {
             for (Building building : buildings)
-                building.tick(MC.level);
+                if (!MC.isPaused())
+                    building.tick(MC.level);
 
             // cleanup destroyed buildings
             selectedBuildings.removeIf(Building::shouldBeDestroyed);

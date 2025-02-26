@@ -4,8 +4,11 @@ import com.solegendary.reignofnether.building.BuildingUtils;
 import com.solegendary.reignofnether.building.buildings.neutral.Beacon;
 import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.keybinds.Keybinding;
+import com.solegendary.reignofnether.startpos.StartPosClientEvents;
+import com.solegendary.reignofnether.startpos.StartPosServerboundPacket;
 import com.solegendary.reignofnether.survival.SurvivalClientEvents;
 import com.solegendary.reignofnether.survival.WaveDifficulty;
+import com.solegendary.reignofnether.util.Faction;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
@@ -24,6 +27,11 @@ public class ClientGameModeHelper {
     public static void cycleGameMode() {
         if (gameModeLocked || pvpModesOnly)
             return;
+
+        if (StartPosClientEvents.hasReservedPos()) {
+            StartPosClientEvents.selectedFaction = Faction.NONE;
+            StartPosServerboundPacket.unreservePos(StartPosClientEvents.getPos().pos);
+        }
         switch (gameMode) {
             case CLASSIC -> gameMode = GameMode.SURVIVAL;
             case SURVIVAL -> gameMode = GameMode.SANDBOX;

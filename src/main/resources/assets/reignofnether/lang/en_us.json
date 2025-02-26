@@ -382,6 +382,7 @@
     "commands.reignofnether.gamerule.allow_beacons": "Allows workers to build Beacons",
     "commands.reignofnether.gamerule.pvp_modes_only": "Disable Wave Survival and Sandbox",
     "commands.reignofnether.gamerule.beacon_win_minutes": "Time needed to win with beacon control",
+    "commands.reignofnether.gamerule.slanted_buildings": "Allow building on non-flat terrain",
 
     "controls.reignofnether.toggle_cam": "F12 - Toggle RTS camera",
     "controls.reignofnether.refresh_chunks": "F8 - Refresh chunks",
