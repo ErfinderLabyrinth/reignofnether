@@ -956,7 +956,8 @@ public class BuildingClientEvents {
         }
         if (MC.level != null && MC.level.dimension() == Level.OVERWORLD) {
             for (Building building : buildings)
-                building.tick(MC.level);
+                if (!MC.isPaused())
+                    building.tick(MC.level);
 
             // cleanup destroyed buildings
             selectedBuildings.removeIf(Building::shouldBeDestroyed);

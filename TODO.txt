@@ -1,5 +1,5 @@
 
-1.19.2-1.1.2a
+1.19.2-1.1.2b
 
 [✔] Done and tested
 [🟡] Partially done and/or needs testing
@@ -13,17 +13,16 @@ Features
 
 Bugfixes
 --------
-[🟡] Your start block is unreserved if you log out, change RTS or vanilla gamemodes or disable RTS camera
-[🟡] All start blocks are disabled if the game is started in a different gamemode
-[✔] Fixed building outlines being weird when below Y level 0
+[🟡] Production % numbers no longer tick up when the game is paused in singleplayer
+    - does this apply to any other ClientTickEvent stuff?
+[❌] are alliances synced for newly logging in players?
+[❌] reset player research after being defeated
 
 Quality of Life
 ---------------
-[✔] /gamerule neutralAggro is now true by default
-[✔] You can now start the game with start blocks with only one player
-[❌] Added /gamerule slantedBuilding which lets players build regardless of flatness
-    - This will also carve out terrain to fit the building, so be warned!
-[❌] Allow survival players to use allied transport portals
+
+[❌] save alliances to world data
+[❌] save transport portal links to world data
 
 Balancing
 ---------
