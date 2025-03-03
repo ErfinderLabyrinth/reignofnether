@@ -49,8 +49,8 @@ public class HealingFountain extends Building implements RangeIndicator {
         super(level, originPos, rotation, ownerName, getAbsoluteBlockData(getRelativeBlockData(level), level, originPos, rotation), false);
         this.name = buildingName;
         this.ownerName = ownerName;
-        this.portraitBlock = Blocks.PRISMARINE;
-        this.icon = new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/blocks/prismarine.png");
+        this.portraitBlock = Blocks.ROSE_BUSH;
+        this.icon = new ResourceLocation("minecraft", "textures/block/rose_bush_bottom.png");
 
         this.foodCost = cost.food;
         this.woodCost = cost.wood;
@@ -87,11 +87,11 @@ public class HealingFountain extends Building implements RangeIndicator {
                 this.level);
 
         for (LivingEntity le : nearbyEntities)
-            if (tickAgeAfterBuilt % 100 == 0) // only 1hp/4s
+            if (isBuilt && tickAgeAfterBuilt % 100 == 0) // only 1hp/4s
                 le.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 100, 0));
 
         // spawn random healing particle
-        if (!waterBlocks.isEmpty()) {
+        if (!waterBlocks.isEmpty() && isBuilt) {
             Collections.shuffle(waterBlocks);
             int col = 16262179; // red healing effect
             BlockPos bp = waterBlocks.get(0).getBlockPos();
@@ -111,7 +111,7 @@ public class HealingFountain extends Building implements RangeIndicator {
     public static AbilityButton getBuildButton(Keybinding hotkey) {
         return new AbilityButton(
             HealingFountain.buildingName,
-            new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/blocks/prismarine.png"),
+            new ResourceLocation("minecraft", "textures/block/rose_bush_bottom.png"),
             hotkey,
             () -> BuildingClientEvents.getBuildingToPlace() == HealingFountain.class,
             () -> false,

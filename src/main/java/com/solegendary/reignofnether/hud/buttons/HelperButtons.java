@@ -13,6 +13,7 @@ import com.solegendary.reignofnether.sandbox.SandboxClientEvents;
 import com.solegendary.reignofnether.time.TimeUtils;
 import com.solegendary.reignofnether.unit.Relationship;
 import com.solegendary.reignofnether.unit.UnitClientEvents;
+import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.interfaces.WorkerUnit;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.ChatScreen;
@@ -131,13 +132,17 @@ public class HelperButtons {
             () -> false,
             () -> {
                 List<LivingEntity> militaryUnits = UnitClientEvents.getAllUnits().stream()
-                        .filter(u -> !(u instanceof WorkerUnit) && getPlayerToEntityRelationship(u) == Relationship.OWNED).toList();
+                        .filter(u -> !(u instanceof WorkerUnit) &&
+                            GarrisonableBuilding.getGarrison((Unit) u) == null &&
+                            getPlayerToEntityRelationship(u) == Relationship.OWNED).toList();
                 return militaryUnits.isEmpty();
             },
             () -> true,
             () -> {
                 List<LivingEntity> militaryUnits = UnitClientEvents.getAllUnits().stream()
-                        .filter(u -> !(u instanceof WorkerUnit) && getPlayerToEntityRelationship(u) == Relationship.OWNED).toList();
+                        .filter(u -> !(u instanceof WorkerUnit) &&
+                            GarrisonableBuilding.getGarrison((Unit) u) == null &&
+                            getPlayerToEntityRelationship(u) == Relationship.OWNED).toList();
                 UnitClientEvents.clearSelectedUnits();
                 for (LivingEntity militaryUnit : militaryUnits)
                     UnitClientEvents.addSelectedUnit(militaryUnit);

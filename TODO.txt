@@ -24,7 +24,7 @@ Quality of Life
 ---------------
 
 [🟡] Transport portal links are now saved between server restarts
-
+[🟡] Selecting all military units no longer selects garrisoned units
 
 Balancing
 ---------
