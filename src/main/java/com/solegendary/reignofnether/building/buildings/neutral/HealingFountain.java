@@ -17,22 +17,23 @@ import com.solegendary.reignofnether.util.Faction;
 import com.solegendary.reignofnether.util.MiscUtil;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Rotation;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static com.solegendary.reignofnether.building.BuildingUtils.getAbsoluteBlockData;
 
@@ -41,6 +42,8 @@ public class HealingFountain extends Building implements RangeIndicator {
     public final static String buildingName = "Healing Fountain";
     public final static String structureName = "healing_fountain";
     public final static ResourceCost cost = ResourceCost.Building(0,0,0,0);
+
+    private final ArrayList<BuildingBlock> waterBlocks;
 
     public HealingFountain(Level level, BlockPos originPos, Rotation rotation, String ownerName) {
         super(level, originPos, rotation, ownerName, getAbsoluteBlockData(getRelativeBlockData(level), level, originPos, rotation), false);
@@ -63,16 +66,15 @@ public class HealingFountain extends Building implements RangeIndicator {
         this.capturable = false;
         this.invulnerable = true;
         this.shouldDestroyOnReset = false;
+
+        List<BuildingBlock> wbs = blocks.stream().filter(b -> b.getBlockPos().getY() < centrePos.getY() &&
+                b.getBlockState().getBlock() == Blocks.WATER).toList();
+        this.waterBlocks = new ArrayList<>(wbs);
     }
 
     @Override
     public void onBuilt() {
         super.onBuilt();
-        //for (BuildingBlock bb : blocks) {
-        //    if (bb.getBlockState().getFluidState().isSource() && bb.getBlockPos().getY() > this.centrePos.getY()) {
-        //        this.level.updateNeighborsAt(bb.getBlockPos().north(), bb.getBlockState().getBlock());
-        //    }
-        //}
     }
 
     public void tick(Level tickLevel) {
@@ -84,9 +86,19 @@ public class HealingFountain extends Building implements RangeIndicator {
                 LivingEntity.class,
                 this.level);
 
-        for (LivingEntity le : nearbyEntities) {
-            if (tickAgeAfterBuilt % 80 == 0) // only 1hp/4s
-                le.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 60, 0));
+        for (LivingEntity le : nearbyEntities)
+            if (tickAgeAfterBuilt % 100 == 0) // only 1hp/4s
+                le.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 100, 0));
+
+        // spawn random healing particle
+        if (!waterBlocks.isEmpty()) {
+            Collections.shuffle(waterBlocks);
+            int col = 16262179; // red healing effect
+            BlockPos bp = waterBlocks.get(0).getBlockPos();
+            double d0 = (double)(col >> 16 & 255) / 255.0;
+            double d1 = (double)(col >> 8 & 255) / 255.0;
+            double d2 = (double)(col >> 0 & 255) / 255.0;
+            this.level.addParticle(ParticleTypes.ENTITY_EFFECT, bp.getX(), bp.getY() + 1, bp.getZ(), d0, d1, d2);
         }
     }
 
