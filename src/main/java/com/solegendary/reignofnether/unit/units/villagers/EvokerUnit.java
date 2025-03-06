@@ -213,11 +213,6 @@ public class EvokerUnit extends Evoker implements Unit, AttackerUnit, RangedAtta
         this.castFangsGoal.tick();
         this.castSummonVexesGoal.tick();
         PromoteIllager.checkAndApplyBuff(this);
-
-        // need to do this outside the goal so it ticks down while not attacking
-        // only needed for attack goals created by reignofnether like RangedBowAttackUnitGoal
-        if (attackGoal != null)
-            attackGoal.tickCooldown();
     }
 
     public void initialiseGoals() {

@@ -45,7 +45,6 @@ public class WaveEnemy {
 
     private BlockPos lastOnPos;
 
-
     public WaveEnemy(Unit unit) {
         this.unit = unit;
         this.lastOnPos = getEntity().getOnPos();

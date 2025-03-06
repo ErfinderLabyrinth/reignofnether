@@ -176,11 +176,6 @@ public class StrayUnit extends Stray implements Unit, AttackerUnit, RangedAttack
         Unit.tick(this);
         AttackerUnit.tick(this);
         this.mountGoal.tick();
-
-        // need to do this outside the goal so it ticks down while not attacking
-        // only needed for attack goals created by reignofnether like RangedBowAttackUnitGoal
-        if (attackGoal != null)
-            attackGoal.tickCooldown();
     }
 
     @Override

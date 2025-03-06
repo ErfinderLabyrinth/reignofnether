@@ -122,7 +122,8 @@ public class SandboxClientEvents {
                 PolarBearProd.getPlaceButton(),
                 GrizzlyBearProd.getPlaceButton(),
                 PandaProd.getPlaceButton(),
-                WolfProd.getPlaceButton()
+                WolfProd.getPlaceButton(),
+                LlamaProd.getPlaceButton()
             );
         };
     }

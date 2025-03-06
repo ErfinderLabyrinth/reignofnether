@@ -58,6 +58,7 @@ public class ReignOfNetherCommonConfigs {
         UnitCosts.GRIZZLY_BEAR.define(BUILDER);
         UnitCosts.PANDA.define(BUILDER);
         UnitCosts.WOLF.define(BUILDER);
+        UnitCosts.LLAMA.define(BUILDER);
 
         //*Buildings*
         BUILDER.comment("Building Cost Configurations");
@@ -196,6 +197,7 @@ public class ReignOfNetherCommonConfigs {
         public static final ResourceCostConfigEntry GRIZZLY_BEAR = ResourceCostConfigEntry.Unit(250,0,0,40,4, ResourceCosts.GRIZZLY_BEAR, "Grizzly Bear Config");
         public static final ResourceCostConfigEntry PANDA = ResourceCostConfigEntry.Unit(250,0,0,40,4, ResourceCosts.PANDA, "Panda Config");
         public static final ResourceCostConfigEntry WOLF = ResourceCostConfigEntry.Unit(120,0,0,25,2, ResourceCosts.WOLF, "Wolf Config");
+        public static final ResourceCostConfigEntry LLAMA = ResourceCostConfigEntry.Unit(180,0,0,25,2, ResourceCosts.LLAMA, "Llama Config");
     }
     public static class BuildingCosts implements Costs {
         public static final ResourceCostConfigEntry BEACON = ResourceCostConfigEntry.Building(0,1000,1000, 0, ResourceCosts.BEACON, "Beacon Config");

@@ -115,6 +115,12 @@ public interface AttackerUnit {
         if (!unitMob.level.isClientSide) {
             if (attackerUnit.getAttackGoal() instanceof AbstractMeleeAttackUnitGoal meleeAttackUnitGoal)
                 meleeAttackUnitGoal.tickAttackCooldown();
+            else if (attackerUnit.getAttackGoal() instanceof UnitRangedAttackGoal rangedAttackGoal)
+                rangedAttackGoal.tickAttackCooldown();
+            else if (attackerUnit.getAttackGoal() instanceof UnitBowAttackGoal rangedAttackGoal)
+                rangedAttackGoal.tickAttackCooldown();
+            else if (attackerUnit.getAttackGoal() instanceof UnitCrossbowAttackGoal rangedAttackGoal)
+                rangedAttackGoal.tickAttackCooldown();
 
             if (attackerUnit.getAttackBuildingGoal() != null && attackerUnit.canAttackBuildings())
                 attackerUnit.getAttackBuildingGoal().tick();

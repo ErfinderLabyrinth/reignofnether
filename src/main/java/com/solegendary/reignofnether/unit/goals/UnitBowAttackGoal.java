@@ -5,7 +5,6 @@ import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.RangedAttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.units.piglins.GhastUnit;
-import com.solegendary.reignofnether.unit.units.villagers.EvokerUnit;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -27,6 +26,8 @@ import java.util.Random;
 
 // can also be used for generic projectile attacks as long as the mob 'technically' is holding a bow, eg. Blazes and ghasts
 
+// DEPRECATED - USE UNITATTACKGOAL INSTEAD
+
 public class UnitBowAttackGoal<T extends net.minecraft.world.entity.Mob> extends Goal {
     private final Random random = new Random();
 
@@ -44,7 +45,7 @@ public class UnitBowAttackGoal<T extends net.minecraft.world.entity.Mob> extends
         this.setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK));
     }
 
-    public void tickCooldown() {
+    public void tickAttackCooldown() {
         if (this.attackCooldown > ((AttackerUnit) this.mob).getAttackCooldown())
             setToMaxAttackCooldown();
         if (this.attackCooldown > 0)

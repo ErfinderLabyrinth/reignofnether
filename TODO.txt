@@ -25,9 +25,9 @@ Quality of Life
 
 [🟡] Transport portal links are now saved between server restarts
 [🟡] Selecting all military units no longer selects garrisoned units
-[❌] Enemy buildings and units placed in sandbox become neutral instead of being destroyed after exiting sandbox
+[🟡] Enemy buildings and units placed in sandbox become neutral instead of being destroyed after exiting sandbox
     - Buildings built by workers and any unanchored units will still be destroyed
-[❌] You can now manage anchors on enemy units in sandbox
+[🟡] You can now manage anchors on enemy units in sandbox
 
 Balancing
 ---------
