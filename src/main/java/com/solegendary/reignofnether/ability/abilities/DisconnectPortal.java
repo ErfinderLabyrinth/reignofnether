@@ -50,7 +50,7 @@ public class DisconnectPortal extends Ability {
                 if (building instanceof Portal portal) {
                     if (portal.portalType != Portal.PortalType.TRANSPORT)
                         return true;
-                    return portal.destination == null;
+                    return !portal.hasDestination();
                 }
                 return true;
             },

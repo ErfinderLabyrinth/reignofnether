@@ -32,9 +32,8 @@ public class UsePortalGoal extends MoveToTargetBlockGoal {
                 moveTarget.getY() + 0.5f,
                 moveTarget.getZ() + 0.5f
             )) <= 3f) {
-
                 // teleport to destination
-                if (portal.destination != null && buildingTarget.isBuilt) {
+                if (portal.hasDestination()) {
                     BlockPos bp = portal.destination;
                     SoundClientboundPacket.playSoundAtPos(SoundAction.USE_PORTAL, bp);
                     mob.teleportTo(bp.getX() + 0.5f, bp.getY() + 0.5f, bp.getZ() + 0.5f);
@@ -61,7 +60,7 @@ public class UsePortalGoal extends MoveToTargetBlockGoal {
                     (buildingTarget.ownerName.equals(((Unit) mob).getOwnerName()) ||
                     portal instanceof NeutralTransportPortal)) {
 
-                    if (portal.destination != null) {
+                    if (portal.hasDestination()) {
                         MiscUtil.addUnitCheckpoint(((Unit) mob), new BlockPos(
                             buildingTarget.centrePos.getX(),
                             buildingTarget.originPos.getY() + 1,

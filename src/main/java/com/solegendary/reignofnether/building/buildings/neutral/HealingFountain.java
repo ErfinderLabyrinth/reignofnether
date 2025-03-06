@@ -63,6 +63,7 @@ public class HealingFountain extends Building implements RangeIndicator {
         this.startingBlockTypes.add(Blocks.GRASS_BLOCK);
         this.startingBlockTypes.add(Blocks.SPRUCE_TRAPDOOR);
 
+        this.selfBuilding = true;
         this.capturable = false;
         this.invulnerable = true;
         this.shouldDestroyOnReset = false;

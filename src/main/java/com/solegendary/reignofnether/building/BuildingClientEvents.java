@@ -690,7 +690,7 @@ public class BuildingClientEvents {
                     MyRenderer.drawLineBoxOutlineOnly(evt.getPoseStack(), le.getBoundingBox(), 0, 1.0f, 0, a, false);
                 }
             }
-            if (selBuilding instanceof Portal portal && portal.destination != null) {
+            if (selBuilding instanceof Portal portal && portal.hasDestination()) {
                 float a = MiscUtil.getOscillatingFloat(0.25f, 0.75f);
                 MyRenderer.drawLine(evt.getPoseStack(), portal.centrePos, portal.destination, 0, 1, 0, a);
             }

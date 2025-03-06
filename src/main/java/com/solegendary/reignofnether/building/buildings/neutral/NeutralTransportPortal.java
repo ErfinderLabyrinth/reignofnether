@@ -44,6 +44,7 @@ public class NeutralTransportPortal extends Portal {
         this.portalType = Portal.PortalType.TRANSPORT;
         this.invulnerable = true;
         this.shouldDestroyOnReset = false;
+        this.selfBuilding = true;
     }
 
     public static ArrayList<BuildingBlock> getRelativeBlockData(LevelAccessor level) {

@@ -68,6 +68,13 @@ public class Portal extends ProductionBuilding implements NetherConvertingBuildi
 
     public NetherZone netherConversionZone = null;
 
+    public boolean hasDestination() {
+        return isBuilt &&
+                portalType == PortalType.TRANSPORT &&
+                destination != null &&
+                !destination.equals(new BlockPos(0,0,0));
+    }
+
     @Override
     public double getMaxRange() {
         return 20;

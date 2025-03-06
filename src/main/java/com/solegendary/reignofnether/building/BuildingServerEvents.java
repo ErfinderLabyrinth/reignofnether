@@ -114,7 +114,7 @@ public class BuildingServerEvents {
                 b.isBuilt,
                 b.getUpgradeLevel(),
                 portalType,
-                portalType == Portal.PortalType.TRANSPORT ? ((Portal) b).destination : null
+                portalType == Portal.PortalType.TRANSPORT ? ((Portal) b).destination : new BlockPos(0,0,0)
             ));
             ReignOfNether.LOGGER.info("saved buildings/nether in serverevents: " + b.originPos);
         });
@@ -166,7 +166,7 @@ public class BuildingServerEvents {
                         } else if (building instanceof Portal portal) {
                             if (!(building instanceof NeutralTransportPortal)) {
                                 portal.changeStructure(b.portalType);
-                            } if (b.portalType == Portal.PortalType.TRANSPORT) {
+                            } if (portal.hasDestination()) {
                                 portal.destination = b.portalDestination;
                             }
                         } else if (building instanceof Library library) {
@@ -664,8 +664,7 @@ public class BuildingServerEvents {
                 (AlliancesServerEvents.isAllied(player.getName().getString(), building.ownerName) ||
                 building instanceof NeutralTransportPortal) &&
                 building instanceof Portal portal &&
-                portal.portalType == Portal.PortalType.TRANSPORT &&
-                portal.destination != null) {
+                portal.hasDestination()) {
 
                 player.moveTo(Vec3.atCenterOf(portal.destination));
                 building.level.playSound(null, building.centrePos, SoundEvents.ENDERMAN_TELEPORT,

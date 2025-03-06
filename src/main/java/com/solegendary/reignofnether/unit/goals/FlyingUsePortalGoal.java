@@ -33,7 +33,7 @@ public class FlyingUsePortalGoal extends FlyingMoveToTargetGoal {
             )) <= 9f) {
 
                 // teleport to destination
-                if (portal.destination != null && buildingTarget.isBuilt) {
+                if (portal.hasDestination() && ) {
                     BlockPos bp = portal.destination.offset(0,4,0);
                     SoundClientboundPacket.playSoundAtPos(SoundAction.USE_PORTAL, bp);
                     mob.teleportTo(bp.getX() + 0.5f, bp.getY() + 0.5f, bp.getZ() + 0.5f);
@@ -59,7 +59,7 @@ public class FlyingUsePortalGoal extends FlyingMoveToTargetGoal {
                 if (this.buildingTarget instanceof Portal portal
                     && buildingTarget.ownerName.equals(((Unit) mob).getOwnerName())) {
 
-                    if (portal.destination != null) {
+                    if (portal.hasDestination()) {
                         MiscUtil.addUnitCheckpoint(((Unit) mob), new BlockPos(
                             buildingTarget.centrePos.getX(),
                             buildingTarget.originPos.getY() + 1,
