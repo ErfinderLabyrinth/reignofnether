@@ -10,7 +10,7 @@ Features
 --------
 [🟡] Healing fountains
 [🟡] Neutral Transport portals
-
+[🟡] Llamas
 
 Bugfixes
 --------

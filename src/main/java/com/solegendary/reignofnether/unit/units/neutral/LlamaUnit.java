@@ -1,7 +1,6 @@
 package com.solegendary.reignofnether.unit.units.neutral;
 
 import com.solegendary.reignofnether.ability.Ability;
-import com.solegendary.reignofnether.fogofwar.FogOfWarClientboundPacket;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
@@ -16,7 +15,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
@@ -24,14 +22,11 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.world.entity.ai.goal.RangedAttackGoal;
 import net.minecraft.world.entity.animal.horse.Llama;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
-import net.minecraft.world.entity.projectile.ProjectileUtil;
-import net.minecraft.world.item.BowItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
@@ -123,7 +118,7 @@ public class LlamaUnit extends Llama implements Unit, AttackerUnit, RangedAttack
 
     final static public float maxHealth = 30.0f;
     final static public float armorValue = 0.0f;
-    final static public float movementSpeed = 0.25f;
+    final static public float movementSpeed = 0.22f;
     public int maxResources = 100;
 
     public int fogRevealDuration = 0; // set > 0 for the client who is attacked by this unit
@@ -164,16 +159,6 @@ public class LlamaUnit extends Llama implements Unit, AttackerUnit, RangedAttack
         super.tick();
         Unit.tick(this);
         AttackerUnit.tick(this);
-    }
-
-    // vanilla wolves take reduced damage from nonplayers
-    @Override
-    public boolean hurt(DamageSource pSource, float pAmount) {
-        Entity entity = pSource.getEntity();
-        if (entity != null && !(entity instanceof Player) && !(entity instanceof AbstractArrow)) {
-            pAmount = (pAmount * 2) - 2f;
-        }
-        return super.hurt(pSource, pAmount);
     }
 
     public void initialiseGoals() {
