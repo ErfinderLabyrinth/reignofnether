@@ -102,6 +102,7 @@ public class CommonModEvents {
         evt.registerEntityRenderer(EntityRegistrar.GRIZZLY_BEAR_UNIT.get(), GrizzlyBearRenderer::new);
         evt.registerEntityRenderer(EntityRegistrar.PANDA_UNIT.get(), PandaRenderer::new);
         evt.registerEntityRenderer(EntityRegistrar.WOLF_UNIT.get(), WolfRenderer::new);
+        evt.registerEntityRenderer(EntityRegistrar.LLAMA_UNIT.get(), LlamaUnitRenderer::new);
     }
 
     @SubscribeEvent
@@ -110,6 +111,7 @@ public class CommonModEvents {
         evt.put(EntityRegistrar.GRIZZLY_BEAR_UNIT.get(), GrizzlyBearUnit.createAttributes().build());
         evt.put(EntityRegistrar.PANDA_UNIT.get(), PandaUnit.createAttributes().build());
         evt.put(EntityRegistrar.WOLF_UNIT.get(), WolfUnit.createAttributes().build());
+        evt.put(EntityRegistrar.LLAMA_UNIT.get(), WolfUnit.createAttributes().build());
 
         evt.put(EntityRegistrar.ZOMBIE_UNIT.get(), ZombieUnit.createAttributes().build());
         evt.put(EntityRegistrar.ZOMBIE_PIGLIN_UNIT.get(), ZombiePiglinUnit.createAttributes().build());

@@ -3,13 +3,12 @@ package com.solegendary.reignofnether.building.buildings.neutral;
 import com.mojang.math.Vector3d;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.*;
-import com.solegendary.reignofnether.alliance.AlliancesServer;
+import com.solegendary.reignofnether.alliance.AlliancesServerEvents;
 import com.solegendary.reignofnether.building.*;
 import com.solegendary.reignofnether.building.buildings.monsters.Stronghold;
 import com.solegendary.reignofnether.building.buildings.piglins.Fortress;
 import com.solegendary.reignofnether.building.buildings.villagers.Castle;
 import com.solegendary.reignofnether.gamerules.GameruleClient;
-import com.solegendary.reignofnether.gamerules.GameruleClientboundPacket;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.keybinds.Keybindings;
@@ -245,9 +244,9 @@ public class Beacon extends ProductionBuilding implements RangeIndicator {
 
             for (LivingEntity le : nearbyEntities) {
                 boolean isOwnedOrFriendlyUnit = le instanceof Unit unit && (unit.getOwnerName().equals(this.ownerName) ||
-                        AlliancesServer.isAllied(this.ownerName, unit.getOwnerName()));
+                        AlliancesServerEvents.isAllied(this.ownerName, unit.getOwnerName()));
                 boolean isFriendlyPlayer = le instanceof Player player && !player.isCreative() && !player.isSpectator() &&
-                        (player.getName().getString().equals(ownerName) || AlliancesServer.isAllied(player.getName().getString(), ownerName));
+                        (player.getName().getString().equals(ownerName) || AlliancesServerEvents.isAllied(player.getName().getString(), ownerName));
 
                 if ((isOwnedOrFriendlyUnit || isFriendlyPlayer) &&
                         (isFriendlyPlayer || auraEffect != MobEffects.LUCK) &&

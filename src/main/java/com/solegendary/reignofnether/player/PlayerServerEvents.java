@@ -1,7 +1,7 @@
 package com.solegendary.reignofnether.player;
 
 import com.solegendary.reignofnether.ReignOfNether;
-import com.solegendary.reignofnether.alliance.AlliancesServer;
+import com.solegendary.reignofnether.alliance.AlliancesServerEvents;
 import com.solegendary.reignofnether.alliance.AllyCommand;
 import com.solegendary.reignofnether.building.*;
 import com.solegendary.reignofnether.building.buildings.monsters.Mausoleum;
@@ -13,17 +13,18 @@ import com.solegendary.reignofnether.gamemode.GameModeClientboundPacket;
 import com.solegendary.reignofnether.guiscreen.TopdownGuiContainer;
 import com.solegendary.reignofnether.registrars.EntityRegistrar;
 import com.solegendary.reignofnether.registrars.GameRuleRegistrar;
+import com.solegendary.reignofnether.research.ResearchClient;
 import com.solegendary.reignofnether.research.ResearchClientboundPacket;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.Resources;
 import com.solegendary.reignofnether.resources.ResourcesServerEvents;
 import com.solegendary.reignofnether.sandbox.SandboxServer;
-import com.solegendary.reignofnether.startpos.StartPosClientboundPacket;
 import com.solegendary.reignofnether.startpos.StartPosServerEvents;
 import com.solegendary.reignofnether.survival.SurvivalServerEvents;
 import com.solegendary.reignofnether.time.TimeUtils;
 import com.solegendary.reignofnether.tutorial.TutorialServerEvents;
+import com.solegendary.reignofnether.unit.UnitClientEvents;
 import com.solegendary.reignofnether.unit.UnitServerEvents;
 import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
@@ -363,7 +364,7 @@ public class PlayerServerEvents {
                     level.setDayTime(TimeUtils.DAWN + getWaveSurvivalTimeModifier(SurvivalServerEvents.getDifficulty()));
                     for (RTSPlayer rtsPlayer : rtsPlayers)
                         if (!rtsPlayer.name.equals(playerName))
-                            AlliancesServer.addAlliance(rtsPlayer.name, playerName);
+                            AlliancesServerEvents.addAlliance(rtsPlayer.name, playerName);
                 } else {
                     level.setDayTime(MONSTER_START_TIME_OF_DAY);
                 }
@@ -717,6 +718,7 @@ public class PlayerServerEvents {
             ResearchServerEvents.removeAllResearchFor(playerName);
             ResearchServerEvents.syncResearch(playerName);
             ResearchServerEvents.saveResearch();
+            ResearchServerEvents.removeAllCheatsFor(playerName);
             ResourcesServerEvents.resourcesList.removeIf(rl -> rl.ownerName.equals(playerName));
 
             // Check if only allied players are left or if a single player remains
@@ -728,7 +730,7 @@ public class PlayerServerEvents {
 
                 // Use the first remaining player as a reference to find all connected allies
                 String referencePlayer = remainingPlayers.iterator().next();
-                Set<String> factionGroup = AlliancesServer.getAllConnectedAllies(referencePlayer);
+                Set<String> factionGroup = AlliancesServerEvents.getAllConnectedAllies(referencePlayer);
 
                 // Check if all remaining players are part of the same alliance group
                 if (remainingPlayers.equals(factionGroup)) {
@@ -749,17 +751,17 @@ public class PlayerServerEvents {
 
     public static void beaconVictory(String playerName) {
         if (SurvivalServerEvents.isEnabled()) {
-            if (AlliancesServer.getAllAllies(playerName).isEmpty())
+            if (AlliancesServerEvents.getAllAllies(playerName).isEmpty())
                 sendMessageToAllPlayers("server.reignofnether.victorious", true, playerName);
             else
                 sendMessageToAllPlayers("server.reignofnether.victory_alliance", true, playerName);
             PlayerClientboundPacket.victory(playerName);
-            for (String allyName : AlliancesServer.getAllAllies(playerName))
+            for (String allyName : AlliancesServerEvents.getAllAllies(playerName))
                 PlayerClientboundPacket.victory(allyName);
             SurvivalServerEvents.endCurrentWave();
         } else {
             List<String> playerNames = rtsPlayers.stream().map(p -> p.name)
-                    .filter(n -> !AlliancesServer.isAllied(playerName, n) && !n.equals(playerName))
+                    .filter(n -> !AlliancesServerEvents.isAllied(playerName, n) && !n.equals(playerName))
                     .toList();
             for (String name : playerNames)
                 defeat(name, Component.translatable("server.reignofnether.beacon_defeat").getString());
@@ -786,11 +788,15 @@ public class PlayerServerEvents {
         synchronized (rtsPlayers) {
             rtsPlayers.clear();
 
-            for (LivingEntity entity : UnitServerEvents.getAllUnits()) {
-                if (hardReset || (entity instanceof Unit unit && !unit.getOwnerName().isEmpty()))
+            for (LivingEntity entity : UnitServerEvents.getAllUnits())
+                if (hardReset || (entity instanceof Unit unit && !Unit.hasAnchor(unit)))
                     entity.kill();
-            }
-            UnitServerEvents.getAllUnits().removeIf(u -> (hardReset || (u instanceof Unit unit && !unit.getOwnerName().isEmpty())));
+
+            UnitServerEvents.getAllUnits().removeIf(u -> (hardReset || (u instanceof Unit unit && !Unit.hasAnchor(unit))));
+
+            for (LivingEntity entity : UnitServerEvents.getAllUnits())
+                if (entity instanceof Unit unit)
+                    unit.setOwnerName("");
 
             for (Building building : BuildingServerEvents.getBuildings()) {
                 if (building instanceof ProductionBuilding productionBuilding)
@@ -824,7 +830,7 @@ public class PlayerServerEvents {
 
             if (rtsLocked)
                 setRTSLock(false);
-            AlliancesServer.resetAllAlliances();
+            AlliancesServerEvents.resetAllAlliances();
             SurvivalServerEvents.reset();
         }
     }

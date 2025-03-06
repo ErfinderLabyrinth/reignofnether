@@ -3,7 +3,7 @@ package com.solegendary.reignofnether.unit;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Vector3d;
 import com.solegendary.reignofnether.ReignOfNether;
-import com.solegendary.reignofnether.alliance.AlliancesServer;
+import com.solegendary.reignofnether.alliance.AlliancesServerEvents;
 import com.solegendary.reignofnether.building.*;
 import com.solegendary.reignofnether.building.buildings.monsters.SculkCatalyst;
 import com.solegendary.reignofnether.building.buildings.villagers.IronGolemBuilding;
@@ -294,7 +294,7 @@ public class UnitServerEvents {
         }
 
         // Check if the owners are allied first
-        if (AlliancesServer.isAllied(ownerName1, ownerName2)) {
+        if (AlliancesServerEvents.isAllied(ownerName1, ownerName2)) {
             return Relationship.FRIENDLY;
         }
         // If not allied, check if the owners are the same
@@ -314,7 +314,7 @@ public class UnitServerEvents {
         }
         if (unitOwnerName.equals(buildingOwnerName)) {
             return Relationship.OWNED;
-        } else if (AlliancesServer.isAllied(unitOwnerName, buildingOwnerName)) {
+        } else if (AlliancesServerEvents.isAllied(unitOwnerName, buildingOwnerName)) {
             return Relationship.FRIENDLY;
         } else {
             return Relationship.HOSTILE;

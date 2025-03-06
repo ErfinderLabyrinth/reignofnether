@@ -3,10 +3,7 @@ package com.solegendary.reignofnether.building;
 // class for static building functions
 
 import com.solegendary.reignofnether.building.buildings.monsters.*;
-import com.solegendary.reignofnether.building.buildings.neutral.Beacon;
-import com.solegendary.reignofnether.building.buildings.neutral.CapturableBeacon;
-import com.solegendary.reignofnether.building.buildings.neutral.EndPortal;
-import com.solegendary.reignofnether.building.buildings.neutral.HealingFountain;
+import com.solegendary.reignofnether.building.buildings.neutral.*;
 import com.solegendary.reignofnether.building.buildings.piglins.*;
 import com.solegendary.reignofnether.building.buildings.piglins.BlackstoneBridge;
 import com.solegendary.reignofnether.building.buildings.villagers.OakStockpile;
@@ -119,7 +116,7 @@ public class BuildingUtils {
             case Portal.buildingName,
                  Portal.buildingNameMilitary,
                  Portal.buildingNameCivilian,
-                 Portal.buildingNameTransport -> building = new Portal(level, pos, rotation, ownerName);
+                 Portal.buildingNameTransport -> building = new Portal(level, pos, rotation, ownerName, false);
             case NetherwartFarm.buildingName -> building = new NetherwartFarm(level, pos, rotation, ownerName);
             case Bastion.buildingName -> building = new Bastion(level, pos, rotation, ownerName);
             case HoglinStables.buildingName -> building = new HoglinStables(level, pos, rotation, ownerName);
@@ -131,6 +128,7 @@ public class BuildingUtils {
             case CapturableBeacon.buildingName -> building = new CapturableBeacon(level, pos, rotation, ownerName);
             case EndPortal.buildingName -> building = new EndPortal(level, pos, rotation, ownerName);
             case HealingFountain.buildingName -> building = new HealingFountain(level, pos, rotation, ownerName);
+            case NeutralTransportPortal.buildingName -> building = new NeutralTransportPortal(level, pos, rotation, ownerName);
         }
         if (building != null)
             building.setLevel(level);

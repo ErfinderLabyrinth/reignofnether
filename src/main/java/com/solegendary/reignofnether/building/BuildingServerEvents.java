@@ -1,10 +1,11 @@
 package com.solegendary.reignofnether.building;
 
 import com.solegendary.reignofnether.ReignOfNether;
-import com.solegendary.reignofnether.alliance.AlliancesServer;
+import com.solegendary.reignofnether.alliance.AlliancesServerEvents;
 import com.solegendary.reignofnether.building.buildings.monsters.Dungeon;
 import com.solegendary.reignofnether.building.buildings.monsters.Laboratory;
 import com.solegendary.reignofnether.building.buildings.neutral.Beacon;
+import com.solegendary.reignofnether.building.buildings.neutral.NeutralTransportPortal;
 import com.solegendary.reignofnether.building.buildings.piglins.FlameSanctuary;
 import com.solegendary.reignofnether.building.buildings.piglins.Portal;
 import com.solegendary.reignofnether.building.buildings.shared.AbstractBridge;
@@ -12,16 +13,12 @@ import com.solegendary.reignofnether.building.buildings.villagers.Castle;
 import com.solegendary.reignofnether.building.buildings.villagers.IronGolemBuilding;
 import com.solegendary.reignofnether.building.buildings.villagers.Library;
 import com.solegendary.reignofnether.fogofwar.FrozenChunkClientboundPacket;
-import com.solegendary.reignofnether.gamerules.GameruleServerEvents;
 import com.solegendary.reignofnether.nether.NetherBlocks;
 import com.solegendary.reignofnether.player.PlayerServerEvents;
-import com.solegendary.reignofnether.player.RTSPlayer;
 import com.solegendary.reignofnether.registrars.GameRuleRegistrar;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
 import com.solegendary.reignofnether.resources.*;
 import com.solegendary.reignofnether.sandbox.SandboxServer;
-import com.solegendary.reignofnether.sounds.SoundAction;
-import com.solegendary.reignofnether.sounds.SoundClientboundPacket;
 import com.solegendary.reignofnether.survival.SurvivalServerEvents;
 import com.solegendary.reignofnether.unit.Relationship;
 import com.solegendary.reignofnether.unit.UnitAction;
@@ -116,7 +113,8 @@ public class BuildingServerEvents {
                 b.isDiagonalBridge,
                 b.isBuilt,
                 b.getUpgradeLevel(),
-                portalType
+                portalType,
+                b instanceof Portal portal && portal.hasDestination() ? ((Portal) b).destination : new BlockPos(0,0,0)
             ));
             ReignOfNether.LOGGER.info("saved buildings/nether in serverevents: " + b.originPos);
         });
@@ -166,7 +164,11 @@ public class BuildingServerEvents {
                         } else if (building instanceof Laboratory lab) {
                             lab.changeStructure(Laboratory.upgradedStructureName);
                         } else if (building instanceof Portal portal) {
-                            portal.changeStructure(b.portalType);
+                            if (!(building instanceof NeutralTransportPortal)) {
+                                portal.changeStructure(b.portalType);
+                            } if (b.portalDestination != null && !b.portalDestination.equals(new BlockPos(0,0,0))) {
+                                portal.destination = b.portalDestination;
+                            }
                         } else if (building instanceof Library library) {
                             library.changeStructure(Library.upgradedStructureName);
                         } else if (building instanceof Beacon beacon) {
@@ -268,6 +270,7 @@ public class BuildingServerEvents {
                     0,
                     false,
                     Portal.PortalType.BASIC,
+                    pos,
                     false
                 );
                 ResourcesServerEvents.addSubtractResources(new Resources(ownerName,
@@ -289,6 +292,9 @@ public class BuildingServerEvents {
 
             } else if (!PlayerServerEvents.isBot(ownerName)) {
                 warnInsufficientResources(newBuilding);
+            }
+            if (SandboxServer.isAnyoneASandboxPlayer() && builderUnitIds.length == 0) {
+                newBuilding.shouldDestroyOnReset = false;
             }
             return newBuilding;
         }
@@ -454,6 +460,7 @@ public class BuildingServerEvents {
                 building.getUpgradeLevel(),
                 building.isBuilt,
                 building instanceof Portal p ? p.portalType : Portal.PortalType.BASIC,
+                building instanceof Portal p && p.hasDestination() ? p.destination : new BlockPos(0,0,0),
                 true
             );
         ReignOfNether.LOGGER.info("Synced " + buildings.size() + " buildings with player logged in");
@@ -653,11 +660,11 @@ public class BuildingServerEvents {
             evt.setCanceled(true);
 
             if (evt.getEntity() instanceof Player player &&
-                !player.isSpectator() && !player.isCreative() &&
-                AlliancesServer.isAllied(player.getName().getString(), building.ownerName) &&
+                !player.isSpectator() &&
+                (AlliancesServerEvents.isAllied(player.getName().getString(), building.ownerName) ||
+                building instanceof NeutralTransportPortal) &&
                 building instanceof Portal portal &&
-                portal.portalType == Portal.PortalType.TRANSPORT &&
-                portal.destination != null) {
+                portal.hasDestination()) {
 
                 player.moveTo(Vec3.atCenterOf(portal.destination));
                 building.level.playSound(null, building.centrePos, SoundEvents.ENDERMAN_TELEPORT,
@@ -690,6 +697,7 @@ public class BuildingServerEvents {
                     building.getUpgradeLevel(),
                     building.isBuilt,
                     building instanceof Portal p ? p.portalType : Portal.PortalType.BASIC,
+                    building instanceof Portal p && p.portalType == Portal.PortalType.TRANSPORT ? p.destination : new BlockPos(0,0,0),
                     false
                 );
                 return;

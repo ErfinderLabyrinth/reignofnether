@@ -1,6 +1,7 @@
 package com.solegendary.reignofnether.unit;
 
 import com.solegendary.reignofnether.ReignOfNether;
+import com.solegendary.reignofnether.unit.interfaces.Unit;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -67,9 +68,15 @@ public class UnitSaveData extends SavedData {
             cTag.putString("name", u.name);
             cTag.putString("ownerName", u.ownerName);
             cTag.putString("uuid", u.uuid);
-            cTag.putInt("anchorPosX", u.anchorPos.getX());
-            cTag.putInt("anchorPosY", u.anchorPos.getY());
-            cTag.putInt("anchorPosZ", u.anchorPos.getZ());
+            if (u instanceof Unit unit && Unit.hasAnchor(unit)) {
+                cTag.putInt("anchorPosX", u.anchorPos.getX());
+                cTag.putInt("anchorPosY", u.anchorPos.getY());
+                cTag.putInt("anchorPosZ", u.anchorPos.getZ());
+            } else {
+                cTag.putInt("anchorPosX", 0);
+                cTag.putInt("anchorPosY", 0);
+                cTag.putInt("anchorPosZ", 0);
+            }
             list.add(cTag);
 
             ReignOfNether.LOGGER.info("UnitSaveData.save: " + u.ownerName + "|" + u.name + "|" + u.uuid);

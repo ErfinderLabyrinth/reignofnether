@@ -1,7 +1,7 @@
 package com.solegendary.reignofnether.building;
 
 import com.solegendary.reignofnether.alliance.AlliancesClient;
-import com.solegendary.reignofnether.alliance.AlliancesServer;
+import com.solegendary.reignofnether.alliance.AlliancesServerEvents;
 import com.solegendary.reignofnether.unit.UnitClientEvents;
 import com.solegendary.reignofnether.unit.UnitServerEvents;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
@@ -55,7 +55,7 @@ public interface GarrisonableBuilding {
             if (((Entity) unit).getLevel().isClientSide())
                 isAllied = AlliancesClient.isAllied(unit.getOwnerName(), building.ownerName);
             else
-                isAllied = AlliancesServer.isAllied(unit.getOwnerName(), building.ownerName);
+                isAllied = AlliancesServerEvents.isAllied(unit.getOwnerName(), building.ownerName);
 
             if ((unit.getOwnerName().equals(building.ownerName) || isAllied) &&
                     building instanceof GarrisonableBuilding garr && building.isBuilt &&

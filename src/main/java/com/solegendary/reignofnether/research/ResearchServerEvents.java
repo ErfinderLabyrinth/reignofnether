@@ -89,6 +89,10 @@ public class ResearchServerEvents {
         cheatItems.clear();
     }
 
+    public static void removeAllCheatsFor(String playerName) {
+        cheatItems.removeIf(r -> r.getFirst().equals(playerName));
+    }
+
     public static void syncCheats(String playerName) {
         for (Pair<String, String> cheatItem : cheatItems)
             if (playerName.equals(cheatItem.getFirst()))

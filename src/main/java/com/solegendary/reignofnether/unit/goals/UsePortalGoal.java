@@ -2,6 +2,7 @@ package com.solegendary.reignofnether.unit.goals;
 
 import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingUtils;
+import com.solegendary.reignofnether.building.buildings.neutral.NeutralTransportPortal;
 import com.solegendary.reignofnether.building.buildings.piglins.Portal;
 import com.solegendary.reignofnether.hud.HudClientEvents;
 import com.solegendary.reignofnether.sounds.SoundAction;
@@ -31,9 +32,8 @@ public class UsePortalGoal extends MoveToTargetBlockGoal {
                 moveTarget.getY() + 0.5f,
                 moveTarget.getZ() + 0.5f
             )) <= 3f) {
-
                 // teleport to destination
-                if (portal.destination != null && buildingTarget.isBuilt) {
+                if (portal.hasDestination()) {
                     BlockPos bp = portal.destination;
                     SoundClientboundPacket.playSoundAtPos(SoundAction.USE_PORTAL, bp);
                     mob.teleportTo(bp.getX() + 0.5f, bp.getY() + 0.5f, bp.getZ() + 0.5f);
@@ -56,10 +56,11 @@ public class UsePortalGoal extends MoveToTargetBlockGoal {
         if (blockPos != null) {
             if (this.mob.level.isClientSide()) {
                 this.buildingTarget = BuildingUtils.findBuilding(true, blockPos);
-                if (this.buildingTarget instanceof Portal portal
-                    && buildingTarget.ownerName.equals(((Unit) mob).getOwnerName())) {
+                if (this.buildingTarget instanceof Portal portal &&
+                    (buildingTarget.ownerName.equals(((Unit) mob).getOwnerName()) ||
+                    portal instanceof NeutralTransportPortal)) {
 
-                    if (portal.destination != null) {
+                    if (portal.hasDestination()) {
                         MiscUtil.addUnitCheckpoint(((Unit) mob), new BlockPos(
                             buildingTarget.centrePos.getX(),
                             buildingTarget.originPos.getY() + 1,

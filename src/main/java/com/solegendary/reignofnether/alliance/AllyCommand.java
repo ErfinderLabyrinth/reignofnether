@@ -5,16 +5,12 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.solegendary.reignofnether.player.PlayerServerEvents;
-import com.solegendary.reignofnether.player.RTSPlayer;
 import com.solegendary.reignofnether.sounds.SoundAction;
-import com.solegendary.reignofnether.sounds.SoundClientEvents;
 import com.solegendary.reignofnether.sounds.SoundClientboundPacket;
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.TickTask;
 
 import java.util.*;
 import java.util.concurrent.Executors;
@@ -69,7 +65,7 @@ public class AllyCommand {
         String requesterPlayerName = requesterPlayer.getName().getString();
 
         if (pendingAlliances.getOrDefault(playerName, "").equals(requesterPlayerName)) {
-            AlliancesServer.addAlliance(playerName, requesterPlayerName);
+            AlliancesServerEvents.addAlliance(playerName, requesterPlayerName);
             pendingAlliances.remove(playerName);
 
             context.getSource().sendSuccess(Component.translatable("alliance.reignofnether.now_allied", requesterPlayerName), false);
@@ -110,7 +106,7 @@ public class AllyCommand {
         pendingDisbands.add(playerId);
         scheduler.schedule(() -> {
             if (pendingDisbands.remove(playerId)) {
-                AlliancesServer.removeAlliance(playerName, allyPlayerName);
+                AlliancesServerEvents.removeAlliance(playerName, allyPlayerName);
 
                 player.sendSystemMessage(Component.translatable("alliance.reignofnether.disbanded", allyPlayerName));
                 SoundClientboundPacket.playSoundForPlayer(SoundAction.ENEMY, playerName);

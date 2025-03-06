@@ -21,6 +21,7 @@ import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.client.event.RegisterClientCommandsEvent;
 import net.minecraftforge.client.event.ScreenEvent;
@@ -150,6 +151,8 @@ public class PlayerClientEvents {
             MC.gui.setTitle(Component.translatable("titles.reignofnether.defeated"));
             MC.player.playSound(SoundRegistrar.DEFEAT.get(), 0.5f, 1.0f);
         }
+        ResearchClient.removeAllResearch();
+        ResearchClient.removeAllCheats();
     }
 
     public static void victory(String playerName) {
@@ -186,7 +189,7 @@ public class PlayerClientEvents {
     }
 
     @SubscribeEvent
-    public static void onPlayerLoginEvent(PlayerEvent.PlayerLoggedInEvent evt) {
+    public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent evt) {
         // LOG IN TO SINGLEPLAYER WORLD ONLY
         if (MC.player != null && evt.getEntity().getId() == MC.player.getId()) {
             FogOfWarClientEvents.updateFogChunks();
@@ -253,7 +256,10 @@ public class PlayerClientEvents {
         HudClientEvents.controlGroups.clear();
         UnitClientEvents.getSelectedUnits().clear();
         UnitClientEvents.getPreselectedUnits().clear();
-        UnitClientEvents.getAllUnits().removeIf(u -> (hardReset || (u instanceof Unit unit && !unit.getOwnerName().isEmpty())));
+        UnitClientEvents.getAllUnits().removeIf(u -> (hardReset || (u instanceof Unit unit && !Unit.hasAnchor(unit))));
+        for (LivingEntity entity : UnitClientEvents.getAllUnits())
+            if (entity instanceof Unit unit)
+                unit.setOwnerName("");
         UnitClientEvents.idleWorkerIds.clear();
         ResearchClient.removeAllResearch();
         ResearchClient.removeAllCheats();

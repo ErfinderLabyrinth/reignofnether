@@ -7,8 +7,6 @@ import com.solegendary.reignofnether.unit.interfaces.KeyframeAnimated;
 import com.solegendary.reignofnether.unit.interfaces.RangedAttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.packets.UnitAnimationClientboundPacket;
-import com.solegendary.reignofnether.unit.packets.UnitSyncClientboundPacket;
-import com.solegendary.reignofnether.unit.units.monsters.NecromancerUnit;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -39,7 +37,7 @@ public class UnitRangedAttackGoal<T extends net.minecraft.world.entity.Mob> exte
         this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
     }
 
-    public void tickCooldown() {
+    public void tickAttackCooldown() {
         if (this.attackCooldown > ((AttackerUnit) this.mob).getAttackCooldown())
             setToMaxAttackCooldown();
         if (this.attackCooldown > 0)

@@ -189,11 +189,11 @@ public class IllagerWaveSpawner {
 
             for (int x = bp.getX() - (sqrLen/2); x <= bp.getX() + (sqrLen/2); x++)
                 for (int z = bp.getZ() - (sqrLen / 2); z <= bp.getZ() + (sqrLen / 2); z++)
-                    bps.add(MiscUtil.getHighestNonAirBlock(level, new BlockPos(x, 0, z), true));
+                    bps.add(new BlockPos(x, 0, z));
 
             int j = Math.min(entities.size(), bps.size());
             for (int i = 0; i < j; i++)
-                entities.get(i).moveTo(bps.get(i).getX(), bps.get(i).getY() + 2, bps.get(i).getZ());
+                entities.get(i).moveTo(bps.get(i).getX(), entities.get(i).getY() + 0.5f, bps.get(i).getZ());
         }
         if (remainingPop > 0) {
             PlayerServerEvents.sendMessageToAllPlayers("Failed to spawn " + remainingPop + "/" + pop + " population worth of villager units");

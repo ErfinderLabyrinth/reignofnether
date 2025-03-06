@@ -1,18 +1,22 @@
 package com.solegendary.reignofnether.alliance;
 
 import com.solegendary.reignofnether.registrars.PacketHandler;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.network.PacketDistributor;
 
 import java.util.*;
 
-public class AlliancesServer {
+public class AlliancesServerEvents {
     private static final Map<String, Set<String>> alliances = new HashMap<>();
 
     public static void addAlliance(String owner1, String owner2) {
-        alliances.computeIfAbsent(owner1, k -> new HashSet<>()).add(owner2);
-        alliances.computeIfAbsent(owner2, k -> new HashSet<>()).add(owner1);
+        if (!owner1.equals(owner2)) {
+            alliances.computeIfAbsent(owner1, k -> new HashSet<>()).add(owner2);
+            alliances.computeIfAbsent(owner2, k -> new HashSet<>()).add(owner1);
 
-        PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(), new AllianceClientboundAddPacket(owner1, owner2));
+            PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(), new AllianceClientboundAddPacket(owner1, owner2));
+        }
     }
 
     public static void removeAlliance(String owner1, String owner2) {
@@ -63,5 +67,17 @@ public class AlliancesServer {
         alliances.clear();
         PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(), new AllianceClientboundRemovePacket());
     }
+
+    public static void syncAlliances() {
+        for (String player1 : alliances.keySet())
+            for (String player2 : alliances.get(player1))
+                PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(), new AllianceClientboundAddPacket(player1, player2));
+    }
+
+    @SubscribeEvent
+    public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent evt) {
+        syncAlliances();
+    }
+
 
 }

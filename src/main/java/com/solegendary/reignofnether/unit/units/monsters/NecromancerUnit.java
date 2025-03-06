@@ -200,11 +200,6 @@ public class NecromancerUnit extends Skeleton implements Unit, AttackerUnit, Ran
         Unit.tick(this);
         AttackerUnit.tick(this);
 
-        // need to do this outside the goal so it ticks down while not attacking
-        // only needed for attack goals created by reignofnether like RangedBowAttackUnitGoal
-        if (attackGoal != null)
-            attackGoal.tickCooldown();
-
         if (level.isClientSide()) {
             if (animateTicks > 0) {
                 animateTicks -= 1;

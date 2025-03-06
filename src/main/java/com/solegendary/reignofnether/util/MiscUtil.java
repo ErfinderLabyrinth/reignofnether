@@ -7,6 +7,7 @@ import com.mojang.math.Vector3d;
 import com.solegendary.reignofnether.alliance.AlliancesClient;
 import com.solegendary.reignofnether.blocks.RTSStartBlock;
 import com.solegendary.reignofnether.building.*;
+import com.solegendary.reignofnether.building.buildings.shared.AbstractBridge;
 import com.solegendary.reignofnether.cursor.CursorClientEvents;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
@@ -37,7 +38,9 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.monster.Vex;
+import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.FireworkRocketEntity;
 import net.minecraft.world.item.ItemStack;
@@ -252,12 +255,14 @@ public class MiscUtil {
                 attackerUnit.getAttackGoal() instanceof AbstractMeleeAttackUnitGoal) {
             return false;
         }
+        boolean isPassiveNonUnit = !(targetEntity instanceof Unit) &&
+                (targetEntity instanceof Animal || targetEntity instanceof Villager);
 
         // Checks if neutral units can be attacked based on neutralAggro flag and other conditions
         boolean canAttackNeutral =
                 rs == Relationship.NEUTRAL && neutralAggro &&
                         !(targetEntity instanceof Vex) &&
-                        !ResourceSources.isHuntableAnimal(targetEntity);
+                        !isPassiveNonUnit;
 
         return (rs == Relationship.HOSTILE || canAttackNeutral) &&
                 targetEntity.getId() != unitMob.getId();
@@ -273,7 +278,7 @@ public class MiscUtil {
 
         for (Building building : buildings) {
             // Check if the building is attackable, taking into account the relationship
-            if (isBuildingAttackable(unitMob, building)) {
+            if (isBuildingAttackable(unitMob, building) && !(building instanceof AbstractBridge)) {
                 BlockPos attackPos = building.getClosestGroundPos(unitMob.getOnPos(), 1);
                 double dist = Math.sqrt(unitMob.getOnPos().distSqr(attackPos));
                 if (dist < closestDist) {

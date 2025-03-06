@@ -1,28 +1,33 @@
 
-1.19.2-1.1.2b
+1.19.2-1.1.3
 
 [✔] Done and tested
 [🟡] Partially done and/or needs testing
 [❌] Not done, including unmerged PRs
 
+
 Features
 --------
-[❌] Healing fountains
-[❌] Neutral Transport portals
-
+[🟡] Healing fountains
+[🟡] Neutral Transport portals
+[🟡] Llamas
 
 Bugfixes
 --------
 [🟡] Production % numbers no longer tick up when the game is paused in singleplayer
-    - does this apply to any other ClientTickEvent stuff?
-[❌] are alliances synced for newly logging in players?
-[❌] reset player research after being defeated
+[🟡] Resyncs alliances for players who log in midway through a match
+[🟡] Player research is now reset upon being defeated
+[🟡] Fixed enemy illagers getting stuck in and under ice blocks when spawning over water
+[🟡] Units no longer automatically attack bridges and passive vanilla mobs when neutralAggro is true
 
 Quality of Life
 ---------------
 
-[❌] save alliances to world data
-[❌] save transport portal links to world data
+[🟡] Transport portal links are now saved between server restarts
+[🟡] Selecting all military units no longer selects garrisoned units
+[🟡] Enemy buildings and units placed in sandbox become neutral instead of being destroyed after exiting sandbox
+    - Buildings built by workers and any unanchored units will still be destroyed
+[🟡] You can now manage anchors on enemy units in sandbox
 
 Balancing
 ---------

@@ -303,7 +303,8 @@ public class HudClientEvents {
 
         if (hudSelectedBuilding != null) {
             boolean hudSelBuildingOwned =
-                BuildingClientEvents.getPlayerToBuildingRelationship(hudSelectedBuilding) == Relationship.OWNED;
+                BuildingClientEvents.getPlayerToBuildingRelationship(hudSelectedBuilding) == Relationship.OWNED ||
+                SandboxClientEvents.isSandboxPlayer();
 
             // -----------------
             // Building portrait
@@ -758,9 +759,8 @@ public class HudClientEvents {
         // ---------------------------
         // Unit sandbox action buttons
         // ---------------------------
-        if (selUnits.size() > 0 && getPlayerToEntityRelationship(selUnits.get(0)) == Relationship.NEUTRAL
-                && hudSelectedEntity instanceof Unit unit) {
-
+        if (selUnits.size() > 0 && SandboxClientEvents.isSandboxPlayer() && hudSelectedEntity instanceof Unit &&
+            getPlayerToEntityRelationship(selUnits.get(0)) != Relationship.OWNED) {
             blitX = 0;
             blitY = screenHeight - iconFrameSize;
             ArrayList<Button> actionButtons = new ArrayList<>();

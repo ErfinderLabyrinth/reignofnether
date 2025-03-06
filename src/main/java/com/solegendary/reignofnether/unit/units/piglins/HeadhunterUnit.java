@@ -208,11 +208,6 @@ public class HeadhunterUnit extends PiglinBrute implements Unit, AttackerUnit, R
         AttackerUnit.tick(this);
         this.mountGoal.tick();
 
-        // need to do this outside the goal so it ticks down while not attacking
-        // only needed for attack goals created by reignofnether like RangedBowAttackUnitGoal
-        if (attackGoal != null)
-            attackGoal.tickCooldown();
-
         if (bloodlustTicks > 0)
             bloodlustTicks -= 1;
     }

@@ -39,7 +39,7 @@ public class SandboxActionButtons {
             new ResourceLocation("minecraft", "textures/block/respawn_anchor_side4.png"),
             Keybindings.keyQ,
             () -> CursorClientEvents.getLeftClickSandboxAction() == SandboxAction.SET_ANCHOR,
-            () -> !neutralUnitsSelected() || !SandboxClientEvents.isSandboxPlayer(),
+            () -> !SandboxClientEvents.isSandboxPlayer(),
             () -> true,
             () -> CursorClientEvents.setLeftClickSandboxAction(SandboxAction.SET_ANCHOR),
             null,
@@ -55,7 +55,7 @@ public class SandboxActionButtons {
             new ResourceLocation("minecraft", "textures/block/respawn_anchor_top_off.png"),
             Keybindings.keyW,
             () -> CursorClientEvents.getLeftClickSandboxAction() == SandboxAction.RESET_TO_ANCHOR,
-            () -> !neutralUnitsSelected() || !SandboxClientEvents.isSandboxPlayer(),
+            () -> !SandboxClientEvents.isSandboxPlayer(),
             () -> selectedUnitsHaveAnchor(),
             () -> {
                 if (!UnitClientEvents.getSelectedUnits().isEmpty()) {
@@ -79,7 +79,7 @@ public class SandboxActionButtons {
             new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/barrier.png"),
             Keybindings.keyE,
             () -> CursorClientEvents.getLeftClickSandboxAction() == SandboxAction.REMOVE_ANCHOR,
-            () -> !neutralUnitsSelected() || !SandboxClientEvents.isSandboxPlayer(),
+            () -> !SandboxClientEvents.isSandboxPlayer(),
             () -> selectedUnitsHaveAnchor(),
             () -> {
                 if (!UnitClientEvents.getSelectedUnits().isEmpty())

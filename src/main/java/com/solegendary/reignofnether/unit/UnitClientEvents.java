@@ -787,7 +787,7 @@ public class UnitClientEvents {
                     }
 
                     // draw anchor pos
-                    if (unit.getAnchor() != null && !unit.getAnchor().equals(new BlockPos(0,0,0))) {
+                    if (SandboxClientEvents.isSandboxPlayer() && unit.getAnchor() != null && !unit.getAnchor().equals(new BlockPos(0,0,0))) {
                         BlockPos ap = unit.getAnchor();
                         float a = MiscUtil.getOscillatingFloat(0.25f, 0.75f);
                         Vec3 apVec3 = new Vec3(ap.getX() + 0.5f, ap.getY() + 1.0f, ap.getZ() + 0.5f);

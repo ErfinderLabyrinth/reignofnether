@@ -4,6 +4,7 @@ import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.building.buildings.neutral.EndPortal;
 import com.solegendary.reignofnether.building.buildings.neutral.HealingFountain;
 import com.solegendary.reignofnether.building.buildings.neutral.CapturableBeacon;
+import com.solegendary.reignofnether.building.buildings.neutral.NeutralTransportPortal;
 import com.solegendary.reignofnether.cursor.CursorClientEvents;
 import com.solegendary.reignofnether.gamemode.ClientGameModeHelper;
 import com.solegendary.reignofnether.gamemode.GameMode;
@@ -63,7 +64,8 @@ public class SandboxClientEvents {
         return List.of(
             CapturableBeacon.getBuildButton(Keybindings.keyQ),
             HealingFountain.getBuildButton(Keybindings.keyW),
-            EndPortal.getBuildButton(Keybindings.keyE)
+            EndPortal.getBuildButton(Keybindings.keyE),
+            NeutralTransportPortal.getBuildButton(Keybindings.keyR)
         );
     }
 
@@ -120,7 +122,8 @@ public class SandboxClientEvents {
                 PolarBearProd.getPlaceButton(),
                 GrizzlyBearProd.getPlaceButton(),
                 PandaProd.getPlaceButton(),
-                WolfProd.getPlaceButton()
+                WolfProd.getPlaceButton(),
+                LlamaProd.getPlaceButton()
             );
         };
     }

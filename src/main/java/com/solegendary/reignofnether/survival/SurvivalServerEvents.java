@@ -1,6 +1,7 @@
 package com.solegendary.reignofnether.survival;
 
 import com.solegendary.reignofnether.ReignOfNether;
+import com.solegendary.reignofnether.alliance.AlliancesServerEvents;
 import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingServerEvents;
 import com.solegendary.reignofnether.building.BuildingUtils;
@@ -243,6 +244,8 @@ public class SurvivalServerEvents {
             SurvivalClientboundPacket.enableAndSetDifficulty(difficulty);
             SurvivalClientboundPacket.setWaveNumber(nextWave.number);
             SurvivalClientboundPacket.setWaveRandomSeed(Wave.randomSeed);
+            for (RTSPlayer rtsPlayer : PlayerServerEvents.rtsPlayers)
+                AlliancesServerEvents.addAlliance(rtsPlayer.name, evt.getEntity().getName().getString());
         }
     }
 
@@ -251,6 +254,7 @@ public class SurvivalServerEvents {
         if (evt.getEntity() instanceof Unit unit &&
                 evt.getEntity() instanceof LivingEntity entity &&
                 !evt.getLevel().isClientSide &&
+                isEnabled() &&
                 ENEMY_OWNER_NAME.equals(unit.getOwnerName())) {
 
             enemies.add(new WaveEnemy(unit));

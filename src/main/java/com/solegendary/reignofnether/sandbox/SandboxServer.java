@@ -48,7 +48,7 @@ public class SandboxServer {
 
         if (entityType != null) {
             Entity entity = UnitServerEvents.spawnMob(entityType, serverLevel, blockPos, playerName);
-            if (entity instanceof Unit unit && playerName.isEmpty()) {
+            if (entity instanceof Unit unit && (playerName.isEmpty() || playerName.equals("Enemy"))) {
                 unit.setAnchor(blockPos);
             }
         }

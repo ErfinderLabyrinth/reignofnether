@@ -54,6 +54,8 @@ public class BuildingSaveData extends SavedData {
                 boolean isBuilt = btag.getBoolean("isBuilt");
                 int upgradeLevel = btag.getInt("upgradeLevel");
                 Portal.PortalType portalType = Portal.PortalType.valueOf(btag.getString("portalType"));
+                BlockPos portalDestination = new BlockPos(btag.getInt("xp"), btag.getInt("yp"), btag.getInt("zp"));
+
                 data.buildings.add(new BuildingSave(pos,
                     level,
                     name,
@@ -63,7 +65,8 @@ public class BuildingSaveData extends SavedData {
                     isDiagonalBridge,
                     isBuilt,
                     upgradeLevel,
-                    portalType
+                    portalType,
+                    portalDestination
                 ));
                 ReignOfNether.LOGGER.info("BuildingSaveData.load: " + ownerName + "|" + name);
             }
@@ -91,6 +94,9 @@ public class BuildingSaveData extends SavedData {
             cTag.putBoolean("isBuilt", b.isBuilt);
             cTag.putInt("upgradeLevel", b.upgradeLevel);
             cTag.putString("portalType", b.portalType != null ? b.portalType.name() : Portal.PortalType.BASIC.name());
+            cTag.putInt("xp", b.portalDestination != null ? b.portalDestination.getX() : 0);
+            cTag.putInt("yp", b.portalDestination != null ? b.portalDestination.getY() : 0);
+            cTag.putInt("zp", b.portalDestination != null ? b.portalDestination.getZ() : 0);
             list.add(cTag);
 
             ReignOfNether.LOGGER.info("BuildingSaveData.save: " + b.ownerName + "|" + b.name);

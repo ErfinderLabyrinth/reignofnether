@@ -30,6 +30,7 @@ public class BuildingClientboundPacket {
     public int upgradeLevel;
     public boolean isBuilt;
     public Portal.PortalType portalType;
+    public BlockPos portalDestination;
     public boolean forPlayerLoggingIn; // is this placement for someone logging in currently joined?
 
     public static void placeBuilding(
@@ -42,6 +43,7 @@ public class BuildingClientboundPacket {
         int upgradeLevel,
         boolean isBuilt,
         Portal.PortalType portalType,
+        BlockPos portalDestination,
         boolean forPlayerLoggingIn
     ) {
         PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(), new BuildingClientboundPacket(BuildingAction.PLACE,
@@ -55,6 +57,7 @@ public class BuildingClientboundPacket {
             upgradeLevel,
             isBuilt,
             portalType,
+            portalDestination,
             forPlayerLoggingIn
         ));
     }
@@ -72,6 +75,7 @@ public class BuildingClientboundPacket {
                 0,
                 false,
                 Portal.PortalType.BASIC,
+                new BlockPos(0,0,0),
                 false
             )
         );
@@ -90,6 +94,7 @@ public class BuildingClientboundPacket {
                 0,
                 false,
                 Portal.PortalType.BASIC,
+                new BlockPos(0,0,0),
                 false
             )
         );
@@ -110,6 +115,7 @@ public class BuildingClientboundPacket {
                 0,
                 false,
                 Portal.PortalType.BASIC,
+                new BlockPos(0,0,0),
                 false
             )
         );
@@ -128,6 +134,7 @@ public class BuildingClientboundPacket {
                 0,
                 false,
                 Portal.PortalType.BASIC,
+                new BlockPos(0,0,0),
                 false
             )
         );
@@ -146,6 +153,7 @@ public class BuildingClientboundPacket {
                         0,
                         false,
                         Portal.PortalType.BASIC,
+                        new BlockPos(0,0,0),
                         false
                 )
         );
@@ -164,6 +172,7 @@ public class BuildingClientboundPacket {
                         0,
                         false,
                         Portal.PortalType.BASIC,
+                        new BlockPos(0,0,0),
                         false
                 )
         );
@@ -181,6 +190,7 @@ public class BuildingClientboundPacket {
         int upgradeLevel,
         boolean isBuilt,
         Portal.PortalType portalType,
+        BlockPos portalDestination,
         boolean forPlayerLoggingIn
     ) {
         this.action = action;
@@ -194,6 +204,7 @@ public class BuildingClientboundPacket {
         this.isBuilt = isBuilt;
         this.upgradeLevel = upgradeLevel;
         this.portalType = portalType;
+        this.portalDestination = portalDestination;
         this.forPlayerLoggingIn = forPlayerLoggingIn;
     }
 
@@ -209,6 +220,7 @@ public class BuildingClientboundPacket {
         this.isBuilt = buffer.readBoolean();
         this.upgradeLevel = buffer.readInt();
         this.portalType = buffer.readEnum(Portal.PortalType.class);
+        this.portalDestination = buffer.readBlockPos();
         this.forPlayerLoggingIn = buffer.readBoolean();
     }
 
@@ -224,6 +236,7 @@ public class BuildingClientboundPacket {
         buffer.writeBoolean(this.isBuilt);
         buffer.writeInt(this.upgradeLevel);
         buffer.writeEnum(this.portalType);
+        buffer.writeBlockPos(this.portalDestination);
         buffer.writeBoolean(this.forPlayerLoggingIn);
     }
 
@@ -256,6 +269,7 @@ public class BuildingClientboundPacket {
                         this.upgradeLevel,
                         this.isBuilt,
                         this.portalType,
+                        this.portalDestination,
                         this.forPlayerLoggingIn
                     );
                     case SYNC_BLOCKS_AND_OWNER -> BuildingClientEvents.syncBuilding(building, this.blocksPlaced, this.ownerName);

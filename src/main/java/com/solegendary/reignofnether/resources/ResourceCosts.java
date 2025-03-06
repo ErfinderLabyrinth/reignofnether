@@ -51,6 +51,7 @@ public class ResourceCosts {
     public static final ResourceCost GRIZZLY_BEAR = new ResourceCost(ID, "GRIZZLY_BEAR");
     public static final ResourceCost PANDA = new ResourceCost(ID, "PANDA");
     public static final ResourceCost WOLF = new ResourceCost(ID, "WOLF");
+    public static final ResourceCost LLAMA = new ResourceCost(ID, "LLAMA");
 
     //BUILDINGS
     public static final ResourceCost BEACON = new ResourceCost(ID, "BEACON");
@@ -216,6 +217,7 @@ public class ResourceCosts {
         GRIZZLY_BEAR.bakeValues(ReignOfNetherCommonConfigs.UnitCosts.GRIZZLY_BEAR);
         PANDA.bakeValues(ReignOfNetherCommonConfigs.UnitCosts.PANDA);
         WOLF.bakeValues(ReignOfNetherCommonConfigs.UnitCosts.WOLF);
+        LLAMA.bakeValues(ReignOfNetherCommonConfigs.UnitCosts.LLAMA);
 
         // ******************* BUILDINGS ******************* //
         BEACON.bakeValues(ReignOfNetherCommonConfigs.BuildingCosts.BEACON);

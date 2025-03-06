@@ -360,9 +360,12 @@
     "buildings.neutral.reignofnether.end_portal": "End Portal",
     "buildings.neutral.reignofnether.end_portal.tooltip1": "A mysterious portal that can produce ",
     "buildings.neutral.reignofnether.end_portal.tooltip2": "creatures from the end dimension.",
-    "buildings.neutral.reignofnether.healing_fountain": "Healing Fountain (Coming soon!)",
+    "buildings.neutral.reignofnether.healing_fountain": "Healing Fountain",
     "buildings.neutral.reignofnether.healing_fountain.tooltip1": "A magical spring of water that ",
     "buildings.neutral.reignofnether.healing_fountain.tooltip2": "regenerates all nearby units.",
+    "buildings.neutral.reignofnether.neutral_transport_portal": "Neutral Transport Portal",
+    "buildings.neutral.reignofnether.neutral_transport_portal.tooltip1": "A portal that anyone can use to teleport ",
+    "buildings.neutral.reignofnether.neutral_transport_portal.tooltip2": "units to another connected portal.",
 
     "commands.reignofnether.toggle_fow": "%s - Toggle fog of war for all players",
     "commands.reignofnether.surrender": "%s - Concede the match",
@@ -1055,7 +1058,7 @@
     "sandbox.reignofnether.unit_cheats2": "fast resource gathering, sunlight immunity",
     "sandbox.reignofnether.unit_cheats3": "(Click to toggle)",
     "sandbox.reignofnether.exit1": "Reset & Exit Sandbox Mode",
-    "sandbox.reignofnether.exit2": "(Destroys all non-neutrals)",
+    "sandbox.reignofnether.exit2": "(Kills all unanchored units)",
 
     "startpos.reignofnether.positions_button.tooltip1": "Starting Locations",
     "startpos.reignofnether.positions_button.tooltip2": "%d/%d locations taken",

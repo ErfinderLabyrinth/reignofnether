@@ -27,6 +27,8 @@ import net.minecraft.world.level.Level;
 
 import java.util.List;
 
+import static com.solegendary.reignofnether.util.MiscUtil.fcs;
+
 public class Bloodlust extends Ability {
 
     private static final int HEALTH_COST = 10;
@@ -68,7 +70,7 @@ public class Bloodlust extends Ability {
                 () -> UnitClientEvents.sendUnitCommand(UnitAction.BLOOD_LUST),
                 null,
                 List.of(
-                        FormattedCharSequence.forward(I18n.get("abilities.reignofnether.bloodlust"), Style.EMPTY),
+                        fcs(I18n.get("abilities.reignofnether.bloodlust"), true),
                         FormattedCharSequence.forward("\uE007  " + DURATION_SECONDS, MyRenderer.iconStyle),
                         FormattedCharSequence.forward("", Style.EMPTY),
                         FormattedCharSequence.forward(I18n.get("abilities.reignofnether.bloodlust.tooltip1", HEALTH_COST), Style.EMPTY),

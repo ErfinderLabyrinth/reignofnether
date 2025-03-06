@@ -4,6 +4,7 @@ import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingUtils;
+import com.solegendary.reignofnether.building.buildings.neutral.NeutralTransportPortal;
 import com.solegendary.reignofnether.building.buildings.piglins.Portal;
 import com.solegendary.reignofnether.cursor.CursorClientEvents;
 import com.solegendary.reignofnether.hud.AbilityButton;
@@ -65,9 +66,12 @@ public class ConnectPortal extends Ability {
             portal.disconnectPortal();
 
             Building targetBuilding = BuildingUtils.findBuilding(level.isClientSide(), targetBp);
-            if (targetBuilding instanceof Portal targetPortal && targetPortal.portalType == Portal.PortalType.TRANSPORT
-                && targetBuilding != building && targetBuilding.isBuilt
-                && targetBuilding.ownerName.equals(building.ownerName)) {
+            if (targetBuilding instanceof Portal targetPortal && targetPortal.portalType == Portal.PortalType.TRANSPORT &&
+                targetBuilding != building && targetBuilding.isBuilt &&
+                (targetBuilding.ownerName.equals(building.ownerName) ||
+                (targetBuilding instanceof NeutralTransportPortal &&
+                    building instanceof NeutralTransportPortal))) {
+
                 targetPortal.disconnectPortal();
                 targetPortal.destination = portal.centrePos;
                 portal.destination = targetPortal.centrePos;

@@ -6,6 +6,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.solegendary.reignofnether.alliance.AlliancesClient;
 import com.solegendary.reignofnether.building.buildings.monsters.Laboratory;
 import com.solegendary.reignofnether.building.buildings.neutral.Beacon;
+import com.solegendary.reignofnether.building.buildings.neutral.NeutralTransportPortal;
 import com.solegendary.reignofnether.building.buildings.piglins.Portal;
 import com.solegendary.reignofnether.building.buildings.shared.AbstractBridge;
 import com.solegendary.reignofnether.building.buildings.villagers.Castle;
@@ -689,7 +690,7 @@ public class BuildingClientEvents {
                     MyRenderer.drawLineBoxOutlineOnly(evt.getPoseStack(), le.getBoundingBox(), 0, 1.0f, 0, a, false);
                 }
             }
-            if (selBuilding instanceof Portal portal && portal.destination != null) {
+            if (selBuilding instanceof Portal portal && portal.hasDestination()) {
                 float a = MiscUtil.getOscillatingFloat(0.25f, 0.75f);
                 MyRenderer.drawLine(evt.getPoseStack(), portal.centrePos, portal.destination, 0, 1, 0, a);
             }
@@ -1014,6 +1015,7 @@ public class BuildingClientEvents {
         int upgradeLevel,
         boolean isBuilt,
         Portal.PortalType portalType,
+        BlockPos portalDestination,
         boolean forPlayerLoggingIn
     ) {
 
@@ -1048,7 +1050,11 @@ public class BuildingClientEvents {
                 } else if (newBuilding instanceof Laboratory lab) {
                     lab.changeStructure(Laboratory.upgradedStructureName);
                 } else if (newBuilding instanceof Portal portal) {
-                    portal.changeStructure(portalType);
+                    if (!(newBuilding instanceof NeutralTransportPortal)) {
+                        portal.changeStructure(portalType);
+                    }
+                    if (portalType == Portal.PortalType.TRANSPORT)
+                        portal.destination = portalDestination;
                 } else if (newBuilding instanceof Library library) {
                     library.changeStructure(Library.upgradedStructureName);
                 } else if (newBuilding instanceof Beacon beacon) {

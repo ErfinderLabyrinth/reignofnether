@@ -258,6 +258,12 @@ public class EntityRegistrar {
                     .clientTrackingRange(UNIT_CLIENT_TRACKING_RANGE)
                     .build(new ResourceLocation(ReignOfNether.MOD_ID, "wolf_unit").toString()));
 
+    public static final RegistryObject<EntityType<LlamaUnit>> LLAMA_UNIT = ENTITIES.register("llama_unit",
+            () -> EntityType.Builder.of(LlamaUnit::new, MobCategory.CREATURE)
+                    .sized(EntityType.LLAMA.getWidth(), EntityType.LLAMA.getHeight())
+                    .clientTrackingRange(UNIT_CLIENT_TRACKING_RANGE)
+                    .build(new ResourceLocation(ReignOfNether.MOD_ID, "llama_unit").toString()));
+
     public static void init() {
         ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
     }
@@ -300,6 +306,7 @@ public class EntityRegistrar {
             case GrizzlyBearProd.itemName -> EntityRegistrar.GRIZZLY_BEAR_UNIT.get();
             case PandaProd.itemName -> EntityRegistrar.PANDA_UNIT.get();
             case WolfProd.itemName -> EntityRegistrar.WOLF_UNIT.get();
+            case LlamaProd.itemName -> EntityRegistrar.LLAMA_UNIT.get();
             default -> null;
         };
     }

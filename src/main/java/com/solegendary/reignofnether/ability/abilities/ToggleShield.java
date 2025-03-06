@@ -25,6 +25,8 @@ import net.minecraft.world.level.Level;
 
 import java.util.List;
 
+import static com.solegendary.reignofnether.util.MiscUtil.fcs;
+
 public class ToggleShield extends Ability {
 
     private static final int CD_MAX_SECONDS = 0;
@@ -56,7 +58,7 @@ public class ToggleShield extends Ability {
                 () -> UnitClientEvents.sendUnitCommand(UnitAction.TOGGLE_SHIELD),
                 null,
                 List.of(
-                        FormattedCharSequence.forward(I18n.get("abilities.reignofnether.shield_stance"), Style.EMPTY),
+                        fcs(I18n.get("abilities.reignofnether.shield_stance"), true),
                         FormattedCharSequence.forward("", Style.EMPTY),
                         FormattedCharSequence.forward(I18n.get("abilities.reignofnether.shield_stance.tooltip1"), Style.EMPTY),
                         FormattedCharSequence.forward(I18n.get("abilities.reignofnether.shield_stance.tooltip2"), Style.EMPTY),

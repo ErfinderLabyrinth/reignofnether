@@ -10,7 +10,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.WaterFluid;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,14 +41,15 @@ public class BuildingBlockData {
             CompoundTag blockNbt = blocksNbt.getCompound(i);
             ListTag blockPosNbt = blockNbt.getList("pos", 3);
 
-            blocks.add(new BuildingBlock(
-                new BlockPos(
+            BlockPos bp = new BlockPos(
                     blockPosNbt.getInt(0),
                     blockPosNbt.getInt(1),
                     blockPosNbt.getInt(2)
-                ),
-                palette.get(blockNbt.getInt("state"))
-            ));
+            );
+            BlockState bs = palette.get(blockNbt.getInt("state"));
+
+            if (bs.getBlock() != Blocks.WATER || bs.getFluidState().isSource())
+                blocks.add(new BuildingBlock(bp, bs));
         }
         return blocks;
     }
