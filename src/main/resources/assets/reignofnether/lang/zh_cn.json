@@ -360,9 +360,12 @@
   "buildings.neutral.reignofnether.end_portal": "末地传送门",
   "buildings.neutral.reignofnether.end_portal.tooltip1": "一座神秘的传送门，",
   "buildings.neutral.reignofnether.end_portal.tooltip2": "能够生产来自末地的生灵。",
-  "buildings.neutral.reignofnether.healing_fountain": "疗愈喷泉（敬请期待！）",
+  "buildings.neutral.reignofnether.healing_fountain": "疗愈喷泉",
   "buildings.neutral.reignofnether.healing_fountain.tooltip1": "一座魔法泉水，",
   "buildings.neutral.reignofnether.healing_fountain.tooltip2": "能够为邻近的单位提供再生效果。",
+  "buildings.neutral.reignofnether.neutral_transport_portal": "运输传送门（中立）",
+  "buildings.neutral.reignofnether.neutral_transport_portal.tooltip1": "任何单位均可通过此传送门",
+  "buildings.neutral.reignofnether.neutral_transport_portal.tooltip2": "传送至相连的另一座传送门。",
 
   "commands.reignofnether.toggle_fow": "%s - 为所有玩家开关战争迷雾",
   "commands.reignofnether.surrender": "%s - 投降认输",
@@ -1055,7 +1058,7 @@
   "sandbox.reignofnether.unit_cheats2": "快速采集资源，免疫阳光下燃烧",
   "sandbox.reignofnether.unit_cheats3": "（鼠标左击以切换）",
   "sandbox.reignofnether.exit1": "重置并退出沙盒模式",
-  "sandbox.reignofnether.exit2": "（将移除所有非中立单位/建筑）",
+  "sandbox.reignofnether.exit2": "（将移除所有未设置锚点的单位）",
 
   "startpos.reignofnether.positions_button.tooltip1": "出生点",
   "startpos.reignofnether.positions_button.tooltip2": "已占据/出生点总数：%d/%d",
