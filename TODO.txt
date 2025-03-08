@@ -1,5 +1,5 @@
 
-1.19.2-1.1.3a
+1.19.2-1.1.4
 
 [✔] Done and tested
 [🟡] Partially done and/or needs testing
@@ -8,14 +8,16 @@
 
 Features
 --------
-
+HEROES (in order of priority)
+    - spells
+    - spell animations
+    - spell particles
+    - levelling and exp
+    -
 
 
 Bugfixes
 --------
-[✔] Fixed Pillagers not attacking
-[✔] Healing fountains now remove their water blocks when deleted
-[✔] Beacon win timers are now saved between server restarts
 
 
 
