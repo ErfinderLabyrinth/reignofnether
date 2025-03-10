@@ -17,8 +17,6 @@ Features
 Bugfixes
 --------
 
-[❌] Workers on a building that is still auto-building the foundation layer actually slows down building
-
 [❌] Central portals sometimes do not ignite (and this somehow makes grunts spawn underground)
 
 [❌] Dying in survival puts you in a bugged survival mode
@@ -44,5 +42,3 @@ Balancing
 ---------
 
 [❌] Soulfires created by blazes need to be made temporary
-
-[❌] let allied survival players use transport portals

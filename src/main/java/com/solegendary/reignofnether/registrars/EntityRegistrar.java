@@ -264,6 +264,12 @@ public class EntityRegistrar {
                     .clientTrackingRange(UNIT_CLIENT_TRACKING_RANGE)
                     .build(new ResourceLocation(ReignOfNether.MOD_ID, "llama_unit").toString()));
 
+    public static final RegistryObject<EntityType<PhantomSummon>> PHANTOM_SUMMON = ENTITIES.register("phantom_summon",
+            () -> EntityType.Builder.of(PhantomSummon::new, MobCategory.MONSTER)
+                    .sized(EntityType.PHANTOM.getWidth(), EntityType.PHANTOM.getHeight())
+                    .clientTrackingRange(UNIT_CLIENT_TRACKING_RANGE)
+                    .build(new ResourceLocation(ReignOfNether.MOD_ID, "phantom_summon").toString()));
+
     public static void init() {
         ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
     }

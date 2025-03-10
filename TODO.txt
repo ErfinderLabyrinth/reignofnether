@@ -13,16 +13,31 @@ HEROES (in order of priority)
     - spell animations
     - spell particles
     - levelling and exp
-    -
+    - spell levelling and requirements
+    - mana?
+    - equipment
 
 
 Bugfixes
 --------
+[❌] Prevent superflat worlds generating regular worlds after a certain range
+[❌] Kicked for sending too many packets when spam clicking large army
+[❌] groundYlevel not working if you're already below it?
+[❌] gui scale not working?
 
 
+
+Quality of Life
+---------------
+[❌] Ravagers that are mounted no longer aggro automatically onto buildings
+    - This prevents them hurting themselves from the splash damage
 
 Balancing
 ---------
+- Nerf sculk amplifiers? (can reduce damage)
+- Nerf ravager artillery? (take away bonus damage?)
+- Buff creepers?
+- Buff
 
 
 Villagers
