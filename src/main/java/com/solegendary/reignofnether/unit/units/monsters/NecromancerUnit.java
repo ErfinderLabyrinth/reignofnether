@@ -1,8 +1,16 @@
 package com.solegendary.reignofnether.unit.units.monsters;
 
 import com.solegendary.reignofnether.ability.Ability;
+import com.solegendary.reignofnether.ability.abilities.CastSummonVexes;
+import com.solegendary.reignofnether.ability.abilities.SetFangsCircle;
+import com.solegendary.reignofnether.ability.abilities.SetFangsLine;
+import com.solegendary.reignofnether.ability.heroAbilities.monster.BloodMoon;
+import com.solegendary.reignofnether.ability.heroAbilities.monster.InsomniaCurse;
+import com.solegendary.reignofnether.ability.heroAbilities.monster.RaiseDead;
+import com.solegendary.reignofnether.ability.heroAbilities.monster.SoulSiphonPassive;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientboundPacket;
 import com.solegendary.reignofnether.hud.AbilityButton;
+import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.time.NightUtils;
@@ -115,6 +123,22 @@ public class NecromancerUnit extends Skeleton implements Unit, AttackerUnit, Ran
     public void setFollowTarget(@Nullable LivingEntity target) { this.followTarget = target; }
 
     // endregion
+
+    private int skillPoints = 0;
+    @Override public int getSkillPoints() { return 0; }
+    @Override public void setSkillPoints(int points) { skillPoints = points; }
+    private int heroLevel = 1;
+    private boolean rankUpMenuOpen = false;
+    @Override public boolean isRankUpMenuOpen() { return rankUpMenuOpen; }
+    @Override public void showRankUpMenu(boolean show) { rankUpMenuOpen = show; }
+    @Override public int getHeroLevel() { return Math.min(MAX_HERO_LEVEL, heroLevel); }
+    @Override public void levelUp() {
+        if (heroLevel < MAX_HERO_LEVEL) {
+            heroLevel += 1;
+            skillPoints += 1;
+        }
+    }
+
     final static public float attackDamage = 4.0f;
     final static public float attacksPerSecond = 0.35f;
     final static public float maxHealth = 100.0f;
@@ -176,6 +200,22 @@ public class NecromancerUnit extends Skeleton implements Unit, AttackerUnit, Ran
 
     public NecromancerUnit(EntityType<? extends Skeleton> entityType, Level level) {
         super(entityType, level);
+
+        RaiseDead ab1 = new RaiseDead(this);
+        InsomniaCurse ab2 = new InsomniaCurse(this);
+        SoulSiphonPassive ab3 = new SoulSiphonPassive(this);
+        BloodMoon ab4 = new BloodMoon(this);
+        this.abilities.add(ab1);
+        this.abilities.add(ab2);
+        this.abilities.add(ab3);
+        this.abilities.add(ab4);
+
+        if (level.isClientSide()) {
+            this.abilityButtons.add(ab1.getButton(Keybindings.keyQ));
+            this.abilityButtons.add(ab2.getButton(Keybindings.keyW));
+            this.abilityButtons.add(ab3.getButton(Keybindings.keyE));
+            this.abilityButtons.add(ab4.getButton(Keybindings.keyR));
+        }
     }
 
     @Override

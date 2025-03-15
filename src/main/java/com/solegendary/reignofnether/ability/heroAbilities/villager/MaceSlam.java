@@ -10,8 +10,8 @@ import net.minecraft.world.level.Level;
 
 public class MaceSlam extends HeroAbility {
 
-    public MaceSlam(HeroUnit hero, UnitAction action, Level level, int cooldownMax, float range, float radius, boolean canTargetEntities) {
-        super(hero, action, level, cooldownMax, range, radius, canTargetEntities);
+    public MaceSlam(HeroUnit hero) {
+        super(hero, 3, UnitAction.MACE_SLAM, 20, 3, 0, false);
     }
 
 

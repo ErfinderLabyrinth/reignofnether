@@ -1,5 +1,6 @@
 package com.solegendary.reignofnether.registrars;
 
+import com.solegendary.reignofnether.ability.AbilityServerboundPacket;
 import com.solegendary.reignofnether.alliance.AllianceClientboundAddPacket;
 import com.solegendary.reignofnether.alliance.AllianceClientboundRemovePacket;
 import com.solegendary.reignofnether.ReignOfNether;
@@ -135,6 +136,10 @@ public final class PacketHandler {
         INSTANCE.messageBuilder(AbilityClientboundPacket.class, index++, NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(AbilityClientboundPacket::encode).decoder(AbilityClientboundPacket::new)
                 .consumer(AbilityClientboundPacket::handle).add();
+
+        INSTANCE.messageBuilder(AbilityServerboundPacket.class, index++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(AbilityServerboundPacket::encode).decoder(AbilityServerboundPacket::new)
+                .consumer(AbilityServerboundPacket::handle).add();
 
         INSTANCE.messageBuilder(EnchantAbilityServerboundPacket.class, index++, NetworkDirection.PLAY_TO_SERVER)
                 .encoder(EnchantAbilityServerboundPacket::encode).decoder(EnchantAbilityServerboundPacket::new)

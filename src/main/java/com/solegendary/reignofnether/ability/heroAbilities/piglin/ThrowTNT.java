@@ -11,8 +11,8 @@ import net.minecraft.world.level.Level;
 
 public class ThrowTNT extends HeroAbility {
 
-    public ThrowTNT(HeroUnit hero, UnitAction action, Level level, int cooldownMax, float range, float radius, boolean canTargetEntities) {
-        super(hero, action, level, cooldownMax, range, radius, canTargetEntities);
+    public ThrowTNT(HeroUnit hero) {
+        super(hero, 3, UnitAction.THROW_TNT, 25, 3, 3, false);
     }
 
 

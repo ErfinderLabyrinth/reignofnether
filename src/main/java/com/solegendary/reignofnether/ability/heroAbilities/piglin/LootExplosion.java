@@ -11,8 +11,8 @@ import net.minecraft.world.level.Level;
 
 public class LootExplosion extends HeroAbility {
 
-    public LootExplosion(HeroUnit hero, UnitAction action, Level level, int cooldownMax, float range, float radius, boolean canTargetEntities) {
-        super(hero, action, level, cooldownMax, range, radius, canTargetEntities);
+    public LootExplosion(HeroUnit hero) {
+        super(hero, 3, UnitAction.LOOT_EXPLOSION, 240, 0, 0, false);
     }
 
 

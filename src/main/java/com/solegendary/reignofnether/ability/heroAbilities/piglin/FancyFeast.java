@@ -9,12 +9,11 @@ package com.solegendary.reignofnether.ability.heroAbilities.piglin;
 import com.solegendary.reignofnether.ability.HeroAbility;
 import com.solegendary.reignofnether.unit.UnitAction;
 import com.solegendary.reignofnether.unit.interfaces.HeroUnit;
-import net.minecraft.world.level.Level;
 
 public class FancyFeast extends HeroAbility {
 
-    public FancyFeast(HeroUnit hero, UnitAction action, Level level, int cooldownMax, float range, float radius, boolean canTargetEntities) {
-        super(hero, action, level, cooldownMax, range, radius, canTargetEntities);
+    public FancyFeast(HeroUnit hero) {
+        super(hero, 3, UnitAction.FANCY_FEAST, 45, 10, 0, false);
     }
 
 

@@ -11,8 +11,8 @@ import net.minecraft.world.level.Level;
 
 public class TauntingCry extends HeroAbility {
 
-    public TauntingCry(HeroUnit hero, UnitAction action, Level level, int cooldownMax, float range, float radius, boolean canTargetEntities) {
-        super(hero, action, level, cooldownMax, range, radius, canTargetEntities);
+    public TauntingCry(HeroUnit hero) {
+        super(hero, 3, UnitAction.TAUNTING_CRY, 30, 6, 0, false);
     }
 
 

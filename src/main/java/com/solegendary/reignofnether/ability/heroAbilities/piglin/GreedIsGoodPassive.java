@@ -11,9 +11,10 @@ import net.minecraft.world.level.Level;
 
 public class GreedIsGoodPassive extends HeroAbility {
 
-    public GreedIsGoodPassive(HeroUnit hero, UnitAction action, Level level, int cooldownMax, float range, float radius, boolean canTargetEntities) {
-        super(hero, action, level, cooldownMax, range, radius, canTargetEntities);
+    public GreedIsGoodPassive(HeroUnit hero) {
+        super(hero, 1, UnitAction.TOGGLE_GREED_IS_GOOD_PASSIVE, 0, 0, 0, false);
     }
+
 
 
 }

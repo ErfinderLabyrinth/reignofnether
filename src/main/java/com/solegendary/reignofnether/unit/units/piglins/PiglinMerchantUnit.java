@@ -2,6 +2,14 @@ package com.solegendary.reignofnether.unit.units.piglins;
 
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.Eject;
+import com.solegendary.reignofnether.ability.heroAbilities.monster.BloodMoon;
+import com.solegendary.reignofnether.ability.heroAbilities.monster.InsomniaCurse;
+import com.solegendary.reignofnether.ability.heroAbilities.monster.RaiseDead;
+import com.solegendary.reignofnether.ability.heroAbilities.monster.SoulSiphonPassive;
+import com.solegendary.reignofnether.ability.heroAbilities.piglin.FancyFeast;
+import com.solegendary.reignofnether.ability.heroAbilities.piglin.GreedIsGoodPassive;
+import com.solegendary.reignofnether.ability.heroAbilities.piglin.LootExplosion;
+import com.solegendary.reignofnether.ability.heroAbilities.piglin.ThrowTNT;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.resources.ResourceCost;
@@ -121,6 +129,21 @@ public class PiglinMerchantUnit extends Piglin implements Unit, AttackerUnit, He
 
     // endregion
 
+    private int skillPoints = 0;
+    @Override public int getSkillPoints() { return 0; }
+    @Override public void setSkillPoints(int points) { skillPoints = points; }
+    private int heroLevel = 1;
+    private boolean rankUpMenuOpen = false;
+    @Override public boolean isRankUpMenuOpen() { return rankUpMenuOpen; }
+    @Override public void showRankUpMenu(boolean show) { rankUpMenuOpen = show; }
+    @Override public int getHeroLevel() { return Math.min(MAX_HERO_LEVEL, heroLevel); }
+    @Override public void levelUp() {
+        if (heroLevel < MAX_HERO_LEVEL) {
+            heroLevel += 1;
+            skillPoints += 1;
+        }
+    }
+
     final static public float attackDamage = 6.0f;
     final static public float attacksPerSecond = 0.45f;
     final static public float attackRange = 2; // only used by ranged units or melee building attackers
@@ -176,10 +199,21 @@ public class PiglinMerchantUnit extends Piglin implements Unit, AttackerUnit, He
     public PiglinMerchantUnit(EntityType<? extends Piglin> entityType, Level level) {
         super(entityType, level);
 
-        Eject ab1 = new Eject(this);
+        ThrowTNT ab1 = new ThrowTNT(this);
+        FancyFeast ab2 = new FancyFeast(this);
+        GreedIsGoodPassive ab3 = new GreedIsGoodPassive(this);
+        LootExplosion ab4 = new LootExplosion(this);
         this.abilities.add(ab1);
-        if (level.isClientSide())
+        this.abilities.add(ab2);
+        this.abilities.add(ab3);
+        this.abilities.add(ab4);
+
+        if (level.isClientSide()) {
             this.abilityButtons.add(ab1.getButton(Keybindings.keyQ));
+            this.abilityButtons.add(ab2.getButton(Keybindings.keyW));
+            this.abilityButtons.add(ab3.getButton(Keybindings.keyE));
+            this.abilityButtons.add(ab4.getButton(Keybindings.keyR));
+        }
     }
 
     @Override

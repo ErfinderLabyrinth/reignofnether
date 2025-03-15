@@ -1,0 +1,59 @@
+package com.solegendary.reignofnether.ability;
+
+import com.solegendary.reignofnether.unit.UnitAction;
+import com.solegendary.reignofnether.unit.UnitClientEvents;
+import com.solegendary.reignofnether.unit.UnitServerEvents;
+import com.solegendary.reignofnether.unit.interfaces.Unit;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraftforge.network.NetworkEvent;
+
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Supplier;
+
+public class AbilityServerboundPacket {
+
+    private final int unitId;
+    private final UnitAction unitAction;
+
+    public static void rankUpAbility(int unitId, UnitAction abilityAction) {
+        for (LivingEntity entity : UnitServerEvents.getAllUnits())
+            if (entity.getId() == unitId && entity instanceof Unit unit)
+                for (Ability ability : unit.getAbilities())
+                    if (ability instanceof HeroAbility heroAbility && ability.action == abilityAction)
+                        heroAbility.rankUp();
+    }
+
+    public AbilityServerboundPacket(
+        int unitId,
+        UnitAction unitAction
+    ) {
+        this.unitId = unitId;
+        this.unitAction = unitAction;
+    }
+
+    public AbilityServerboundPacket(FriendlyByteBuf buffer) {
+        this.unitId = buffer.readInt();
+        this.unitAction = buffer.readEnum(UnitAction.class);
+    }
+
+    public void encode(FriendlyByteBuf buffer) {
+        buffer.writeInt(this.unitId);
+        buffer.writeEnum(this.unitAction);
+    }
+
+    // server-side packet-consuming functions
+    public boolean handle(Supplier<NetworkEvent.Context> ctx) {
+        final var success = new AtomicBoolean(false);
+        ctx.get().enqueueWork(() -> {
+            success.set(true);
+            for (LivingEntity entity : UnitServerEvents.getAllUnits())
+                if (entity.getId() == this.unitId && entity instanceof Unit unit)
+                    for (Ability ability : unit.getAbilities())
+                        if (ability.action == this.unitAction && ability instanceof HeroAbility heroAbility)
+                            heroAbility.rankUp();
+        });
+        ctx.get().setPacketHandled(true);
+        return success.get();
+    }
+}

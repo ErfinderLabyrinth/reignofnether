@@ -2,7 +2,16 @@ package com.solegendary.reignofnether.unit.units.villagers;
 
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.PromoteIllager;
+import com.solegendary.reignofnether.ability.heroAbilities.monster.BloodMoon;
+import com.solegendary.reignofnether.ability.heroAbilities.monster.InsomniaCurse;
+import com.solegendary.reignofnether.ability.heroAbilities.monster.RaiseDead;
+import com.solegendary.reignofnether.ability.heroAbilities.monster.SoulSiphonPassive;
+import com.solegendary.reignofnether.ability.heroAbilities.villager.Avatar;
+import com.solegendary.reignofnether.ability.heroAbilities.villager.BattleRagePassive;
+import com.solegendary.reignofnether.ability.heroAbilities.villager.MaceSlam;
+import com.solegendary.reignofnether.ability.heroAbilities.villager.TauntingCry;
 import com.solegendary.reignofnether.hud.AbilityButton;
+import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.unit.Checkpoint;
@@ -111,6 +120,21 @@ public class RoyalGuardUnit extends Vindicator implements Unit, AttackerUnit, He
 
     // endregion
 
+    private int skillPoints = 0;
+    @Override public int getSkillPoints() { return 0; }
+    @Override public void setSkillPoints(int points) { skillPoints = points; }
+    private int heroLevel = 1;
+    private boolean rankUpMenuOpen = false;
+    @Override public boolean isRankUpMenuOpen() { return rankUpMenuOpen; }
+    @Override public void showRankUpMenu(boolean show) { rankUpMenuOpen = show; }
+    @Override public int getHeroLevel() { return Math.min(MAX_HERO_LEVEL, heroLevel); }
+    @Override public void levelUp() {
+        if (heroLevel < MAX_HERO_LEVEL) {
+            heroLevel += 1;
+            skillPoints += 1;
+        }
+    }
+
     final static public float attackDamage = 6.0f;
     final static public float attacksPerSecond = 0.5f;
     final static public float maxHealth = 65.0f;
@@ -168,6 +192,22 @@ public class RoyalGuardUnit extends Vindicator implements Unit, AttackerUnit, He
 
     public RoyalGuardUnit(EntityType<? extends Vindicator> entityType, Level level) {
         super(entityType, level);
+
+        MaceSlam ab1 = new MaceSlam(this);
+        TauntingCry ab2 = new TauntingCry(this);
+        BattleRagePassive ab3 = new BattleRagePassive(this);
+        Avatar ab4 = new Avatar(this);
+        this.abilities.add(ab1);
+        this.abilities.add(ab2);
+        this.abilities.add(ab3);
+        this.abilities.add(ab4);
+
+        if (level.isClientSide()) {
+            this.abilityButtons.add(ab1.getButton(Keybindings.keyQ));
+            this.abilityButtons.add(ab2.getButton(Keybindings.keyW));
+            this.abilityButtons.add(ab3.getButton(Keybindings.keyE));
+            this.abilityButtons.add(ab4.getButton(Keybindings.keyR));
+        }
     }
 
     @Override
