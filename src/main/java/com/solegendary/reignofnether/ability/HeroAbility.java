@@ -34,8 +34,21 @@ public abstract class HeroAbility extends Ability {
         this.maxRank = maxRank;
     }
 
+    public int getLevelRequirement() {
+        if (maxRank == 1) {
+           return 6;
+        } else if (maxRank == 3 && rank == 0) {
+            return 1;
+        } else if (maxRank == 3 && rank == 1) {
+            return 3;
+        } else if (maxRank == 3 && rank == 2) {
+            return 5;
+        }
+        return 1;
+    }
+
     public boolean rankUp() {
-        if (rank < maxRank && hero.getSkillPoints() > 0) {
+        if (rank < maxRank && hero.getSkillPoints() > 0 && hero.getHeroLevel() >= getLevelRequirement()) {
             rank += 1;
             hero.setSkillPoints(hero.getSkillPoints() - 1);
             return true;
@@ -71,7 +84,7 @@ public abstract class HeroAbility extends Ability {
             (Keybinding) null,
             () -> false,
             () -> !hero.isRankUpMenuOpen() || rank >= maxRank,
-            () -> hero.getSkillPoints() > 0,
+            () -> hero.getSkillPoints() > 0 && hero.getHeroLevel() >= getLevelRequirement(),
             () -> {
                 if (rankUp()) {
                     AbilityServerboundPacket.rankUpAbility(((Entity) hero).getId(), action);
@@ -87,7 +100,7 @@ public abstract class HeroAbility extends Ability {
         return button;
     }
 
-    // button that all heroes have to show
+    // button that all heroes have to show ability level up options
     public static Button getRankUpMenuButton(HeroUnit hero) {
         return new Button("Rank up abilities",
             14,

@@ -244,6 +244,7 @@
     "abilities.reignofnether.avatar.tooltip2": "health and damage for as long as you remain in battle.",
     "abilities.reignofnether.avatar.tooltip3": "Lasts %ds +1s each time you take damage.",
 
+    "abilities.reignofnether.level_req": "[Requires Level %d]",
     "abilities.reignofnether.rank_up_menu": "Level up (%d)",
     "abilities.reignofnether.rank": "[Rank %d]",
     "abilities.reignofnether.unlearnt": "[Unlearnt]",

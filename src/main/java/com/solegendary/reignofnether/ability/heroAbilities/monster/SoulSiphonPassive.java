@@ -93,6 +93,8 @@ public class SoulSiphonPassive extends HeroAbility {
     public List<FormattedCharSequence> getRankUpTooltipLines() {
         return List.of(
                 fcs(I18n.get("abilities.reignofnether.soul_siphon"), true),
+                fcs(I18n.get("abilities.reignofnether.level_req", getLevelRequirement())),
+                fcs(""),
                 fcs(I18n.get("abilities.reignofnether.soul_siphon.tooltip1")),
                 fcs(I18n.get("abilities.reignofnether.soul_siphon.tooltip2")),
                 fcs(""),

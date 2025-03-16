@@ -29,6 +29,7 @@ Bugfixes
 [❌] tutorial camera centering is off
 
 
+
 Quality of Life
 ---------------
 [❌] Ravagers that are mounted no longer aggro automatically onto buildings

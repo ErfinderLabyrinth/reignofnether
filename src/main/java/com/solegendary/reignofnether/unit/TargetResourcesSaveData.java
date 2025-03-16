@@ -99,8 +99,8 @@ public class TargetResourcesSaveData extends SavedData {
             cTag.putString("targetResourceName", td.targetResourceName.toString());
             if (td.targetFarm != null) {
                 cTag.putInt("farmX", td.targetFarm.originPos.getX());
-                cTag.putInt("farmY", td.targetFarm.originPos.getX());
-                cTag.putInt("farmZ", td.targetFarm.originPos.getX());
+                cTag.putInt("farmY", td.targetFarm.originPos.getY());
+                cTag.putInt("farmZ", td.targetFarm.originPos.getZ());
             }
             list.add(cTag);
 

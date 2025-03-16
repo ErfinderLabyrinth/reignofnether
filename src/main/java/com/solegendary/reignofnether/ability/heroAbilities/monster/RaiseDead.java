@@ -75,6 +75,8 @@ public class RaiseDead extends HeroAbility {
     public List<FormattedCharSequence> getRankUpTooltipLines() {
         return List.of(
                 fcs(I18n.get("abilities.reignofnether.raise_dead"), true),
+                fcs(I18n.get("abilities.reignofnether.level_req", getLevelRequirement())),
+                fcs(""),
                 fcs(I18n.get("abilities.reignofnether.raise_dead.tooltip1")),
                 fcs(I18n.get("abilities.reignofnether.raise_dead.tooltip2")),
                 fcs(""),
