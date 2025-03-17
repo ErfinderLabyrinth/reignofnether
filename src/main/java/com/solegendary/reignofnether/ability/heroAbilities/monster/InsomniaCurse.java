@@ -27,10 +27,10 @@ import static com.solegendary.reignofnether.util.MiscUtil.fcsIcons;
 public class InsomniaCurse extends HeroAbility {
 
     // TODO:
-    // [❌] PhantomUnit that can attack buildings and fixate on a target
-    // [❌] Phantoms should despawn after a set number of attacks
-    // [❌] Should be able to curse buildings too
-    // [❌] Can have set number of charges
+    // [X] PhantomUnit that can attack buildings and fixate on a target
+    // [X] Phantoms should despawn after a set number of attacks
+    // [X] Should be able to curse buildings too
+    // [X] Can have set number of charges
 
     public int charges = 3;
     public int maxCharges = 3;

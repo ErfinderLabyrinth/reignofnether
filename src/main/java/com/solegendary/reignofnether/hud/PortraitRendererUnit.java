@@ -8,6 +8,7 @@ import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Quaternion;
 import com.mojang.math.Vector3f;
+import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.ability.abilities.EnchantMaiming;
 import com.solegendary.reignofnether.ability.abilities.EnchantVigor;
 import com.solegendary.reignofnether.building.GarrisonableBuilding;
@@ -16,6 +17,7 @@ import com.solegendary.reignofnether.resources.Resources;
 import com.solegendary.reignofnether.unit.Relationship;
 import com.solegendary.reignofnether.unit.UnitClientEvents;
 import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
+import com.solegendary.reignofnether.unit.interfaces.HeroUnit;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.interfaces.WorkerUnit;
 import com.solegendary.reignofnether.unit.units.monsters.CreeperUnit;
@@ -34,6 +36,7 @@ import net.minecraft.client.model.Model;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
@@ -54,8 +57,7 @@ import java.util.List;
 
 // Renders a Unit's portrait including its animated head, name, healthbar, list of stats and UI frames for these
 
-public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<T>, R extends LivingEntityRenderer<T,
-    M>> {
+public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<T>, R extends LivingEntityRenderer<T, M>> {
     public R renderer;
     public Model model;
 
@@ -194,6 +196,10 @@ public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<
         }
 
         // draw name (unless a player, since their nametag will be rendered anyway)
+        if (entity instanceof HeroUnit heroUnit) {
+            y -= 6;
+            name += I18n.get("hud.hero.reignofnether.level", heroUnit.getHeroLevel());
+        }
         if (!(entity instanceof Player)) {
             GuiComponent.drawString(poseStack, Minecraft.getInstance().font, name, x + 4, y - 9, 0xFFFFFFFF);
         }
@@ -308,6 +314,29 @@ public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<
             blitYIcon += 10;
         }
         return RectZone.getZoneByLW(x, y, statsWidth, statsHeight);
+    }
+
+    public RectZone renderHeroLevelAndExp(PoseStack poseStack, int x, int y, int mouseX, int mouseY, HeroUnit heroUnit) {
+        int width = 101;
+        int height = 5;
+        ResourceLocation expBarEmptyRl = new ResourceLocation(ReignOfNether.MOD_ID, "textures/hud/experience_bar_empty.png");
+        RenderSystem.setShaderTexture(0, expBarEmptyRl);
+        GuiComponent.blit(poseStack,
+                x, y, 0,
+                0,0, // where on texture to start drawing from
+                width, height, // dimensions of blit texture
+                width, height // size of texture itself (if < dimensions, texture is repeated)
+        );
+        ResourceLocation expBarFullRl = new ResourceLocation(ReignOfNether.MOD_ID, "textures/hud/experience_bar_full.png");
+        RenderSystem.setShaderTexture(0, expBarFullRl);
+        float expPercent = (float) heroUnit.getExpOnCurrentLevel() / heroUnit.getExpToNextlevel();
+        GuiComponent.blit(poseStack,
+                x, y, 0,
+                0,0, // where on texture to start drawing from
+                Math.round((float) width * expPercent), height, // dimensions of blit texture
+                width, height // size of texture itself (if < dimensions, texture is repeated)
+        );
+        return RectZone.getZoneByLW(x, y, width, height);
     }
 
     public RectZone renderResourcesHeld(PoseStack poseStack, String name, int x, int y, Unit unit) {

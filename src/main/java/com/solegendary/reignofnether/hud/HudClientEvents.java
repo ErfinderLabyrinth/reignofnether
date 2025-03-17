@@ -595,6 +595,9 @@ public class HudClientEvents {
             );
             hudZones.add(unitPortraitZone);
 
+            if (hudSelectedEntity instanceof HeroUnit heroUnit)
+                hudZones.add(portraitRendererUnit.renderHeroLevelAndExp(evt.getPoseStack(), blitX + 1, blitY - 5, mouseX, mouseY, heroUnit));
+
             blitX += portraitRendererUnit.frameWidth;
 
             if (hudSelectedEntity instanceof Unit unit) {

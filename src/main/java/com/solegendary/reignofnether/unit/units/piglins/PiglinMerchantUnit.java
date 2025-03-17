@@ -130,19 +130,14 @@ public class PiglinMerchantUnit extends Piglin implements Unit, AttackerUnit, He
     // endregion
 
     private int skillPoints = 0;
+    private int experience = 0;
+    private boolean rankUpMenuOpen = false;
     @Override public int getSkillPoints() { return skillPoints; }
     @Override public void setSkillPoints(int points) { skillPoints = points; }
-    private int heroLevel = 1;
-    private boolean rankUpMenuOpen = false;
     @Override public boolean isRankUpMenuOpen() { return rankUpMenuOpen; }
     @Override public void showRankUpMenu(boolean show) { rankUpMenuOpen = show; }
-    @Override public int getHeroLevel() { return Math.min(MAX_HERO_LEVEL, heroLevel); }
-    @Override public void levelUp() {
-        if (heroLevel < MAX_HERO_LEVEL) {
-            heroLevel += 1;
-            skillPoints += 1;
-        }
-    }
+    @Override public int getExperience() { return experience; }
+    @Override public void setExperience(int amount) { experience = amount; }
 
     final static public float attackDamage = 6.0f;
     final static public float attacksPerSecond = 0.45f;

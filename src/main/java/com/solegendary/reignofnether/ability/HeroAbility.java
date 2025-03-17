@@ -6,14 +6,11 @@ import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.unit.UnitAction;
-import com.solegendary.reignofnether.unit.UnitServerEvents;
 import com.solegendary.reignofnether.unit.interfaces.HeroUnit;
-import com.solegendary.reignofnether.unit.interfaces.Unit;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
 
 import java.util.List;
 
@@ -35,16 +32,11 @@ public abstract class HeroAbility extends Ability {
     }
 
     public int getLevelRequirement() {
-        if (maxRank == 1) {
+        if (maxRank <= 1) {
            return 6;
-        } else if (maxRank == 3 && rank == 0) {
-            return 1;
-        } else if (maxRank == 3 && rank == 1) {
-            return 3;
-        } else if (maxRank == 3 && rank == 2) {
-            return 5;
+        } else {
+            return (rank * 2) + 1;
         }
-        return 1;
     }
 
     public boolean rankUp() {

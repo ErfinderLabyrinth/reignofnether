@@ -593,6 +593,8 @@
     "hud.relationship.reignofnether.enemy": "Enemy",
     "hud.relationship.reignofnether.neutral": "Neutral",
 
+    "hud.hero.reignofnether.level": " (Lvl %d)",
+
     "server.reignofnether.is_defeated": "%s has %s and is defeated!",
     "server.reignofnether.lost_buildings": "lost all their buildings",
     "server.reignofnether.lost_capitol": "%s has lost their capitol and will be revealed in %d seconds unless they rebuild it!",
