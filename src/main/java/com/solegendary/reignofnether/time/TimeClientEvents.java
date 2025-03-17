@@ -79,7 +79,8 @@ public class TimeClientEvents {
 
         ItemRenderer itemrenderer = MC.getItemRenderer();
 
-        itemrenderer.renderAndDecorateItem(new ItemStack(Items.CLOCK), xPos, yPos);
+        evt.getGuiGraphics().renderItem(new ItemStack(Items.CLOCK), xPos, yPos);
+        evt.getGuiGraphics().renderItemDecorations(MC.font, new ItemStack(Items.CLOCK), xPos, yPos);
     }
 
     @SubscribeEvent
@@ -97,7 +98,7 @@ public class TimeClientEvents {
         ) - 6;
 
         if (!CLOCK_BUTTON.isHidden.get())
-            CLOCK_BUTTON.render(evt.getPoseStack(), xPos - 3, yPos - 3, evt.getMouseX(), evt.getMouseY());
+            CLOCK_BUTTON.render(evt.getGuiGraphics(), xPos - 3, yPos - 3, evt.getMouseX(), evt.getMouseY());
     }
 
     @SubscribeEvent
@@ -156,7 +157,7 @@ public class TimeClientEvents {
                 );
                 tooltip.add(gameLengthStr);
             }
-            MyRenderer.renderTooltip(evt.getPoseStack(), tooltip, evt.getMouseX(), evt.getMouseY());
+            MyRenderer.renderTooltip(evt.getGuiGraphics(), tooltip, evt.getMouseX(), evt.getMouseY());
         }
     }
 

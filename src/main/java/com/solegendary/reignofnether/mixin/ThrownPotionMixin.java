@@ -35,7 +35,7 @@ public abstract class ThrownPotionMixin extends Projectile {
     private void makeAreaOfEffectCloud(ItemStack pStack, Potion pPotion, CallbackInfo ci) {
         ci.cancel();
 
-        AreaEffectCloud aec = new AreaEffectCloud(this.level, this.getX(), this.getY(), this.getZ());
+        AreaEffectCloud aec = new AreaEffectCloud(this.level(), this.getX(), this.getY(), this.getZ());
         if (this.getOwner() instanceof LivingEntity le) {
             aec.setOwner(le);
         }
@@ -51,9 +51,9 @@ public abstract class ThrownPotionMixin extends Projectile {
             aec.setWaitTime(10);
 
             int duration = WitchUnit.LINGERING_POTION_DURATION;
-            if (this.level.isClientSide() && ResearchClient.hasResearch(ResearchLingeringPotions.itemName)) {
+            if (this.level().isClientSide() && ResearchClient.hasResearch(ResearchLingeringPotions.itemName)) {
                 duration = WitchUnit.LINGERING_POTION_DURATION_EXTENDED;
-            } else if (!this.level.isClientSide() && ResearchServerEvents.playerHasResearch(witchUnit.getOwnerName(), ResearchLingeringPotions.itemName)) {
+            } else if (!this.level().isClientSide() && ResearchServerEvents.playerHasResearch(witchUnit.getOwnerName(), ResearchLingeringPotions.itemName)) {
                 duration = WitchUnit.LINGERING_POTION_DURATION_EXTENDED;
             }
             aec.setDuration(duration);
@@ -71,6 +71,6 @@ public abstract class ThrownPotionMixin extends Projectile {
             aec.setFixedColor($$5.getInt("CustomPotionColor"));
         }
 
-        this.level.addFreshEntity(aec);
+        this.level().addFreshEntity(aec);
     }
 }

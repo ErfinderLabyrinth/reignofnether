@@ -1,20 +1,33 @@
 package com.solegendary.reignofnether.building;
 
+import com.solegendary.reignofnether.building.buildings.monsters.SculkCatalyst;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.model.Material;
 import net.minecraft.core.BlockPos;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
+import net.minecraftforge.common.Tags;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 public class BuildingBlock {
     private BlockPos blockPos;
     private BlockState blockState; // ideal blockstate when placed, not actual world state
 
-    private List<Material> materialsThatIgnoreState = List.of(Material.SCULK, Material.LEAVES, Material.GLASS);
+    private List<Predicate<BlockState>> materialsThatIgnoreState = List.of((s)-> SculkCatalyst.isSculk(s.getBlock()), (s)->s.is(Tags.Blocks.GLASS),(s)->s.is(BlockTags.LEAVES));
+
+    private boolean isIgnored(BlockState state){
+        for(Predicate<BlockState> predicate : materialsThatIgnoreState){
+            if(predicate.test(state)){
+                return true;
+            }
+        }
+        return false;
+    }
 
     public BuildingBlock(BlockPos blockPos, BlockState blockState) {
         this.blockPos = blockPos;
@@ -53,8 +66,8 @@ public class BuildingBlock {
         boolean isMatchingWallBlock = this.blockState.getBlock() instanceof WallBlock && bs.getBlock() == this.blockState.getBlock();
 
         // account for sculk sensors turning on and off constantly
-        if (this.materialsThatIgnoreState.contains(this.blockState.getMaterial()) &&
-            this.materialsThatIgnoreState.contains(bs.getMaterial()))
+        if (isIgnored(this.blockState) &&
+                isIgnored(bs))
             return true;
 
         Block block1 = this.blockState.getBlock();

@@ -32,11 +32,11 @@ public class CastSummonVexesGoal extends Goal {
         if (isCasting) {
             ticksCasting += 1;
             if (ticksCasting >= TICKS_CASTING_MAX) {
-                if (!this.mob.level.isClientSide())
+                if (!this.mob.level().isClientSide())
                     ((EvokerUnit) this.mob).summonVexes();
 
-                if (this.ability != null && !this.mob.level.isClientSide()) {
-                    if (!this.mob.level.isClientSide())
+                if (this.ability != null && !this.mob.level().isClientSide()) {
+                    if (!this.mob.level().isClientSide())
                         AbilityClientboundPacket.sendSetCooldownPacket(this.mob.getId(), this.ability.action, this.ability.cooldownMax);
                     else
                         this.ability.setToMaxCooldown();
@@ -53,7 +53,7 @@ public class CastSummonVexesGoal extends Goal {
 
     public void startCasting() {
         this.isCasting = true;
-        if (!this.mob.level.isClientSide())
+        if (!this.mob.level().isClientSide())
             UnitAnimationClientboundPacket.sendBasicPacket(UnitAnimationAction.NON_KEYFRAME_START, this.mob);
     }
 
@@ -61,7 +61,7 @@ public class CastSummonVexesGoal extends Goal {
     public void stop() {
         this.ticksCasting = 0;
         this.isCasting = false;
-        if (!this.mob.level.isClientSide())
+        if (!this.mob.level().isClientSide())
             UnitAnimationClientboundPacket.sendBasicPacket(UnitAnimationAction.NON_KEYFRAME_STOP, this.mob);
     }
 }

@@ -1,6 +1,6 @@
 package com.solegendary.reignofnether.unit.units.villagers;
 
-import com.mojang.math.Vector3d;
+import org.joml.Vector3d;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.Eject;
 import com.solegendary.reignofnether.ability.abilities.Roar;
@@ -240,19 +240,19 @@ public class RavagerUnit extends Ravager implements Unit, AttackerUnit {
     @Override
     public void roar() {
         if (this.isAlive()) {
-            if (!level.isClientSide()) {
+            if (!level().isClientSide()) {
                 LivingEntity livingentity;
 
                 List<Mob> nearbyMobs = MiscUtil.getEntitiesWithinRange(
                         new Vector3d(this.position().x, this.position().y, this.position().z),
                         ROAR_RANGE,
                         Mob.class,
-                        this.level);
+                        this.level());
 
                 for (Mob mob : nearbyMobs) {
                     if (mob instanceof Unit unit && UnitServerEvents.getUnitToEntityRelationship(this, mob) != Relationship.FRIENDLY) {
                         this.strongKnockback(mob);
-                        mob.hurt(DamageSource.mobAttack(this), ROAR_DAMAGE);
+                        mob.hurt(damageSources().mobAttack(this), ROAR_DAMAGE);
                         mob.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, ROAR_SLOW_DURATION, 1));
                     }
                 }
@@ -261,7 +261,7 @@ public class RavagerUnit extends Ravager implements Unit, AttackerUnit {
                 for (double x = this.position().x - ROAR_RANGE; x < this.position().x + ROAR_RANGE; x++) {
                     for (double y = this.position().y - ROAR_RANGE; y < this.position().y + ROAR_RANGE; y++) {
                         for (double z = this.position().z - ROAR_RANGE; z < this.position().z + ROAR_RANGE; z++) {
-                            BlockPos bp = new BlockPos(x,y,z);
+                            BlockPos bp = new BlockPos((int) x, (int) y, (int) z);
                             Building building = BuildingUtils.findBuilding(false, bp);
                             if (building != null && !building.ownerName.equals(this.getOwnerName()))
                                 affectedBuildings.add(building);
@@ -275,11 +275,11 @@ public class RavagerUnit extends Ravager implements Unit, AttackerUnit {
 
                 this.playSound(SoundEvents.GENERIC_EXPLODE, 1.0F, 1.0F);
                 this.gameEvent(GameEvent.ENTITY_ROAR);
-                this.level.explode(null, null, null,
+                this.level().explode(null, null, null,
                         vec3.x, vec3.y, vec3.z,
                         2.0f,
                         false,
-                        Explosion.BlockInteraction.NONE);
+                        Level.ExplosionInteraction.NONE);
             }
             else {
                 Vec3 vec3 = this.getBoundingBox().getCenter();
@@ -288,7 +288,7 @@ public class RavagerUnit extends Ravager implements Unit, AttackerUnit {
                     double d0 = this.random.nextGaussian() * 0.2;
                     double d1 = this.random.nextGaussian() * 0.2;
                     double d2 = this.random.nextGaussian() * 0.2;
-                    this.level.addParticle(ParticleTypes.POOF, vec3.x, vec3.y, vec3.z, d0, d1, d2);
+                    this.level().addParticle(ParticleTypes.POOF, vec3.x, vec3.y, vec3.z, d0, d1, d2);
                 }
                 this.playSound(SoundEvents.GENERIC_EXPLODE, 1.0F, 1.0F);
             }

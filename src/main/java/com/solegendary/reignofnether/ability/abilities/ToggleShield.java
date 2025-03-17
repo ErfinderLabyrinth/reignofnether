@@ -36,7 +36,7 @@ public class ToggleShield extends Ability {
     public ToggleShield(BruteUnit bruteUnit) {
         super(
                 UnitAction.TOGGLE_SHIELD,
-                bruteUnit.level,
+                bruteUnit.level(),
                 CD_MAX_SECONDS * ResourceCost.TICKS_PER_SECOND,
                 0,
                 0,

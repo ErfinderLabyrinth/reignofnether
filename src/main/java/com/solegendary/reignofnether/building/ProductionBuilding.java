@@ -17,6 +17,7 @@ import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.UnitServerEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.*;
@@ -94,7 +95,7 @@ public abstract class ProductionBuilding extends Building {
 
     // start with the centre pos then go down and look at adjacent blocks until we reach a non-solid block
     public BlockPos getDefaultOutdoorSpawnPoint() {
-        return getMinCorner(this.blocks).offset(-spawnRadiusOffset, 0, -spawnRadiusOffset);
+        return getMinCorner(this.blocks).offset((int) -spawnRadiusOffset, 0, (int) -spawnRadiusOffset);
     }
 
     public Entity produceUnit(ServerLevel level, EntityType<? extends Unit> entityType, String ownerName, boolean spawnIndoors) {
@@ -113,7 +114,7 @@ public abstract class ProductionBuilding extends Building {
         else
             spawnPoint = getDefaultOutdoorSpawnPoint();
 
-        Entity entity = entityType.spawn(level, null,
+        Entity entity = entityType.spawn(level, (CompoundTag) null,
                 null,
                 spawnPoint,
                 MobSpawnType.SPAWNER,

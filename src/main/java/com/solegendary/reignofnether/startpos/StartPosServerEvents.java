@@ -43,7 +43,7 @@ public class StartPosServerEvents {
     public static void onBlockPlaced(BlockEvent.EntityPlaceEvent evt) {
         if (evt.getPlacedBlock().getBlock() instanceof RTSStartBlock rtsStartBlock) {
             if (startPoses.size() < MAX_START_POSES) {
-                StartPos newStartPos = new StartPos(evt.getPos(), rtsStartBlock.defaultMaterialColor().id);
+                StartPos newStartPos = new StartPos(evt.getPos(), rtsStartBlock.defaultMapColor().id);
                 startPoses.add(newStartPos);
                 StartPosClientboundPacket.addPos(newStartPos);
             } else {

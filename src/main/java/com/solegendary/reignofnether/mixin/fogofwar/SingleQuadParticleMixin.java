@@ -30,7 +30,7 @@ public abstract class SingleQuadParticleMixin extends Particle {
     public void render(VertexConsumer pBuffer, Camera pRenderInfo, float pPartialTicks, CallbackInfo ci) {
         if (!FogOfWarClientEvents.isEnabled())
             return;
-        BlockPos bp = new BlockPos(x,y,z);
+        BlockPos bp = new BlockPos((int) x, (int) y, (int) z);
         if (!FogOfWarClientEvents.isInBrightChunk(bp))
             ci.cancel();
     }

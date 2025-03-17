@@ -1,6 +1,7 @@
 package com.solegendary.reignofnether.unit.units.monsters;
 
-import com.mojang.math.Vector3d;
+import net.minecraft.tags.DamageTypeTags;
+import org.joml.Vector3d;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.ConsumeSlime;
 import com.solegendary.reignofnether.hud.AbilityButton;
@@ -175,14 +176,14 @@ public class SlimeUnit extends Slime implements Unit, AttackerUnit {
     public int pushAttackCd = 0;
 
     public boolean isPushable() {
-        return this.isAlive() && !this.isSpectator() && !this.onClimbable() && isOnGround();
+        return this.isAlive() && !this.isSpectator() && !this.onClimbable() && onGround();
     }
 
     @Override
     public void push(Entity pEntity) {
         super.push(pEntity);
-        if (this.getTargetGoal().getTarget() == pEntity && !onGround &&
-            !level.isClientSide() && pushAttackCd <= 0) {
+        if (this.getTargetGoal().getTarget() == pEntity && !onGround() &&
+            !level().isClientSide() && pushAttackCd <= 0) {
             this.doHurtTarget(pEntity);
             pushAttackCd = PUSH_ATTACK_CD_MAX;
         }
@@ -213,7 +214,7 @@ public class SlimeUnit extends Slime implements Unit, AttackerUnit {
     @Override
     protected float getDamageAfterMagicAbsorb(DamageSource pSource, float pDamage) {
         pDamage = super.getDamageAfterMagicAbsorb(pSource, pDamage);
-        if (pSource.isMagic())
+        if (pSource.is(DamageTypeTags.WITCH_RESISTANT_TO))
             pDamage *= 0.5F;
         return pDamage;
     }
@@ -221,7 +222,7 @@ public class SlimeUnit extends Slime implements Unit, AttackerUnit {
     protected void spawnTinySlime() {
         float f = (float) getSize() / 4.0F;
         float f1 = -0.5F * f;
-        Slime slime = this.getType().create(this.level);
+        Slime slime = this.getType().create(this.level());
         if (slime != null) {
             if (this.isPersistenceRequired())
                 slime.setPersistenceRequired();
@@ -232,7 +233,7 @@ public class SlimeUnit extends Slime implements Unit, AttackerUnit {
             slime.moveTo(this.getX() + (double)f1, this.getY() + 0.5, this.getZ() + (double)f1, this.random.nextFloat() * 360.0F, 0.0F);
             if (slime instanceof Unit unit)
                 unit.setOwnerName(getOwnerName());
-            this.level.addFreshEntity(slime);
+            this.level().addFreshEntity(slime);
         }
     }
 
@@ -351,7 +352,7 @@ public class SlimeUnit extends Slime implements Unit, AttackerUnit {
         if (autocastingConsume() && getSize() < MAX_SIZE && getTargetGoal().getTarget() == null) {
 
             Vector3d unitPosition = new Vector3d(position().x, position().y, position().z);
-            List<SlimeUnit> nearbyEntities = MiscUtil.getEntitiesWithinRange(unitPosition, aggroRange, SlimeUnit.class, level);
+            List<SlimeUnit> nearbyEntities = MiscUtil.getEntitiesWithinRange(unitPosition, aggroRange, SlimeUnit.class, level());
 
             double closestDist = aggroRange;
             SlimeUnit closestTarget = null;
@@ -372,7 +373,7 @@ public class SlimeUnit extends Slime implements Unit, AttackerUnit {
         }
         // apply slowness level 2 during daytime for a short time repeatedly
         if (!(this instanceof MagmaCubeUnit) &&
-                tickCount % 10 == 0 && !this.level.isClientSide() && this.level.isDay() &&
+                tickCount % 10 == 0 && !this.level().isClientSide() && this.level().isDay() &&
                 !NightUtils.isInRangeOfNightSource(this.getEyePosition(), false) &&
                 !ResearchServerEvents.playerHasCheat(getOwnerName(), "slipslopslap"))
             this.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 15, 1));
@@ -398,11 +399,11 @@ public class SlimeUnit extends Slime implements Unit, AttackerUnit {
                         if (!var.hasNext())
                             break label;
                         blockpos = (BlockPos) var.next();
-                        BlockState blockstate = this.level.getBlockState(blockpos);
+                        BlockState blockstate = this.level().getBlockState(blockpos);
                         block = blockstate.getBlock();
                     } while (!(block instanceof LeavesBlock));
 
-                    flag = this.level.destroyBlock(blockpos, false, this) || flag;
+                    flag = this.level().destroyBlock(blockpos, false, this) || flag;
                 }
             }
         }
@@ -414,7 +415,7 @@ public class SlimeUnit extends Slime implements Unit, AttackerUnit {
 
     @Override
     protected void checkFallDamage(double pY, boolean pOnGround, BlockState pState, BlockPos pPos) {
-        if (!level.isClientSide() && pOnGround && !wasOnGround) {
+        if (!level().isClientSide() && pOnGround && !wasOnGround) {
             attackGoal.landedJump();
 
             BlockPos moveTarget = getMoveGoal().getMoveTarget();
@@ -472,7 +473,7 @@ public class SlimeUnit extends Slime implements Unit, AttackerUnit {
             consumeTarget = null;
             return true;
         }
-        if (result && getSize() >= 2 && pEntity instanceof LivingEntity && !(this instanceof MagmaCubeUnit) && !this.level.isClientSide())
+        if (result && getSize() >= 2 && pEntity instanceof LivingEntity && !(this instanceof MagmaCubeUnit) && !this.level().isClientSide())
             if (ResearchServerEvents.playerHasResearch(getOwnerName(), ResearchSlimeConversion.itemName))
                 ((LivingEntity)pEntity).addEffect(new MobEffectInstance(MobEffects.CONFUSION, CONVERT_DEBUFF_DURATION_SECONDS * 20, 0), this);
         return result;

@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraftforge.client.event.CustomizeGuiOverlayEvent;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
@@ -27,19 +28,19 @@ public class ForgeGuiMixin extends Gui {
             cancellable = true,
             remap=false
     )
-    protected void renderChat(int width, int height, PoseStack pStack, CallbackInfo ci) {
+    protected void renderChat(int width, int height, GuiGraphics guiGraphics, CallbackInfo ci) {
         if (!OrthoviewClientEvents.isEnabled())
             return;
 
         ci.cancel();
 
         this.minecraft.getProfiler().push("chat");
-        CustomizeGuiOverlayEvent.Chat event = new CustomizeGuiOverlayEvent.Chat(this.minecraft.getWindow(), pStack, this.minecraft.getFrameTime(), 0, height - 48);
+        CustomizeGuiOverlayEvent.Chat event = new CustomizeGuiOverlayEvent.Chat(this.minecraft.getWindow(), guiGraphics, this.minecraft.getFrameTime(), 0, height - 48);
         MinecraftForge.EVENT_BUS.post(event);
-        pStack.pushPose();
-        pStack.translate(event.getPosX(), event.getPosY() - 50, 0.0);
-        this.chat.render(pStack, this.tickCount);
-        pStack.popPose();
+        guiGraphics.pose().pushPose();
+        guiGraphics.pose().translate(event.getPosX(), event.getPosY() - 50, 0.0);
+        this.chat.render(guiGraphics, this.tickCount, 0, 0);
+        guiGraphics.pose().popPose();
         this.minecraft.getProfiler().pop();
     }
 }

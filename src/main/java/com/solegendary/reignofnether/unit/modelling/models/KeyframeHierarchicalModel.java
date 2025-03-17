@@ -1,7 +1,7 @@
 
 package com.solegendary.reignofnether.unit.modelling.models;
 
-import com.mojang.math.Vector3f;
+import org.joml.Vector3f;
 import com.solegendary.reignofnether.unit.interfaces.KeyframeAnimated;
 import net.minecraft.client.animation.AnimationDefinition;
 import net.minecraft.client.animation.KeyframeAnimations;

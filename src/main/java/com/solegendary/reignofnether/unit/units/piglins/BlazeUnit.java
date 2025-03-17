@@ -216,14 +216,14 @@ public class BlazeUnit extends Blaze implements Unit, AttackerUnit, RangedAttack
             double z = target.getZ() - this.getZ();
             double distSqr = this.distanceToSqr(target);
             double dist = Math.sqrt(Math.sqrt(distSqr)) * 0.5;
-            BlazeUnitFireball fireball = new BlazeUnitFireball(this.level, this,
+            BlazeUnitFireball fireball = new BlazeUnitFireball(this.level(), this,
                     this.getRandom().triangle(x, 2.297 * dist), y,
                     this.getRandom().triangle(z, 2.297 * dist), false);
             fireball.setPos(fireball.getX(), this.getY(0.5) + 0.5, fireball.getZ());
             this.playSound(SoundEvents.BLAZE_SHOOT, 3.0F, 1.0F);
-            this.level.addFreshEntity(fireball);
+            this.level().addFreshEntity(fireball);
 
-            if (!level.isClientSide() && target instanceof Unit unit)
+            if (!level().isClientSide() && target instanceof Unit unit)
                 FogOfWarClientboundPacket.revealRangedUnit(unit.getOwnerName(), this.getId());
         }
     }
@@ -232,10 +232,10 @@ public class BlazeUnit extends Blaze implements Unit, AttackerUnit, RangedAttack
         double x = bp.getX() - this.getX();
         double y = bp.getY() - this.getY(0.5) + 1.5f;
         double z = bp.getZ() - this.getZ();
-        BlazeUnitFireball fireball = new BlazeUnitFireball(this.level, this, x, y, z, true);
+        BlazeUnitFireball fireball = new BlazeUnitFireball(this.level(), this, x, y, z, true);
         fireball.setPos(fireball.getX(), this.getY(0.5) + 0.5, fireball.getZ());
         this.playSound(SoundEvents.BLAZE_SHOOT, 3.0F, 1.0F);
-        this.level.addFreshEntity(fireball);
+        this.level().addFreshEntity(fireball);
     }
 
     @Override

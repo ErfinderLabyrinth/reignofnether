@@ -32,7 +32,7 @@ public class MountHoglin extends Ability {
     private final LivingEntity entity;
 
     public MountHoglin(LivingEntity entity) {
-        super(UnitAction.MOUNT_HOGLIN, entity.level, 0, 0, 0, true);
+        super(UnitAction.MOUNT_HOGLIN, entity.level(), 0, 0, 0, true);
         this.entity = entity;
     }
 

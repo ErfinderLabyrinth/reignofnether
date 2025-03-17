@@ -6,6 +6,7 @@ import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.registrars.PacketHandler;
 import com.solegendary.reignofnether.votesystem.networking.ClientVoteHandler;
 import com.solegendary.reignofnether.votesystem.networking.VotePacket;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -95,9 +96,9 @@ public class MapSelectionScreen extends Screen {
     }
 
 
-    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         if (this.minecraft != null) {
-            this.renderBackground(poseStack);
+            this.renderBackground(guiGraphics);
         } else {
             System.err.println("Minecraft instance is null during rendering.");
             return;
@@ -116,7 +117,7 @@ public class MapSelectionScreen extends Screen {
 
         // Render timer countdown
         long timeLeft = Math.max(0, (endTime - System.currentTimeMillis()) / 1000);
-        this.font.draw(poseStack, "Time Left: " + timeLeft + "s", this.width / 2 - 50, startY - 30, 0xFFFFFF);
+        guiGraphics.drawString(font, "Time Left: " + timeLeft + "s", this.width / 2 - 50, startY - 30, 0xFFFFFF);
 
         for (int i = 0; i < maps.size(); i++) {
             MapData map = maps.get(i);
@@ -130,14 +131,14 @@ public class MapSelectionScreen extends Screen {
             if(imageOptional.isPresent()) {
                 RenderSystem.setShaderTexture(0, rl);
                 thumbnailHeight = 100;
-                blit(poseStack, x, y, 0, 0, thumbnailWidth, thumbnailHeight, thumbnailWidth, thumbnailHeight);
+                guiGraphics.blit(rl, x, y, 0, 0, thumbnailWidth, thumbnailHeight, thumbnailWidth, thumbnailHeight);
             } else {
                 System.err.println("Image file does not exist for map: " + map.getName() + " at path: textures/mapvote/" + map.getImage());
             }
 
             // Render map information
             int infoStartY = y + thumbnailHeight + 5;
-            this.font.draw(poseStack, map.getName(), x, infoStartY, 0xFFFFFF);
+            guiGraphics.drawString(font, map.getName(), x, infoStartY, 0xFFFFFF);
 
             List<String> wrappedDescription = wrapText(map.getDescription(), 150); // Set maxWidth to your desired width
 
@@ -145,11 +146,11 @@ public class MapSelectionScreen extends Screen {
             int descriptionStartY = infoStartY + 10;
 
             for (String line : wrappedDescription) {
-                this.font.draw(poseStack, line, x, descriptionStartY, 0xCCCCCC);
+                guiGraphics.drawString(font, line, x, descriptionStartY, 0xCCCCCC);
                 descriptionStartY += lineHeight; // Move down for the next line
             }
 
-            this.font.draw(poseStack, "Players: " + map.getPlayers(), x, descriptionStartY, 0xAAAAAA);
+            guiGraphics.drawString(font, "Players: " + map.getPlayers(), x, descriptionStartY, 0xAAAAAA);
 
 
             // Render vote count and percentage if voting is still ongoing
@@ -157,12 +158,12 @@ public class MapSelectionScreen extends Screen {
                 int voteCount = ClientVoteHandler.getVotes().getOrDefault(map.getName(), 0);
                 int totalVotes = ClientVoteHandler.getVotes().values().stream().mapToInt(Integer::intValue).sum();
                 float percentage = totalVotes > 0 ? (voteCount * 100.0f / totalVotes) : 0;
-                this.font.draw(poseStack, "Votes: " + voteCount + " (" + String.format("%.1f", percentage) + "%)", x, infoStartY + 40, 0xFFFF00);
+                guiGraphics.drawString(font, "Votes: " + voteCount + " (" + String.format("%.1f", percentage) + "%)", x, infoStartY + 40, 0xFFFF00);
 
             }
         }
 
-        super.render(poseStack, mouseX, mouseY, partialTicks);
+        super.render(guiGraphics, mouseX, mouseY, partialTicks);
     }
 
     private void selectWinningMap() {

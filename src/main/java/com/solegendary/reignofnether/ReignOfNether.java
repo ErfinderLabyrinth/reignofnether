@@ -1,6 +1,8 @@
 package com.solegendary.reignofnether;
 
+import com.mojang.realmsclient.util.task.ConnectTask;
 import com.solegendary.reignofnether.config.ReignOfNetherCommonConfigs;
+import com.solegendary.reignofnether.mixin.DownloadPackSourceAccessor;
 import com.solegendary.reignofnether.network.S2CReset;
 import com.solegendary.reignofnether.registrars.*;
 import com.solegendary.reignofnether.resources.ResourceCosts;
@@ -34,6 +36,7 @@ import org.apache.logging.log4j.MarkerManager;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.time.Duration;
 import java.util.NoSuchElementException;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
@@ -137,6 +140,9 @@ public class ReignOfNether {
             connection,
             Minecraft.getInstance(),
             null,
+            null,
+            false,
+            Duration.ZERO,
             statusMessage -> {
             }
         ));
@@ -163,12 +169,12 @@ public class ReignOfNether {
             logger.debug(RESETMARKER, "Clearing");
 
             ServerData serverData = Minecraft.getInstance().getCurrentServer();
-            Pack serverPack = Minecraft.getInstance().getClientPackSource().serverPack;
+            Pack serverPack = ((DownloadPackSourceAccessor)Minecraft.getInstance().getDownloadedPackSource()).getServerPack();
 
             if (Minecraft.getInstance().level == null) {
                 GameData.revertToFrozen();
             }
-            Minecraft.getInstance().getClientPackSource().serverPack = null;
+            ((DownloadPackSourceAccessor)Minecraft.getInstance().getDownloadedPackSource()).setServerPack(null);
 
             Minecraft.getInstance()
                 .clearLevel(new GenericDirtMessageScreen(Component.translatable("connect.negotiating")));
@@ -181,8 +187,8 @@ public class ReignOfNether {
             } catch (NoSuchElementException ignored) {
             }
 
-            Minecraft.getInstance().getClientPackSource().serverPack = serverPack;
-            Minecraft.getInstance().setCurrentServer(serverData);
+            ((DownloadPackSourceAccessor)Minecraft.getInstance().getDownloadedPackSource()).setServerPack(serverPack);
+            //Minecraft.getInstance().setCurrentServer(serverData); TODO find out why, almost impossible to reproduce
         });
 
         logger.debug(RESETMARKER, "Waiting for clear to complete");

@@ -9,7 +9,7 @@ import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.startpos.StartPosClientEvents;
 import com.solegendary.reignofnether.util.MyRenderer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
@@ -78,13 +78,13 @@ public class GameruleClient {
             this.frameResource = null;
         }
         @Override
-        public void render(PoseStack poseStack, int x, int y, int mouseX, int mouseY) {
-            super.render(poseStack, x, y, mouseX, mouseY);
-            GuiComponent.drawString(poseStack, MC.font, label,x + 23, y + 7, 0xFFFFFF);
+        public void render(GuiGraphics guiGraphics, int x, int y, int mouseX, int mouseY) {
+            super.render(guiGraphics, x, y, mouseX, mouseY);
+            guiGraphics.drawString(MC.font, label,x + 23, y + 7, 0xFFFFFF);
         }
         @Override
-        public void renderTooltip(PoseStack poseStack, int mouseX, int mouseY) {
-            MyRenderer.renderTooltip(poseStack, tooltipLines, mouseX, mouseY + tooltipOffsetY - 10);
+        public void renderTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+            MyRenderer.renderTooltip(guiGraphics, tooltipLines, mouseX, mouseY + tooltipOffsetY - 10);
         }
     }
 
@@ -106,19 +106,19 @@ public class GameruleClient {
             this.label = label;
         }
         @Override
-        public void render(PoseStack poseStack, int x, int y, int mouseX, int mouseY) {
-            super.render(poseStack, x, y, mouseX, mouseY);
-            GuiComponent.drawString(poseStack, MC.font, label,
+        public void render(GuiGraphics guiGraphics, int x, int y, int mouseX, int mouseY) {
+            super.render(guiGraphics, x, y, mouseX, mouseY);
+            guiGraphics.drawString(MC.font, label,
                     x + 23, y + 7, 0xFFFFFF);
         }
         @Override
-        public void renderTooltip(PoseStack poseStack, int mouseX, int mouseY) {
-            MyRenderer.renderTooltip(poseStack, tooltipLines, mouseX, mouseY + tooltipOffsetY - 10);
+        public void renderTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+            MyRenderer.renderTooltip(guiGraphics, tooltipLines, mouseX, mouseY + tooltipOffsetY - 10);
         }
     }
 
     // returns list of rendered buttons
-    public static List<Button> renderGamerulesGUI(PoseStack poseStack, int xTR, int yTR, int mouseX, int mouseY) {
+    public static List<Button> renderGamerulesGUI(GuiGraphics guiGraphics, int xTR, int yTR, int mouseX, int mouseY) {
         ArrayList<Button> buttons = new ArrayList<>();
         int width = 145;
         int x = xTR - width - 10;
@@ -218,11 +218,11 @@ public class GameruleClient {
         ));
 
         int height = (buttons.size() * 20) - 5;
-        MyRenderer.renderFrameWithBg(poseStack, x, y, width, height, 0xA0000000);
+        MyRenderer.renderFrameWithBg(guiGraphics, x, y, width, height, 0xA0000000);
 
         int i = 0;
         for (Button button : buttons) {
-            button.render(poseStack, x + 5, y + 5, mouseX, mouseY);
+            button.render(guiGraphics, x + 5, y + 5, mouseX, mouseY);
             y += 18;
         }
         return buttons;

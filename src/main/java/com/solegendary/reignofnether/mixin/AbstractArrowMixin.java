@@ -118,7 +118,7 @@ public abstract class AbstractArrowMixin extends Projectile {
             this.discard();
     }
 
-    @Shadow public byte getPierceLevel() { return new Byte(""); }
+    @Shadow public byte getPierceLevel() { return 0; }
     @Shadow private SoundEvent soundEvent;
     @Shadow private IntOpenHashSet piercingIgnoreEntityIds;
     @Shadow private List<Entity> piercedAndKilledEntities;
@@ -165,9 +165,9 @@ public abstract class AbstractArrowMixin extends Projectile {
         Entity entity1 = this.getOwner();
         DamageSource damagesource;
         if (entity1 == null) {
-            damagesource = DamageSource.arrow(new Arrow(this.level, this.xo, this.yo, this.zo), this);//DamageSource.arrow(this, this);
+            damagesource = damageSources().arrow(new Arrow(this.level(), this.xo, this.yo, this.zo), this);//DamageSource.arrow(this, this);
         } else {
-            damagesource = DamageSource.arrow(new Arrow(this.level, this.xo, this.yo, this.zo), entity1);
+            damagesource = damageSources().arrow(new Arrow(this.level(), this.xo, this.yo, this.zo), entity1);
             if (entity1 instanceof LivingEntity) {
                 ((LivingEntity)entity1).setLastHurtMob(entity);
             }
@@ -186,7 +186,7 @@ public abstract class AbstractArrowMixin extends Projectile {
 
             if (entity instanceof LivingEntity) {
                 LivingEntity livingentity = (LivingEntity)entity;
-                if (!this.level.isClientSide && this.getPierceLevel() <= 0) {
+                if (!this.level().isClientSide && this.getPierceLevel() <= 0) {
                     livingentity.setArrowCount(livingentity.getArrowCount() + 1);
                 }
 
@@ -198,7 +198,7 @@ public abstract class AbstractArrowMixin extends Projectile {
                     }
                 }
 
-                if (!this.level.isClientSide && entity1 instanceof LivingEntity) {
+                if (!this.level().isClientSide && entity1 instanceof LivingEntity) {
                     EnchantmentHelper.doPostHurtEffects(livingentity, entity1);
                     EnchantmentHelper.doPostDamageEffects((LivingEntity)entity1, livingentity);
                 }
@@ -212,7 +212,7 @@ public abstract class AbstractArrowMixin extends Projectile {
                     this.piercedAndKilledEntities.add(livingentity);
                 }
 
-                if (!this.level.isClientSide && entity1 instanceof ServerPlayer) {
+                if (!this.level().isClientSide && entity1 instanceof ServerPlayer) {
                     ServerPlayer serverplayer = (ServerPlayer)entity1;
                     if (this.piercedAndKilledEntities != null && this.shotFromCrossbow()) {
                         CriteriaTriggers.KILLED_BY_CROSSBOW.trigger(serverplayer, this.piercedAndKilledEntities);
@@ -241,14 +241,14 @@ public abstract class AbstractArrowMixin extends Projectile {
         }
 
         if (this.getOwner() instanceof PillagerUnit pUnit &&
-            !pUnit.getLevel().isClientSide() && pUnit.isPassenger()) {
-            pUnit.getLevel().explode(this, damagesource, null,
+            !pUnit.level().isClientSide() && pUnit.isPassenger()) {
+            pUnit.level().explode(this, damagesource, null,
                     pResult.getEntity().getEyePosition().x,
                     pResult.getEntity().getEyePosition().y,
                     pResult.getEntity().getEyePosition().z,
                     1f,
                     false,
-                    Explosion.BlockInteraction.NONE);
+                    Level.ExplosionInteraction.NONE);
         }
     }
 
@@ -259,14 +259,14 @@ public abstract class AbstractArrowMixin extends Projectile {
     )
     protected void onHitBlock(BlockHitResult pResult, CallbackInfo ci) {
         if (this.getOwner() instanceof PillagerUnit pUnit &&
-                !pUnit.getLevel().isClientSide() && pUnit.isPassenger()) {
-            pUnit.getLevel().explode(this, null, null,
+                !pUnit.level().isClientSide() && pUnit.isPassenger()) {
+            pUnit.level().explode(this, null, null,
                     pResult.getLocation().x,
                     pResult.getLocation().y,
                     pResult.getLocation().z,
                     1f,
                     false,
-                    Explosion.BlockInteraction.NONE);
+                    Level.ExplosionInteraction.NONE);
         }
     }
 }

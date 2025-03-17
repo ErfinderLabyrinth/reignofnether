@@ -1,12 +1,12 @@
 package com.solegendary.reignofnether.util;
 
-import com.mojang.math.Vector3d;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
-
+import org.joml.Vector3d;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -109,7 +109,7 @@ public class MyMath {
     public static Vector3d addVector3d(Vector3d vec, Vector3d unitVec, float scale) {
         Vector3d unitVecLocal = new Vector3d(0,0,0);
         unitVecLocal.set(unitVec);
-        unitVecLocal.scale(scale);
+        unitVecLocal.mul(scale);
         Vector3d vecLocal = new Vector3d(0,0,0);
         vecLocal.set(vec);
         vecLocal.add(unitVecLocal);
@@ -203,6 +203,6 @@ public class MyMath {
         double x3 = x1 + scale * deltaX;
         double z3 = z1 + scale * deltaZ;
 
-        return new BlockPos(x3, originPos.getY(), z3);
+        return new BlockPos((int) x3, originPos.getY(), (int) z3);
     }
 }

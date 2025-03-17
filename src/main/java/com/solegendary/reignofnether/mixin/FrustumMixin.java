@@ -23,13 +23,12 @@ public class FrustumMixin {
     // I have no idea why this is needed but without it the game freezes and gets stuck inside
     // this function forever a few seconds after activating orthoView
     @Inject(
-            method = "cubeCompletelyInFrustum(FFFFFF)Z",
+            method = "cubeInFrustum",
             at = @At("HEAD"),
             cancellable = true
     )
     private void cubeCompletelyInFrustum(
-            float f1, float f2, float f3, float f4, float f5, float f6,
-            CallbackInfoReturnable<Boolean> cir
+            double pMinX, double pMinY, double pMinZ, double pMaxX, double pMaxY, double pMaxZ, CallbackInfoReturnable<Boolean> cir
     ) {
         if (OrthoviewClientEvents.isEnabled()) {
             cir.setReturnValue(true);

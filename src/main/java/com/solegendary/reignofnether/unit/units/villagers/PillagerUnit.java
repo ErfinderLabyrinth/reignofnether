@@ -1,6 +1,6 @@
 package com.solegendary.reignofnether.unit.units.villagers;
 
-import com.mojang.math.Vector3f;
+import org.joml.Vector3f;
 import com.solegendary.reignofnether.ability.abilities.MountRavager;
 import com.solegendary.reignofnether.ability.abilities.PromoteIllager;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientboundPacket;
@@ -256,7 +256,7 @@ public class PillagerUnit extends Pillager implements Unit, AttackerUnit, Ranged
         );
         ItemStack itemstack = pUser.getItemInHand(interactionhand);
         if (pUser.isHolding((is) -> is.getItem() instanceof CrossbowItem)) {
-            CrossbowItem.performShooting(pUser.level, pUser, interactionhand, itemstack, pVelocity, 0);
+            CrossbowItem.performShooting(pUser.level(), pUser, interactionhand, itemstack, pVelocity, 0);
             this.playSound(SoundEvents.CROSSBOW_SHOOT, 3.0F, 0);
         }
         this.onCrossbowAttackPerformed();
@@ -285,10 +285,10 @@ public class PillagerUnit extends Pillager implements Unit, AttackerUnit, Ranged
             d1 -= (1.0f - pTarget.getEyeHeight());
 
         Vector3f vector3f = this.getProjectileShotVector(pUser, new Vec3(d0, d3, d1), pProjectileAngle);
-        pProjectile.shoot(vector3f.x(), vector3f.y(), vector3f.z(), pVelocity, (float) (14 - pUser.level.getDifficulty().getId() * 4));
+        pProjectile.shoot(vector3f.x(), vector3f.y(), vector3f.z(), pVelocity, (float) (14 - pUser.level().getDifficulty().getId() * 4));
         pUser.playSound(SoundEvents.CROSSBOW_SHOOT, 1.0F, 1.0F / (pUser.getRandom().nextFloat() * 0.4F + 0.8F));
 
-        if (!level.isClientSide() && pTarget instanceof Unit unit)
+        if (!level().isClientSide() && pTarget instanceof Unit unit)
             FogOfWarClientboundPacket.revealRangedUnit(unit.getOwnerName(), this.getId());
     }
 
@@ -301,10 +301,10 @@ public class PillagerUnit extends Pillager implements Unit, AttackerUnit, Ranged
         double d3 = rabg.getBuildingTarget().centrePos.getY();
 
         Vector3f vector3f = this.getProjectileShotVector(pUser, new Vec3(d0, d3, d1), pProjectileAngle);
-        pProjectile.shoot(vector3f.x(), vector3f.y(), vector3f.z(), pVelocity, (float) (14 - pUser.level.getDifficulty().getId() * 4));
+        pProjectile.shoot(vector3f.x(), vector3f.y(), vector3f.z(), pVelocity, (float) (14 - pUser.level().getDifficulty().getId() * 4));
         pUser.playSound(SoundEvents.CROSSBOW_SHOOT, 1.0F, 1.0F / (pUser.getRandom().nextFloat() * 0.4F + 0.8F));
 
-        if (!level.isClientSide())
+        if (!level().isClientSide())
             FogOfWarClientboundPacket.revealRangedUnit(rabg.getBuildingTarget().ownerName, this.getId());
     }
 

@@ -41,7 +41,7 @@ public class WalkableMagmaBlock extends Block {
                 !(pEntity instanceof GruntUnit) &&
                 !EnchantmentHelper.hasFrostWalker((LivingEntity)pEntity) &&
                 !isPiglinFaction && isDamageTick) {
-            pEntity.hurt(DamageSource.HOT_FLOOR, DAMAGE);
+            pEntity.hurt(pEntity.damageSources().hotFloor(), DAMAGE);
         }
     }
 

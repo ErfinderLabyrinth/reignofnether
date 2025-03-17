@@ -15,6 +15,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -60,7 +61,7 @@ public class MagmaCubeUnit extends SlimeUnit implements Unit, AttackerUnit {
 
     public void tick() {
         super.tick();
-        if (!level.isClientSide()) {
+        if (!level().isClientSide()) {
             setFireTicks += 1;
             if (setFireTicks >= SET_FIRE_TICKS_MAX) {
                 setFireTicks = 0;
@@ -72,7 +73,7 @@ public class MagmaCubeUnit extends SlimeUnit implements Unit, AttackerUnit {
     @Override
     protected void checkFallDamage(double pY, boolean pOnGround, BlockState pState, BlockPos pPos) {
         super.checkFallDamage(pY, pOnGround, pState, pPos);
-        if (!level.isClientSide() && pOnGround && !wasOnGround)
+        if (!level().isClientSide() && pOnGround && !wasOnGround)
             createMagma();
     }
 
@@ -90,9 +91,8 @@ public class MagmaCubeUnit extends SlimeUnit implements Unit, AttackerUnit {
         if (getSize() >= 2 && pSource.getEntity() instanceof AttackerUnit aUnit && aUnit.getAttackGoal() instanceof AbstractMeleeAttackUnitGoal)
             pSource.getEntity().setRemainingFireTicks((FIRE_DURATION_PER_SIZE * getSize()) / 2);
 
-        if (pSource == DamageSource.ON_FIRE ||
-            pSource == DamageSource.IN_FIRE ||
-            pSource == DamageSource.LAVA)
+        if (pSource.is(DamageTypeTags.IS_FIRE) ||
+            pSource == damageSources().lava())
             return false;
 
         return super.hurt(pSource, pAmount);
@@ -100,7 +100,7 @@ public class MagmaCubeUnit extends SlimeUnit implements Unit, AttackerUnit {
 
 
     public void createMagma() {
-        if (getSize() < 4 || level.isClientSide())
+        if (getSize() < 4 || level().isClientSide())
             return;
 
         if (!ResearchServerEvents.playerHasResearch(getOwnerName(), ResearchCubeMagma.itemName))
@@ -108,7 +108,7 @@ public class MagmaCubeUnit extends SlimeUnit implements Unit, AttackerUnit {
 
         BlockState bsToPlace = BlockRegistrar.WALKABLE_MAGMA_BLOCK.get().defaultBlockState();
         BlockPos bpOn = getOnPos();
-        if (level.getBlockState(bpOn).isAir())
+        if (level().getBlockState(bpOn).isAir())
             return;
 
         ArrayList<BlockPos> bps = new ArrayList<>();
@@ -146,27 +146,27 @@ public class MagmaCubeUnit extends SlimeUnit implements Unit, AttackerUnit {
 
         // Frostwalker effect provided in LivingEntityMixin, but it only happens on changing block positions on the ground
         for (BlockPos bp : bps) {
-            BlockState bsOld = level.getBlockState(bp);
-            if (bsOld.getMaterial().isSolidBlocking()) {
-                BlockServerEvents.addTempBlock((ServerLevel) level, bp,
+            BlockState bsOld = level().getBlockState(bp);
+            if (bsOld.isSolid()) {
+                BlockServerEvents.addTempBlock((ServerLevel) level(), bp,
                     BlockRegistrar.WALKABLE_MAGMA_BLOCK.get().defaultBlockState(), bsOld, MAGMA_DURATION);
             }
         }
     }
     public void createFire() {
-        if (getSize() < MAX_SIZE || level.isClientSide())
+        if (getSize() < MAX_SIZE || level().isClientSide())
             return;
 
         ArrayList<BlockPos> bps = new ArrayList<>();
         for (int x = -4; x < 4; x++)
             for (int y = -4; y < 4; y++)
                 for (int z = -4; z < 4; z++)
-                    if (level.getBlockState(getOnPos().offset(x,y,z)).getBlock() ==
+                    if (level().getBlockState(getOnPos().offset(x,y,z)).getBlock() ==
                             BlockRegistrar.WALKABLE_MAGMA_BLOCK.get() &&
-                            level.getBlockState(getOnPos().offset(x,y+1,z)).isAir())
+                            level().getBlockState(getOnPos().offset(x,y+1,z)).isAir())
                         bps.add(getOnPos().offset(x,y,z));
         Collections.shuffle(bps);
         if (bps.size() >= 1)
-            level.setBlockAndUpdate(bps.get(0).above(), Blocks.FIRE.defaultBlockState());
+            level().setBlockAndUpdate(bps.get(0).above(), Blocks.FIRE.defaultBlockState());
     }
 }

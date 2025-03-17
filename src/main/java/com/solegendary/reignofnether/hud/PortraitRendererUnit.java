@@ -6,8 +6,10 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.datafixers.util.Pair;
-import com.mojang.math.Quaternion;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
+import net.minecraft.client.gui.GuiGraphics;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import com.solegendary.reignofnether.ability.abilities.EnchantMaiming;
 import com.solegendary.reignofnether.ability.abilities.EnchantVigor;
 import com.solegendary.reignofnether.building.GarrisonableBuilding;
@@ -27,7 +29,6 @@ import com.solegendary.reignofnether.util.MyMath;
 import com.solegendary.reignofnether.util.MyRenderer;
 import net.minecraft.ReportedException;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.Model;
@@ -139,7 +140,7 @@ public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<
     // - healthbar
     // - unit name
     // Must be called from DrawScreenEvent
-    public RectZone render(PoseStack poseStack, String name, int x, int y, LivingEntity entity) {
+    public RectZone render(GuiGraphics guiGraphics, String name, int x, int y, LivingEntity entity) {
 
         Relationship rs = UnitClientEvents.getPlayerToEntityRelationship(entity);
 
@@ -150,7 +151,7 @@ public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<
             case NEUTRAL -> bgCol = 0x90909000;
             case HOSTILE -> bgCol = 0x90900000;
         }
-        MyRenderer.renderFrameWithBg(poseStack, x, y, frameWidth, frameHeight, bgCol);
+        MyRenderer.renderFrameWithBg(guiGraphics, x, y, frameWidth, frameHeight, bgCol);
 
         // remember 0,0 is top left
         int drawX = x + offsetX;
@@ -169,7 +170,7 @@ public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<
             hasBanner = true;
             entity.setItemSlot(EquipmentSlot.HEAD, ItemStack.EMPTY);
         }
-        drawEntityOnScreen(poseStack, entity, drawX, drawY, sizeFinal);
+        drawEntityOnScreen(guiGraphics.pose(), entity, drawX, drawY, sizeFinal);
 
         name = WordUtils.capitalize(name);
 
@@ -195,13 +196,13 @@ public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<
 
         // draw name (unless a player, since their nametag will be rendered anyway)
         if (!(entity instanceof Player)) {
-            GuiComponent.drawString(poseStack, Minecraft.getInstance().font, name, x + 4, y - 9, 0xFFFFFFFF);
+            guiGraphics.drawString(Minecraft.getInstance().font, name, x + 4, y - 9, 0xFFFFFFFF);
         }
 
         RectZone rectZone = RectZone.getZoneByLW(x, y, frameWidth, frameHeight);
 
         // draw health bar and write min/max hp
-        HealthBarClientEvents.renderForEntity(poseStack,
+        HealthBarClientEvents.renderForEntity(guiGraphics.pose(),
             entity,
             x + (frameWidth / 2f),
             y + frameHeight - 15,
@@ -221,24 +222,24 @@ public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<
         // entity
         Minecraft MC = Minecraft.getInstance();
         Window window = MC.getWindow();
-        poseStack.pushPose();
+        guiGraphics.pose().pushPose();
         MultiBufferSource.BufferSource multibuffersource$buffersource =
             MultiBufferSource.immediate(Tesselator.getInstance()
             .getBuilder());
         String text = healthText + "/" + (int) entity.getMaxHealth();
         FormattedCharSequence pTooltips = FormattedCharSequence.forward(text, Style.EMPTY);
         ClientTooltipComponent clientTooltip = ClientTooltipComponent.create(pTooltips);
-        poseStack.translate(0.0, 0.0, 400.0);
+        guiGraphics.pose().translate(0.0, 0.0, 400.0);
         int x0 = x + (frameWidth / 2);
         int xC = (x0 - MC.font.width(text) / 2);
         clientTooltip.renderText(MC.font,
             xC,
             y + frameHeight - 13,
-            poseStack.last().pose(),
+                guiGraphics.pose().last().pose(),
             multibuffersource$buffersource
         );
         multibuffersource$buffersource.endBatch();
-        poseStack.popPose();
+        guiGraphics.pose().popPose();
 
         if (hasBanner)
             entity.setItemSlot(EquipmentSlot.HEAD, bannerStack);
@@ -246,8 +247,8 @@ public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<
         return rectZone;
     }
 
-    public RectZone renderStats(PoseStack poseStack, String name, int x, int y, Unit unit) {
-        MyRenderer.renderFrameWithBg(poseStack, x, y, statsWidth, statsHeight, 0xA0000000);
+    public RectZone renderStats(GuiGraphics guiGraphics, String name, int x, int y, Unit unit) {
+        MyRenderer.renderFrameWithBg(guiGraphics, x, y, statsWidth, statsHeight, 0xA0000000);
 
         int blitXIcon = x + 6;
         int blitYIcon = y + 7;
@@ -297,8 +298,8 @@ public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<
 
         // render based on prepped strings/icons
         for (int i = 0; i < statStrings.size(); i++) {
-            MyRenderer.renderIcon(poseStack, textureStatIcons.get(i), blitXIcon, blitYIcon, 8);
-            GuiComponent.drawString(poseStack,
+            MyRenderer.renderIcon(guiGraphics, textureStatIcons.get(i), blitXIcon, blitYIcon, 8);
+            guiGraphics.drawString(
                 Minecraft.getInstance().font,
                 statStrings.get(i),
                 blitXIcon + 13,
@@ -310,11 +311,11 @@ public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<
         return RectZone.getZoneByLW(x, y, statsWidth, statsHeight);
     }
 
-    public RectZone renderResourcesHeld(PoseStack poseStack, String name, int x, int y, Unit unit) {
+    public RectZone renderResourcesHeld(GuiGraphics guiGraphics, String name, int x, int y, Unit unit) {
 
         int totalRes = Resources.getTotalResourcesFromItems(unit.getItems()).getTotalValue();
 
-        MyRenderer.renderFrameWithBg(poseStack, x, y, statsWidth, statsHeight, 0xA0000000);
+        MyRenderer.renderFrameWithBg(guiGraphics, x, y, statsWidth, statsHeight, 0xA0000000);
 
         int blitXIcon = x + 6;
         int blitYIcon = y + 7;
@@ -337,8 +338,8 @@ public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<
         for (int i = 0; i < statStrings.size(); i++) {
 
             if (!statStrings.get(i).equals("0")) {
-                MyRenderer.renderIcon(poseStack, textureStatIcons.get(i), blitXIcon, blitYIcon, 8);
-                GuiComponent.drawString(poseStack,
+                MyRenderer.renderIcon(guiGraphics, textureStatIcons.get(i), blitXIcon, blitYIcon, 8);
+                guiGraphics.drawString(
                     Minecraft.getInstance().font,
                     statStrings.get(i),
                     blitXIcon + 12,
@@ -365,8 +366,8 @@ public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<
         poseStack.pushPose();
         poseStack.translate(0.0D, 0.0D, 1000.0D);
         poseStack.scale((float) size, (float) size, (float) size);
-        Quaternion quaternion = Vector3f.ZP.rotationDegrees(180.0F);
-        Quaternion quaternion2 = Vector3f.XP.rotationDegrees(g * 20.0F);
+        Quaternionf quaternion = Axis.ZP.rotationDegrees(180.0F);
+        Quaternionf quaternion2 = Axis.XP.rotationDegrees(g * 20.0F);
         quaternion.mul(quaternion2);
         poseStack.mulPose(quaternion);
         float h = entity.yBodyRot; // bodyYaw;
@@ -382,7 +383,7 @@ public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<
 
         Lighting.setupForEntityInInventory();
         EntityRenderDispatcher entityrenderdispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
-        quaternion2.conj();
+        quaternion2.conjugate();
         entityrenderdispatcher.setRenderShadow(false);
         entityrenderdispatcher.overrideCameraOrientation(quaternion2);
 

@@ -74,8 +74,8 @@ public class PlayerServerboundPacket {
         Minecraft MC = Minecraft.getInstance();
 
         if (MC.player != null && MC.level != null) {
-            BlockState bs = MC.level.getBlockState(new BlockPos(x, y, z));
-            if (bs.getMaterial().isLiquid() && faction != Faction.NONE) {
+            BlockState bs = MC.level.getBlockState(new BlockPos(x.intValue(), y.intValue(), z.intValue()));
+            if (!bs.getFluidState().isEmpty() && faction != Faction.NONE) {
                 HudClientEvents.showTemporaryMessage(I18n.get("hud.reignofnether.invalid_start_location"));
                 return;
             }

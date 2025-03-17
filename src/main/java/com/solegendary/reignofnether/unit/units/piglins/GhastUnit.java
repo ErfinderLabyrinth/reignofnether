@@ -189,7 +189,7 @@ public class GhastUnit extends Ghast implements Unit, AttackerUnit, RangedAttack
 
     @Override // destroy touching leaves, copied from Ravager AI
     protected void customServerAiStep() {
-        if (this.isAlive() && this.horizontalCollision && ForgeEventFactory.getMobGriefingEvent(this.level, this)) {
+        if (this.isAlive() && this.horizontalCollision && ForgeEventFactory.getMobGriefingEvent(this.level(), this)) {
             boolean flag = false;
             AABB aabb = this.getBoundingBox().inflate(0.2);
             Iterator var8 = BlockPos.betweenClosed(Mth.floor(aabb.minX), Mth.floor(aabb.minY), Mth.floor(aabb.minZ), Mth.floor(aabb.maxX), Mth.floor(aabb.maxY), Mth.floor(aabb.maxZ)).iterator();
@@ -202,11 +202,11 @@ public class GhastUnit extends Ghast implements Unit, AttackerUnit, RangedAttack
                     if (!var8.hasNext())
                         break label62;
                     blockpos = (BlockPos)var8.next();
-                    BlockState blockstate = this.level.getBlockState(blockpos);
+                    BlockState blockstate = this.level().getBlockState(blockpos);
                     block = blockstate.getBlock();
                 } while(!(block instanceof LeavesBlock));
 
-                flag = this.level.destroyBlock(blockpos, true, this) || flag;
+                flag = this.level().destroyBlock(blockpos, true, this) || flag;
             }
         }
     }
@@ -287,7 +287,7 @@ public class GhastUnit extends Ghast implements Unit, AttackerUnit, RangedAttack
         double z = pTarget.getZ();
         performUnitRangedAttack(x, y, z, velocity);
 
-        if (!level.isClientSide() && pTarget instanceof Unit unit)
+        if (!level().isClientSide() && pTarget instanceof Unit unit)
             FogOfWarClientboundPacket.revealRangedUnit(unit.getOwnerName(), this.getId());
     }
 
@@ -298,13 +298,13 @@ public class GhastUnit extends Ghast implements Unit, AttackerUnit, RangedAttack
         double ty = y - (0.5 + this.getY(0.5));
         double tz = z - (this.getZ() + viewVec.z * 4.0);
         if (!this.isSilent()) {
-            this.level.levelEvent(null, 1016, this.blockPosition(), 0);
+            this.level().levelEvent(null, 1016, this.blockPosition(), 0);
         }
-        LargeFireball fireball = new GhastUnitFireball(this.level, this, tx, ty, tz, EXPLOSION_POWER);
+        LargeFireball fireball = new GhastUnitFireball(this.level(), this, tx, ty, tz, EXPLOSION_POWER);
         fireball.setInvulnerable(true);
         fireball.setPos(this.getX() + viewVec.x * 4.0, this.getY(0.5) + 0.5, fireball.getZ() + viewVec.z * 4.0);
         this.playSound(SoundEvents.GHAST_WARN, 3.0F, 1.0F);
-        this.level.addFreshEntity(fireball);
+        this.level().addFreshEntity(fireball);
         UnitAnimationClientboundPacket.sendBasicPacket(UnitAnimationAction.NON_KEYFRAME_START, this);
     }
 

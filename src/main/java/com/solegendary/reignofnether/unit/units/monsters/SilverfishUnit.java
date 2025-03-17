@@ -152,7 +152,7 @@ public class SilverfishUnit extends Silverfish implements Unit, AttackerUnit {
 
         if (this.hasLimitedLife && --this.limitedLifeTicks <= 0) {
             this.limitedLifeTicks = 20;
-            this.hurt(DamageSource.STARVE, 1.0F);
+            this.hurt(damageSources().starve(), 1.0F);
         }
     }
 

@@ -44,7 +44,7 @@ public interface GarrisonableBuilding {
 
     static GarrisonableBuilding getGarrison(Unit unit) {
         List<Building> buildings;
-        if (((Entity) unit).getLevel().isClientSide())
+        if (((Entity) unit).level().isClientSide())
             buildings = BuildingClientEvents.getBuildings();
         else
             buildings = BuildingServerEvents.getBuildings();
@@ -52,7 +52,7 @@ public interface GarrisonableBuilding {
         for (Building building : buildings) {
 
             boolean isAllied;
-            if (((Entity) unit).getLevel().isClientSide())
+            if (((Entity) unit).level().isClientSide())
                 isAllied = AlliancesClient.isAllied(unit.getOwnerName(), building.ownerName);
             else
                 isAllied = AlliancesServerEvents.isAllied(unit.getOwnerName(), building.ownerName);

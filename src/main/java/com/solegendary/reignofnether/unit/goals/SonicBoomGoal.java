@@ -23,16 +23,16 @@ public class SonicBoomGoal extends AbstractCastTargetedSpellGoal {
     @Override
     public void startCasting() {
         super.startCasting();
-        if (!this.mob.level.isClientSide())
+        if (!this.mob.level().isClientSide())
             UnitAnimationClientboundPacket.sendBasicPacket(UnitAnimationAction.NON_KEYFRAME_START, this.mob);
     }
 
     @Override
     public void stopCasting() {
-        if (!this.mob.level.isClientSide() && ticksCasting < channelTicks)
+        if (!this.mob.level().isClientSide() && ticksCasting < channelTicks)
             UnitAnimationClientboundPacket.sendBasicPacket(UnitAnimationAction.NON_KEYFRAME_STOP, this.mob);
         super.stopCasting();
-        if (this.mob.level.isClientSide() && !Keybindings.shiftMod.isDown())
+        if (this.mob.level().isClientSide() && !Keybindings.shiftMod.isDown())
             ((Unit) this.mob).getCheckpoints().clear();
     }
 

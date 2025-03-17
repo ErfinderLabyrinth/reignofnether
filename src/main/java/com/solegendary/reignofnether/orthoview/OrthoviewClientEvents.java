@@ -1,7 +1,7 @@
 package com.solegendary.reignofnether.orthoview;
 
-import com.mojang.math.Matrix4f;
-import com.mojang.math.Vector3d;
+import org.joml.Matrix4f;
+import org.joml.Vector3d;
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingClientEvents;
@@ -654,14 +654,10 @@ public class OrthoviewClientEvents {
         float top = zoomFinal / 2;
         float bot = -zoomFinal / 2;
 
-        float[] arr = new float[] {
-            2.0f / (rgt - left), 0, 0,
-            -(rgt + left) / (rgt - left), 0,
-            2.0f / (top - bot), 0,
-            -(top + bot) / (top - bot), 0, 0, -2.0f / (far - near), -(far + near) / (far - near), 0, 0, 0, 1 };
-        FloatBuffer fb = FloatBuffer.wrap(arr);
-        Matrix4f m1 = new Matrix4f();
-        m1.load(fb);
+        Matrix4f m1 = new Matrix4f(2.0f / (rgt - left), 0, 0,
+                -(rgt + left) / (rgt - left), 0,
+                2.0f / (top - bot), 0,
+                -(top + bot) / (top - bot), 0, 0, -2.0f / (far - near), -(far + near) / (far - near), 0, 0, 0, 1);
 
         return m1;
     }

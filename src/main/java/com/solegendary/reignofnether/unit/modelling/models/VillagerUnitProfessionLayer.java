@@ -23,6 +23,8 @@ import net.minecraft.client.resources.metadata.animation.VillagerMetaDataSection
 import net.minecraft.client.resources.metadata.animation.VillagerMetaDataSection.Hat;
 import net.minecraft.core.DefaultedRegistry;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.Mth;
@@ -59,14 +61,14 @@ public class VillagerUnitProfessionLayer<T extends LivingEntity & VillagerDataHo
             VillagerData vData = pLivingEntity.getVillagerData();
             VillagerType biomeType = vData.getType();
             VillagerProfession profession = vData.getProfession();
-            VillagerMetaDataSection.Hat typeHatData = this.getHatData(this.typeHatCache, "type", Registry.VILLAGER_TYPE, biomeType);
-            VillagerMetaDataSection.Hat profHatData = this.getHatData(this.professionHatCache, "profession", Registry.VILLAGER_PROFESSION, profession);
+            VillagerMetaDataSection.Hat typeHatData = this.getHatData(this.typeHatCache, "type", BuiltInRegistries.VILLAGER_TYPE, biomeType);
+            VillagerMetaDataSection.Hat profHatData = this.getHatData(this.professionHatCache, "profession", BuiltInRegistries.VILLAGER_PROFESSION, profession);
             M vHeadModel = this.getParentModel();
             ((VillagerUnitModel<?>) vHeadModel).hatRimVisible(profession == VillagerProfession.FARMER);
-            ResourceLocation biomeTypeRL = this.getResourceLocation("type", Registry.VILLAGER_TYPE.getKey(biomeType));
+            ResourceLocation biomeTypeRL = this.getResourceLocation("type", BuiltInRegistries.VILLAGER_TYPE.getKey(biomeType));
             renderColoredCutoutModel(vHeadModel, biomeTypeRL, pMatrixStack, pBuffer, pPackedLight, pLivingEntity, 1.0F, 1.0F, 1.0F);
             if (profession != VillagerProfession.NONE && !pLivingEntity.isBaby()) {
-                ResourceLocation profRL = this.getResourceLocation("profession", Registry.VILLAGER_PROFESSION.getKey(profession));
+                ResourceLocation profRL = this.getResourceLocation("profession", BuiltInRegistries.VILLAGER_PROFESSION.getKey(profession));
                 renderColoredCutoutModel(vHeadModel, profRL, pMatrixStack, pBuffer, pPackedLight, pLivingEntity, 1.0F, 1.0F, 1.0F);
                 if (profession != VillagerProfession.NITWIT) {
                     ResourceLocation profLevelRL = this.getResourceLocation("profession_level", LEVEL_LOCATIONS.get(Mth.clamp(vData.getLevel(), 1, LEVEL_LOCATIONS.size())));

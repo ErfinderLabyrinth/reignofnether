@@ -57,7 +57,7 @@ public class BuildingUtils {
         double z = aabb.minZ;
         do {
             do {
-                bps.add(new BlockPos(x, aabb.minY, z));
+                bps.add(new BlockPos((int) x, (int) aabb.minY, (int) z));
                 x += 16;
             }
             while (x <= aabb.maxX);
@@ -67,9 +67,9 @@ public class BuildingUtils {
         while (z <= aabb.maxZ);
 
         // include far corners
-        bps.add(new BlockPos(aabb.maxX, aabb.minY, aabb.minZ));
-        bps.add(new BlockPos(aabb.minX, aabb.minY, aabb.maxZ));
-        bps.add(new BlockPos(aabb.maxX, aabb.minY, aabb.maxZ));
+        bps.add(new BlockPos((int) aabb.maxX, (int) aabb.minY, (int) aabb.minZ));
+        bps.add(new BlockPos((int) aabb.minX, (int) aabb.minY, (int) aabb.maxZ));
+        bps.add(new BlockPos((int) aabb.maxX, (int) aabb.minY, (int) aabb.maxZ));
 
         return bps;
     }
@@ -302,7 +302,7 @@ public class BuildingUtils {
     }
 
     public static boolean isWithinRangeOfMaxedCatalyst(LivingEntity entity) {
-        List<Building> buildings = getBuildingsList(entity.level.isClientSide());
+        List<Building> buildings = getBuildingsList(entity.level().isClientSide());
 
         double maxCatalystRangeSquared = SculkCatalyst.ESTIMATED_RANGE * SculkCatalyst.ESTIMATED_RANGE;
 

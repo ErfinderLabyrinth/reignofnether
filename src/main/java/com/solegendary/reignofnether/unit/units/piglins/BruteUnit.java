@@ -249,7 +249,7 @@ public class BruteUnit extends PiglinBrute implements Unit, AttackerUnit {
 
     @Override
     public boolean fireImmune() {
-        Building building = BuildingUtils.findBuilding(level.isClientSide(), getOnPos());
+        Building building = BuildingUtils.findBuilding(level().isClientSide(), getOnPos());
         return super.fireImmune() || building instanceof FlameSanctuary || building instanceof BasaltSprings;
     }
 }

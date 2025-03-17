@@ -1,4 +1,5 @@
 {
+    "has_precipitation": false,
     "carvers": {
       "air": [
         "minecraft:cave",

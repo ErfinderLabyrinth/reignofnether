@@ -2,7 +2,7 @@ package com.solegendary.reignofnether.mixin;
 
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
 import net.minecraft.client.renderer.GameRenderer;
-import com.mojang.math.Matrix4f;
+import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class OrthoViewMixin {
     // applies an orthographic projection matrix
     @Inject(
-            method = "getProjectionMatrix(D)Lcom/mojang/math/Matrix4f;",
+            method = "getProjectionMatrix",
             at = @At("HEAD"),
             cancellable = true
     )

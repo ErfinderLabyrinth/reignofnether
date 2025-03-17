@@ -36,7 +36,7 @@ public abstract class MagmaBlockMixin {
             !(pEntity instanceof GruntUnit) &&
             !EnchantmentHelper.hasFrostWalker((LivingEntity)pEntity) &&
             !isPiglinFaction && isDamageTick) {
-            pEntity.hurt(DamageSource.HOT_FLOOR, WalkableMagmaBlock.DAMAGE);
+            pEntity.hurt(pEntity.damageSources().hotFloor(), WalkableMagmaBlock.DAMAGE);
         }
     }
 }

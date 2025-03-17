@@ -28,7 +28,7 @@ public class ReturnResourcesGoal extends MoveToTargetBlockGoal {
     }
 
     public void depositItems() {
-        if (this.mob instanceof Unit unit && !this.mob.level.isClientSide()) {
+        if (this.mob instanceof Unit unit && !this.mob.level().isClientSide()) {
             Resources res = Resources.getTotalResourcesFromItems(unit.getItems());
             if (res.getTotalValue() > 0) {
                 res.ownerName = unit.getOwnerName();
@@ -45,7 +45,7 @@ public class ReturnResourcesGoal extends MoveToTargetBlockGoal {
         if (buildingTarget != null) {
             calcMoveTarget();
             if (canDropOff() && this.mob instanceof Unit unit) {
-                if (!this.mob.level.isClientSide()) {
+                if (!this.mob.level().isClientSide()) {
                     this.depositItems();
                     if (this.mob instanceof WorkerUnit worker) {
                         unit.resetBehaviours();
@@ -79,7 +79,7 @@ public class ReturnResourcesGoal extends MoveToTargetBlockGoal {
     }
 
     public void returnToClosestBuilding() {
-        if (this.mob.level.isClientSide())
+        if (this.mob.level().isClientSide())
             return;
 
         BlockPos pos = mob.getOnPos();

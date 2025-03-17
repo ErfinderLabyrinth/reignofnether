@@ -4,9 +4,7 @@ import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingUtils;
 import com.solegendary.reignofnether.building.buildings.piglins.Portal;
 import com.solegendary.reignofnether.guiscreen.TopdownGui;
-import com.solegendary.reignofnether.registrars.ContainerRegistrar;
-import com.solegendary.reignofnether.registrars.EntityRegistrar;
-import com.solegendary.reignofnether.registrars.PacketHandler;
+import com.solegendary.reignofnether.registrars.*;
 import com.solegendary.reignofnether.unit.modelling.models.NecromancerModel;
 import com.solegendary.reignofnether.unit.modelling.models.PiglinMerchantModel;
 import com.solegendary.reignofnether.unit.modelling.models.RoyalGuardModel;
@@ -19,13 +17,18 @@ import com.solegendary.reignofnether.unit.units.villagers.*;
 import com.solegendary.reignofnether.votesystem.VoteCommand;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.entity.*;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.animal.PolarBear;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterColorHandlersEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -162,6 +165,57 @@ public class CommonModEvents {
         event.registerLayerDefinition(RoyalGuardModel.LAYER_LOCATION, RoyalGuardModel::createBodyLayer);
         event.registerLayerDefinition(NecromancerModel.LAYER_LOCATION, NecromancerModel::createBodyLayer);
         event.registerLayerDefinition(PiglinMerchantModel.LAYER_LOCATION, PiglinMerchantModel::createBodyLayer);
+    }
+
+    @SubscribeEvent
+    public static void creativeTabSetup(BuildCreativeModeTabContentsEvent event) {
+        if(BuiltInRegistries.CREATIVE_MODE_TAB.getKey(event.getTab())==CreativeModeTabs.BUILDING_BLOCKS.location()){
+            for(Item item : BlockRegistrar.blockItems.get(CreativeModeTabs.BUILDING_BLOCKS)){
+                event.accept(item);
+            }
+        }
+        if(BuiltInRegistries.CREATIVE_MODE_TAB.getKey(event.getTab())==CreativeModeTabs.FUNCTIONAL_BLOCKS.location()){
+            for(Item item : BlockRegistrar.blockItems.get(CreativeModeTabs.FUNCTIONAL_BLOCKS)){
+                event.accept(item);
+            }
+        }
+        if(BuiltInRegistries.CREATIVE_MODE_TAB.getKey(event.getTab())==CreativeModeTabs.SPAWN_EGGS.location()){
+            event.accept(ItemRegistrar.ZOMBIE_UNIT_SPAWN_EGG);
+            event.accept(ItemRegistrar.HUSK_UNIT_SPAWN_EGG);
+            event.accept(ItemRegistrar.DROWNED_UNIT_SPAWN_EGG);
+            event.accept(ItemRegistrar.ZOMBIE_PIGLIN_UNIT_SPAWN_EGG);
+            event.accept(ItemRegistrar.ZOGLIN_UNIT);
+            event.accept(ItemRegistrar.SKELETON_UNIT_SPAWN_EGG);
+            event.accept(ItemRegistrar.STRAY_UNIT_SPAWN_EGG);
+            event.accept(ItemRegistrar.CREEPER_UNIT_SPAWN_EGG);
+            event.accept(ItemRegistrar.SPIDER_UNIT_SPAWN_EGG);
+            event.accept(ItemRegistrar.POISON_SPIDER_UNIT_SPAWN_EGG);
+            event.accept(ItemRegistrar.VILLAGER_UNIT_SPAWN_EGG);
+            event.accept(ItemRegistrar.MILITIA_UNIT_SPAWN_EGG);
+            event.accept(ItemRegistrar.ZOMBIE_VILLAGER_UNIT_SPAWN_EGG);
+            event.accept(ItemRegistrar.VINDICATOR_UNIT_SPAWN_EGG);
+            event.accept(ItemRegistrar.PILLAGER_UNIT_SPAWN_EGG);
+            event.accept(ItemRegistrar.IRON_GOLEM_UNIT_SPAWN_EGG);
+            event.accept(ItemRegistrar.WITCH_UNIT_SPAWN_EGG);
+            event.accept(ItemRegistrar.EVOKER_UNIT_SPAWN_EGG);
+            event.accept(ItemRegistrar.ENDERMAN_UNIT_SPAWN_EGG);
+            event.accept(ItemRegistrar.WARDEN_UNIT_SPAWN_EGG);
+            event.accept(ItemRegistrar.RAVAGER_UNIT_SPAWN_EGG);
+            event.accept(ItemRegistrar.SILVERFISH_UNIT_SPAWN_EGG);
+            event.accept(ItemRegistrar.GRUNT_UNIT_SPAWN_EGG);
+            event.accept(ItemRegistrar.BRUTE_UNIT_SPAWN_EGG);
+            event.accept(ItemRegistrar.HEADHUNTER_UNIT_SPAWN_EGG);
+            event.accept(ItemRegistrar.HOGLIN_UNIT_SPAWN_EGG);
+            event.accept(ItemRegistrar.BLAZE_UNIT_SPAWN_EGG);
+            event.accept(ItemRegistrar.WITHER_SKELETON_UNIT_SPAWN_EGG);
+            event.accept(ItemRegistrar.GHAST_UNIT_SPAWN_EGG);
+            event.accept(ItemRegistrar.MAGMA_CUBE_UNIT_SPAWN_EGG);
+            event.accept(ItemRegistrar.SLIME_UNIT_SPAWN_EGG);
+            event.accept(ItemRegistrar.ROYAL_GUARD_UNIT_SPAWN_EGG);
+            event.accept(ItemRegistrar.NECROMANCER_UNIT_SPAWN_EGG);
+            event.accept(ItemRegistrar.PIGLIN_MERCHANT_UNIT_SPAWN_EGG);
+
+        }
     }
 }
 

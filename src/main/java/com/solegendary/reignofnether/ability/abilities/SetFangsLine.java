@@ -27,7 +27,7 @@ public class SetFangsLine extends Ability {
 
     public SetFangsLine(EvokerUnit evokerUnit) {
         super(UnitAction.SET_FANGS_LINE,
-            evokerUnit.level,
+            evokerUnit.level(),
             CD_MAX_SECONDS * ResourceCost.TICKS_PER_SECOND,
             EvokerUnit.FANGS_RANGE_LINE,
             0,

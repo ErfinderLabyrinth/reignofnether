@@ -22,6 +22,7 @@ import com.solegendary.reignofnether.unit.units.monsters.ZombieUnit;
 import com.solegendary.reignofnether.unit.units.villagers.*;
 import com.solegendary.reignofnether.util.Faction;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
@@ -181,7 +182,7 @@ public class TutorialClientEvents {
     }
 
     // check if we need to render an arrow to point at the next button
-    public static void checkAndRenderNextAction(PoseStack poseStack, ArrayList<Button> buttons) {
+    public static void checkAndRenderNextAction(GuiGraphics poseStack, ArrayList<Button> buttons) {
         if (tutorialStage == PAN_CAMERA && MC.screen != null) {
             if (!pannedUp) {
                 TutorialRendering.pointAtWithArrow(poseStack, MC.screen.width / 2, -Button.DEFAULT_ICON_FRAME_SIZE, true);

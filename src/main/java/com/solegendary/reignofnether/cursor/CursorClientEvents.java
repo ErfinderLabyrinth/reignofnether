@@ -1,7 +1,7 @@
 package com.solegendary.reignofnether.cursor;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.math.Vector3d;
+import org.joml.Vector3d;
 import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingClientEvents;
 import com.solegendary.reignofnether.building.BuildingUtils;
@@ -22,7 +22,6 @@ import com.solegendary.reignofnether.util.MiscUtil;
 import com.solegendary.reignofnether.util.MyMath;
 import com.solegendary.reignofnether.util.MyRenderer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.core.BlockPos;
@@ -63,13 +62,13 @@ public class CursorClientEvents {
 
     // pos of block moused over or inside a box select
     // currently blocks are not fully selectable
-    private static BlockPos preselectedBlockPos = new BlockPos(0,0,0);
+    private static BlockPos preselectedBlockPos = new BlockPos(0, 0, 0);
     // pos of cursor exactly on: first non-air block, last frame, near to screen, far from screen
-    private static Vector3d cursorWorldPos = new Vector3d(0,0,0);
-    private static Vector3d cursorWorldPosLast = new Vector3d(0,0,0);
+    private static Vector3d cursorWorldPos = new Vector3d(0, 0, 0);
+    private static Vector3d cursorWorldPosLast = new Vector3d(0, 0, 0);
     // pos of cursor on screen for box selections
-    private static Vec2 cursorLeftClickDownPos = new Vec2(-1,-1);
-    private static Vec2 cursorLeftClickDragPos = new Vec2(-1,-1);
+    private static Vec2 cursorLeftClickDownPos = new Vec2(-1, -1);
+    private static Vec2 cursorLeftClickDragPos = new Vec2(-1, -1);
     // action that is performed on the next left click
     private static UnitAction leftClickAction = null;
     private static SandboxAction leftClickSandboxAction = null;
@@ -77,29 +76,34 @@ public class CursorClientEvents {
     public static Vector3d getCursorWorldPos() {
         return cursorWorldPos;
     }
+
     public static BlockPos getPreselectedBlockPos() {
         return preselectedBlockPos;
     }
+
     public static UnitAction getLeftClickAction() {
         return leftClickAction;
     }
+
     public static SandboxAction getLeftClickSandboxAction() {
         return leftClickSandboxAction;
     }
+
     public static void setLeftClickAction(UnitAction actionName) {
         if (actionName != null)
             leftClickSandboxAction = null;
         if (actionName != null &&
-            List.of(UnitAction.STARTRTS_VILLAGERS,
-                UnitAction.STARTRTS_MONSTERS,
-                UnitAction.STARTRTS_PIGLINS).contains(actionName))
+                List.of(UnitAction.STARTRTS_VILLAGERS,
+                        UnitAction.STARTRTS_MONSTERS,
+                        UnitAction.STARTRTS_PIGLINS).contains(actionName))
             leftClickAction = actionName;
         else if (UnitClientEvents.getSelectedUnits().size() > 0 ||
-            BuildingClientEvents.getSelectedBuildings().size() > 0)
+                BuildingClientEvents.getSelectedBuildings().size() > 0)
             leftClickAction = actionName;
         else if (actionName == null)
             leftClickAction = null;
     }
+
     public static void setLeftClickSandboxAction(SandboxAction actionName) {
         if (actionName != null)
             leftClickAction = null;
@@ -141,31 +145,36 @@ public class CursorClientEvents {
         // draw at edge of screen even if mouse is off it
         int cursorDrawX = Math.min(evt.getMouseX(), MC.getWindow().getGuiScaledWidth() - 5);
         int cursorDrawY = Math.min(evt.getMouseY(), MC.getWindow().getGuiScaledHeight() - 5);
-        cursorDrawX = Math.max(0,cursorDrawX);
-        cursorDrawY = Math.max(0,cursorDrawY);
-
-        if (Keybindings.altMod.isDown() && (leftClickDown || rightClickDown))
+        cursorDrawX = Math.max(0, cursorDrawX);
+        cursorDrawY = Math.max(0, cursorDrawY);
+        ResourceLocation texture;
+        if (Keybindings.altMod.isDown() && (leftClickDown || rightClickDown)) {
             RenderSystem.setShaderTexture(0, TEXTURE_HAND_GRAB);
-        else if (Keybindings.altMod.isDown())
+            texture = TEXTURE_HAND_GRAB;
+        } else if (Keybindings.altMod.isDown()) {
             RenderSystem.setShaderTexture(0, TEXTURE_HAND);
-        else if (leftClickAction != null && leftClickAction.equals(UnitAction.ATTACK))
+            texture = TEXTURE_HAND;
+        } else if (leftClickAction != null && leftClickAction.equals(UnitAction.ATTACK)) {
             RenderSystem.setShaderTexture(0, TEXTURE_SWORD);
-        else if (leftClickAction != null && leftClickAction.equals(UnitAction.BUILD_REPAIR))
+            texture = TEXTURE_SWORD;
+        } else if (leftClickAction != null && leftClickAction.equals(UnitAction.BUILD_REPAIR)) {
             RenderSystem.setShaderTexture(0, TEXTURE_SHOVEL);
-        else if (leftClickAction != null || leftClickSandboxAction != null) {
+            texture = TEXTURE_SHOVEL;
+        } else if (leftClickAction != null || leftClickSandboxAction != null) {
             RenderSystem.setShaderTexture(0, TEXTURE_CROSS);
+            texture = TEXTURE_CROSS;
             cursorDrawX -= 8;
             cursorDrawY -= 8;
-        }
-        else
+        } else {
             RenderSystem.setShaderTexture(0, TEXTURE_CURSOR);
-
-        GuiComponent.blit(evt.getPoseStack(),
+            texture = TEXTURE_CURSOR;
+        }
+        evt.getGuiGraphics().blit(texture,
                 cursorDrawX, cursorDrawY,
                 16,
                 16, 16,
                 16, 16,
-                16,16
+                16, 16
         );
 
         // ***********************************************
@@ -188,23 +197,23 @@ public class CursorClientEvents {
 
             Vec3 hitPos = getRefinedCursorWorldPos(cursorWorldPosNear, cursorWorldPosFar);
             cursorWorldPos = new Vector3d(hitPos.x, hitPos.y, hitPos.z);
-            preselectedBlockPos = new BlockPos(hitPos);
+            preselectedBlockPos = new BlockPos((int) hitPos.x, (int) hitPos.y, (int) hitPos.z);
 
             boolean usingPosAbove = false;
 
             // if we clipped a non-solid block (eg. tall grass) search adjacent blocks for a next-best match
-            if (!MC.level.getBlockState(preselectedBlockPos).getMaterial().isSolidBlocking()) {
+            if (!MC.level.getBlockState(preselectedBlockPos).isSolid()) {
                 preselectedBlockPos = getRefinedBlockPos(preselectedBlockPos, cursorWorldPosNear);
                 // disallow selecting a block just below a fluid block
-                if (MC.level.getBlockState(preselectedBlockPos.above()).getMaterial().isLiquid()) {
+                if (!MC.level.getBlockState(preselectedBlockPos.above()).getFluidState().isEmpty()) {
                     preselectedBlockPos = preselectedBlockPos.above();
                     usingPosAbove = true;
                 }
             }
             if (!usingPosAbove &&
-                !BuildingUtils.isPosInsideAnyBuilding(true, preselectedBlockPos) &&
-                BuildingUtils.isPosInsideAnyBuilding(true, preselectedBlockPos.above()) &&
-                ResourceSources.getFromBlockPos(preselectedBlockPos, MC.level) == null)
+                    !BuildingUtils.isPosInsideAnyBuilding(true, preselectedBlockPos) &&
+                    BuildingUtils.isPosInsideAnyBuilding(true, preselectedBlockPos.above()) &&
+                    ResourceSources.getFromBlockPos(preselectedBlockPos, MC.level) == null)
                 preselectedBlockPos = preselectedBlockPos.above();
             else if (ResourceSources.GATHERABLE_PLANTS.contains(MC.level.getBlockState(preselectedBlockPos.above()).getBlock()))
                 preselectedBlockPos = preselectedBlockPos.above();
@@ -251,8 +260,8 @@ public class CursorClientEvents {
             );
             for (LivingEntity entity : MiscUtil.getEntitiesWithinRange(cursorWorldPos, 100, LivingEntity.class, MC.level)) {
                 if (MyMath.isPointInsideRect3d(uvwp, entity.getBoundingBox().getCenter()) &&
-                    entity.getId() != MC.player.getId() &&
-                    !UnitClientEvents.getPreselectedUnits().contains(entity))
+                        entity.getId() != MC.player.getId() &&
+                        !UnitClientEvents.getPreselectedUnits().contains(entity))
                     UnitClientEvents.addPreselectedUnit(entity);
             }
         }
@@ -270,7 +279,7 @@ public class CursorClientEvents {
     public static void renderOverlay(RenderGuiOverlayEvent.Post evt) {
 
         if (leftClickDown && !Keybindings.altMod.isDown()) {
-            GuiComponent.fill(evt.getPoseStack(), // x1,y1, x2,y2,
+            evt.getGuiGraphics().fill( // x1,y1, x2,y2,
                     Math.round(cursorLeftClickDownPos.x),
                     Math.round(cursorLeftClickDownPos.y),
                     Math.round(cursorLeftClickDragPos.x),
@@ -283,8 +292,8 @@ public class CursorClientEvents {
     public static void onMouseClick(ScreenEvent.MouseButtonPressed.Post evt) {
 
         if (!OrthoviewClientEvents.isEnabled() ||
-            MinimapClientEvents.isPointInsideMinimap(evt.getMouseX(), evt.getMouseY()) ||
-            HudClientEvents.isMouseOverAnyButtonOrHud())
+                MinimapClientEvents.isPointInsideMinimap(evt.getMouseX(), evt.getMouseY()) ||
+                HudClientEvents.isMouseOverAnyButtonOrHud())
             return;
 
         // select a moused over entity by left clicking it
@@ -301,7 +310,7 @@ public class CursorClientEvents {
     @SubscribeEvent
     public static void onMouseDrag(ScreenEvent.MouseDragged.Pre evt) {
         if (!OrthoviewClientEvents.isEnabled() ||
-            (cursorLeftClickDownPos.x < 0 && cursorLeftClickDownPos.y < 0))
+                (cursorLeftClickDownPos.x < 0 && cursorLeftClickDownPos.y < 0))
             return;
 
         cursorLeftClickDragPos = new Vec2(floor(evt.getMouseX()), floor(evt.getMouseY()));
@@ -346,8 +355,8 @@ public class CursorClientEvents {
                 }
 
             }
-            cursorLeftClickDownPos = new Vec2(-1,-1);
-            cursorLeftClickDragPos = new Vec2(-1,-1);
+            cursorLeftClickDownPos = new Vec2(-1, -1);
+            cursorLeftClickDragPos = new Vec2(-1, -1);
         }
         if (evt.getButton() == GLFW.GLFW_MOUSE_BUTTON_2) {
             rightClickDown = false;
@@ -364,7 +373,7 @@ public class CursorClientEvents {
     @SubscribeEvent
     public static void onRenderLevel(RenderLevelStageEvent evt) {
         if (evt.getStage() != RenderLevelStageEvent.Stage.AFTER_CUTOUT_BLOCKS ||
-            HudClientEvents.isMouseOverAnyButtonOrHud())
+                HudClientEvents.isMouseOverAnyButtonOrHud())
             return;
         if (MC.level != null && OrthoviewClientEvents.isEnabled()) {
 
@@ -374,13 +383,13 @@ public class CursorClientEvents {
                     preSelBuilding != null &&
                     CursorClientEvents.getLeftClickAction() != UnitAction.MOVE &&
                     (BuildingClientEvents.getPlayerToBuildingRelationship(preSelBuilding) == Relationship.OWNED ||
-                    CursorClientEvents.getLeftClickAction() == UnitAction.BUILD_REPAIR));
+                            CursorClientEvents.getLeftClickAction() == UnitAction.BUILD_REPAIR));
             // same for attacker
             boolean buildingTargetedByAttacker = (HudClientEvents.hudSelectedEntity instanceof AttackerUnit &&
                     preSelBuilding != null &&
                     CursorClientEvents.getLeftClickAction() != UnitAction.MOVE &&
                     (BuildingClientEvents.getPlayerToBuildingRelationship(preSelBuilding) != Relationship.OWNED ||
-                    CursorClientEvents.getLeftClickAction() == UnitAction.ATTACK));
+                            CursorClientEvents.getLeftClickAction() == UnitAction.ATTACK));
 
             // do we own any of the selected buildings or entities?
             // will be false if there are none selected in the first place
@@ -396,22 +405,22 @@ public class CursorClientEvents {
                 }
             }
             boolean isLeftClickActionStartRTS = leftClickAction != null &&
-                List.of(UnitAction.STARTRTS_VILLAGERS,
-                    UnitAction.STARTRTS_MONSTERS,
-                    UnitAction.STARTRTS_PIGLINS).contains(leftClickAction);
+                    List.of(UnitAction.STARTRTS_VILLAGERS,
+                            UnitAction.STARTRTS_MONSTERS,
+                            UnitAction.STARTRTS_PIGLINS).contains(leftClickAction);
 
             if ((!OrthoviewClientEvents.isCameraMovingByMouse() &&
-                !leftClickDown && ownAnySelected &&
-                UnitClientEvents.getPreselectedUnits().size() == 0 &&
-                BuildingClientEvents.getPreselectedBuilding() == null &&
-                !buildingTargetedByWorker && !buildingTargetedByAttacker) || isLeftClickActionStartRTS || getLeftClickSandboxAction() != null) {
+                    !leftClickDown && ownAnySelected &&
+                    UnitClientEvents.getPreselectedUnits().size() == 0 &&
+                    BuildingClientEvents.getPreselectedBuilding() == null &&
+                    !buildingTargetedByWorker && !buildingTargetedByAttacker) || isLeftClickActionStartRTS || getLeftClickSandboxAction() != null) {
 
-                if (MC.level.getBlockState(getPreselectedBlockPos().offset(0,1,0)).getBlock() instanceof SnowLayerBlock) {
+                if (MC.level.getBlockState(getPreselectedBlockPos().offset(0, 1, 0)).getBlock() instanceof SnowLayerBlock) {
                     AABB aabb = new AABB(preselectedBlockPos);
                     aabb = aabb.setMaxY(aabb.maxY + 0.13f);
                     MyRenderer.drawSolidBox(evt.getPoseStack(), aabb, null, 1, 1, 1, rightClickDown ? 0.3f : 0.15f, new ResourceLocation("forge:textures/white.png"));
-                    aabb = new AABB(preselectedBlockPos).move(0,0.13,0);
-                    MyRenderer.drawLineBox(evt.getPoseStack(), aabb, 1.0f,1.0f,1.0f, rightClickDown ? 1.0f : 0.5f);
+                    aabb = new AABB(preselectedBlockPos).move(0, 0.13, 0);
+                    MyRenderer.drawLineBox(evt.getPoseStack(), aabb, 1.0f, 1.0f, 1.0f, rightClickDown ? 1.0f : 0.5f);
                 } else {
                     MyRenderer.drawBox(evt.getPoseStack(), preselectedBlockPos, 1, 1, 1, rightClickDown ? 0.3f : 0.15f);
                     MyRenderer.drawBlockOutline(evt.getPoseStack(), preselectedBlockPos, rightClickDown ? 1.0f : 0.5f);
@@ -432,8 +441,8 @@ public class CursorClientEvents {
         }
 
         if (hitResult != null)
-            return hitResult.getLocation().add(new Vec3(-0.001,-0.001,-0.001));
-        return new Vec3(0,0,0);
+            return hitResult.getLocation().add(new Vec3(-0.001, -0.001, -0.001));
+        return new Vec3(0, 0, 0);
     }
 
     // from ClientLevel.clip() but added exception for leaf blocks
@@ -462,7 +471,7 @@ public class CursorClientEvents {
 
         }, (p_151372_) -> {
             Vec3 vec3 = p_151372_.getFrom().subtract(p_151372_.getTo());
-            return BlockHitResult.miss(p_151372_.getTo(), Direction.getNearest(vec3.x, vec3.y, vec3.z), new BlockPos(p_151372_.getTo()));
+            return BlockHitResult.miss(p_151372_.getTo(), Direction.getNearest(vec3.x, vec3.y, vec3.z), new BlockPos((int) p_151372_.getTo().x, (int) p_151372_.getTo().y, (int) p_151372_.getTo().z));
         });
     }
 
@@ -514,11 +523,11 @@ public class CursorClientEvents {
                     isBlockSelectableResource = ResourceSources.getFromBlockPos(block, MC.level) != null;
 
                 BlockState bs = MC.level.getBlockState(block);
-                if ((bs.getMaterial().isSolidBlocking() || isBlockSelectableResource) &&
-                    (!(bs.getBlock() instanceof LeavesBlock) || !OrthoviewClientEvents.shouldHideLeaves()) &&
-                    !(bs.getBlock() instanceof SnowLayerBlock) &&
-                    MyMath.rayIntersectsAABBCustom(cursorWorldPosNear, lookVector, new AABB(block)) &&
-                    dist < smallestDist ) {
+                if ((bs.isSolid() || isBlockSelectableResource) &&
+                        (!(bs.getBlock() instanceof LeavesBlock) || !OrthoviewClientEvents.shouldHideLeaves()) &&
+                        !(bs.getBlock() instanceof SnowLayerBlock) &&
+                        MyMath.rayIntersectsAABBCustom(cursorWorldPosNear, lookVector, new AABB(block)) &&
+                        dist < smallestDist) {
                     smallestDist = dist;
                     bestBp = block;
                 }

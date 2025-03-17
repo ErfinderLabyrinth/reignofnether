@@ -17,6 +17,7 @@ import com.solegendary.reignofnether.unit.units.villagers.IronGolemProd;
 import com.solegendary.reignofnether.util.Faction;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -76,7 +77,7 @@ public class IronGolemBuilding extends Building {
         if (!this.getLevel().isClientSide()) {
             this.destroy((ServerLevel) this.getLevel());
             Entity entity = EntityRegistrar.IRON_GOLEM_UNIT.get().spawn((ServerLevel) this.getLevel(),
-                null,
+                    (CompoundTag) null,
                 null,
                 this.centrePos.offset(0, -1, 0),
                 MobSpawnType.SPAWNER,

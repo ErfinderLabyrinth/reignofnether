@@ -63,7 +63,7 @@ public class SlimeUnitMoveControl extends MoveControl {
             this.mob.setZza(0.0F);
         } else {
             this.operation = Operation.WAIT;
-            if (this.mob.isOnGround()) {
+            if (this.mob.onGround()) {
                 this.mob.setSpeed((float)(this.speedModifier * this.mob.getAttributeValue(Attributes.MOVEMENT_SPEED)));
                 if (this.jumpDelay-- <= 0) {
                     this.jumpDelay = getJumpDelay();

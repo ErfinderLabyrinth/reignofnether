@@ -3,6 +3,8 @@ package com.solegendary.reignofnether.hud;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.ability.Ability;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
@@ -36,9 +38,9 @@ public class AbilityButton extends Button {
     }
 
     @Override
-    public void render(PoseStack poseStack, int x, int y, int mouseX, int mouseY) {
+    public void render(GuiGraphics guiGraphics, int x, int y, int mouseX, int mouseY) {
         if (this.ability != null && ability.cooldownMax > 0)
             this.greyPercent = 1.0f - ((float) ability.getCooldown() / (float) ability.cooldownMax);
-        super.render(poseStack, x, y, mouseX, mouseY);
+        super.render(guiGraphics, x, y, mouseX, mouseY);
     }
 }

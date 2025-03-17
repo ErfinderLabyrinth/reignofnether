@@ -30,15 +30,15 @@ public class BlazeMixin extends Monster {
     public void aiStep(CallbackInfo ci) {
         ci.cancel();
 
-        if (!this.onGround && this.getDeltaMovement().y < 0.0) {
+        if (!this.onGround() && this.getDeltaMovement().y < 0.0) {
             this.setDeltaMovement(this.getDeltaMovement().multiply(1.0, 0.6, 1.0));
         }
-        if (this.level.isClientSide) {
+        if (this.level().isClientSide) {
             if (this.random.nextInt(24) == 0 && !this.isSilent())
-                this.level.playLocalSound(this.getX() + 0.5, this.getY() + 0.5, this.getZ() + 0.5, SoundEvents.BLAZE_BURN, this.getSoundSource(), 1.0F + this.random.nextFloat(), this.random.nextFloat() * 0.7F + 0.3F, false);
+                this.level().playLocalSound(this.getX() + 0.5, this.getY() + 0.5, this.getZ() + 0.5, SoundEvents.BLAZE_BURN, this.getSoundSource(), 1.0F + this.random.nextFloat(), this.random.nextFloat() * 0.7F + 0.3F, false);
             if (!isBlazeUnitWithFireWallOnCooldown())
                 for (int $$0 = 0; $$0 < 2; ++$$0)
-                    this.level.addParticle(ParticleTypes.LARGE_SMOKE, this.getRandomX(0.5), this.getRandomY(), this.getRandomZ(0.5), 0.0, 0.0, 0.0);
+                    this.level().addParticle(ParticleTypes.LARGE_SMOKE, this.getRandomX(0.5), this.getRandomY(), this.getRandomZ(0.5), 0.0, 0.0, 0.0);
         }
         super.aiStep();
     }

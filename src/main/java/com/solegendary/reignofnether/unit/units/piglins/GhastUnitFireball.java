@@ -31,7 +31,7 @@ public class GhastUnitFireball extends LargeFireball {
     protected void onHit(HitResult pResult) {
         super.onHit(pResult);
 
-        if (level.isClientSide())
+        if (level().isClientSide())
             return;
 
         if (getOwner() instanceof GhastUnit ghastUnit &&
@@ -41,12 +41,12 @@ public class GhastUnitFireball extends LargeFireball {
                 for (int y = -4; y < 4; y++) {
                     for (int z = -4; z < 4; z++) {
                         BlockPos bp = getOnPos().offset(x, y, z);
-                        BlockState bs = level.getBlockState(bp);
+                        BlockState bs = level().getBlockState(bp);
                         if (bs.getBlock() == Blocks.FIRE) {
                             for (BlockPos bpAdj : List.of(bp, bp.north(), bp.south(), bp.east(), bp.west())) {
-                                BlockState bsBelow = level.getBlockState(bpAdj.below());
+                                BlockState bsBelow = level().getBlockState(bpAdj.below());
                                 if (!bsBelow.isAir())
-                                    BlockServerEvents.addTempBlock((ServerLevel) level, bpAdj.below(), Blocks.SOUL_SAND.defaultBlockState(), bsBelow, SOULSAND_DURATION);
+                                    BlockServerEvents.addTempBlock((ServerLevel) level(), bpAdj.below(), Blocks.SOUL_SAND.defaultBlockState(), bsBelow, SOULSAND_DURATION);
                             }
                             for (BlockPos bpAdj : List.of(
                                     bp.north().north(),
@@ -59,9 +59,9 @@ public class GhastUnitFireball extends LargeFireball {
                                     bp.south().east()
                                 )) {
                                 if (random.nextBoolean()) {
-                                    BlockState bsBelow = level.getBlockState(bpAdj.below());
+                                    BlockState bsBelow = level().getBlockState(bpAdj.below());
                                     if (!bsBelow.isAir())
-                                        BlockServerEvents.addTempBlock((ServerLevel) level, bpAdj.below(), Blocks.SOUL_SAND.defaultBlockState(), bsBelow, SOULSAND_DURATION);
+                                        BlockServerEvents.addTempBlock((ServerLevel) level(), bpAdj.below(), Blocks.SOUL_SAND.defaultBlockState(), bsBelow, SOULSAND_DURATION);
                                 }
                             }
                         }

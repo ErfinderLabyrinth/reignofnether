@@ -30,7 +30,7 @@ public class ThrowLingeringRegenPotion extends Ability {
     public ThrowLingeringRegenPotion(WitchUnit witchUnit) {
         super(
             UnitAction.THROW_LINGERING_REGEN_POTION,
-            witchUnit.level,
+            witchUnit.level(),
             CD_MAX_SECONDS * ResourceCost.TICKS_PER_SECOND,
             witchUnit.getPotionThrowRange(),
             0,

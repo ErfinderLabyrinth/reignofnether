@@ -2,12 +2,13 @@ package com.solegendary.reignofnether.mixin;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
+import net.minecraft.client.gui.GuiGraphics;
+import org.joml.Vector3f;
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.hud.TitleClientEvents;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratedElementType;
@@ -78,12 +79,13 @@ public class TitleScreenMixin extends Screen {
             }
 
             @Override
-            public void updateNarration(NarrationElementOutput output) {
-                output.add(NarratedElementType.TITLE, Component.literal("Choose Lilypad Hosting"));
+            protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
+                narrationElementOutput.add(NarratedElementType.TITLE, Component.literal("Choose Lilypad Hosting"));
             }
 
             @Override
-            public void renderButton(PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTick) {
+            public void renderWidget(GuiGraphics guiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
+                PoseStack pPoseStack = guiGraphics.pose();
                 RenderSystem.setShader(GameRenderer::getPositionTexShader);
                 RenderSystem.setShaderTexture(0, LILYPAD_TEXTURE);
 
@@ -92,13 +94,13 @@ public class TitleScreenMixin extends Screen {
 
                 pPoseStack.pushPose();
                 float scale = 0.8f;
-                pPoseStack.translate(this.x, this.y, 0);
+                pPoseStack.translate(this.getX(), this.getY(), 0);
                 pPoseStack.scale(scale, scale, 1.0f);
 
-                blit(pPoseStack, 0, 0, 0, 0, this.width, this.height, this.width, this.height);
+                guiGraphics.blit(LILYPAD_TEXTURE, 0, 0, 0, 0, this.width, this.height, this.width, this.height);
 
                 if (isHoveredOrFocused())
-                    GuiComponent.fill(pPoseStack, // x1,y1, x2,y2,
+                    guiGraphics.fill( // x1,y1, x2,y2,
                             0,0,
                             this.width,
                             this.height,
@@ -119,12 +121,13 @@ public class TitleScreenMixin extends Screen {
             }
 
             @Override
-            public void updateNarration(NarrationElementOutput output) {
+            public void updateWidgetNarration(NarrationElementOutput output) {
                 output.add(NarratedElementType.TITLE, Component.literal("Join our Discord"));
             }
 
             @Override
-            public void renderButton(PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTick) {
+            public void renderWidget(GuiGraphics guiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
+                PoseStack pPoseStack = guiGraphics.pose();
                 RenderSystem.setShader(GameRenderer::getPositionTexShader);
                 RenderSystem.setShaderTexture(0, DISCORD_TEXTURE);
 
@@ -135,13 +138,13 @@ public class TitleScreenMixin extends Screen {
                 float scaleX = 0.8f;
                 float scaleY = 0.8f;
 
-                pPoseStack.translate(this.x, this.y, 0);
+                pPoseStack.translate(this.getX(), this.getY(), 0);
                 pPoseStack.scale(scaleX, scaleY, 1.0f);
 
-                blit(pPoseStack, 0, 0, 0, 0, this.width, this.height, this.width, this.height);
+                guiGraphics.blit(DISCORD_TEXTURE, 0, 0, 0, 0, this.width, this.height, this.width, this.height);
 
                 if (isHoveredOrFocused())
-                    GuiComponent.fill(pPoseStack, // x1,y1, x2,y2,
+                    guiGraphics.fill( // x1,y1, x2,y2,
                             0,0,
                             this.width,
                             this.height,
@@ -167,10 +170,10 @@ public class TitleScreenMixin extends Screen {
     }
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
-    private void render(PoseStack pPoseStack, int pMouseX, int pMouseY,
+    private void render(GuiGraphics guiGraphics, int pMouseX, int pMouseY,
                         float pPartialTick, CallbackInfo ci) {
         ci.cancel();
-
+        PoseStack pPoseStack = guiGraphics.pose();
         // Handle fade-in effect
         if (this.fadeInStart == 0L && this.fading) {
             this.fadeInStart = Util.getMillis();
@@ -193,25 +196,25 @@ public class TitleScreenMixin extends Screen {
             // Render Minecraft logo
             RenderSystem.setShaderTexture(0, MINECRAFT_LOGO);
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, alpha);
-            blit(pPoseStack, logoX - 54, 30, 0, 0, 380, 36, 380, 36);
+            guiGraphics.blit(MINECRAFT_LOGO, logoX - 54, 30, 0, 0, 380, 36, 380, 36);
 
             // Render Edition logo
             RenderSystem.setShaderTexture(0, MINECRAFT_EDITION);
-            blit(pPoseStack, logoX + 44, 67, 0.0F, 0.0F, 186, 14, 186, 16);
+            guiGraphics.blit(MINECRAFT_EDITION, logoX + 44, 67, 0.0F, 0.0F, 186, 14, 186, 16);
 
             // Render main menu elements and splash text
             ForgeHooksClient.renderMainMenu((TitleScreen) Minecraft.getInstance().screen,
-                    pPoseStack, this.font, this.width, this.height, alphaMask);
+                    guiGraphics, this.font, this.width, this.height, alphaMask);
 
             if (TitleClientEvents.splash != null) {
                 pPoseStack.pushPose();
                 pPoseStack.translate(this.width / 2 + 90, 70.0, 0.0);
-                pPoseStack.mulPose(Vector3f.ZP.rotationDegrees(-20.0F));
+                pPoseStack.mulPose(Axis.ZP.rotationDegrees(-20.0F));
                 float scale = 1.8F - Mth.abs(Mth.sin((float) (Util.getMillis() % 1000L) / 1000.0F * 6.2831855F) * 0.1F);
                 scale = scale * 100.0F / (float) (this.font.width(TitleClientEvents.splash) + 32);
                 pPoseStack.scale(scale, scale, scale);
                 int splashX = Math.max(0, this.font.width(TitleClientEvents.splash) / 5);
-                drawCenteredString(pPoseStack, this.font, TitleClientEvents.splash, splashX + 14, splashX - 2, 16776960 | alphaMask);
+                guiGraphics.drawCenteredString(this.font, TitleClientEvents.splash, splashX + 14, splashX - 2, 16776960 | alphaMask);
                 pPoseStack.popPose();
             }
 
@@ -220,7 +223,7 @@ public class TitleScreenMixin extends Screen {
                 if (line == 1) {
                     text = "Reign of Nether " + ReignOfNether.VERSION_STRING;
                 }
-                drawString(pPoseStack, this.font, text, 2, this.height - (10 + line * (9 + 1)), 16777215 | alphaMask);
+                guiGraphics.drawString(this.font, text, 2, this.height - (10 + line * (9 + 1)), 16777215 | alphaMask);
             });
 
             //BrandingControl.forEachAboveCopyrightLine((line, text) -> {
@@ -236,11 +239,11 @@ public class TitleScreenMixin extends Screen {
             }
 
             // Call the superclass render
-            super.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
+            super.render(guiGraphics, pMouseX, pMouseY, pPartialTick);
 
             // Render mod update notification
             if (alpha >= 1.0F && this.modUpdateNotification != null) {
-                this.modUpdateNotification.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
+                this.modUpdateNotification.render(guiGraphics, pMouseX, pMouseY, pPartialTick);
             }
 
             // Disable blending after rendering

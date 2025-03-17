@@ -1,6 +1,6 @@
 package com.solegendary.reignofnether.ability.abilities;
 
-import com.mojang.math.Vector3d;
+import org.joml.Vector3d;
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.building.Building;
@@ -51,7 +51,7 @@ public class PromoteIllager extends Ability {
 
     // checks that the unit has a banner and applies the speed buff to nearby friendly units if it is
     public static void checkAndApplyBuff(LivingEntity entity) {
-        if (!entity.level.isClientSide() && entity instanceof Unit captainUnit
+        if (!entity.level().isClientSide() && entity instanceof Unit captainUnit
             && entity.getItemBySlot(EquipmentSlot.HEAD).getItem() instanceof BannerItem) {
             List<Mob> nearbyMobs = MiscUtil.getEntitiesWithinRange(new Vector3d(entity.position().x,
                     entity.position().y,
@@ -59,7 +59,7 @@ public class PromoteIllager extends Ability {
                 ),
                 BUFF_RANGE,
                 Mob.class,
-                entity.level
+                entity.level()
             );
 
             for (Mob mob : nearbyMobs)

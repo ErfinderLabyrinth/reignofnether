@@ -34,13 +34,13 @@ public abstract class MobMixin extends LivingEntity {
         if (pTarget == null || !pTarget.isAlive())
             return;
 
-        Entity entity = pTarget.getLevel().getEntity(this.getId());
+        Entity entity = pTarget.level().getEntity(this.getId());
         if (entity instanceof Vex vex &&
             vex.getOwner() instanceof EvokerUnit eu) {
 
             boolean targetIsAlliedPlayer;
 
-            if (level.isClientSide()) {
+            if (level().isClientSide()) {
                 targetIsAlliedPlayer = pTarget instanceof Player player &&
                         (AlliancesClient.isAllied(player.getName().getString(), eu.getOwnerName()) ||
                             player.getName().getString().equals(eu.getOwnerName()));

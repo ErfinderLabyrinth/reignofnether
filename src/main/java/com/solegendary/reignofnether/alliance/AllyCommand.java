@@ -50,7 +50,7 @@ public class AllyCommand {
             return 0;
         }
         pendingAlliances.put(allyPlayerName, playerName);
-        context.getSource().sendSuccess(Component.translatable("alliance.reignofnether.sent_request", allyPlayerName), false);
+        context.getSource().sendSuccess(()->Component.translatable("alliance.reignofnether.sent_request", allyPlayerName), false);
         SoundClientboundPacket.playSoundForPlayer(SoundAction.CHAT, allyPlayerName);
         allyPlayer.sendSystemMessage(Component.translatable("alliance.reignofnether.ally_confirm", playerName, playerName));
         SoundClientboundPacket.playSoundForPlayer(SoundAction.CHAT, playerName);
@@ -68,7 +68,7 @@ public class AllyCommand {
             AlliancesServerEvents.addAlliance(playerName, requesterPlayerName);
             pendingAlliances.remove(playerName);
 
-            context.getSource().sendSuccess(Component.translatable("alliance.reignofnether.now_allied", requesterPlayerName), false);
+            context.getSource().sendSuccess(()->Component.translatable("alliance.reignofnether.now_allied", requesterPlayerName), false);
             SoundClientboundPacket.playSoundForPlayer(SoundAction.ALLY, requesterPlayerName);
             requesterPlayer.sendSystemMessage(Component.translatable("alliance.reignofnether.ally_accepted", playerName));
             SoundClientboundPacket.playSoundForPlayer(SoundAction.ALLY, playerName);
@@ -122,7 +122,7 @@ public class AllyCommand {
             }
         }, 30, TimeUnit.SECONDS);
 
-        context.getSource().sendSuccess(Component.translatable("alliance.reignofnether.disbanding", allyPlayerName), false);
+        context.getSource().sendSuccess(()->Component.translatable("alliance.reignofnether.disbanding", allyPlayerName), false);
         SoundClientboundPacket.playSoundForPlayer(SoundAction.ENEMY, playerName);
         allyPlayer.sendSystemMessage(Component.translatable("alliance.reignofnether.disbanding", playerName));
         SoundClientboundPacket.playSoundForPlayer(SoundAction.ENEMY, allyPlayerName);

@@ -178,7 +178,7 @@ public class UnitSyncClientboundPacket {
                         case MAKE_VILLAGER_VETERAN -> UnitClientEvents.makeVillagerVeteran(this.entityId);
                         case SYNC_ANCHOR_POS -> UnitClientEvents.syncAnchorPos(
                                 this.entityId,
-                                new BlockPos(this.posX, this.posY, this.posZ)
+                                new BlockPos((int) this.posX, (int) this.posY, (int) this.posZ)
                         );
                         case REMOVE_ANCHOR_POS -> UnitClientEvents.removeAnchorPos(this.entityId);
                     }

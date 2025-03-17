@@ -27,6 +27,6 @@ public class LlamaUnitRenderer extends MobRenderer<Llama, LlamaModel<Llama>> {
     }
 
     public ResourceLocation getTextureLocation(Llama pEntity) {
-        return LLAMA_LOCATIONS[pEntity.getVariant()];
+        return LLAMA_LOCATIONS[pEntity.getVariant().getId()];
     }
 }

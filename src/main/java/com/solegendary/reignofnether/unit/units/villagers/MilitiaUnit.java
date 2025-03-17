@@ -197,8 +197,8 @@ public class MilitiaUnit extends Vindicator implements Unit, AttackerUnit, Villa
             Unit.tick(this);
             AttackerUnit.tick(this);
 
-            if (this.tickCount > 100 && this.tickCount % 10 == 0 && !converted && !level.isClientSide() && !getOwnerName().equals(ENEMY_OWNER_NAME)) {
-                Building building = BuildingUtils.findClosestBuilding(level.isClientSide(), this.getEyePosition(),
+            if (this.tickCount > 100 && this.tickCount % 10 == 0 && !converted && !level().isClientSide() && !getOwnerName().equals(ENEMY_OWNER_NAME)) {
+                Building building = BuildingUtils.findClosestBuilding(level().isClientSide(), this.getEyePosition(),
                         (b) -> b.isBuilt && b.ownerName.equals(getOwnerName()) && b instanceof TownCentre);
 
                 int range = TownCentre.MILITIA_RANGE;

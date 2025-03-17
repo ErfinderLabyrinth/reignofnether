@@ -239,7 +239,7 @@ public class PlayerClientEvents {
             if (!MC.isLocalServer()) {
                 MC.gui.getTabList().setVisible(true);
                 MC.gui.getTabList()
-                    .render(evt.getPoseStack(), MC.getWindow().getGuiScaledWidth(), MC.level.getScoreboard(), null);
+                    .render(evt.getGuiGraphics(), MC.getWindow().getGuiScaledWidth(), MC.level.getScoreboard(), null);
             } else {
                 MC.gui.getTabList().setVisible(false);
             }

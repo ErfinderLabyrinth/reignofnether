@@ -80,13 +80,13 @@ public interface WorkerUnit {
                     entity.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.STONE_SWORD));
                 else
                     entity.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.WOODEN_SWORD));
-                if (!entity.level.isClientSide())
+                if (!entity.level().isClientSide())
                     UnitAnimationClientboundPacket.sendEntityPacket(UnitAnimationAction.NON_KEYFRAME_START, entity, ((Unit) entity).getTargetGoal().getTarget());
             }
         } else {
             if (!mainHandItem.is(Items.AIR)) {
                 entity.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.AIR));
-                if (!entity.level.isClientSide())
+                if (!entity.level().isClientSide())
                     UnitAnimationClientboundPacket.sendBasicPacket(UnitAnimationAction.NON_KEYFRAME_STOP, entity);
             }
         }

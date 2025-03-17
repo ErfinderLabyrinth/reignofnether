@@ -1,4 +1,5 @@
 {
+    "has_precipitation": true,
     "temperature": 0.2,
     "downfall": 0.3,
     "precipitation": "rain",

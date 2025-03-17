@@ -2,6 +2,7 @@ package com.solegendary.reignofnether.building;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtIo;
@@ -71,7 +72,7 @@ public class BuildingBlockData {
         // load in palette (list of unique blockstates)
         ListTag paletteNbt = nbt.getList("palette", 10);
         for(int i = 0; i < paletteNbt.size(); i++)
-            palette.add(NbtUtils.readBlockState(paletteNbt.getCompound(i)));
+            palette.add(NbtUtils.readBlockState(BuiltInRegistries.BLOCK.asLookup(),paletteNbt.getCompound(i)));
         return palette;
     }
 

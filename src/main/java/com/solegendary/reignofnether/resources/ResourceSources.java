@@ -2,6 +2,8 @@ package com.solegendary.reignofnether.resources;
 
 import com.solegendary.reignofnether.registrars.BlockRegistrar;
 import net.minecraft.core.BlockPos;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.*;
 import net.minecraft.world.entity.animal.goat.Goat;
@@ -17,15 +19,28 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.material.Material;
+import net.minecraftforge.common.IPlantable;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 public class ResourceSources {
 
-    public static final List<Material> CLEAR_MATERIALS = List.of(
-            Material.WATER, Material.AIR, Material.PLANT, Material.LEAVES, Material.STRUCTURAL_AIR
+    public static final List<Predicate<BlockState>> CLEAR_MATERIALS = List.of(
+            (s)->s.getFluidState().is(FluidTags.WATER),
+            (s)->s.isAir(),
+            (s)->s.is(BlockTags.LEAVES),
+            (s)->s.getBlock() instanceof IPlantable
     );
+
+    public static boolean isClearMaterial(BlockState state){
+        for (Predicate<BlockState> predicate : CLEAR_MATERIALS){
+            if(predicate.test(state)){
+                return true;
+            }
+        }
+        return false;
+    }
 
     public static final List<Block> GATHERABLE_PLANTS = List.of(
             Blocks.SWEET_BERRY_BUSH, Blocks.RED_MUSHROOM, Blocks.BROWN_MUSHROOM

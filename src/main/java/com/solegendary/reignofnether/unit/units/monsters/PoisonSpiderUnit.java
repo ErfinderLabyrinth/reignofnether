@@ -51,7 +51,7 @@ public class PoisonSpiderUnit extends SpiderUnit implements Unit, AttackerUnit {
                 ((LivingEntity)pEntity).addEffect(new MobEffectInstance(MobEffects.POISON, POISON_SECONDS * 20, 0), this);
             for (Ability ability : abilities)
                 if (ability instanceof SpinWebs spinWebs && spinWebs.autocast && spinWebs.isOffCooldown())
-                    spinWebs.use(this.level, this, pEntity.getOnPos());
+                    spinWebs.use(this.level(), this, pEntity.getOnPos());
             return true;
         } else {
             return false;

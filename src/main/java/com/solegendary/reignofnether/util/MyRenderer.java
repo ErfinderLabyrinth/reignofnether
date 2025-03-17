@@ -2,13 +2,13 @@ package com.solegendary.reignofnether.util;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
-import com.mojang.math.Matrix3f;
-import com.mojang.math.Matrix4f;
+import net.minecraft.client.gui.GuiGraphics;
+import org.joml.Matrix3f;
+import org.joml.Matrix4f;
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.hud.RectZone;
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
@@ -301,9 +301,9 @@ public class MyRenderer {
     }
 
     // render a HUD frame and return the RectZone that it represents
-    public static RectZone renderFrameWithBg(PoseStack poseStack, int x, int y, int width, int height, int bgCol) {
+    public static RectZone renderFrameWithBg(GuiGraphics guiGraphics, int x, int y, int width, int height, int bgCol) {
         // draw icon frame with dark transparent bg
-        GuiComponent.fill(poseStack, // x1,y1, x2,y2,
+        guiGraphics.fill(// x1,y1, x2,y2,
                 x + 2, y + 2,
                 x + width - 2,
                 y + height - 2,
@@ -315,7 +315,7 @@ public class MyRenderer {
         ResourceLocation iconFrameResource;
         iconFrameResource = new ResourceLocation(ReignOfNether.MOD_ID, "textures/hud/unit_frame_left" + (height < 50 ? "_small" : "") + ".png");
         RenderSystem.setShaderTexture(0, iconFrameResource);
-        GuiComponent.blit(poseStack,
+        guiGraphics.blit(iconFrameResource,
                 x, y, 0,
                 0,0, // where on texture to start drawing from
                 thickness, height, // dimensions of blit texture
@@ -323,7 +323,7 @@ public class MyRenderer {
         );
         iconFrameResource = new ResourceLocation(ReignOfNether.MOD_ID, "textures/hud/unit_frame_right" + (height < 50 ? "_small" : "") + ".png");
         RenderSystem.setShaderTexture(0, iconFrameResource);
-        GuiComponent.blit(poseStack,
+        guiGraphics.blit(iconFrameResource,
                 x + width - thickness, y, 0,
                 0,0, // where on texture to start drawing from
                 thickness, height, // dimensions of blit texture
@@ -331,7 +331,7 @@ public class MyRenderer {
         );
         iconFrameResource = new ResourceLocation(ReignOfNether.MOD_ID, "textures/hud/unit_frame_top.png");
         RenderSystem.setShaderTexture(0, iconFrameResource);
-        GuiComponent.blit(poseStack,
+        guiGraphics.blit(iconFrameResource,
                 x + thickness, y, 0,
                 0,0, // where on texture to start drawing from
                 width - thickness*2, thickness, // dimensions of blit texture
@@ -339,7 +339,7 @@ public class MyRenderer {
         );
         iconFrameResource = new ResourceLocation(ReignOfNether.MOD_ID, "textures/hud/unit_frame_bottom.png");
         RenderSystem.setShaderTexture(0, iconFrameResource);
-        GuiComponent.blit(poseStack,
+        guiGraphics.blit(iconFrameResource,
                 x + thickness, y + height - thickness, 0,
                 0,0, // where on texture to start drawing from
                 width - thickness*2, thickness, // dimensions of blit texture
@@ -348,9 +348,9 @@ public class MyRenderer {
         return RectZone.getZoneByLW(x, y, width, height);
     }
 
-    public static RectZone renderIconFrameWithBg(PoseStack poseStack, ResourceLocation frameRl, int x, int y, int size, int bg) {
+    public static RectZone renderIconFrameWithBg(GuiGraphics guiGraphics, ResourceLocation frameRl, int x, int y, int size, int bg) {
         //transparent background
-        GuiComponent.fill(poseStack, // x1,y1, x2,y2,
+        guiGraphics.fill(// x1,y1, x2,y2,
                 x, y,
                 x + size,
                 y + size,
@@ -358,7 +358,7 @@ public class MyRenderer {
 
         // icon frame
         RenderSystem.setShaderTexture(0, frameRl);
-        GuiComponent.blit(poseStack,
+        guiGraphics.blit(frameRl,
                 x, y, 0,
                 0,0, // where on texture to start drawing from
                 size, size, // dimensions of blit texture
@@ -367,9 +367,9 @@ public class MyRenderer {
         return RectZone.getZoneByLW(x, y, size, size);
     }
 
-    public static void renderIcon(PoseStack poseStack, ResourceLocation resourceLocation, int x, int y, int size) {
+    public static void renderIcon(GuiGraphics guiGraphics, ResourceLocation resourceLocation, int x, int y, int size) {
         RenderSystem.setShaderTexture(0, resourceLocation);
-        GuiComponent.blit(poseStack,
+        guiGraphics.blit(resourceLocation,
                 x, y, 0,
                 0,0, // where on texture to start drawing from
                 size, size, // dimensions of blit texture
@@ -377,13 +377,13 @@ public class MyRenderer {
         );
     }
 
-    public static void renderTooltip(PoseStack poseStack, List<FormattedCharSequence> tooltipLines, int mouseX, int mouseY) {
+    public static void renderTooltip(GuiGraphics guiGraphics, List<FormattedCharSequence> tooltipLines, int mouseX, int mouseY) {
         if (!OrthoviewClientEvents.isEnabled())
             return;
         if (MC.screen != null && tooltipLines != null && tooltipLines.size() > 0) {
             if (mouseY < MC.screen.height / 2)
                 mouseY += (tooltipLines.size() * 10);
-            MC.screen.renderTooltip(poseStack, tooltipLines, mouseX, mouseY - (9 * (tooltipLines.size() - 1)), MC.font);
+            guiGraphics.renderTooltip(MC.font, tooltipLines, mouseX, mouseY - (9 * (tooltipLines.size() - 1)));
         }
     }
 }

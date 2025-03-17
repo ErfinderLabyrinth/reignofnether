@@ -9,13 +9,17 @@ import com.solegendary.reignofnether.registrars.BlockRegistrar;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.util.MiscUtil;
 import net.minecraft.core.BlockPos;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LiquidBlockContainer;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
-import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.levelgen.feature.TreeFeature;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.IPlantable;
 
 import java.util.*;
 
@@ -68,7 +72,7 @@ public class WaveSpawner {
 
         BlockPos bpLiquid = null;
         for (int i = 0; i < 10; i++) {
-            if (level.getBlockState(bp.offset(0,5-i,0)).getMaterial().isLiquid()) {
+            if (!level.getBlockState(bp.offset(0,5-i,0)).getFluidState().isEmpty()) {
                 bpLiquid = bp.offset(0,5-i,0);
                 break;
             }
@@ -79,9 +83,9 @@ public class WaveSpawner {
         BlockState bs = level.getBlockState(bpLiquid);
         BlockState bsToPlace;
 
-        if (bs.getMaterial() == Material.LAVA)
+        if (bs.getFluidState().is(FluidTags.LAVA))
             bsToPlace = BlockRegistrar.WALKABLE_MAGMA_BLOCK.get().defaultBlockState();
-        else if (bs.getMaterial() == Material.WATER)
+        else if (bs.getFluidState().is(FluidTags.WATER))
             bsToPlace = Blocks.FROSTED_ICE.defaultBlockState();
         else
             return;
@@ -97,9 +101,8 @@ public class WaveSpawner {
         // Frostwalker effect provided in LivingEntityMixin, but it only happens on changing block positions on the ground
         for (BlockPos pos : bps) {
             BlockState bsAdj = level.getBlockState(pos);
-            if (bsAdj.getMaterial().isLiquid() ||
-                    bsAdj.getMaterial() == Material.WATER_PLANT ||
-                    bsAdj.getMaterial() == Material.REPLACEABLE_WATER_PLANT)
+            if (!bsAdj.getFluidState().isEmpty() ||
+                    (bsAdj instanceof IPlantable plantable && plantable instanceof LiquidBlockContainer))
                 level.setBlockAndUpdate(pos, bsToPlace);
         }
     }
@@ -166,11 +169,11 @@ public class WaveSpawner {
                 if (eb != null)
                     distSqrToNearestEnemyBuilding = eb.centrePos.distToCenterSqr(vec3);
 
-            } while (spawnBs.getMaterial() == Material.LEAVES
-                    || spawnBs.getMaterial() == Material.WOOD
+            } while (spawnBs.is(BlockTags.LEAVES)
+                    || spawnBs.is(BlockTags.LOGS) || spawnBs.is(BlockTags.PLANKS)
                     || distSqrToNearestBuilding < (MIN_SPAWN_RANGE * MIN_SPAWN_RANGE)
                     || distSqrToNearestEnemyBuilding < (10 * 10)
-                    || (spawnBs.getMaterial().isLiquid() && !allowLiquid)
+                    || (!spawnBs.getFluidState().isEmpty() && !allowLiquid)
                     || BuildingUtils.isPosInsideAnyBuilding(level.isClientSide(), spawnBp)
                     || BuildingUtils.isPosInsideAnyBuilding(level.isClientSide(), spawnBp.above())
                     || (flatnessRadius > 0 && getYVariance(level, spawnBp, flatnessRadius) >= flatnessRadius / 2f));

@@ -17,10 +17,10 @@ public interface ConvertableUnit {
     public default LivingEntity convertToUnit(EntityType<? extends Unit> entityType) {
         Unit oldUnit = (Unit) this;
         LivingEntity oldEntity = (LivingEntity) this;
-        if (oldEntity.getLevel().isClientSide())
+        if (oldEntity.level().isClientSide())
             return null;
 
-        ServerLevel level = (ServerLevel) oldEntity.getLevel();
+        ServerLevel level = (ServerLevel) oldEntity.level();
         LivingEntity newEntity = (LivingEntity) entityType.create(level);
 
         if (newEntity == null)

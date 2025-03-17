@@ -174,7 +174,7 @@ public class EndermanUnit extends EnderMan implements Unit, AttackerUnit {
 
     @Override
     protected boolean teleport() {
-        if (!this.level.isClientSide() && this.isAlive()) {
+        if (!this.level().isClientSide() && this.isAlive()) {
             double d0 = this.getX() + (this.random.nextDouble() - 0.5) * 16.0;
             double d1 = this.getY() + (double)(this.random.nextInt(16) - 8);
             double d2 = this.getZ() + (this.random.nextDouble() - 0.5) * 16.0;
@@ -214,12 +214,12 @@ public class EndermanUnit extends EnderMan implements Unit, AttackerUnit {
         BlockPos bpTarget = mBp;
 
         for (BlockPos bp2 : bps)
-            if (!this.level.getBlockState(mBp).getMaterial().blocksMotion())
+            if (!this.level().getBlockState(mBp).blocksMotion())
                 bpTarget = bp2;
 
         this.moveTo(new Vec3(bpTarget.getX(), bpTarget.getY(), bpTarget.getZ()));
         if (!this.isSilent()) {
-            this.level.playSound(null, this.xo, this.yo, this.zo, SoundEvents.ENDERMAN_TELEPORT, this.getSoundSource(), 1.0F, 1.0F);
+            this.level().playSound(null, this.xo, this.yo, this.zo, SoundEvents.ENDERMAN_TELEPORT, this.getSoundSource(), 1.0F, 1.0F);
             this.playSound(SoundEvents.ENDERMAN_TELEPORT, 3.0F, 1.0F);
         }
     }

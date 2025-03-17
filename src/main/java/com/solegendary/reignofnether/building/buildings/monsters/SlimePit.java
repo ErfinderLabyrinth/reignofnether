@@ -91,6 +91,6 @@ public class SlimePit extends ProductionBuilding {
     }
 
     public BlockPos getDefaultOutdoorSpawnPoint() {
-        return getMinCorner(this.blocks).offset(-spawnRadiusOffset + 4, 0, -spawnRadiusOffset + 9);
+        return getMinCorner(this.blocks).offset((int) (-spawnRadiusOffset + 4), 0, (int) (-spawnRadiusOffset + 9));
     }
 }

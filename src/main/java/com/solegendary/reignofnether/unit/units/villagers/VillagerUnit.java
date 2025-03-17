@@ -182,7 +182,7 @@ public class VillagerUnit extends Vindicator implements Unit, WorkerUnit, Attack
     }
 
     public boolean hasSpeedCheat() {
-        return !this.level.isClientSide() && ResearchServerEvents.playerHasCheat(getOwnerName(), "operationcwal");
+        return !this.level().isClientSide() && ResearchServerEvents.playerHasCheat(getOwnerName(), "operationcwal");
     }
 
     // equal to 4 full farm clears
@@ -473,7 +473,7 @@ public class VillagerUnit extends Vindicator implements Unit, WorkerUnit, Attack
         this.minerExp = pCompound.getInt("minerExp");
         this.masonExp = pCompound.getInt("masonExp");
         this.hunterExp = pCompound.getInt("hunterExp");
-        if (!level.isClientSide() && pCompound.getBoolean("isVeteran"))
+        if (!level().isClientSide() && pCompound.getBoolean("isVeteran"))
             makeVeteran();
     }
 

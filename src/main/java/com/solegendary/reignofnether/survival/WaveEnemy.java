@@ -23,10 +23,10 @@ import com.solegendary.reignofnether.unit.units.piglins.WitherSkeletonUnit;
 import com.solegendary.reignofnether.unit.units.villagers.EvokerUnit;
 import com.solegendary.reignofnether.unit.units.villagers.RavagerUnit;
 import net.minecraft.core.BlockPos;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
@@ -93,9 +93,8 @@ public class WaveEnemy {
             }
         }
         if (ticks > 0 && ticks % 20 == 0 && getEntity().isInWater() && idleTicks > 100) {
-            Material matOn = getEntity().level.getBlockState(getEntity().getOnPos()).getMaterial();
-            if (matOn == Material.WATER) {
-                getEntity().getLevel().setBlockAndUpdate(getEntity().getOnPos(), Blocks.FROSTED_ICE.defaultBlockState());
+            if (getEntity().level().getBlockState(getEntity().getOnPos()).getFluidState().is(FluidTags.WATER)) {
+                getEntity().level().setBlockAndUpdate(getEntity().getOnPos(), Blocks.FROSTED_ICE.defaultBlockState());
                 getEntity().moveTo(getEntity().getX(), getEntity().getY() + 0.5f, getEntity().getZ());
             }
         }
@@ -118,7 +117,7 @@ public class WaveEnemy {
                 if (ability instanceof Roar roar && roar.isOffCooldown() &&
                         ravagerUnit.getHealth() < ravagerUnit.getMaxHealth() / 2) {
                     Unit.fullResetBehaviours(ravagerUnit);
-                    roar.use(getEntity().level, unit, (BlockPos) null);
+                    roar.use(getEntity().level(), unit, (BlockPos) null);
                 }
             }
         }
@@ -128,7 +127,7 @@ public class WaveEnemy {
                 if (ability instanceof SonicBoom boom && boom.isOffCooldown() && target != null &&
                         wardenUnit.distanceToSqr(target) <= (boom.range * boom.range)) {
                     Unit.fullResetBehaviours(wardenUnit);
-                    boom.use(getEntity().level, unit, target);
+                    boom.use(getEntity().level(), unit, target);
                 }
             }
         }
@@ -138,7 +137,7 @@ public class WaveEnemy {
                 if (ability instanceof CastSummonVexes summon && summon.isOffCooldown() && target != null &&
                         evokerUnit.distanceToSqr(target) <= (evokerUnit.getAttackRange() * evokerUnit.getAttackRange())) {
                     Unit.fullResetBehaviours(evokerUnit);
-                    summon.use(getEntity().level, unit, target);
+                    summon.use(getEntity().level(), unit, target);
                 }
             }
         }
@@ -153,7 +152,7 @@ public class WaveEnemy {
 
                     if ((!bruteUnit.isHoldingUpShield && shouldRaiseShield) ||
                         ((bruteUnit.isHoldingUpShield && !shouldRaiseShield))) {
-                        shield.use(getEntity().level, unit, (BlockPos) null);
+                        shield.use(getEntity().level(), unit, (BlockPos) null);
                     }
                 }
             }
@@ -164,7 +163,7 @@ public class WaveEnemy {
                 LivingEntity nearestAlly = getNearestNonWitherAllyUnit();
                 if (ability instanceof WitherCloud cloud && cloud.isOffCooldown() && target != null &&
                     wsUnit.distanceToSqr(target) <= 16 && (nearestAlly == null || wsUnit.distanceToSqr(nearestAlly) > 16)) {
-                    cloud.use(getEntity().level, unit, (BlockPos) null);
+                    cloud.use(getEntity().level(), unit, (BlockPos) null);
                 }
             }
         }

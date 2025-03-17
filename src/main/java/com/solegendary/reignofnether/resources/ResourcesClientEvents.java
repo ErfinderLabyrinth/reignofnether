@@ -1,7 +1,8 @@
 package com.solegendary.reignofnether.resources;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
+import org.joml.Vector3f;
 import com.solegendary.reignofnether.hud.HudClientEvents;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
@@ -88,7 +89,7 @@ public class ResourcesClientEvents {
             if (loc.contains("You don't have enough")) {
                 for (LivingEntity entity : getSelectedUnits())
                     if (entity instanceof Unit unit)
-                        if (((Entity) unit).getLevel().isClientSide() && !Keybindings.shiftMod.isDown())
+                        if (((Entity) unit).level().isClientSide() && !Keybindings.shiftMod.isDown())
                             unit.getCheckpoints().clear();
             }
         }
@@ -154,8 +155,8 @@ public class ResourcesClientEvents {
                     floatingText.pos.getY() - camPos.y() + 2.5 + (floatingText.tickAge / 20f),
                     floatingText.pos.getZ() - camPos.z()
                 );
-                poseStack.mulPose(Vector3f.YP.rotationDegrees(-camera.getYRot()));
-                poseStack.mulPose(Vector3f.XP.rotationDegrees(camera.getXRot()));
+                poseStack.mulPose(Axis.YP.rotationDegrees(-camera.getYRot()));
+                poseStack.mulPose(Axis.XP.rotationDegrees(camera.getXRot()));
                 if (OrthoviewClientEvents.isEnabled()) {
                     poseStack.scale(-0.075F, -0.075F, 0.075F);
                 } else {
@@ -175,16 +176,16 @@ public class ResourcesClientEvents {
                 int textCol = 0x00FFFFFF + ((int) (0xFF * alphaPercent) << 24);
                 int bgCol = (int) (f1 * 255.0F * alphaPercent) << 24;
 
-                font.drawInBatch(component,
+                font.drawInBatch(component.getString(),
                     f2,
                     0,
                     textCol,
                     false,
                     poseStack.last().pose(),
                     MC.renderBuffers().bufferSource(),
-                    false,
+                    Font.DisplayMode.NORMAL,
                     bgCol,
-                    255
+                    255, false
                 );
 
                 poseStack.popPose();

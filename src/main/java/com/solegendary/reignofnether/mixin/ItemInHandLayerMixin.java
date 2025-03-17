@@ -1,7 +1,9 @@
 package com.solegendary.reignofnether.mixin;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
+import net.minecraft.world.item.ItemDisplayContext;
+import org.joml.Vector3f;
 import com.solegendary.reignofnether.unit.units.piglins.BruteUnit;
 import net.minecraft.client.model.ArmedModel;
 import net.minecraft.client.model.EntityModel;
@@ -36,7 +38,7 @@ public abstract class ItemInHandLayerMixin<T extends LivingEntity, M extends Ent
             at = @At("HEAD"),
             cancellable = true
     )
-    protected void renderArmWithItem(LivingEntity pLivingEntity, ItemStack pItemStack, ItemTransforms.TransformType pTransformType,
+    protected void renderArmWithItem(LivingEntity pLivingEntity, ItemStack pItemStack, ItemDisplayContext pTransformType,
                                      HumanoidArm pArm, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight, CallbackInfo ci) {
         if (pLivingEntity instanceof BruteUnit brute &&
                 pItemStack.getItem() == Items.SHIELD &&
@@ -47,8 +49,8 @@ public abstract class ItemInHandLayerMixin<T extends LivingEntity, M extends Ent
             if (!pItemStack.isEmpty()) {
                 pPoseStack.pushPose();
                 this.getParentModel().translateToHand(pArm, pPoseStack);
-                pPoseStack.mulPose(Vector3f.XP.rotationDegrees(-90));
-                pPoseStack.mulPose(Vector3f.YP.rotationDegrees(90));
+                pPoseStack.mulPose(Axis.XP.rotationDegrees(-90));
+                pPoseStack.mulPose(Axis.YP.rotationDegrees(90));
                 boolean $$7 = pArm == HumanoidArm.LEFT;
                 pPoseStack.translate((float) ($$7 ? -1 : 1) / 2.5f, 0.125f, -0.225f);
 

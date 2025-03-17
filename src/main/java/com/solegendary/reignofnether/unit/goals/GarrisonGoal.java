@@ -52,7 +52,7 @@ public class GarrisonGoal extends MoveToTargetBlockGoal {
 
     public void setBuildingTarget(BlockPos blockPos) {
         if (blockPos != null) {
-            boolean clientside = this.mob.level.isClientSide();
+            boolean clientside = this.mob.level().isClientSide();
             Building building = BuildingUtils.findBuilding(clientside, blockPos);
 
             if (building == null)

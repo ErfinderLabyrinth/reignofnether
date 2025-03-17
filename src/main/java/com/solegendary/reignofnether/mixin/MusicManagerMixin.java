@@ -8,6 +8,7 @@ import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.MusicManager;
 import net.minecraft.client.sounds.SoundManager;
+import net.minecraft.core.Holder;
 import net.minecraft.sounds.Music;
 import net.minecraft.sounds.Musics;
 import net.minecraft.sounds.SoundEvent;
@@ -41,13 +42,13 @@ public class MusicManagerMixin {
         Music music = this.minecraft.getSituationalMusic();
         if (music == Musics.MENU) {
             ci.cancel();
-            music = new Music(SoundRegistrar.MAIN_MENU.get(), 0, 0, true);
+            music = new Music(Holder.direct(SoundRegistrar.MAIN_MENU.get()), 0, 0, true);
             this.nextSongDelay = 0;
         } else {
             return;
         }
         if (this.currentMusic != null) {
-            if (!music.getEvent().getLocation().equals(this.currentMusic.getLocation()) && music.replaceCurrentMusic()) {
+            if (!music.getEvent().value().getLocation().equals(this.currentMusic.getLocation()) && music.replaceCurrentMusic()) {
                 this.minecraft.getSoundManager().stop(this.currentMusic);
             }
             if (!this.minecraft.getSoundManager().isActive(this.currentMusic)) {

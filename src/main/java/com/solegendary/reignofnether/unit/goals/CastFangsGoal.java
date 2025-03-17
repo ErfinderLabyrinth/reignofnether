@@ -17,14 +17,14 @@ public class CastFangsGoal extends AbstractCastTargetedSpellGoal {
     @Override
     public void startCasting() {
         super.startCasting();
-        if (!this.mob.level.isClientSide())
+        if (!this.mob.level().isClientSide())
             UnitAnimationClientboundPacket.sendBasicPacket(UnitAnimationAction.NON_KEYFRAME_START, this.mob);
     }
 
     @Override
     public void stopCasting() {
         super.stopCasting();
-        if (!this.mob.level.isClientSide())
+        if (!this.mob.level().isClientSide())
             UnitAnimationClientboundPacket.sendBasicPacket(UnitAnimationAction.NON_KEYFRAME_STOP, this.mob);
     }
 }

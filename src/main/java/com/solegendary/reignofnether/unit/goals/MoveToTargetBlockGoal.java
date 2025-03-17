@@ -112,7 +112,7 @@ public class MoveToTargetBlockGoal extends Goal {
         }
         this.moveTarget = bp;
 
-        if (!this.mob.level.isClientSide())
+        if (!this.mob.level().isClientSide())
             this.start();
     }
 

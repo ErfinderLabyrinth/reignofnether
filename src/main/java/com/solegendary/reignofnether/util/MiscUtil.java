@@ -3,7 +3,9 @@ package com.solegendary.reignofnether.util;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Pair;
-import com.mojang.math.Vector3d;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.tags.BlockTags;
+import org.joml.Vector3d;
 import com.solegendary.reignofnether.alliance.AlliancesClient;
 import com.solegendary.reignofnether.blocks.RTSStartBlock;
 import com.solegendary.reignofnether.building.*;
@@ -26,8 +28,6 @@ import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.units.piglins.GhastUnit;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiComponent;
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntArrayTag;
@@ -51,7 +51,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
@@ -97,7 +96,7 @@ public class MiscUtil {
     }
 
     public static void addUnitCheckpoint(Unit unit, BlockPos blockPos, boolean green) {
-        if (((Entity) unit).getLevel().isClientSide()) {
+        if (((Entity) unit).level().isClientSide()) {
             boolean clearExisting = !Keybindings.shiftMod.isDown();
             if (clearExisting)
                 unit.getCheckpoints().clear();
@@ -105,7 +104,7 @@ public class MiscUtil {
         }
     }
     public static void addUnitCheckpoint(Unit unit, int id, boolean green) {
-        Level level = ((Entity) unit).getLevel();
+        Level level = ((Entity) unit).level();
         if (level.isClientSide() && !Keybindings.shiftMod.isDown()) {
             unit.getCheckpoints().clear();
             unit.getCheckpoints().add(new Checkpoint(level.getEntity(id), green));
@@ -125,10 +124,10 @@ public class MiscUtil {
                 BuildingUtils.isPosInsideAnyBuilding(level.isClientSide, bp) ||
                 bs.getBlock() == Blocks.LIGHT ||
                 bs.getBlock() == Blocks.STRUCTURE_VOID ||
-                (!bs.getMaterial().isSolidBlocking() &&
-                !bs.getMaterial().isLiquid()) ||
-                bs.getMaterial() == Material.LEAVES ||
-                bs.getMaterial() == Material.WOOD) && y > -63);
+                (!bs.isSolid() &&
+                bs.getFluidState().isEmpty()) ||
+                bs.is(BlockTags.LEAVES) ||
+                bs.is(BlockTags.LOGS) || bs.is(BlockTags.PLANKS)) && y > -63);
         return new BlockPos(blockPos.getX(), y, blockPos.getZ());
     }
 
@@ -141,8 +140,8 @@ public class MiscUtil {
         } while((bs.isAir() ||
                 bs.getBlock() == Blocks.LIGHT ||
                 bs.getBlock() == Blocks.STRUCTURE_VOID ||
-                (!bs.getMaterial().isSolidBlocking() && !bs.getMaterial().isLiquid()) ||
-                (ignoreLeaves && bs.getMaterial() == Material.LEAVES)) && y > -63);
+                (!bs.isSolid() && bs.getFluidState().isEmpty()) ||
+                (ignoreLeaves && bs.is(BlockTags.LEAVES))) && y > -63);
         return new BlockPos(blockPos.getX(), y, blockPos.getZ());
     }
     public static BlockPos getHighestNonAirBlock(Level level, BlockPos blockPos) {
@@ -223,7 +222,7 @@ public class MiscUtil {
 
         double closestDist = range;
         LivingEntity closestTarget = null;
-        boolean neutralAggro = unitMob.getLevel().getGameRules().getRule(GameRuleRegistrar.NEUTRAL_AGGRO).get();
+        boolean neutralAggro = unitMob.level().getGameRules().getRule(GameRuleRegistrar.NEUTRAL_AGGRO).get();
 
         for (LivingEntity tle : nearbyEntities) {
             if (isIdleOrMoveAttackable(unitMob, tle, neutralAggro) && hasLineOfSightForAttacks(unitMob, tle)) {
@@ -270,7 +269,7 @@ public class MiscUtil {
 
 
     public static Building findClosestAttackableBuilding(Mob unitMob, float range, ServerLevel level) {
-        List<Building> buildings = unitMob.level.isClientSide() ?
+        List<Building> buildings = unitMob.level().isClientSide() ?
                 BuildingClientEvents.getBuildings() : BuildingServerEvents.getBuildings();
 
         double closestDist = range;
@@ -301,7 +300,7 @@ public class MiscUtil {
         if (relationship == Relationship.FRIENDLY)
             return false;
 
-        boolean neutralAggro = unitMob.getLevel().getGameRules().getRule(GameRuleRegistrar.NEUTRAL_AGGRO).get();
+        boolean neutralAggro = unitMob.level().getGameRules().getRule(GameRuleRegistrar.NEUTRAL_AGGRO).get();
         if (relationship == Relationship.NEUTRAL && neutralAggro)
             return true;
 
@@ -330,7 +329,7 @@ public class MiscUtil {
 
             for (Entity entity : entities)
                 if (entity.position().distanceTo(new Vec3(pos.x, pos.y, pos.z)) <= range &&
-                        entity.level.getWorldBorder().isWithinBounds(entity.getOnPos()))
+                        entity.level().getWorldBorder().isWithinBounds(entity.getOnPos()))
                     entitiesInRange.add((T) entity);
 
             return entitiesInRange;
@@ -342,10 +341,10 @@ public class MiscUtil {
     // accepts a list of strings to draw at the top left to track debug data
     //MiscUtil.drawDebugStrings(evt.getMatrixStack(), MC.font, new String[] {
     //});
-    public static void drawDebugStrings(PoseStack stack, Font font, String[] strings) {
+    public static void drawDebugStrings(GuiGraphics guiGraphics, Font font, String[] strings) {
         int y = 200 - (strings.length * 10);
         for (String str : strings) {
-            GuiComponent.drawString(stack, font, str, 0,y, 0xFFFFFF);
+            guiGraphics.drawString(font, str, 0,y, 0xFFFFFF);
             y += 10;
         }
     }
@@ -467,8 +466,8 @@ public class MiscUtil {
                         bottomBp = topBp.offset(0,-y,0);
                         bs = level.getBlockState(bottomBp); // TODO: infinite loop negative Y
                         y += 1;
-                    } while (y < 30 && (bs.getBlock() instanceof LeavesBlock || !bs.getMaterial().isSolid()));
-                    if (!level.getBlockState(bottomBp.above()).getMaterial().isSolid())
+                    } while (y < 30 && (bs.getBlock() instanceof LeavesBlock || !bs.isSolid()));
+                    if (!level.getBlockState(bottomBp.above()).isSolid())
                         bps.add(bottomBp);
                 }
             }
