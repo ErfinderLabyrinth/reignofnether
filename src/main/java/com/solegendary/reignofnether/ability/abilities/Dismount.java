@@ -25,7 +25,7 @@ public class Dismount extends Ability {
     public Dismount(LivingEntity entity) {
         super(
             UnitAction.DISMOUNT,
-            entity.level,
+            entity.level(),
             0,
             0,
             0,

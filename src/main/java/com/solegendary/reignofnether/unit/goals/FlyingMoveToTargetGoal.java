@@ -8,11 +8,6 @@ import com.solegendary.reignofnether.util.MiscUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.control.MoveControl;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.LeavesBlock;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
 
 import javax.annotation.Nullable;
 
@@ -62,21 +57,21 @@ public class FlyingMoveToTargetGoal extends MoveToTargetBlockGoal {
         if (bp != null) {
             MiscUtil.addUnitCheckpoint((Unit) mob, bp, true);
 
-            if (this.mob.level.getBlockState(bp).isAir())
+            if (this.mob.level().getBlockState(bp).isAir())
                 return;
 
             BlockPos bpGround = bp;
             int y = 1;
-            while(!MiscUtil.isGroundBlock(this.mob.level, bpGround)) {
+            while(!MiscUtil.isGroundBlock(this.mob.level(), bpGround)) {
                 bpGround = bp.offset(0,-y,0);
                 y += 1;
                 if (y > 30)
                     break;
             }
             BlockPos targetBp = bpGround.offset(0,10,0);
-            double maxHeight = this.mob.level.getGameRules().getRule(GameRuleRegistrar.FLYING_MAX_Y_LEVEL).get();
+            double maxHeight = this.mob.level().getGameRules().getRule(GameRuleRegistrar.FLYING_MAX_Y_LEVEL).get();
             if (targetBp.getY() > maxHeight)
-                targetBp = new BlockPos(targetBp.getX(), maxHeight, targetBp.getZ());
+                targetBp = new BlockPos(targetBp.getX(), (int) maxHeight, targetBp.getZ());
 
             this.moveTarget = targetBp;
 

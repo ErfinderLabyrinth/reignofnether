@@ -5,8 +5,9 @@ import com.solegendary.reignofnether.sounds.SoundClientEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
+import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -24,11 +25,9 @@ public class FrozenChunkServerboundPacket {
                     for (int z = 0; z < 16; z++) {
                         BlockPos bp = renderChunkOrigin.offset(x,y,z);
                         BlockState bs = MC.level.getBlockState(bp);
-                        if (bs.getMaterial() == Material.PORTAL ||
-                            bs.getMaterial() == Material.PLANT ||
-                            bs.getMaterial() == Material.REPLACEABLE_PLANT ||
-                            bs.getMaterial() == Material.REPLACEABLE_WATER_PLANT ||
-                            bs.getMaterial() == Material.REPLACEABLE_FIREPROOF_PLANT) {
+
+                        if (bs.is(BlockTags.PORTALS) ||
+                                bs.is(BlockTags.REPLACEABLE_BY_TREES) || bs.getBlock() instanceof IPlantable) {
                             SoundClientEvents.mutedBps.add(bp);
                         }
                     }

@@ -239,7 +239,7 @@ public class HeadhunterUnit extends PiglinBrute implements Unit, AttackerUnit, R
 
     @Override
     public void performUnitRangedAttack(LivingEntity pTarget, float velocity) {
-        ThrownTrident $$2 = new ThrownTrident(this.level, this, new ItemStack(Items.TRIDENT));
+        ThrownTrident $$2 = new ThrownTrident(this.level(), this, new ItemStack(Items.TRIDENT));
         double $$3 = pTarget.getX() - this.getX();
         double $$4 = pTarget.getY(0.3333333333333333) - $$2.getY();
         double $$5 = pTarget.getZ() - this.getZ();
@@ -250,9 +250,9 @@ public class HeadhunterUnit extends PiglinBrute implements Unit, AttackerUnit, R
 
         $$2.shoot($$3, $$4 + $$6 * 0.20000000298023224, $$5, 1.6F, 0);
         this.playSound(SoundEvents.DROWNED_SHOOT, 3.0F, 1.0F / (this.getRandom().nextFloat() * 0.4F + 0.8F));
-        this.level.addFreshEntity($$2);
+        this.level().addFreshEntity($$2);
 
-        if (!level.isClientSide() && pTarget instanceof Unit unit)
+        if (!level().isClientSide() && pTarget instanceof Unit unit)
             FogOfWarClientboundPacket.revealRangedUnit(unit.getOwnerName(), this.getId());
     }
 
@@ -275,7 +275,7 @@ public class HeadhunterUnit extends PiglinBrute implements Unit, AttackerUnit, R
 
     @Override
     public boolean fireImmune() {
-        Building building = BuildingUtils.findBuilding(level.isClientSide(), getOnPos());
+        Building building = BuildingUtils.findBuilding(level().isClientSide(), getOnPos());
         return super.fireImmune() || building instanceof FlameSanctuary || building instanceof BasaltSprings;
     }
 }

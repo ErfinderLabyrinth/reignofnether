@@ -1,7 +1,10 @@
 package com.solegendary.reignofnether.unit;
 
 import com.mojang.datafixers.util.Pair;
-import com.mojang.math.Vector3d;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.tags.DamageTypeTags;
+import net.minecraftforge.common.IPlantable;
+import org.joml.Vector3d;
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.alliance.AlliancesServerEvents;
 import com.solegendary.reignofnether.building.*;
@@ -32,7 +35,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.IndirectEntityDamageSource;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.animal.Animal;
@@ -46,7 +48,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -423,13 +424,13 @@ public class UnitServerEvents {
         for (Building building : BuildingServerEvents.getBuildings()) {
             if (building instanceof SculkCatalyst sc && evt.getEntity().distanceToSqr(Vec3.atCenterOf(sc.centrePos))
                 < SculkCatalyst.ESTIMATED_RANGE * SculkCatalyst.ESTIMATED_RANGE) {
-                Level level = evt.getEntity().getLevel();
+                Level level = evt.getEntity().level();
                 BlockPos bp = evt.getEntity().getOnPos();
 
                 if (level.getBlockState(bp).getBlock() == Blocks.DIRT_PATH) {
                     level.setBlockAndUpdate(bp, Blocks.DIRT.defaultBlockState());
                 }
-                if (level.getBlockState(bp.above()).getMaterial() == Material.PLANT) {
+                if (level.getBlockState(bp.above()).getBlock() instanceof IPlantable) {
                     level.destroyBlock(bp.above(), false);
                 }
 
@@ -487,9 +488,9 @@ public class UnitServerEvents {
                 entityType = EntityRegistrar.SLIME_UNIT.get();
             }
 
-            if (entityType != null && evt.getEntity().getLevel() instanceof ServerLevel serverLevel) {
+            if (entityType != null && evt.getEntity().level() instanceof ServerLevel serverLevel) {
                 Entity entity = entityType.spawn(serverLevel,
-                    null,
+                        (CompoundTag) null,
                     null,
                     evt.getEntity().getOnPos(),
                     MobSpawnType.SPAWNER,
@@ -532,7 +533,7 @@ public class UnitServerEvents {
     // animal hunting
     @SubscribeEvent
     public static void onDropItem(LivingDropsEvent evt) {
-        if (ResourceSources.isHuntableAnimal(evt.getEntity()) && !evt.getSource().isMagic() && evt.getSource()
+        if (ResourceSources.isHuntableAnimal(evt.getEntity()) && !evt.getSource().is(DamageTypeTags.WITCH_RESISTANT_TO) && evt.getSource()
             .getEntity() instanceof Unit unit && evt.getSource().getEntity() instanceof WorkerUnit && evt.getSource()
             .getEntity() instanceof Mob mob && mob.canPickUpLoot() && !Unit.atMaxResources(unit)) {
 
@@ -642,8 +643,8 @@ public class UnitServerEvents {
 
     @SubscribeEvent
     // assign unit owner when spawned with an egg based on whoever is closest
-    public static void onMobSpawn(LivingSpawnEvent.SpecialSpawn evt) {
-        if (!evt.getSpawnReason().equals(MobSpawnType.SPAWN_EGG)) {
+    public static void onMobSpawn(MobSpawnEvent.FinalizeSpawn evt) {
+        if (!evt.getSpawnType().equals(MobSpawnType.SPAWN_EGG)) {
             return;
         }
 
@@ -654,7 +655,7 @@ public class UnitServerEvents {
             List<Player> nearbyPlayers = MiscUtil.getEntitiesWithinRange(new Vector3d(pos.x, pos.y, pos.z),
                 10,
                 Player.class,
-                evt.getEntity().level
+                evt.getEntity().level()
             );
 
             float closestPlayerDist = 10;
@@ -687,7 +688,7 @@ public class UnitServerEvents {
         if (projectile instanceof AbstractArrow)
             return true;
 
-        return evt.getSource().isMagic() && evt.getSource() instanceof IndirectEntityDamageSource
+        return evt.getSource().is(DamageTypeTags.WITCH_RESISTANT_TO) && evt.getSource().isIndirect()
             && (!(shooter instanceof EvokerUnit));
     }
 
@@ -756,7 +757,7 @@ public class UnitServerEvents {
         }
 
         if (evt.getEntity() instanceof Unit && (
-            evt.getSource() == DamageSource.SWEET_BERRY_BUSH || evt.getSource() == DamageSource.CACTUS
+            evt.getSource() == evt.getEntity().damageSources().sweetBerryBush() || evt.getSource() == evt.getEntity().damageSources().cactus()
         )) {
             evt.setCanceled(true);
             return;
@@ -771,7 +772,7 @@ public class UnitServerEvents {
         }
 
         // ensure projectiles from units do the damage of the unit, not the item
-        if (evt.getSource().isProjectile() && evt.getSource().getEntity() instanceof AttackerUnit attackerUnit) {
+        if (evt.getSource().is(DamageTypeTags.IS_PROJECTILE) && evt.getSource().getEntity() instanceof AttackerUnit attackerUnit) {
             evt.setAmount(attackerUnit.getUnitAttackDamage());
         }
 
@@ -781,11 +782,11 @@ public class UnitServerEvents {
             evt.setAmount(attackerUnit.getUnitAttackDamage());
         }
 
-        if (evt.getEntity() instanceof BruteUnit brute && brute.isHoldingUpShield && (evt.getSource().isProjectile())) {
+        if (evt.getEntity() instanceof BruteUnit brute && brute.isHoldingUpShield && (evt.getSource().is(DamageTypeTags.IS_PROJECTILE))) {
             evt.setAmount(evt.getAmount() / 4);
         }
 
-        if (evt.getSource() == DamageSource.LIGHTNING_BOLT) {
+        if (evt.getSource() == evt.getEntity().damageSources().lightningBolt()) {
             if (evt.getEntity() instanceof CreeperUnit) {
                 evt.setCanceled(true);
             } else {
@@ -799,11 +800,11 @@ public class UnitServerEvents {
             evt.setAmount(attackerUnit.getUnitAttackDamage());
         }
 
-        if (evt.getEntity() instanceof BruteUnit brute && brute.isHoldingUpShield && (evt.getSource().isProjectile())) {
+        if (evt.getEntity() instanceof BruteUnit brute && brute.isHoldingUpShield && (evt.getSource().is(DamageTypeTags.IS_PROJECTILE))) {
             evt.setAmount(evt.getAmount() / 3);
         }
         
-        if (evt.getSource() == DamageSource.LIGHTNING_BOLT) {
+        if (evt.getSource() == evt.getEntity().damageSources().lightningBolt()) {
             if (evt.getEntity() instanceof CreeperUnit) {
                 evt.setCanceled(true);
             } else {
@@ -811,12 +812,12 @@ public class UnitServerEvents {
             }
         }
 
-        if (evt.getEntity() instanceof Unit && (evt.getSource() == DamageSource.IN_WALL)) {
+        if (evt.getEntity() instanceof Unit && (evt.getSource() == evt.getEntity().damageSources().inWall())) {
             evt.setCanceled(true);
         }
 
         // prevent friendly fire damage from ranged units (unless specifically targeted)
-        if (evt.getSource().isProjectile() && evt.getSource().getEntity() instanceof Unit unit) {
+        if (evt.getSource().is(DamageTypeTags.IS_PROJECTILE) && evt.getSource().getEntity() instanceof Unit unit) {
             if (getUnitToEntityRelationship(unit, evt.getEntity()) == Relationship.FRIENDLY
                 && unit.getTargetGoal().getTarget() != evt.getEntity()) {
                 evt.setCanceled(true);

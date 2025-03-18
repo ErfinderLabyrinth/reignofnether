@@ -201,7 +201,7 @@ public class SpiderUnit extends Spider implements Unit, AttackerUnit, Convertabl
             AttackerUnit.tick(this);
 
             // apply slowness level 2 during daytime for a short time repeatedly
-            if (tickCount % 10 == 0 && !this.level.isClientSide() && this.level.isDay() &&
+            if (tickCount % 10 == 0 && !this.level().isClientSide() && this.level().isDay() &&
                     !NightUtils.isInRangeOfNightSource(this.getEyePosition(), false) &&
                     !ResearchServerEvents.playerHasCheat(getOwnerName(), "slipslopslap"))
                 this.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 15, 1));
@@ -251,7 +251,7 @@ public class SpiderUnit extends Spider implements Unit, AttackerUnit, Convertabl
     public boolean doHurtTarget(@NotNull Entity pEntity) {
         if (super.doHurtTarget(pEntity)) {
             if (getWebAbility() != null)
-                getWebAbility().use(this.level, this, pEntity.getOnPos());
+                getWebAbility().use(this.level(), this, pEntity.getOnPos());
             return true;
         } else {
             return false;
@@ -267,10 +267,10 @@ public class SpiderUnit extends Spider implements Unit, AttackerUnit, Convertabl
         if (spinWebs == null)
             return;
 
-        if (!level.isClientSide() && !isVehicle()) {
+        if (!level().isClientSide() && !isVehicle()) {
             BlockPos limitedBp = MyMath.getXZRangeLimitedBlockPos(getOnPos(), targetBp, spinWebs.range);
 
-            BlockPos originBp = MiscUtil.getHighestNonAirBlock(level, limitedBp, true);
+            BlockPos originBp = MiscUtil.getHighestNonAirBlock(level(), limitedBp, true);
             List<Vec2> vec2s = List.of(
                     new Vec2(0,0),
                     new Vec2(1,1),
@@ -279,13 +279,13 @@ public class SpiderUnit extends Spider implements Unit, AttackerUnit, Convertabl
                     new Vec2(-1,1)
             );
             for (Vec2 vec2 : vec2s) {
-                BlockPos bp = MiscUtil.getHighestNonAirBlock(level, limitedBp.offset(vec2.x, 0, vec2.y), true);
+                BlockPos bp = MiscUtil.getHighestNonAirBlock(level(), limitedBp.offset((int) vec2.x, 0, (int) vec2.y), true);
                 if (distanceToSqr(Vec3.atCenterOf(bp)) < (spinWebs.range * 2) * (spinWebs.range * 2))
-                    BlockServerEvents.addTempBlock((ServerLevel) level, bp.above().above(), Blocks.COBWEB.defaultBlockState(),
+                    BlockServerEvents.addTempBlock((ServerLevel) level(), bp.above().above(), Blocks.COBWEB.defaultBlockState(),
                             Blocks.AIR.defaultBlockState(), SpinWebs.DURATION_SECONDS * 20);
             }
             resetBehaviours();
-        } else if (level.isClientSide()) {
+        } else if (level().isClientSide()) {
             if (isVehicle()) {
                 HudClientEvents.showTemporaryMessage(I18n.get("abilities.reignofnether.spin_webs.error1"));
                 return;
@@ -293,7 +293,7 @@ public class SpiderUnit extends Spider implements Unit, AttackerUnit, Convertabl
         }
         if (!isVehicle()) {
             spinWebs.setToMaxCooldown();
-            if (!level.isClientSide())
+            if (!level().isClientSide())
                 AbilityClientboundPacket.sendSetCooldownPacket(getId(), spinWebs.action, spinWebs.cooldownMax);
         }
     }

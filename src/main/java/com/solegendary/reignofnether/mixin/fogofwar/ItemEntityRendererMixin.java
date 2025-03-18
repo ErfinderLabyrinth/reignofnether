@@ -26,7 +26,7 @@ public abstract class ItemEntityRendererMixin {
         BlockPos bp = pEntity.getOnPos();
 
         if (FogOfWarClientEvents.isInBrightChunk(pEntity) &&
-            pEntity.level.getWorldBorder().isWithinBounds(bp))
+            pEntity.level().getWorldBorder().isWithinBounds(bp))
             shouldRender = true;
 
         if (!shouldRender)

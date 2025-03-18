@@ -64,7 +64,7 @@ public class RangedFlyingAttackGroundGoal<T extends net.minecraft.world.entity.M
 
             this.mob.getLookControl().setLookAt(tx, ty, tz);
 
-            if (this.mob.level.isClientSide())
+            if (this.mob.level().isClientSide())
                 return;
 
             float attackRange = ((AttackerUnit) this.mob).getAttackRange();

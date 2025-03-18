@@ -2,6 +2,7 @@ package com.solegendary.reignofnether.registrars;
 
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.guiscreen.TopdownGuiContainer;
+import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
@@ -14,7 +15,7 @@ public class ContainerRegistrar {
             ReignOfNether.MOD_ID);
 
     public static final RegistryObject<MenuType<TopdownGuiContainer>> TOPDOWNGUI_CONTAINER = CONTAINERS
-            .register("topdowngui_container", () -> new MenuType<>(TopdownGuiContainer::new));
+            .register("topdowngui_container", () -> new MenuType<>(TopdownGuiContainer::new, FeatureFlagSet.of()));
 
     public static void init() {
         CONTAINERS.register(FMLJavaModLoadingContext.get().getModEventBus());

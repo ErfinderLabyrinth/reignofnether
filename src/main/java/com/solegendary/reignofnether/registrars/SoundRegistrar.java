@@ -20,31 +20,31 @@ public class SoundRegistrar {
 
     public static final RegistryObject<SoundEvent> UNDER_ATTACK =
             SOUND_EVENTS.register("under_attack", () ->
-                    new SoundEvent(new ResourceLocation(ReignOfNether.MOD_ID, "under_attack")));
+                    SoundEvent.createVariableRangeEvent(new ResourceLocation(ReignOfNether.MOD_ID, "under_attack")));
 
     public static final RegistryObject<SoundEvent> VICTORY =
             SOUND_EVENTS.register("victory", () ->
-                    new SoundEvent(new ResourceLocation(ReignOfNether.MOD_ID, "victory")));
+                    SoundEvent.createVariableRangeEvent(new ResourceLocation(ReignOfNether.MOD_ID, "victory")));
 
     public static final RegistryObject<SoundEvent> DEFEAT =
             SOUND_EVENTS.register("defeat", () ->
-                    new SoundEvent(new ResourceLocation(ReignOfNether.MOD_ID, "defeat")));
+                    SoundEvent.createVariableRangeEvent(new ResourceLocation(ReignOfNether.MOD_ID, "defeat")));
 
     public static final RegistryObject<SoundEvent> ALLY =
             SOUND_EVENTS.register("ally", () ->
-                    new SoundEvent(new ResourceLocation(ReignOfNether.MOD_ID, "ally")));
+                    SoundEvent.createVariableRangeEvent(new ResourceLocation(ReignOfNether.MOD_ID, "ally")));
 
     public static final RegistryObject<SoundEvent> ENEMY =
             SOUND_EVENTS.register("enemy", () ->
-                    new SoundEvent(new ResourceLocation(ReignOfNether.MOD_ID, "enemy")));
+                    SoundEvent.createVariableRangeEvent(new ResourceLocation(ReignOfNether.MOD_ID, "enemy")));
 
     public static final RegistryObject<SoundEvent> CHAT =
             SOUND_EVENTS.register("chat", () ->
-                    new SoundEvent(new ResourceLocation(ReignOfNether.MOD_ID, "chat")));
+                    SoundEvent.createVariableRangeEvent(new ResourceLocation(ReignOfNether.MOD_ID, "chat")));
 
     public static final RegistryObject<SoundEvent> MAIN_MENU =
             SOUND_EVENTS.register("main_menu", () ->
-                    new SoundEvent(new ResourceLocation(ReignOfNether.MOD_ID, "main_menu")));
+                    SoundEvent.createVariableRangeEvent(new ResourceLocation(ReignOfNether.MOD_ID, "main_menu")));
 
     public static void init() {
         SOUND_EVENTS.register(FMLJavaModLoadingContext.get().getModEventBus());

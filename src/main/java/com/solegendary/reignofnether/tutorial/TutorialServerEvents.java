@@ -63,7 +63,7 @@ public class TutorialServerEvents {
 
     private static ServerLevel getServerLevel() {
         if (!PlayerServerEvents.players.isEmpty()) {
-            return PlayerServerEvents.players.get(0).getLevel();
+            return (ServerLevel) PlayerServerEvents.players.get(0).level();
         }
         return null;
     }
@@ -96,7 +96,7 @@ public class TutorialServerEvents {
             return;
         }
         String levelName = server.getWorldData().getLevelSettings().levelName();
-        if (evt.getEntity().getLevel() instanceof ServerLevel serverLevel && serverLevel.getSeed() == TUTORIAL_MAP_SEED
+        if (evt.getEntity().level() instanceof ServerLevel serverLevel && serverLevel.getSeed() == TUTORIAL_MAP_SEED
             && levelName.equals(TUTORIAL_MAP_NAME)) {
 
             TutorialStage stage = loadStage(server.getLevel(Level.OVERWORLD));

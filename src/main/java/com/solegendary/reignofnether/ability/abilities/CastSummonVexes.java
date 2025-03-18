@@ -32,7 +32,7 @@ public class CastSummonVexes extends Ability {
     public CastSummonVexes(EvokerUnit evokerUnit) {
         super(
             UnitAction.CAST_SUMMON_VEXES,
-            evokerUnit.level,
+            evokerUnit.level(),
             CD_MAX_SECONDS * ResourceCost.TICKS_PER_SECOND,
             0,
             0,

@@ -32,7 +32,7 @@ public class FirewallShot extends Ability {
     private final BlazeUnit blazeUnit;
 
     public FirewallShot(BlazeUnit blazeUnit) {
-        super(UnitAction.SHOOT_FIREWALL, blazeUnit.level,CD_MAX_SECONDS * ResourceCost.TICKS_PER_SECOND, RANGE, 0, true, true);
+        super(UnitAction.SHOOT_FIREWALL, blazeUnit.level(),CD_MAX_SECONDS * ResourceCost.TICKS_PER_SECOND, RANGE, 0, true, true);
         this.blazeUnit = blazeUnit;
     }
 

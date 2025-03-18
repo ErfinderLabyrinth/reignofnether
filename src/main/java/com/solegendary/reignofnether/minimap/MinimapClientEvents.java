@@ -4,8 +4,9 @@ import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.datafixers.util.Pair;
-import com.mojang.math.Matrix4f;
-import com.mojang.math.Vector3d;
+import net.minecraft.world.level.material.MapColor;
+import org.joml.Matrix4f;
+import org.joml.Vector3d;
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.alliance.AlliancesClient;
 import com.solegendary.reignofnether.building.Building;
@@ -49,7 +50,6 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.SnowLayerBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.Vec2;
 import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.client.event.ScreenEvent;
@@ -370,7 +370,7 @@ public class MinimapClientEvents {
                         y += (int) (layers * (1.0F / 8.0F));
                         break;
                     }
-                    if (!bs.getMaterial().isSolid() && !bs.getMaterial().isLiquid() && y > 0) {
+                    if (!bs.isSolid() && bs.getFluidState().isEmpty() && y > 0) {
                         y -= 1;
                     } else {
                         break;
@@ -387,21 +387,21 @@ public class MinimapClientEvents {
                         yNorth += (int) (layersNorth * (1.0F / 8.0F));
                         break;
                     }
-                    if (!bsNorth.getMaterial().isSolid() && !bsNorth.getMaterial().isLiquid() && yNorth > 0) {
+                    if (!bsNorth.isSolid() && bsNorth.getFluidState().isEmpty() && yNorth > 0) {
                         yNorth -= 1;
                     } else {
                         break;
                     }
                 } while (true);
 
-                Material mat = MC.level.getBlockState(new BlockPos(x, yNorth, z - 1)).getMaterial();
-                int rgb = mat.getColor().col;
+                MapColor mat = MC.level.getBlockState(new BlockPos(x, yNorth, z - 1)).getMapColor(MC.level, new BlockPos(x, yNorth, z - 1));
+                int rgb = mat.col;
                 if (bs.getBlock() instanceof SnowLayerBlock) {
                     rgb = 0xFFFFFF;
                 }
 
                 // shade blocks to give elevation effects, excluding liquids and nonblocking blocks (eg. grass, flowers)
-                if (!mat.isLiquid()) {
+                if (MC.level.getBlockState(new BlockPos(x, yNorth, z - 1)).getFluidState().isEmpty()) {
                     if (yNorth > y) {
                         rgb = MiscUtil.shadeHexRGB(rgb, 0.82F);
                     } else if (yNorth < y) {
@@ -410,11 +410,11 @@ public class MinimapClientEvents {
                 } else { // shade liquid based on depth
                     int depth = 0;
                     int depthMax = 20;
-                    Material matBelow;
+                    BlockState matBelow;
                     do {
                         depth += 1;
-                        matBelow = MC.level.getBlockState(new BlockPos(x, y - depth, z)).getMaterial();
-                    } while (matBelow.isLiquid() && depth < depthMax);
+                        matBelow = MC.level.getBlockState(new BlockPos(x, y - depth, z));
+                    } while (!matBelow.getFluidState().isEmpty() && depth < depthMax);
 
                     // only reduce shade every nth step to have the map look sharper
                     depth = (int) (5 * (Math.ceil(Math.abs(depth / 5))));
@@ -812,9 +812,9 @@ public class MinimapClientEvents {
 
         double xWorld = xc_world + clicked.x * pixelsToBlocks * Math.sqrt(2);
         double zWorld = zc_world + clicked.y * pixelsToBlocks * Math.sqrt(2);
-        double yWorld = MiscUtil.getHighestNonAirBlock(MC.level, new BlockPos(xWorld, 0, zWorld)).getY();
+        double yWorld = MiscUtil.getHighestNonAirBlock(MC.level, new BlockPos((int) xWorld, 0, (int) zWorld)).getY();
 
-        return new BlockPos(xWorld, yWorld, zWorld);
+        return new BlockPos((int) xWorld, (int) yWorld, (int) zWorld);
     }
 
     @SubscribeEvent
@@ -913,7 +913,7 @@ public class MinimapClientEvents {
             updateMapTexture();
         }
 
-        renderMap(evt.getPoseStack());
+        renderMap(evt.getGuiGraphics().pose());
 
         //MiscUtil.drawDebugStrings(evt.getMatrixStack(), MC.font, new String[] {
         //});

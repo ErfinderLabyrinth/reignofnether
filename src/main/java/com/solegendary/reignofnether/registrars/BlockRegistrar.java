@@ -7,20 +7,26 @@ import com.solegendary.reignofnether.blocks.WalkableMagmaBlock;
 import net.minecraft.client.renderer.entity.FallingBlockRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
 public class BlockRegistrar {
@@ -28,161 +34,167 @@ public class BlockRegistrar {
     public static final DeferredRegister<Block> BLOCKS =
             DeferredRegister.create(ForgeRegistries.BLOCKS, ReignOfNether.MOD_ID);
 
-    private static FallingRotatedPillarBlock fallingLog(MaterialColor pTopColor, MaterialColor pBarkColor) {
-        return new FallingRotatedPillarBlock(BlockBehaviour.Properties.of(Material.WOOD, (p_152624_) -> {
+    private static FallingRotatedPillarBlock fallingLog(MapColor pTopColor, MapColor pBarkColor) {
+        return new FallingRotatedPillarBlock(BlockBehaviour.Properties.of().mapColor((p_152624_) -> {
             return p_152624_.getValue(RotatedPillarBlock.AXIS) == Direction.Axis.Y ? pTopColor : pBarkColor;
         }).strength(2.0F).sound(SoundType.WOOD));
     }
 
-    private static FallingRotatedPillarBlock fallingNetherStem(MaterialColor pMaterialColor) {
-        return new FallingRotatedPillarBlock(BlockBehaviour.Properties.of(Material.NETHER_WOOD, (p_152620_) -> {
-            return pMaterialColor;
+    private static FallingRotatedPillarBlock fallingNetherStem(MapColor pMapColor) {
+        return new FallingRotatedPillarBlock(BlockBehaviour.Properties.of().mapColor((p_152620_) -> {
+            return pMapColor;
         }).strength(2.0F).sound(SoundType.STEM));
     }
 
     public static final RegistryObject<Block> DECAYABLE_NETHER_WART_BLOCK = registerBlock("decayable_nether_wart_block",
-            () -> new LeavesBlock(BlockBehaviour.Properties.of(Material.LEAVES, MaterialColor.COLOR_RED)
+            () -> new LeavesBlock(BlockBehaviour.Properties.copy(Blocks.ACACIA_LEAVES).mapColor(MapColor.COLOR_RED)
                     .strength(1.0F)
                     .randomTicks()
-                    .color(MaterialColor.COLOR_RED)
+                    .mapColor(MapColor.COLOR_RED)
                     .sound(SoundType.WART_BLOCK)),
-            CreativeModeTab.TAB_BUILDING_BLOCKS
+            CreativeModeTabs.BUILDING_BLOCKS
     );
 
     public static final RegistryObject<Block> DECAYABLE_WARPED_WART_BLOCK = registerBlock("decayable_warped_wart_block",
-            () -> new LeavesBlock(BlockBehaviour.Properties.of(Material.LEAVES, MaterialColor.WARPED_WART_BLOCK)
+            () -> new LeavesBlock(BlockBehaviour.Properties.copy(Blocks.ACACIA_LEAVES).mapColor(MapColor.WARPED_WART_BLOCK)
                     .strength(1.0F)
                     .randomTicks()
-                    .color(MaterialColor.WARPED_WART_BLOCK)
+                    .mapColor(MapColor.WARPED_WART_BLOCK)
                     .sound(SoundType.WART_BLOCK)),
-            CreativeModeTab.TAB_BUILDING_BLOCKS
+            CreativeModeTabs.BUILDING_BLOCKS
     );
 
     public static final RegistryObject<Block> FALLING_OAK_LOG = registerBlock("falling_oak_log",
-            () -> fallingLog(MaterialColor.WOOD, MaterialColor.PODZOL),
-            CreativeModeTab.TAB_BUILDING_BLOCKS
+            () -> fallingLog(MapColor.WOOD, MapColor.PODZOL),
+            CreativeModeTabs.BUILDING_BLOCKS
     );
     public static final RegistryObject<Block> FALLING_SPRUCE_LOG = registerBlock("falling_spruce_log",
-            () -> fallingLog(MaterialColor.PODZOL, MaterialColor.COLOR_BROWN),
-            CreativeModeTab.TAB_BUILDING_BLOCKS
+            () -> fallingLog(MapColor.PODZOL, MapColor.COLOR_BROWN),
+            CreativeModeTabs.BUILDING_BLOCKS
     );
     public static final RegistryObject<Block> FALLING_BIRCH_LOG = registerBlock("falling_birch_log",
-            () -> fallingLog(MaterialColor.SAND, MaterialColor.QUARTZ),
-            CreativeModeTab.TAB_BUILDING_BLOCKS
+            () -> fallingLog(MapColor.SAND, MapColor.QUARTZ),
+            CreativeModeTabs.BUILDING_BLOCKS
     );
     public static final RegistryObject<Block> FALLING_JUNGLE_LOG = registerBlock("falling_jungle_log",
-            () -> fallingLog(MaterialColor.DIRT, MaterialColor.PODZOL),
-            CreativeModeTab.TAB_BUILDING_BLOCKS
+            () -> fallingLog(MapColor.DIRT, MapColor.PODZOL),
+            CreativeModeTabs.BUILDING_BLOCKS
     );
     public static final RegistryObject<Block> FALLING_ACACIA_LOG = registerBlock("falling_acacia_log",
-            () -> fallingLog(MaterialColor.COLOR_ORANGE, MaterialColor.STONE),
-            CreativeModeTab.TAB_BUILDING_BLOCKS
+            () -> fallingLog(MapColor.COLOR_ORANGE, MapColor.STONE),
+            CreativeModeTabs.BUILDING_BLOCKS
     );
     public static final RegistryObject<Block> FALLING_DARK_OAK_LOG = registerBlock("falling_dark_oak_log",
-            () -> fallingLog(MaterialColor.COLOR_BROWN, MaterialColor.COLOR_BROWN),
-            CreativeModeTab.TAB_BUILDING_BLOCKS
+            () -> fallingLog(MapColor.COLOR_BROWN, MapColor.COLOR_BROWN),
+            CreativeModeTabs.BUILDING_BLOCKS
     );
     public static final RegistryObject<Block> FALLING_MANGROVE_LOG = registerBlock("falling_mangrove_log",
-            () -> fallingLog(MaterialColor.COLOR_RED, MaterialColor.PODZOL),
-            CreativeModeTab.TAB_BUILDING_BLOCKS
+            () -> fallingLog(MapColor.COLOR_RED, MapColor.PODZOL),
+            CreativeModeTabs.BUILDING_BLOCKS
     );
     public static final RegistryObject<Block> FALLING_WARPED_STEM = registerBlock("falling_warped_stem",
-            () -> fallingNetherStem(MaterialColor.WARPED_STEM),
-            CreativeModeTab.TAB_BUILDING_BLOCKS
+            () -> fallingNetherStem(MapColor.WARPED_STEM),
+            CreativeModeTabs.BUILDING_BLOCKS
     );
     public static final RegistryObject<Block> FALLING_CRIMSON_STEM = registerBlock("falling_crimson_stem",
-            () -> fallingNetherStem(MaterialColor.CRIMSON_STEM),
-            CreativeModeTab.TAB_BUILDING_BLOCKS
+            () -> fallingNetherStem(MapColor.CRIMSON_STEM),
+            CreativeModeTabs.BUILDING_BLOCKS
     );
     public static final RegistryObject<Block> WALKABLE_MAGMA_BLOCK = registerBlock("walkable_magma_block", () ->
-            new WalkableMagmaBlock(BlockBehaviour
-            .Properties.of(Material.STONE, MaterialColor.NETHER)
-            .requiresCorrectToolForDrops()
-            .lightLevel((p_50828_) -> 3)
-            .randomTicks().strength(0.5F)
-            .isValidSpawn((p_187421_, p_187422_, p_187423_, p_187424_) -> p_187424_.fireImmune())
-            .hasPostProcess(BlockRegistrar::always).emissiveRendering(BlockRegistrar::always)),
-            CreativeModeTab.TAB_BUILDING_BLOCKS);
+                    new WalkableMagmaBlock(BlockBehaviour
+                            .Properties.copy(Blocks.STONE).mapColor(MapColor.NETHER)
+                            .requiresCorrectToolForDrops()
+                            .lightLevel((p_50828_) -> 3)
+                            .randomTicks().strength(0.5F)
+                            .isValidSpawn((p_187421_, p_187422_, p_187423_, p_187424_) -> p_187424_.fireImmune())
+                            .hasPostProcess(BlockRegistrar::always).emissiveRendering(BlockRegistrar::always)),
+            CreativeModeTabs.BUILDING_BLOCKS);
 
     public static final RegistryObject<Block> RTS_START_BLOCK_BLUE = registerBlock("rts_start_block_blue", () ->
-            new RTSStartBlock(BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BLUE)
-                    .strength(-1.0F, 3600000.0F).noLootTable()), CreativeModeTab.TAB_MISC);
+            new RTSStartBlock(BlockBehaviour.Properties.copy(Blocks.STONE).mapColor(MapColor.COLOR_BLUE)
+                    .strength(-1.0F, 3600000.0F).noLootTable()), CreativeModeTabs.FUNCTIONAL_BLOCKS);
 
     public static final RegistryObject<Block> RTS_START_BLOCK_YELLOW = registerBlock("rts_start_block_yellow", () ->
-            new RTSStartBlock(BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_YELLOW)
-                    .strength(-1.0F, 3600000.0F).noLootTable()), CreativeModeTab.TAB_MISC);
+            new RTSStartBlock(BlockBehaviour.Properties.copy(Blocks.STONE).mapColor(MapColor.COLOR_YELLOW)
+                    .strength(-1.0F, 3600000.0F).noLootTable()), CreativeModeTabs.FUNCTIONAL_BLOCKS);
 
     public static final RegistryObject<Block> RTS_START_BLOCK_GREEN = registerBlock("rts_start_block_green", () ->
-            new RTSStartBlock(BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_GREEN)
-                    .strength(-1.0F, 3600000.0F).noLootTable()), CreativeModeTab.TAB_MISC);
+            new RTSStartBlock(BlockBehaviour.Properties.copy(Blocks.STONE).mapColor(MapColor.COLOR_GREEN)
+                    .strength(-1.0F, 3600000.0F).noLootTable()), CreativeModeTabs.FUNCTIONAL_BLOCKS);
 
     public static final RegistryObject<Block> RTS_START_BLOCK_RED = registerBlock("rts_start_block_red", () ->
-            new RTSStartBlock(BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_RED)
-                    .strength(-1.0F, 3600000.0F).noLootTable()), CreativeModeTab.TAB_MISC);
+            new RTSStartBlock(BlockBehaviour.Properties.copy(Blocks.STONE).mapColor(MapColor.COLOR_RED)
+                    .strength(-1.0F, 3600000.0F).noLootTable()), CreativeModeTabs.FUNCTIONAL_BLOCKS);
 
     public static final RegistryObject<Block> RTS_START_BLOCK_ORANGE = registerBlock("rts_start_block_orange", () ->
-            new RTSStartBlock(BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_ORANGE)
-                    .strength(-1.0F, 3600000.0F).noLootTable()), CreativeModeTab.TAB_MISC);
+            new RTSStartBlock(BlockBehaviour.Properties.copy(Blocks.STONE).mapColor(MapColor.COLOR_ORANGE)
+                    .strength(-1.0F, 3600000.0F).noLootTable()), CreativeModeTabs.FUNCTIONAL_BLOCKS);
 
     public static final RegistryObject<Block> RTS_START_BLOCK_CYAN = registerBlock("rts_start_block_cyan", () ->
-            new RTSStartBlock(BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_CYAN)
-                    .strength(-1.0F, 3600000.0F).noLootTable()), CreativeModeTab.TAB_MISC);
+            new RTSStartBlock(BlockBehaviour.Properties.copy(Blocks.STONE).mapColor(MapColor.COLOR_CYAN)
+                    .strength(-1.0F, 3600000.0F).noLootTable()), CreativeModeTabs.FUNCTIONAL_BLOCKS);
 
     public static final RegistryObject<Block> RTS_START_BLOCK_MAGENTA = registerBlock("rts_start_block_magenta", () ->
-            new RTSStartBlock(BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_MAGENTA)
-                    .strength(-1.0F, 3600000.0F).noLootTable()), CreativeModeTab.TAB_MISC);
+            new RTSStartBlock(BlockBehaviour.Properties.copy(Blocks.STONE).mapColor(MapColor.COLOR_MAGENTA)
+                    .strength(-1.0F, 3600000.0F).noLootTable()), CreativeModeTabs.FUNCTIONAL_BLOCKS);
 
     public static final RegistryObject<Block> RTS_START_BLOCK_BROWN = registerBlock("rts_start_block_brown", () ->
-            new RTSStartBlock(BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BROWN)
-                    .strength(-1.0F, 3600000.0F).noLootTable()), CreativeModeTab.TAB_MISC);
+            new RTSStartBlock(BlockBehaviour.Properties.copy(Blocks.STONE).mapColor(MapColor.COLOR_BROWN)
+                    .strength(-1.0F, 3600000.0F).noLootTable()), CreativeModeTabs.FUNCTIONAL_BLOCKS);
 
     public static final RegistryObject<Block> RTS_START_BLOCK_WHITE = registerBlock("rts_start_block_white", () ->
-            new RTSStartBlock(BlockBehaviour.Properties.of(Material.STONE, MaterialColor.SNOW)
-                    .strength(-1.0F, 3600000.0F).noLootTable()), CreativeModeTab.TAB_MISC);
+            new RTSStartBlock(BlockBehaviour.Properties.copy(Blocks.STONE).mapColor(MapColor.SNOW)
+                    .strength(-1.0F, 3600000.0F).noLootTable()), CreativeModeTabs.FUNCTIONAL_BLOCKS);
 
     public static final RegistryObject<Block> RTS_START_BLOCK_BLACK = registerBlock("rts_start_block_black", () ->
-            new RTSStartBlock(BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BLACK)
-                    .strength(-1.0F, 3600000.0F).noLootTable()), CreativeModeTab.TAB_MISC);
+            new RTSStartBlock(BlockBehaviour.Properties.copy(Blocks.STONE).mapColor(MapColor.COLOR_BLACK)
+                    .strength(-1.0F, 3600000.0F).noLootTable()), CreativeModeTabs.FUNCTIONAL_BLOCKS);
 
     public static final RegistryObject<Block> RTS_START_BLOCK_LIGHT_BLUE = registerBlock("rts_start_block_light_blue", () ->
-            new RTSStartBlock(BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_LIGHT_BLUE)
-                    .strength(-1.0F, 3600000.0F).noLootTable()), CreativeModeTab.TAB_MISC);
+            new RTSStartBlock(BlockBehaviour.Properties.copy(Blocks.STONE).mapColor(MapColor.COLOR_LIGHT_BLUE)
+                    .strength(-1.0F, 3600000.0F).noLootTable()), CreativeModeTabs.FUNCTIONAL_BLOCKS);
 
     public static final RegistryObject<Block> RTS_START_BLOCK_LIME = registerBlock("rts_start_block_lime", () ->
-            new RTSStartBlock(BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_LIGHT_GREEN)
-                    .strength(-1.0F, 3600000.0F).noLootTable()), CreativeModeTab.TAB_MISC);
+            new RTSStartBlock(BlockBehaviour.Properties.copy(Blocks.STONE).mapColor(MapColor.COLOR_LIGHT_GREEN)
+                    .strength(-1.0F, 3600000.0F).noLootTable()), CreativeModeTabs.FUNCTIONAL_BLOCKS);
 
     public static final RegistryObject<Block> RTS_START_BLOCK_LIGHT_GRAY = registerBlock("rts_start_block_light_gray", () ->
-            new RTSStartBlock(BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_LIGHT_GRAY)
-                    .strength(-1.0F, 3600000.0F).noLootTable()), CreativeModeTab.TAB_MISC);
+            new RTSStartBlock(BlockBehaviour.Properties.copy(Blocks.STONE).mapColor(MapColor.COLOR_LIGHT_GRAY)
+                    .strength(-1.0F, 3600000.0F).noLootTable()), CreativeModeTabs.FUNCTIONAL_BLOCKS);
 
     public static final RegistryObject<Block> RTS_START_BLOCK_GRAY = registerBlock("rts_start_block_gray", () ->
-            new RTSStartBlock(BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_GRAY)
-                    .strength(-1.0F, 3600000.0F).noLootTable()), CreativeModeTab.TAB_MISC);
+            new RTSStartBlock(BlockBehaviour.Properties.copy(Blocks.STONE).mapColor(MapColor.COLOR_GRAY)
+                    .strength(-1.0F, 3600000.0F).noLootTable()), CreativeModeTabs.FUNCTIONAL_BLOCKS);
 
     public static final RegistryObject<Block> RTS_START_BLOCK_PURPLE = registerBlock("rts_start_block_purple", () ->
-            new RTSStartBlock(BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_PURPLE)
-                    .strength(-1.0F, 3600000.0F).noLootTable()), CreativeModeTab.TAB_MISC);
+            new RTSStartBlock(BlockBehaviour.Properties.copy(Blocks.STONE).mapColor(MapColor.COLOR_PURPLE)
+                    .strength(-1.0F, 3600000.0F).noLootTable()), CreativeModeTabs.FUNCTIONAL_BLOCKS);
 
     public static final RegistryObject<Block> RTS_START_BLOCK_PINK = registerBlock("rts_start_block_pink", () ->
-            new RTSStartBlock(BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_PINK)
-                    .strength(-1.0F, 3600000.0F).noLootTable()), CreativeModeTab.TAB_MISC);
+            new RTSStartBlock(BlockBehaviour.Properties.copy(Blocks.STONE).mapColor(MapColor.COLOR_PINK)
+                    .strength(-1.0F, 3600000.0F).noLootTable()), CreativeModeTabs.FUNCTIONAL_BLOCKS);
 
 
     private static boolean always(BlockState p_50775_, BlockGetter p_50776_, BlockPos p_50777_) {
         return true;
     }
 
-    private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block, CreativeModeTab tab) {
+    private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block, ResourceKey<CreativeModeTab> tab) {
         RegistryObject<T> toReturn = BLOCKS.register(name, block);
         registerBlockItem(name, toReturn, tab);
         return toReturn;
     }
 
     private static <T extends Block> RegistryObject<Item> registerBlockItem(String name, RegistryObject<T> block,
-                                                                            CreativeModeTab tab) {
-        return ItemRegistrar.ITEMS.register(name, () -> new BlockItem(block.get(), new Item.Properties().tab(tab)));
+                                                                            ResourceKey<CreativeModeTab> tab) {
+        return ItemRegistrar.ITEMS.register(name, () -> {
+            BlockItem blockItem = new BlockItem(block.get(), new Item.Properties());
+            blockItems.computeIfAbsent(tab, (k)-> new ArrayList<>()).add(blockItem);
+            return blockItem;
+        });
     }
+
+    public static Map<ResourceKey<CreativeModeTab>, List<Item>> blockItems = new HashMap<>();
 
     public static void init() {
         BLOCKS.register(FMLJavaModLoadingContext.get().getModEventBus());

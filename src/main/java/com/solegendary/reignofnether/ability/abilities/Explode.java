@@ -24,7 +24,7 @@ public class Explode extends Ability {
     public Explode(CreeperUnit creeperUnit) {
         super(
             UnitAction.EXPLODE,
-            creeperUnit.level,
+            creeperUnit.level(),
             0,
             0,
             0,

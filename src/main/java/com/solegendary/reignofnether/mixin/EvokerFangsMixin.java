@@ -49,7 +49,7 @@ public abstract class EvokerFangsMixin extends Entity {
 
         // set to the damage amount we want and set us as the owner to ensure knockback
         if (pTarget.isAlive() && !pTarget.isInvulnerable() && pTarget != this.getOwner())
-            pTarget.hurt(DamageSource.indirectMagic(this.getOwner(), this.getOwner()), EvokerUnit.FANGS_DAMAGE);
+            pTarget.hurt(damageSources().indirectMagic(this.getOwner(), this.getOwner()), EvokerUnit.FANGS_DAMAGE);
     }
 
     // increase AOE size (originally inflate(0.2, 0.0, 0.2))
@@ -61,7 +61,7 @@ public abstract class EvokerFangsMixin extends Entity {
     private void tick(CallbackInfo ci) {
         ci.cancel();
         super.tick();
-        if (this.level.isClientSide) {
+        if (this.level().isClientSide) {
             if (this.clientSideAttackStarted) {
                 --this.lifeTicks;
                 if (this.lifeTicks == 14) {
@@ -72,13 +72,13 @@ public abstract class EvokerFangsMixin extends Entity {
                         double $$4 = (this.random.nextDouble() * 2.0 - 1.0) * 0.3;
                         double $$5 = 0.3 + this.random.nextDouble() * 0.3;
                         double $$6 = (this.random.nextDouble() * 2.0 - 1.0) * 0.3;
-                        this.level.addParticle(ParticleTypes.CRIT, $$1, $$2 + 1.0, $$3, $$4, $$5, $$6);
+                        this.level().addParticle(ParticleTypes.CRIT, $$1, $$2 + 1.0, $$3, $$4, $$5, $$6);
                     }
                 }
             }
         } else if (--this.warmupDelayTicks < 0) {
             if (this.warmupDelayTicks == -8) {
-                List<LivingEntity> $$7 = this.level.getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(0.5, 0.0, 0.5));
+                List<LivingEntity> $$7 = this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(0.5, 0.0, 0.5));
                 Iterator var15 = $$7.iterator();
 
                 while(var15.hasNext()) {
@@ -88,7 +88,7 @@ public abstract class EvokerFangsMixin extends Entity {
             }
 
             if (!this.sentSpikeEvent) {
-                this.level.broadcastEntityEvent(this, (byte)4);
+                this.level().broadcastEntityEvent(this, (byte)4);
                 this.sentSpikeEvent = true;
             }
 

@@ -149,11 +149,11 @@ public class CreeperUnit extends Creeper implements Unit, AttackerUnit {
 
     @Override
     public void explodeCreeper() {
-        if (!this.level.isClientSide) {
-            Explosion.BlockInteraction explosion$blockinteraction = ForgeEventFactory.getMobGriefingEvent(this.level, this) ? Explosion.BlockInteraction.DESTROY : Explosion.BlockInteraction.NONE;
+        if (!this.level().isClientSide) {
+            Level.ExplosionInteraction explosion$blockinteraction = ForgeEventFactory.getMobGriefingEvent(this.level(), this) ? Level.ExplosionInteraction.TNT : Level.ExplosionInteraction.NONE;
             float radius = this.isPowered() ? CHARGED_EXPLOSION_RADIUS : EXPLOSION_RADIUS;
             this.dead = true;
-            this.level.explode(this, this.getX(), this.getY(), this.getZ(), radius, explosion$blockinteraction);
+            this.level().explode(this, this.getX(), this.getY(), this.getZ(), radius, explosion$blockinteraction);
             this.discard();
             this.spawnLingeringCloud();
         }
@@ -190,7 +190,7 @@ public class CreeperUnit extends Creeper implements Unit, AttackerUnit {
             this.setSwellDir(-1);
 
         // apply slowness level 2 during daytime for a short time repeatedly
-        if (tickCount % 10 == 0 && !this.level.isClientSide() && this.level.isDay() &&
+        if (tickCount % 10 == 0 && !this.level().isClientSide() && this.level().isDay() &&
             !NightUtils.isInRangeOfNightSource(this.getEyePosition(), false) &&
             !ResearchServerEvents.playerHasCheat(getOwnerName(), "slipslopslap"))
             this.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 15, 1));

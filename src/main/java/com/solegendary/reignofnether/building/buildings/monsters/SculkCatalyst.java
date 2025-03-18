@@ -20,10 +20,10 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
 
 import java.util.*;
 
@@ -58,12 +58,12 @@ public class SculkCatalyst extends Building implements NightSource, RangeIndicat
 
     public SculkCatalyst(Level level, BlockPos originPos, Rotation rotation, String ownerName) {
         super(
-            level,
-            originPos,
-            rotation,
-            ownerName,
-            getAbsoluteBlockData(getRelativeBlockData(level), level, originPos, rotation),
-            false
+                level,
+                originPos,
+                rotation,
+                ownerName,
+                getAbsoluteBlockData(getRelativeBlockData(level), level, originPos, rotation),
+                false
         );
         this.name = buildingName;
         this.ownerName = ownerName;
@@ -86,7 +86,9 @@ public class SculkCatalyst extends Building implements NightSource, RangeIndicat
         }
     }
 
-    public float getMagicDamageMult() { return 0.5f; }
+    public float getMagicDamageMult() {
+        return 0.5f;
+    }
 
     public int getUncappedNightRange() {
         if (isBuilt || isBuiltServerside) {
@@ -117,8 +119,8 @@ public class SculkCatalyst extends Building implements NightSource, RangeIndicat
         updateSculkBps();
         this.nightBorderBps.clear();
         this.nightBorderBps.addAll(MiscUtil.getRangeIndicatorCircleBlocks(centrePos,
-            getNightRange() - TimeClientEvents.VISIBLE_BORDER_ADJ,
-            level
+                getNightRange() - TimeClientEvents.VISIBLE_BORDER_ADJ,
+                level
         ));
     }
 
@@ -148,7 +150,7 @@ public class SculkCatalyst extends Building implements NightSource, RangeIndicat
     @Override
     public int getHealth() {
         return (int) (getBlocksPlaced() / MIN_BLOCKS_PERCENT) - getHighestBlockCountReached() + (int) (
-            sculkBps.size() * HP_PER_SCULK
+                sculkBps.size() * HP_PER_SCULK
         );
     }
 
@@ -179,12 +181,16 @@ public class SculkCatalyst extends Building implements NightSource, RangeIndicat
                     bs = level.getBlockState(bp);
                 } while (bs.isAir() && y < 10);
 
-                if (bs.getMaterial() == Material.SCULK) {
+                if (isSculk(bs.getBlock())) {
                     sculkBps.add(bp);
                 }
             }
         }
         Collections.shuffle(sculkBps);
+    }
+
+    public static boolean isSculk(Block block) {
+        return block == Blocks.SCULK || block == Blocks.SCULK_VEIN || block == Blocks.SCULK_CATALYST || block == Blocks.SCULK_SENSOR || block == Blocks.SCULK_SHRIEKER || block == Blocks.CALIBRATED_SCULK_SENSOR;
     }
 
     private static final int destroys = 0;
@@ -225,7 +231,7 @@ public class SculkCatalyst extends Building implements NightSource, RangeIndicat
             if (bs.getBlock() == Blocks.SCULK) {
                 for (BlockPos bpAdj : List.of(bp.below(), bp.north(), bp.south(), bp.east(), bp.west())) {
                     BlockState bsAdj = level.getBlockState(bpAdj);
-                    if (!bsAdj.isAir() && bsAdj.getMaterial() != Material.SCULK) {
+                    if (!bsAdj.isAir() && !isSculk(bsAdj.getBlock())) {
                         level.setBlockAndUpdate(bp, bsAdj);
                         restoredSculk += 1;
                         break;
@@ -252,39 +258,39 @@ public class SculkCatalyst extends Building implements NightSource, RangeIndicat
 
     public static AbilityButton getBuildButton(Keybinding hotkey) {
         return new AbilityButton(SculkCatalyst.buildingName,
-            new ResourceLocation("minecraft", "textures/block/sculk_catalyst_side.png"),
-            hotkey,
-            () -> BuildingClientEvents.getBuildingToPlace() == SculkCatalyst.class,
-            () -> false,
-            () -> BuildingClientEvents.hasFinishedBuilding(Mausoleum.buildingName) || ResearchClient.hasCheat(
-                "modifythephasevariance"),
-            () -> BuildingClientEvents.setBuildingToPlace(SculkCatalyst.class),
-            null,
-            List.of(FormattedCharSequence.forward(
-                    I18n.get("buildings.monsters.reignofnether.sculk_catalyst"),
-                    Style.EMPTY.withBold(true)
+                new ResourceLocation("minecraft", "textures/block/sculk_catalyst_side.png"),
+                hotkey,
+                () -> BuildingClientEvents.getBuildingToPlace() == SculkCatalyst.class,
+                () -> false,
+                () -> BuildingClientEvents.hasFinishedBuilding(Mausoleum.buildingName) || ResearchClient.hasCheat(
+                        "modifythephasevariance"),
+                () -> BuildingClientEvents.setBuildingToPlace(SculkCatalyst.class),
+                null,
+                List.of(FormattedCharSequence.forward(
+                                I18n.get("buildings.monsters.reignofnether.sculk_catalyst"),
+                                Style.EMPTY.withBold(true)
+                        ),
+                        ResourceCosts.getFormattedCost(cost),
+                        FormattedCharSequence.forward("", Style.EMPTY),
+                        FormattedCharSequence.forward(
+                                I18n.get("buildings.monsters.reignofnether.sculk_catalyst.tooltip1"),
+                                Style.EMPTY
+                        ),
+                        FormattedCharSequence.forward("", Style.EMPTY),
+                        FormattedCharSequence.forward(I18n.get(
+                                "buildings.monsters.reignofnether.sculk_catalyst.tooltip2",
+                                nightRangeMin
+                        ), Style.EMPTY),
+                        FormattedCharSequence.forward(I18n.get(
+                                "buildings.monsters.reignofnether.sculk_catalyst.tooltip3",
+                                nightRangeMax
+                        ), Style.EMPTY),
+                        FormattedCharSequence.forward(
+                                I18n.get("buildings.monsters.reignofnether.sculk_catalyst.tooltip4"),
+                                Style.EMPTY
+                        )
                 ),
-                ResourceCosts.getFormattedCost(cost),
-                FormattedCharSequence.forward("", Style.EMPTY),
-                FormattedCharSequence.forward(
-                    I18n.get("buildings.monsters.reignofnether.sculk_catalyst.tooltip1"),
-                    Style.EMPTY
-                ),
-                FormattedCharSequence.forward("", Style.EMPTY),
-                FormattedCharSequence.forward(I18n.get(
-                    "buildings.monsters.reignofnether.sculk_catalyst.tooltip2",
-                    nightRangeMin
-                ), Style.EMPTY),
-                FormattedCharSequence.forward(I18n.get(
-                    "buildings.monsters.reignofnether.sculk_catalyst.tooltip3",
-                    nightRangeMax
-                ), Style.EMPTY),
-                FormattedCharSequence.forward(
-                    I18n.get("buildings.monsters.reignofnether.sculk_catalyst.tooltip4"),
-                    Style.EMPTY
-                )
-            ),
-            null
+                null
         );
     }
 }

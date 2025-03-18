@@ -99,8 +99,8 @@ public class GameruleServerboundPacket {
                 success.set(false);
                 return;
             }
-            MinecraftServer server = player.getLevel().getServer();
-            GameRules gameRules = player.getLevel().getGameRules();
+            MinecraftServer server = player.level().getServer();
+            GameRules gameRules = player.level().getGameRules();
             boolean booleanValue = value == 1L;
 
             switch (action) {

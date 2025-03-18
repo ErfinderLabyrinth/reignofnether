@@ -14,6 +14,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -51,25 +52,25 @@ public class ClientLevelMixin {
     }
 
     @Inject(
-            method = "playSeededSound(Lnet/minecraft/world/entity/player/Player;DDDLnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FFJ)V",
+            method = "playSeededSound(Lnet/minecraft/world/entity/player/Player;DDDLnet/minecraft/core/Holder;Lnet/minecraft/sounds/SoundSource;FFJ)V",
             at = @At("HEAD"),
             cancellable = true
     )
-    public void playSeededSound(@Nullable Player pPlayer, double pX, double pY, double pZ, SoundEvent pSoundEvent, SoundSource pSoundSource, float pVolume, float pPitch, long pSeed, CallbackInfo ci) {
-        if (!OrthoviewClientEvents.isEnabled() || SoundClientEvents.STATIC_SOUNDS.contains(pSoundEvent))
+    public void playSeededSound(Player pPlayer, double pX, double pY, double pZ, Holder<SoundEvent> pSound, SoundSource pSource, float pVolume, float pPitch, long pSeed, CallbackInfo ci) {
+        if (!OrthoviewClientEvents.isEnabled() || SoundClientEvents.STATIC_SOUNDS.contains(pSound.get()))
             return;
 
         ci.cancel();
-        if (pSoundEvent.equals(SoundEvents.WARDEN_HEARTBEAT))
+        if (pSound.get().equals(SoundEvents.WARDEN_HEARTBEAT))
             return;
 
         float volumeMult = 0.5f;
-        if (isWardenSound(pSoundEvent))
+        if (isWardenSound(pSound.get()))
             volumeMult = 0.2f;
-        else if (isGhastHurt(pSoundEvent))
+        else if (isGhastHurt(pSound.get()))
             volumeMult = 0.1f;
 
-        this.playSoundActual(pX, pY, pZ, pSoundEvent, pSoundSource, pVolume * volumeMult, pPitch, false, pSeed);
+        this.playSoundActual(pX, pY, pZ, pSound.get(), pSource, pVolume * volumeMult, pPitch, false, pSeed);
     }
 
     // plays sounds for orthoview players as though they were on the ground near their selected units/buildings
@@ -87,7 +88,7 @@ public class ClientLevelMixin {
         if (pSoundEvent.equals(SoundEvents.WARDEN_HEARTBEAT))
             return;
 
-        BlockPos bp = new BlockPos(pX, pY, pZ);
+        BlockPos bp = new BlockPos((int) pX, (int) pY, (int) pZ);
         if (SoundClientEvents.mutedBps.contains(bp)) {
             SoundClientEvents.mutedBps.remove(bp);
             return;
@@ -105,7 +106,7 @@ public class ClientLevelMixin {
     // not a mixin, but called by them
     private void playSoundActual(double pX, double pY, double pZ, SoundEvent pSoundEvent, SoundSource pSource,
                            float pVolume, float pPitch, boolean pDistanceDelay, long pSeed) {
-        if (!FogOfWarClientEvents.isInBrightChunk(new BlockPos(pX + 0.5f, pY + 0.5f, pZ + 0.5f)) &&
+        if (!FogOfWarClientEvents.isInBrightChunk(new BlockPos((int) (pX + 0.5f), (int) (pY + 0.5f), (int) (pZ + 0.5f))) &&
                 !pSoundEvent.getLocation().getPath().contains("ui.button.click") &&
                 !pSoundEvent.getLocation().getNamespace().contains("reignofnether"))
             return;

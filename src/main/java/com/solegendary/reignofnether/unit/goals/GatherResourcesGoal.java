@@ -65,11 +65,11 @@ public class GatherResourcesGoal extends MoveToTargetBlockGoal {
 
     // whenever we attempt to assign a block as a target it must pass this test
     private final Predicate<BlockPos> BLOCK_CONDITION = bp -> {
-        BlockState bs = mob.level.getBlockState(bp);
-        BlockState bsAbove = mob.level.getBlockState(bp.above());
-        ResourceSource resBlock = ResourceSources.getFromBlockPos(bp, mob.level);
+        BlockState bs = mob.level().getBlockState(bp);
+        BlockState bsAbove = mob.level().getBlockState(bp.above());
+        ResourceSource resBlock = ResourceSources.getFromBlockPos(bp, mob.level());
 
-        if (!mob.level.getWorldBorder().isWithinBounds(bp))
+        if (!mob.level().getWorldBorder().isWithinBounds(bp))
             return false;
 
         // is a valid resource block and meets the target ResourceSource's blockstate condition
@@ -83,17 +83,17 @@ public class GatherResourcesGoal extends MoveToTargetBlockGoal {
             return false;
 
         if (bs.getBlock() == Blocks.FARMLAND || bs.getBlock() == Blocks.SOUL_SAND) {
-            if (!bsAbove.isAir() || !canAffordReplant() || !BuildingUtils.isPosInsideAnyBuilding(mob.level.isClientSide(), bp))
+            if (!bsAbove.isAir() || !canAffordReplant() || !BuildingUtils.isPosInsideAnyBuilding(mob.level().isClientSide(), bp))
                 return false;
         }
         // is not part of a building (unless farming)
-        else if (data.targetFarm == null && BuildingUtils.isPosInsideAnyBuilding(mob.level.isClientSide(), bp))
+        else if (data.targetFarm == null && BuildingUtils.isPosInsideAnyBuilding(mob.level().isClientSide(), bp))
             return false;
 
         // not covered by solid blocks
         boolean hasClearNeighbour = false;
         for (BlockPos adjBp : List.of(bp.above(), bp.north(), bp.south(), bp.east(), bp.west())) {
-            if (ResourceSources.CLEAR_MATERIALS.contains(mob.level.getBlockState(adjBp).getMaterial())) {
+            if (ResourceSources.isClearMaterial(mob.level().getBlockState(adjBp))) {
                 hasClearNeighbour = true;
                 break;
             }
@@ -103,7 +103,7 @@ public class GatherResourcesGoal extends MoveToTargetBlockGoal {
 
         // not targeted by another nearby worker
         AABB aabb = AABB.ofSize(this.mob.position(), REACH_RANGE * 2,REACH_RANGE * 2,REACH_RANGE * 2);
-        for (LivingEntity entity : this.mob.level.getNearbyEntities(LivingEntity.class, TargetingConditions.forNonCombat(), this.mob, aabb)) {
+        for (LivingEntity entity : this.mob.level().getNearbyEntities(LivingEntity.class, TargetingConditions.forNonCombat(), this.mob, aabb)) {
             if (entity instanceof Unit unit) {
                 if (unit instanceof WorkerUnit workerUnit && workerUnit.getGatherResourceGoal() != null && entity.getId() != this.mob.getId()) {
                     BlockPos otherUnitTarget = workerUnit.getGatherResourceGoal().getGatherTarget();
@@ -126,7 +126,7 @@ public class GatherResourcesGoal extends MoveToTargetBlockGoal {
         this.data.targetResourceName = gatherName;
         this.data.gatherTarget = gatherPos;
         this.gatherTicksLeft = gatherTicks;
-        this.data.targetResourceSource = ResourceSources.getFromBlockPos(data.gatherTarget, mob.level);
+        this.data.targetResourceSource = ResourceSources.getFromBlockPos(data.gatherTarget, mob.level());
     }
 
     public void tickClient() {
@@ -136,13 +136,13 @@ public class GatherResourcesGoal extends MoveToTargetBlockGoal {
             if (gatherTicksLeft <= 0)
                 gatherTicksLeft = data.targetResourceSource.ticksToGather;
             int gatherProgress = Math.round((data.targetResourceSource.ticksToGather - gatherTicksLeft) / (float) data.targetResourceSource.ticksToGather * 10);
-            this.mob.level.destroyBlockProgress(this.mob.getId(), data.gatherTarget, gatherProgress);
+            this.mob.level().destroyBlockProgress(this.mob.getId(), data.gatherTarget, gatherProgress);
         }
     }
 
     // move towards the targeted block and start gathering it
     public void tick() {
-        if (this.mob.level.isClientSide()) {
+        if (this.mob.level().isClientSide()) {
             tickClient();
             return;
         }
@@ -194,9 +194,9 @@ public class GatherResourcesGoal extends MoveToTargetBlockGoal {
 
                         bpOpt = BlockPos.findClosestMatch(
                             new BlockPos(
-                                mob.getEyePosition().x,
-                                mob.getEyePosition().y,
-                                mob.getEyePosition().z
+                                    (int) mob.getEyePosition().x,
+                                    (int) mob.getEyePosition().y,
+                                    (int) mob.getEyePosition().z
                             ), range, range,
                             BLOCK_CONDITION);
                     }
@@ -214,7 +214,7 @@ public class GatherResourcesGoal extends MoveToTargetBlockGoal {
                 searchCdTicksLeft = MAX_SEARCH_CD_TICKS;
             }
             if (data.gatherTarget != null)
-                data.targetResourceSource = ResourceSources.getFromBlockPos(data.gatherTarget, mob.level);
+                data.targetResourceSource = ResourceSources.getFromBlockPos(data.gatherTarget, mob.level());
         }
 
         if (data.gatherTarget != null) {
@@ -247,7 +247,7 @@ public class GatherResourcesGoal extends MoveToTargetBlockGoal {
                 mob.getLookControl().setLookAt(data.gatherTarget.getX(), data.gatherTarget.getY(), data.gatherTarget.getZ());
                 mob.getLookControl().lookAtCooldown = 20;
 
-                BlockState bsTarget = mob.level.getBlockState(data.gatherTarget);
+                BlockState bsTarget = mob.level().getBlockState(data.gatherTarget);
 
                 // replant crops on empty farmland
                 if (bsTarget.getBlock() == Blocks.FARMLAND || bsTarget.getBlock() == Blocks.SOUL_SAND) {
@@ -258,7 +258,7 @@ public class GatherResourcesGoal extends MoveToTargetBlockGoal {
 
                         if (canAffordReplant()) {
                             ResourcesServerEvents.addSubtractResources(new Resources(((Unit) mob).getOwnerName(), 0, -ResourceCosts.REPLANT_WOOD_COST, 0));
-                            mob.level.setBlockAndUpdate(data.gatherTarget.above(), ((WorkerUnit) mob).getReplantBlockState());
+                            mob.level().setBlockAndUpdate(data.gatherTarget.above(), ((WorkerUnit) mob).getReplantBlockState());
                             removeGatherTarget();
                         }
                     }
@@ -272,14 +272,14 @@ public class GatherResourcesGoal extends MoveToTargetBlockGoal {
                         ticksToProgress = (TICK_CD / 2);
 
                     if (mob instanceof VillagerUnit vUnit) {
-                        if (ResourceSources.getBlockResourceName(getGatherTarget(), mob.level) == ResourceName.WOOD &&
+                        if (ResourceSources.getBlockResourceName(getGatherTarget(), mob.level()) == ResourceName.WOOD &&
                             vUnit.getUnitProfession() == VillagerUnitProfession.LUMBERJACK) {
                             if (vUnit.isVeteran())
                                 ticksToProgress *= VillagerUnit.LUMBERJACK_SPEED_MULT_VETERAN;
                             else
                                 ticksToProgress *= VillagerUnit.LUMBERJACK_SPEED_MULT;
                         }
-                        else if (ResourceSources.getBlockResourceName(getGatherTarget(), mob.level) == ResourceName.ORE &&
+                        else if (ResourceSources.getBlockResourceName(getGatherTarget(), mob.level()) == ResourceName.ORE &&
                                 vUnit.getUnitProfession() == VillagerUnitProfession.MINER) {
                             if (vUnit.isVeteran())
                                 ticksToProgress *= VillagerUnit.MINER_SPEED_MULT_VETERAN;
@@ -293,22 +293,22 @@ public class GatherResourcesGoal extends MoveToTargetBlockGoal {
                     gatherTicksLeft = Math.min(gatherTicksLeft, data.targetResourceSource.ticksToGather);
                     if (gatherTicksLeft <= 0) {
                         gatherTicksLeft = DEFAULT_MAX_GATHER_TICKS;
-                        ResourceName resourceName = ResourceSources.getBlockResourceName(this.data.gatherTarget, mob.level);
+                        ResourceName resourceName = ResourceSources.getBlockResourceName(this.data.gatherTarget, mob.level());
 
-                        boolean isLogBlock = isLogBlock(this.mob.level.getBlockState(data.gatherTarget));
-                        boolean isFallingLogBlock = isFallingLogBlock(this.mob.level.getBlockState(data.gatherTarget));
+                        boolean isLogBlock = isLogBlock(this.mob.level().getBlockState(data.gatherTarget));
+                        boolean isFallingLogBlock = isFallingLogBlock(this.mob.level().getBlockState(data.gatherTarget));
                         if (isLogBlock)
-                            ResourcesServerEvents.fellAdjacentLogs(data.gatherTarget, new ArrayList<>(), this.mob.level);
+                            ResourcesServerEvents.fellAdjacentLogs(data.gatherTarget, new ArrayList<>(), this.mob.level());
 
                         ResourceName expName = ResourceName.NONE;
-                        if (ResourceSources.getBlockResourceName(getGatherTarget(), mob.level) == ResourceName.FOOD && isFarming())
+                        if (ResourceSources.getBlockResourceName(getGatherTarget(), mob.level()) == ResourceName.FOOD && isFarming())
                             expName = ResourceName.FOOD;
-                        else if (ResourceSources.getBlockResourceName(getGatherTarget(), mob.level) == ResourceName.WOOD && (isLogBlock || isFallingLogBlock))
+                        else if (ResourceSources.getBlockResourceName(getGatherTarget(), mob.level()) == ResourceName.WOOD && (isLogBlock || isFallingLogBlock))
                             expName = ResourceName.WOOD;
-                        else if (ResourceSources.getBlockResourceName(getGatherTarget(), mob.level) == ResourceName.ORE)
+                        else if (ResourceSources.getBlockResourceName(getGatherTarget(), mob.level()) == ResourceName.ORE)
                             expName = ResourceName.ORE;
 
-                        if (mob.level.destroyBlock(data.gatherTarget, false)) {
+                        if (mob.level().destroyBlock(data.gatherTarget, false)) {
 
                             if (mob instanceof VillagerUnit vUnit) {
                                 if (expName == ResourceName.FOOD)
@@ -322,13 +322,13 @@ public class GatherResourcesGoal extends MoveToTargetBlockGoal {
                             // replace workers' mine ores with cobble to prevent creating potholes
                             if (data.targetResourceSource.resourceName == ResourceName.ORE) {
                                 BlockState replaceBs;
-                                if (BuildingUtils.isInNetherRange(mob.level.isClientSide(), data.gatherTarget))
+                                if (BuildingUtils.isInNetherRange(mob.level().isClientSide(), data.gatherTarget))
                                     replaceBs = BlockRegistrar.WALKABLE_MAGMA_BLOCK.get().defaultBlockState();
                                 else if (bsTarget.getBlock().getName().getString().toLowerCase().contains("deepslate"))
                                     replaceBs = Blocks.COBBLED_DEEPSLATE.defaultBlockState();
                                 else
                                     replaceBs = Blocks.COBBLESTONE.defaultBlockState();
-                                this.mob.level.setBlockAndUpdate(data.gatherTarget, replaceBs);
+                                this.mob.level().setBlockAndUpdate(data.gatherTarget, replaceBs);
                             }
 
                             // prioritise gathering adjacent targets first
@@ -411,11 +411,11 @@ public class GatherResourcesGoal extends MoveToTargetBlockGoal {
 
     // only count as gathering if in range of the target
     public boolean isGathering() {
-        if (!Unit.atMaxResources((Unit) mob) && data.gatherTarget != null && this.mob.level.isClientSide())
+        if (!Unit.atMaxResources((Unit) mob) && data.gatherTarget != null && this.mob.level().isClientSide())
             return isBlockInRange(data.gatherTarget);
 
         if (!Unit.atMaxResources((Unit) mob) && this.data.gatherTarget != null && this.data.targetResourceSource != null &&
-            ResourceSources.getBlockResourceName(this.data.gatherTarget, mob.level) != ResourceName.NONE)
+            ResourceSources.getBlockResourceName(this.data.gatherTarget, mob.level()) != ResourceName.NONE)
             return isBlockInRange(data.gatherTarget);
         return false;
     }
@@ -440,7 +440,7 @@ public class GatherResourcesGoal extends MoveToTargetBlockGoal {
         super.setMoveTarget(bp);
         if (BLOCK_CONDITION.test(bp)) {
             this.data.gatherTarget = bp;
-            this.data.targetResourceSource = ResourceSources.getFromBlockPos(data.gatherTarget, this.mob.level);
+            this.data.targetResourceSource = ResourceSources.getFromBlockPos(data.gatherTarget, this.mob.level());
         }
     }
 
@@ -470,7 +470,7 @@ public class GatherResourcesGoal extends MoveToTargetBlockGoal {
         ticksIdle = IDLE_TIMEOUT;
         failedSearches = 0;
         this.savePermState();
-        this.mob.level.destroyBlockProgress(this.mob.getId(), new BlockPos(0,0,0), 0);
+        this.mob.level().destroyBlockProgress(this.mob.getId(), new BlockPos(0,0,0), 0);
         data.todoGatherTargets.clear();
         data.targetFarm = null;
         removeGatherTarget();

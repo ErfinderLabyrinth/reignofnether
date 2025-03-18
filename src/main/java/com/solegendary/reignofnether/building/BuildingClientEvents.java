@@ -48,7 +48,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
@@ -373,10 +372,8 @@ public class BuildingClientEvents {
         }
 
         for (BuildingBlock block : blocksToDraw) {
-            Material bm = block.getBlockState().getMaterial();
             BlockPos bp = block.getBlockPos().offset(originPos).offset(0, 1, 0);
-            Material bmWorld = MC.level.getBlockState(bp).getMaterial();
-            if ((bmWorld.isSolid() || bmWorld.isLiquid()) && (bm.isSolid() || bm.isLiquid())) {
+            if ((MC.level.getBlockState(bp).isSolid() || !MC.level.getBlockState(bp).getFluidState().isEmpty()) && (block.getBlockState().isSolid() || !block.getBlockState().getFluidState().isEmpty())) {
                 return true;
             }
         }
@@ -397,9 +394,9 @@ public class BuildingClientEvents {
                 BlockState bs = block.getBlockState(); // building block
                 BlockState bsBelow = MC.level.getBlockState(bp.below()); // world block
 
-                if (bs.getMaterial().isSolid() && !(bsBelow.getBlock() instanceof IceBlock)) {
+                if (bs.isSolid() && !(bsBelow.getBlock() instanceof IceBlock)) {
                     blocksBelow += 1;
-                    if (bsBelow.getMaterial().isSolid() && !(bsBelow.getBlock() instanceof LeavesBlock)) {
+                    if (bsBelow.isSolid() && !(bsBelow.getBlock() instanceof LeavesBlock)) {
                         solidBlocksBelow += 1;
                     }
                 }
@@ -460,7 +457,7 @@ public class BuildingClientEvents {
                 BlockState bs = block.getBlockState(); // building block
                 BlockState bsBelow = MC.level.getBlockState(bp.below()); // world block
 
-                if (bs.getMaterial().isSolid()) {
+                if (bs.isSolid()) {
                     blocksBelow += 1;
                     if (NetherBlocks.isNetherBlock(MC.level, bp.below())) {
                         netherBlocksBelow += 1;
@@ -500,18 +497,17 @@ public class BuildingClientEvents {
                 BlockPos bp = block.getBlockPos().offset(originPos).offset(0, 1, 0);
                 BlockState bs = block.getBlockState(); // building block
                 BlockState bsWorld = MC.level.getBlockState(bp); // world block
-                Material bmWorld = bsWorld.getMaterial(); // world block
 
                 // top y level should not be touching any water at all
                 if (block.getBlockPos().getY() == 1) {
-                    if ((bs.getBlock() instanceof FenceBlock) && bmWorld.isLiquid()) {
+                    if ((bs.getBlock() instanceof FenceBlock) && !bsWorld.getFluidState().isEmpty()) {
                         return false;
                     }
                 }
 
                 if (block.getBlockPos().getY() == 0) {
                     bridgeBlocks += 1;
-                    if (bmWorld.isLiquid() || bsWorld.getBlock() instanceof SeagrassBlock
+                    if (!bsWorld.getFluidState().isEmpty() || bsWorld.getBlock() instanceof SeagrassBlock
                         || bsWorld.getBlock() instanceof KelpBlock) {
                         waterBlocksClipping += 1;
                     }

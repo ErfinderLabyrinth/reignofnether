@@ -55,7 +55,7 @@ public class ThrowPotionGoal extends MoveToTargetBlockGoal {
                 this.mob.getLookControl().setLookAt(moveTarget.getX(), moveTarget.getY(), moveTarget.getZ());
                 if (moveTarget != null)
                     witch.throwPotion(new Vec3(moveTarget.getX(), moveTarget.getY(), moveTarget.getZ()), this.potion);
-                if (this.ability != null && !this.mob.level.isClientSide()) {
+                if (this.ability != null && !this.mob.level().isClientSide()) {
                     AbilityClientboundPacket.sendSetCooldownPacket(this.mob.getId(), this.ability.action, this.ability.cooldownMax);
                 }
                 this.stop();

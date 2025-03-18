@@ -38,7 +38,7 @@ public class RangedAttackBuildingGoal<T extends net.minecraft.world.entity.Mob> 
     public void setNextBlockTarget() {
         if (this.buildingTarget != null && !buildingTarget.getBlocks().isEmpty()) {
             Random rand = new Random();
-            List<BuildingBlock> nonAirBlocks = buildingTarget.getBlocks().stream().filter(b -> b.isPlaced(this.mob.level)).toList();
+            List<BuildingBlock> nonAirBlocks = buildingTarget.getBlocks().stream().filter(b -> b.isPlaced(this.mob.level())).toList();
 
             int bound = nonAirBlocks.size();
             if (bound > 0) {
@@ -53,8 +53,8 @@ public class RangedAttackBuildingGoal<T extends net.minecraft.world.entity.Mob> 
 
     public void setBuildingTarget(BlockPos blockPos) {
         if (blockPos != null) {
-            if (this.mob.level.isClientSide()) {
-                Building b = BuildingUtils.findBuilding(this.mob.level.isClientSide(), blockPos);
+            if (this.mob.level().isClientSide()) {
+                Building b = BuildingUtils.findBuilding(this.mob.level().isClientSide(), blockPos);
                 if (b != null && !b.invulnerable) {
                     this.buildingTarget = b;
                         MiscUtil.addUnitCheckpoint(((Unit) mob), new BlockPos(
@@ -66,7 +66,7 @@ public class RangedAttackBuildingGoal<T extends net.minecraft.world.entity.Mob> 
                 }
             }
             else {
-                Building b = BuildingUtils.findBuilding(this.mob.level.isClientSide(), blockPos);
+                Building b = BuildingUtils.findBuilding(this.mob.level().isClientSide(), blockPos);
                 if (b != null && !b.invulnerable) {
                     this.buildingTarget = b;
                     setNextBlockTarget();
@@ -117,7 +117,7 @@ public class RangedAttackBuildingGoal<T extends net.minecraft.world.entity.Mob> 
 
             this.mob.getLookControl().setLookAt(tx, ty, tz);
 
-            if (this.mob.level.isClientSide())
+            if (this.mob.level().isClientSide())
                 return;
 
             float attackRange = ((AttackerUnit) this.mob).getAttackRange();
@@ -137,7 +137,7 @@ public class RangedAttackBuildingGoal<T extends net.minecraft.world.entity.Mob> 
                     if (bowAttackGoal.getAttackCooldown() <= 0) {
                         if (mob instanceof RangedAttackerUnit rangedAttackerUnit) {
                             rangedAttackerUnit.performUnitRangedAttack(tx, ty, tz, 20);
-                            if (!mob.level.isClientSide() && buildingTarget != null)
+                            if (!mob.level().isClientSide() && buildingTarget != null)
                                 FogOfWarClientboundPacket.revealRangedUnit(buildingTarget.ownerName, mob.getId());
                         }
                         bowAttackGoal.setToMaxAttackCooldown();

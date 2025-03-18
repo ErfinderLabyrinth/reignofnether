@@ -100,7 +100,7 @@ public class MeleeAttackBuildingGoal extends MoveToTargetBlockGoal {
                         damageInt += 1;
                     buildingTarget.destroyRandomBlocks(damageInt);
 
-                    if (mob instanceof Slime slime && slime.isOnGround())
+                    if (mob instanceof Slime slime && slime.onGround())
                         slime.jumpFromGround();
                 }
             }
@@ -123,8 +123,8 @@ public class MeleeAttackBuildingGoal extends MoveToTargetBlockGoal {
 
     public void setBuildingTarget(BlockPos blockPos) {
         if (blockPos != null) {
-            if (this.mob.level.isClientSide()) {
-                Building b = BuildingUtils.findBuilding(this.mob.level.isClientSide(), blockPos);
+            if (this.mob.level().isClientSide()) {
+                Building b = BuildingUtils.findBuilding(this.mob.level().isClientSide(), blockPos);
                 if (b != null && !b.invulnerable) {
                     this.buildingTarget = b;
                     MiscUtil.addUnitCheckpoint(((Unit) mob), new BlockPos(
@@ -136,7 +136,7 @@ public class MeleeAttackBuildingGoal extends MoveToTargetBlockGoal {
                 }
             }
             else {
-                Building b = BuildingUtils.findBuilding(this.mob.level.isClientSide(), blockPos);
+                Building b = BuildingUtils.findBuilding(this.mob.level().isClientSide(), blockPos);
                 if (b != null && !b.invulnerable) {
                     this.buildingTarget = b;
                     if (this.mob.isVehicle() && this.mob.getFirstPassenger() instanceof AttackerUnit aUnit &&

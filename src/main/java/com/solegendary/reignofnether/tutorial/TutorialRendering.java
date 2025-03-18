@@ -5,7 +5,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.util.MiscUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.resources.ResourceLocation;
 
@@ -47,7 +48,7 @@ public class TutorialRendering {
         buttonNameToHighlight = "";
     }
 
-    public static void highlightNextButton(PoseStack poseStack, ArrayList<Button> buttons) {
+    public static void highlightNextButton(GuiGraphics guiGraphics, ArrayList<Button> buttons) {
         if (!TutorialClientEvents.isEnabled() || buttonNameToHighlight.isEmpty()) {
             return;
         }
@@ -70,7 +71,7 @@ public class TutorialRendering {
         }
 
         if ((System.currentTimeMillis() / 500) % 2 == 0) {
-            GuiComponent.fill(poseStack,
+            guiGraphics.fill(
                 // x1,y1, x2,y2,
                 activeButton.x,
                 activeButton.y,
@@ -79,10 +80,10 @@ public class TutorialRendering {
                 0x32FFFFFF
             ); //ARGB(hex); note that alpha ranges between ~0-16, not 0-255
         }
-        pointAtWithArrow(poseStack, activeButton.x, activeButton.y, true);
+        pointAtWithArrow(guiGraphics, activeButton.x, activeButton.y, true);
     }
 
-    public static void pointAtWithArrow(PoseStack poseStack, int x, int y, boolean vertical) {
+    public static void pointAtWithArrow(GuiGraphics guiGraphics, int x, int y, boolean vertical) {
         if (MC.screen == null) {
             return;
         }
@@ -90,24 +91,29 @@ public class TutorialRendering {
         int xOffset = 0;
         int yOffset = 0;
 
+        ResourceLocation texture;
         if (vertical && y < MC.screen.height / 2) {
             xOffset = -5;
             RenderSystem.setShaderTexture(0, TEXTURE_ARROW_UP);
             yOffset = (int) MiscUtil.getOscillatingFloat(20, 36);
+            texture = TEXTURE_ARROW_UP;
         } else if (vertical) {
             xOffset = -5;
             RenderSystem.setShaderTexture(0, TEXTURE_ARROW_DOWN);
             yOffset = (int) MiscUtil.getOscillatingFloat(-46, -30, 500);
+            texture = TEXTURE_ARROW_DOWN;
         } else if (x < MC.screen.width / 2) {
             yOffset = -5;
             RenderSystem.setShaderTexture(0, TEXTURE_ARROW_LEFT);
             xOffset = (int) MiscUtil.getOscillatingFloat(20, 36);
+            texture = TEXTURE_ARROW_LEFT;
         } else {
             yOffset = -5;
             RenderSystem.setShaderTexture(0, TEXTURE_ARROW_RIGHT);
             xOffset = (int) MiscUtil.getOscillatingFloat(-46, -30, 500);
+            texture = TEXTURE_ARROW_RIGHT;
         }
 
-        GuiComponent.blit(poseStack, x + xOffset + xOffset2, y + yOffset + yOffset2, 32, 32, 32, 32, 32, 32, 32);
+        guiGraphics.blit(texture, x + xOffset + xOffset2, y + yOffset + yOffset2, 32, 32, 32, 32, 32, 32, 32);
     }
 }

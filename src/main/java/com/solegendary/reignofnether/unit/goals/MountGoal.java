@@ -1,6 +1,6 @@
 package com.solegendary.reignofnether.unit.goals;
 
-import com.mojang.math.Vector3d;
+import org.joml.Vector3d;
 import com.solegendary.reignofnether.hud.HudClientEvents;
 import com.solegendary.reignofnether.unit.UnitServerEvents;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
@@ -50,14 +50,14 @@ public class MountGoal extends MoveToTargetBlockGoal {
     }
 
     public void setNearestTarget() {
-        if (this.mob.level.isClientSide())
+        if (this.mob.level().isClientSide())
             return;
 
         for (LivingEntity entity : UnitServerEvents.getAllUnits()) {
             if (this.mob instanceof Unit) {
                 List<Mob> nearbyUnits = MiscUtil.getEntitiesWithinRange(
                         new Vector3d(this.mob.position().x, this.mob.position().y, this.mob.position().z),
-                        SEARCH_RANGE, Mob.class, this.mob.level)
+                        SEARCH_RANGE, Mob.class, this.mob.level())
                         .stream().filter(this::isMountableUnit).toList();
 
                 // find the closest mob
@@ -96,7 +96,7 @@ public class MountGoal extends MoveToTargetBlockGoal {
                 Unit.resetBehaviours(unit1);
                 this.mob.startRiding(targetEntity);
 
-                if (this.mob.level.isClientSide())
+                if (this.mob.level().isClientSide())
                     HudClientEvents.removeFromControlGroups(this.mob.getId());
 
                 this.stop();

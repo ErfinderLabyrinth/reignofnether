@@ -1,5 +1,6 @@
 package com.solegendary.reignofnether.hud;
 
+import com.solegendary.reignofnether.mixin.SplashRendererAccessor;
 import com.solegendary.reignofnether.util.Faction;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.TitleScreen;
@@ -61,7 +62,7 @@ public class TitleClientEvents {
     }
 
     private static String getRandomSplash() {
-        return MC.getSplashManager().getSplash();
+        return ((SplashRendererAccessor)MC.getSplashManager().getSplash()).getSplash();
     }
 
     @SubscribeEvent

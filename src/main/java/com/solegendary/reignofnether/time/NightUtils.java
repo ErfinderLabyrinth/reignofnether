@@ -33,21 +33,21 @@ public class NightUtils {
         return false;
     }
     public static boolean isSunBurnTick(Mob mob) {
-        if (mob.level.isClientSide)
+        if (mob.level().isClientSide)
             return false;
 
         if (mob instanceof Unit unit && ResearchServerEvents.playerHasCheat(unit.getOwnerName(), "slipslopslap"))
             return false;
 
-        if (mob.tickCount % 10 == 0 && TimeUtils.isDay(mob.level.getDayTime())) {
-            BlockPos blockpos = new BlockPos(mob.getX(), mob.getEyeY(), mob.getZ());
+        if (mob.tickCount % 10 == 0 && TimeUtils.isDay(mob.level().getDayTime())) {
+            BlockPos blockpos = new BlockPos((int) mob.getX(), (int) mob.getEyeY(), (int) mob.getZ());
             boolean isProtected = mob.isInWaterRainOrBubble() || mob.isInPowderSnow || mob.wasInPowderSnow || mob.isOnFire();
             // Return early if mob is protected or sky is not visible
-            if (isProtected || !mob.level.canSeeSky(blockpos)) return false;
+            if (isProtected || !mob.level().canSeeSky(blockpos)) return false;
 
             // Check if mob is within range of any NightSource
             Vec3 mobEyePos = mob.getEyePosition();
-            return !NightUtils.isInRangeOfNightSource(mobEyePos, mob.level.isClientSide);
+            return !NightUtils.isInRangeOfNightSource(mobEyePos, mob.level().isClientSide);
         }
         return false;
     }

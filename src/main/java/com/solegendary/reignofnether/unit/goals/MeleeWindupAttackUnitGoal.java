@@ -33,7 +33,7 @@ public class MeleeWindupAttackUnitGoal extends AbstractMeleeAttackUnitGoal {
         if (distSqr <= d && this.ticksUntilNextAttack <= 0) {
             System.out.println("ticking: " + windupTicksLeft);
             if (windupTicksLeft == windupTicksMax &&
-                mob instanceof KeyframeAnimated && !mob.level.isClientSide()) {
+                mob instanceof KeyframeAnimated && !mob.level().isClientSide()) {
                 System.out.println("started animation!");
                 UnitAnimationClientboundPacket.sendBasicPacket(UnitAnimationAction.ATTACK_UNIT, mob);
             }

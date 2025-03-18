@@ -165,12 +165,12 @@ public class HoglinUnit extends Hoglin implements Unit, AttackerUnit {
                 Block block;
                 do {
                     if (!var8.hasNext()) {
-                        if (!flag && this.onGround)
+                        if (!flag && this.onGround())
                             this.jumpFromGround();
                         break label62;
                     }
                     blockpos = (BlockPos)var8.next();
-                    BlockState blockstate = this.level.getBlockState(blockpos);
+                    BlockState blockstate = this.level().getBlockState(blockpos);
                     block = blockstate.getBlock();
                 } while(!(block instanceof LeavesBlock));
             }
@@ -245,7 +245,7 @@ public class HoglinUnit extends Hoglin implements Unit, AttackerUnit {
 
     @Override
     public boolean fireImmune() {
-        Building building = BuildingUtils.findBuilding(level.isClientSide(), getOnPos());
+        Building building = BuildingUtils.findBuilding(level().isClientSide(), getOnPos());
         return super.fireImmune() || building instanceof FlameSanctuary || building instanceof BasaltSprings;
     }
 }

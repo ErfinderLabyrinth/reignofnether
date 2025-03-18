@@ -10,6 +10,7 @@ import java.util.Map;
 
 import com.solegendary.reignofnether.registrars.EntityRegistrar;
 import com.solegendary.reignofnether.unit.modelling.models.PiglinUnitModel;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.model.geom.ModelLayerLocation;
@@ -33,7 +34,7 @@ public class PiglinUnitRenderer extends HumanoidMobRenderer<Mob, PiglinUnitModel
         super(pContext, createModel(pContext.getModelSet(), ModelLayers.PIGLIN, false), 0.5F, 1.0019531F, 1.0F, 1.0019531F);
         this.addLayer(new HumanoidArmorLayer(this,
                     new HumanoidModel(pContext.bakeLayer(ModelLayers.PIGLIN_INNER_ARMOR)),
-                    new HumanoidModel(pContext.bakeLayer(ModelLayers.PIGLIN_OUTER_ARMOR))));
+                    new HumanoidModel(pContext.bakeLayer(ModelLayers.PIGLIN_OUTER_ARMOR)), Minecraft.getInstance().getModelManager()));
     }
 
     private static PiglinUnitModel<Mob> createModel(EntityModelSet p_174350_, ModelLayerLocation pLayer, boolean p_174352_) {

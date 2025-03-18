@@ -2,8 +2,9 @@
 package com.solegendary.reignofnether.healthbars;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.math.Matrix4f;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
@@ -63,7 +64,7 @@ public class HealthBarClientEvents {
     }
     @SubscribeEvent
     public static void playerTick(PlayerTickEvent evt) {
-        if (!evt.player.level.isClientSide)
+        if (!evt.player.level().isClientSide)
             return;
         BarStates.tick();
     }
@@ -127,8 +128,8 @@ public class HealthBarClientEvents {
 
             matrix.pushPose();
             matrix.translate(x - camX, (y + height) - camY, z - camZ);
-            matrix.mulPose(Vector3f.YP.rotationDegrees(-camera.getYRot()));
-            matrix.mulPose(Vector3f.XP.rotationDegrees(camera.getXRot()));
+            matrix.mulPose(Axis.YP.rotationDegrees(-camera.getYRot()));
+            matrix.mulPose(Axis.XP.rotationDegrees(camera.getXRot()));
             matrix.scale(-scaleToGui, -scaleToGui, scaleToGui);
 
             // calculate bar width based in entity max health (1hp : 2px)

@@ -95,7 +95,7 @@ public interface Unit {
 
     public static void tick(Unit unit) {
         Mob unitMob = (Mob) unit;
-        if (!unitMob.level.isClientSide() && unitMob.level instanceof ServerLevel serverLevel) {
+        if (!unitMob.level().isClientSide() && unitMob.level() instanceof ServerLevel serverLevel) {
             ServerChunkCache chunkProvider = serverLevel.getChunkSource();
 
             BlockPos unitPos = unitMob.blockPosition();
@@ -113,7 +113,7 @@ public interface Unit {
             ability.tickCooldown();
 
         // ------------- CHECKPOINT LOGIC ------------- //
-        if (unitMob.level.isClientSide()) {
+        if (unitMob.level().isClientSide()) {
 
             unit.getCheckpoints().removeIf(c -> c.isForEntity() && !c.entity.isAlive() || c.ticksLeft <= 0);
 
@@ -130,7 +130,7 @@ public interface Unit {
         } else {
             int totalRes = Resources.getTotalResourcesFromItems(unit.getItems()).getTotalValue();
             if (unitMob.canPickUpLoot()) {
-                for (ItemEntity itementity : unitMob.level.getEntitiesOfClass(ItemEntity.class, unitMob.getBoundingBox().inflate(1, 0, 1))) {
+                for (ItemEntity itementity : unitMob.level().getEntitiesOfClass(ItemEntity.class, unitMob.getBoundingBox().inflate(1, 0, 1))) {
                     if (!itementity.isRemoved() && !itementity.getItem().isEmpty() && !itementity.hasPickUpDelay() && unitMob.isAlive()) {
 
                         if (!Unit.atMaxResources(unit)) {
@@ -182,29 +182,29 @@ public interface Unit {
         // slow regen for monster and piglin units
         LivingEntity le = (LivingEntity) unit;
 
-        if (!le.level.isClientSide()) {
+        if (!le.level().isClientSide()) {
             if (unit.getFaction() == Faction.MONSTERS &&
                     le.tickCount % MONSTER_HEALING_TICKS == 0 &&
-                    (!le.level.isDay())) {
+                    (!le.level().isDay())) {
                 le.heal(1);
             } else if (unit.getFaction() == Faction.MONSTERS &&
                     (le.tickCount + MONSTER_HEALING_TICKS / 2) % MONSTER_HEALING_TICKS == 0 &&
-                    (NightUtils.isInRangeOfNightSource(le.position(), le.level.isClientSide()))) {
+                    (NightUtils.isInRangeOfNightSource(le.position(), le.level().isClientSide()))) {
                 le.heal(1);
             } else if (unit.getFaction() == Faction.PIGLINS &&
                     le.tickCount % PIGLIN_HEALING_TICKS == 0 &&
                     !(unit instanceof Slime) &&
-                    (NetherBlocks.isNetherBlock(le.level, le.getOnPos()) || unit instanceof GhastUnit)) {
+                    (NetherBlocks.isNetherBlock(le.level(), le.getOnPos()) || unit instanceof GhastUnit)) {
                 le.heal(1);
             }
         }
 
         if (le.isInWater() && // stuck in bridge
-                BuildingUtils.findBuilding(le.level.isClientSide(), le.getOnPos().above()) instanceof AbstractBridge) {
+                BuildingUtils.findBuilding(le.level().isClientSide(), le.getOnPos().above()) instanceof AbstractBridge) {
             le.setDeltaMovement(0, 0.2, 0);
         }
 
-        if (!le.getLevel().getWorldBorder().isWithinBounds(le.getOnPos()))
+        if (!le.level().getWorldBorder().isWithinBounds(le.getOnPos()))
             le.kill();
 
         if (unitMob.tickCount % 20 == 0)
@@ -217,7 +217,7 @@ public interface Unit {
 
     private static void checkAndRetreatToAnchor(Unit unit) {
         LivingEntity le = (LivingEntity) unit;
-        if (!hasAnchor(unit) || le.getLevel().isClientSide())
+        if (!hasAnchor(unit) || le.level().isClientSide())
             return;
 
         if ((unit.isIdle() || le.distanceToSqr(Vec3.atCenterOf(unit.getAnchor())) > ANCHOR_RETREAT_RANGE * ANCHOR_RETREAT_RANGE) &&
@@ -230,7 +230,7 @@ public interface Unit {
 
     private static int getThresholdResources(Unit unit) {
         boolean hasCarryBags;
-        if (((LivingEntity) unit).getLevel().isClientSide())
+        if (((LivingEntity) unit).level().isClientSide())
             hasCarryBags = ResearchClient.hasResearch(ResearchResourceCapacity.itemName);
         else
             hasCarryBags = ResearchServerEvents.playerHasResearch(unit.getOwnerName(), ResearchResourceCapacity.itemName);
@@ -251,7 +251,7 @@ public interface Unit {
     }
 
     public static void fullResetBehaviours(Unit unit) {
-        if (((Entity) unit).getLevel().isClientSide() && !Keybindings.shiftMod.isDown())
+        if (((Entity) unit).level().isClientSide() && !Keybindings.shiftMod.isDown())
             unit.getCheckpoints().clear();
         unit.resetBehaviours();
         Unit.resetBehaviours(unit);

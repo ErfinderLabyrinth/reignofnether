@@ -150,7 +150,7 @@ public class VindicatorUnit extends Vindicator implements Unit, AttackerUnit {
     @Override
     public void setUnitAttackTarget(@Nullable LivingEntity target) {
         AttackerUnit.super.setUnitAttackTarget(target);
-        if (!this.level.isClientSide()) {
+        if (!this.level().isClientSide()) {
             if (target != null)
                 UnitAnimationClientboundPacket.sendEntityPacket(UnitAnimationAction.NON_KEYFRAME_START, this, target);
             else
@@ -160,12 +160,12 @@ public class VindicatorUnit extends Vindicator implements Unit, AttackerUnit {
     @Override
     public void setAttackBuildingTarget(BlockPos preselectedBlockPos) {
         AttackerUnit.super.setAttackBuildingTarget(preselectedBlockPos);
-        if (!this.level.isClientSide())
+        if (!this.level().isClientSide())
              UnitAnimationClientboundPacket.sendBlockPosPacket(UnitAnimationAction.NON_KEYFRAME_START, this, preselectedBlockPos);
     }
     @Override
     public void resetBehaviours() {
-        if (!this.level.isClientSide())
+        if (!this.level().isClientSide())
             UnitAnimationClientboundPacket.sendBasicPacket(UnitAnimationAction.NON_KEYFRAME_STOP, this);
     }
 

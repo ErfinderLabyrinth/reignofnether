@@ -99,7 +99,7 @@ public class NetherZone {
         for (double x = -restoreRange; x < restoreRange; x++)
             for (double y = -restoreRange/2; y < restoreRange/2; y++)
                 for (double z = -restoreRange; z < restoreRange; z++)
-                    bps.add(origin.offset(x, y, z));
+                    bps.add(origin.offset((int) x, (int) y, (int) z));
 
         outerloop:
         for (BlockPos bp : bps) {
@@ -133,7 +133,7 @@ public class NetherZone {
         for (double x = -range; x < range; x++)
             for (double y = -range/2; y < range/2; y++)
                 for (double z = -range; z < range; z++)
-                    bps.add(origin.offset(x, y, z));
+                    bps.add(origin.offset((int) x, (int) y, (int) z));
 
         for (BlockPos bp : bps) {
             double distSqr = bp.distSqr(origin);

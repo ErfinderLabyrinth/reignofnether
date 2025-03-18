@@ -81,7 +81,7 @@ public class GameruleServerEvents {
 
     @SubscribeEvent
     public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent evt) {
-        MinecraftServer server = evt.getEntity().getLevel().getServer();
+        MinecraftServer server = evt.getEntity().level().getServer();
         if (server != null) {
             boolean logFalling = server.getGameRules().getRule(GameRuleRegistrar.LOG_FALLING).get();
             GameruleClientboundPacket.setLogFalling(logFalling);

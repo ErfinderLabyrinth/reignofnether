@@ -93,7 +93,7 @@ public class Dungeon extends ProductionBuilding {
             if (bs.hasBlockEntity()) {
                 BlockEntity be = this.getLevel().getBlockEntity(bp);
                 if (be instanceof SpawnerBlockEntity sbe)
-                    sbe.getSpawner().setEntityId(EntityType.CREEPER);
+                    sbe.getSpawner().setEntityId(EntityType.CREEPER, getLevel(), level.random, bp);
             }
         }
     }

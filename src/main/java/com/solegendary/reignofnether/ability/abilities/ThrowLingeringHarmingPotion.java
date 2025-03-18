@@ -29,7 +29,7 @@ public class ThrowLingeringHarmingPotion extends Ability {
 
     public ThrowLingeringHarmingPotion(WitchUnit witchUnit) {
         super(UnitAction.THROW_LINGERING_HARMING_POTION,
-            witchUnit.level,
+            witchUnit.level(),
             CD_MAX_SECONDS * ResourceCost.TICKS_PER_SECOND,
             witchUnit.getPotionThrowRange(),
             0,

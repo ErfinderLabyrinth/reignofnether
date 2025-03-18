@@ -2,6 +2,7 @@ package com.solegendary.reignofnether.mixin;
 
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageSources;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.phys.AABB;
@@ -45,12 +46,14 @@ public abstract class EntityMixin {
             cancellable=true
     )
     private void isInvulnerableTo(DamageSource pSource, CallbackInfoReturnable<Boolean> cir) {
-        if (pSource == DamageSource.IN_WALL)
+        if (pSource == damageSources().inWall())
             cir.setReturnValue(true);
     }
 
     @Shadow public int getTicksRequiredToFreeze() { return 140; }
     @Shadow public int getTicksFrozen() { return 0; }
+
+    @Shadow public abstract DamageSources damageSources();
 
     @Inject(
             method = "getPercentFrozen",

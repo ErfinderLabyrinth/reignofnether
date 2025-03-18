@@ -191,7 +191,7 @@ public class UnitActionItem {
                 }
                 case MOVE -> {
                     ResourceName resName = ResourceSources.getBlockResourceName(preselectedBlockPos, level);
-                    Building buildingAtPos = BuildingUtils.findBuilding(((Entity) unit).level.isClientSide(),
+                    Building buildingAtPos = BuildingUtils.findBuilding(((Entity) unit).level().isClientSide(),
                         preselectedBlockPos
                     );
 

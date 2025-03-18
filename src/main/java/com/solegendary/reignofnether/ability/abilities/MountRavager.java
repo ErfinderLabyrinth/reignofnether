@@ -32,7 +32,7 @@ public class MountRavager extends Ability {
     private final LivingEntity entity;
 
     public MountRavager(LivingEntity entity) {
-        super(UnitAction.MOUNT_RAVAGER, entity.level, 0, 0, 0, true);
+        super(UnitAction.MOUNT_RAVAGER, entity.level(), 0, 0, 0, true);
         this.entity = entity;
     }
 

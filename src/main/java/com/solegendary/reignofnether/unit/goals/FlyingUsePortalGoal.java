@@ -53,7 +53,7 @@ public class FlyingUsePortalGoal extends FlyingMoveToTargetGoal {
 
     public void setBuildingTarget(BlockPos blockPos) {
         if (blockPos != null) {
-            if (this.mob.level.isClientSide()) {
+            if (this.mob.level().isClientSide()) {
                 this.buildingTarget = BuildingUtils.findBuilding(true, blockPos);
                 if (this.buildingTarget instanceof Portal portal
                     && buildingTarget.ownerName.equals(((Unit) mob).getOwnerName())) {

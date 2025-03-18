@@ -8,7 +8,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,8 +30,6 @@ public abstract class AbstractBridge extends Building {
         boolean isFenceOrAir = b.getBlockState().getBlock() instanceof AirBlock ||
                 b.getBlockState().getBlock() instanceof FenceBlock;
         BlockPos bp = b.getBlockPos().offset(originPos);
-        Material bmWorld = level.getBlockState(bp).getMaterial();
-        Material bmWorldBelow = level.getBlockState(bp.below()).getMaterial();
 
         // if the block in the world matches this exactly, don't cull it, instead just consider it to be our block too
         BlockState bsWorld = level.getBlockState(bp);
@@ -41,7 +38,7 @@ public abstract class AbstractBridge extends Building {
             return false;
         if (bsWorld.equals(bs))
             return false;
-        if ((bsWorld.isAir() || bsWorld.getMaterial().isLiquid()) && !isFenceOrAir)
+        if ((bsWorld.isAir() || !bsWorld.getFluidState().isEmpty()) && !isFenceOrAir)
             return false;
 
         // cull if overlaps another bridge block that isn't built yet
@@ -54,7 +51,7 @@ public abstract class AbstractBridge extends Building {
             if (isFenceOrAir && !bsWorldAdj.isAir() && BuildingUtils.isPosInsideAnyBuilding(level.isClientSide, bpAdj))
                 return true;
         }
-        return bmWorld.isSolidBlocking() || (isFenceOrAir && bmWorldBelow.isSolidBlocking());
+        return level.getBlockState(bp).isSolid() || (isFenceOrAir && level.getBlockState(bp.below()).isSolid());
     }
 
     protected static ArrayList<BuildingBlock> getCulledBlocks(ArrayList<BuildingBlock> blocks, Level level) {
@@ -66,7 +63,7 @@ public abstract class AbstractBridge extends Building {
         if (!(bs.getBlock() instanceof FenceBlock)) {
             for (BlockPos bpAdj : List.of(bp.below(), bp.north(), bp.south(), bp.east(), bp.west())) {
                 BlockState bsAdj = level.getBlockState(bpAdj);
-                if (bsAdj.getMaterial().isLiquid())
+                if (!bsAdj.getFluidState().isEmpty())
                     level.setBlockAndUpdate(bp, bsAdj);
             }
         }

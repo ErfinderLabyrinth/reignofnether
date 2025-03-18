@@ -31,7 +31,7 @@ public class WitherCloud extends Ability {
     public WitherCloud(WitherSkeletonUnit witherSkeletonUnit) {
         super(
                 UnitAction.WITHER_CLOUD,
-                witherSkeletonUnit.level,
+                witherSkeletonUnit.level(),
                 CD_MAX_SECONDS * ResourceCost.TICKS_PER_SECOND,
                 0,
                 0,

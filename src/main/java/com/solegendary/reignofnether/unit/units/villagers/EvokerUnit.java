@@ -262,7 +262,7 @@ public class EvokerUnit extends Evoker implements Unit, AttackerUnit, RangedAtta
             this.getCastFangsGoal().setAbility(this.abilities.get(1));
             this.getCastFangsGoal().setTarget(pTarget);
         }
-        if (!level.isClientSide() && pTarget instanceof Unit unit)
+        if (!level().isClientSide() && pTarget instanceof Unit unit)
             FogOfWarClientboundPacket.revealRangedUnit(unit.getOwnerName(), this.getId());
     }
 
@@ -303,17 +303,17 @@ public class EvokerUnit extends Evoker implements Unit, AttackerUnit, RangedAtta
 
     // based on Evoker.EvokerAttackSpellGoal.createSpellEntity
     private void createEvokerFang(double pX, double pZ, double pMinY, double pMaxY, float pYRot, int pWarmupDelay) {
-        BlockPos blockpos = new BlockPos(pX, pMaxY, pZ);
+        BlockPos blockpos = new BlockPos((int) pX, (int) pMaxY, (int) pZ);
         boolean flag = false;
         double d0 = 0.0;
 
         do {
             BlockPos blockpos1 = blockpos.below();
-            BlockState blockstate = this.level.getBlockState(blockpos1);
-            if (blockstate.isFaceSturdy(this.level, blockpos1, Direction.UP)) {
-                if (!this.level.isEmptyBlock(blockpos)) {
-                    BlockState blockstate1 = this.level.getBlockState(blockpos);
-                    VoxelShape voxelshape = blockstate1.getCollisionShape(this.level, blockpos);
+            BlockState blockstate = this.level().getBlockState(blockpos1);
+            if (blockstate.isFaceSturdy(this.level(), blockpos1, Direction.UP)) {
+                if (!this.level().isEmptyBlock(blockpos)) {
+                    BlockState blockstate1 = this.level().getBlockState(blockpos);
+                    VoxelShape voxelshape = blockstate1.getCollisionShape(this.level(), blockpos);
                     if (!voxelshape.isEmpty())
                         d0 = voxelshape.max(Direction.Axis.Y);
                 }
@@ -324,7 +324,7 @@ public class EvokerUnit extends Evoker implements Unit, AttackerUnit, RangedAtta
         } while(blockpos.getY() >= Mth.floor(pMinY) - 1);
 
         if (flag)
-            this.level.addFreshEntity(new EvokerFangs(this.level, pX, (double)blockpos.getY() + d0, pZ, pYRot, pWarmupDelay, this));
+            this.level().addFreshEntity(new EvokerFangs(this.level(), pX, (double)blockpos.getY() + d0, pZ, pYRot, pWarmupDelay, this));
     }
 
     public int getVexTargetRange() {
@@ -334,19 +334,19 @@ public class EvokerUnit extends Evoker implements Unit, AttackerUnit, RangedAtta
     }
 
     public void summonVexes() {
-        if (this.level.isClientSide())
+        if (this.level().isClientSide())
             return;
 
         for(int i = 0; i < SUMMON_VEXES_AMOUNT; ++i) {
             BlockPos blockpos = this.blockPosition().offset(-2 + this.random.nextInt(5), 1, -2 + this.random.nextInt(5));
-            Vex vex = EntityType.VEX.create(this.level);
+            Vex vex = EntityType.VEX.create(this.level());
             if (vex != null) {
                 vex.moveTo(blockpos, 0.0F, 0.0F);
-                vex.finalizeSpawn((ServerLevel) this.level, this.level.getCurrentDifficultyAt(blockpos), MobSpawnType.MOB_SUMMONED, null, null);
+                vex.finalizeSpawn((ServerLevel) this.level(), this.level().getCurrentDifficultyAt(blockpos), MobSpawnType.MOB_SUMMONED, null, null);
                 vex.setOwner(this);
                 vex.setBoundOrigin(blockpos);
                 vex.setLimitedLife(CastSummonVexes.VEX_DURATION_SECONDS * ResourceCost.TICKS_PER_SECOND);
-                ((ServerLevel) this.level).addFreshEntityWithPassengers(vex);
+                ((ServerLevel) this.level()).addFreshEntityWithPassengers(vex);
             }
         }
     }

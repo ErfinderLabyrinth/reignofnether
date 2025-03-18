@@ -29,7 +29,7 @@ public class AttackGround extends Ability {
     public AttackGround(RangedAttackerUnit rangedAttackerUnit) {
         super(
                 UnitAction.ATTACK_GROUND,
-                ((Entity) rangedAttackerUnit).level,
+                ((Entity) rangedAttackerUnit).level(),
                 CD_MAX,
                 ((AttackerUnit) rangedAttackerUnit).getAttackRange(),
                 0,

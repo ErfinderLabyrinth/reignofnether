@@ -143,7 +143,7 @@ public class WitchUnit extends Witch implements Unit {
     public boolean removeWhenFarAway(double d) { return false; }
 
     public void throwPotion(Vec3 targetBp, Potion potion) {
-        ThrownPotion thrownPotion = new ThrownPotion(this.level, this);
+        ThrownPotion thrownPotion = new ThrownPotion(this.level(), this);
 
         thrownPotion.setItem(PotionUtils.setPotion(new ItemStack(Items.LINGERING_POTION), potion));
 
@@ -154,8 +154,8 @@ public class WitchUnit extends Witch implements Unit {
         thrownPotion.setDeltaMovement(dMove);
 
         if (!this.isSilent())
-            this.level.playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.WITCH_THROW, this.getSoundSource(), 1.0F, 0.8F + this.random.nextFloat() * 0.4F);
-        this.level.addFreshEntity(thrownPotion);
+            this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.WITCH_THROW, this.getSoundSource(), 1.0F, 0.8F + this.random.nextFloat() * 0.4F);
+        this.level().addFreshEntity(thrownPotion);
     }
 
     public static AttributeSupplier.Builder createAttributes() {

@@ -40,7 +40,7 @@ public class CallToArmsGoal extends MoveToTargetBlockGoal {
         if (this.mob.tickCount % 20 == 0)
             start();
 
-        if (isInRange() && buildingTarget != null && !this.mob.getLevel().isClientSide())
+        if (isInRange() && buildingTarget != null && !this.mob.level().isClientSide())
             if (this.mob instanceof VillagerUnit villagerUnit)
                 villagerUnit.convertToMilitia();
     }
@@ -58,7 +58,7 @@ public class CallToArmsGoal extends MoveToTargetBlockGoal {
     }
 
     public void setNearestTownCentreAsTarget() {
-        Building building = BuildingUtils.findClosestBuilding(mob.level.isClientSide(), this.mob.getEyePosition(),
+        Building building = BuildingUtils.findClosestBuilding(mob.level().isClientSide(), this.mob.getEyePosition(),
                 (b) -> b.isBuilt && b.ownerName.equals(((Unit) mob).getOwnerName()) && b instanceof TownCentre);
         if (building instanceof TownCentre townCentre)
             setBuildingTarget(townCentre);

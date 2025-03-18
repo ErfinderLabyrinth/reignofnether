@@ -188,8 +188,8 @@ public class WitherSkeletonUnit extends WitherSkeleton implements Unit, Attacker
         Unit.tick(this);
         AttackerUnit.tick(this);
 
-        if (!level.isClientSide() && deathCloudTicks > 0 && deathCloudTicks % 20 == 0) {
-            AreaEffectCloud aec = new AreaEffectCloud(level, getX(), getY(), getZ());
+        if (!level().isClientSide() && deathCloudTicks > 0 && deathCloudTicks % 20 == 0) {
+            AreaEffectCloud aec = new AreaEffectCloud(level(), getX(), getY(), getZ());
             aec.setOwner(this);
             aec.setRadius(4.0F);
             aec.setRadiusOnUse(0);
@@ -197,7 +197,7 @@ public class WitherSkeletonUnit extends WitherSkeleton implements Unit, Attacker
             aec.setDuration(2 * 20); // cloud duration
             aec.setRadiusPerTick(-aec.getRadius() / (float)aec.getDuration());
             aec.addEffect(new MobEffectInstance(MobEffects.WITHER, 2 * 20, 1));
-            level.addFreshEntity(aec);
+            level().addFreshEntity(aec);
         }
         if (deathCloudTicks > 0)
             deathCloudTicks -= 1;
@@ -271,7 +271,7 @@ public class WitherSkeletonUnit extends WitherSkeleton implements Unit, Attacker
 
     @Override
     public boolean fireImmune() {
-        Building building = BuildingUtils.findBuilding(level.isClientSide(), getOnPos());
+        Building building = BuildingUtils.findBuilding(level().isClientSide(), getOnPos());
         return super.fireImmune() || building instanceof FlameSanctuary || building instanceof BasaltSprings;
     }
 }

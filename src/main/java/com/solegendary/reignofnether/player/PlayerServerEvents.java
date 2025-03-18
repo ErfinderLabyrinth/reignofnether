@@ -343,7 +343,7 @@ public class PlayerServerEvents {
                 serverPlayer.sendSystemMessage(Component.literal(""));
                 return;
             }
-            if (serverPlayer.getLevel().getWorldBorder().getDistanceToBorder(pos.x, pos.z) < 1 && faction != Faction.NONE) {
+            if (serverPlayer.level().getWorldBorder().getDistanceToBorder(pos.x, pos.z) < 1 && faction != Faction.NONE) {
                 serverPlayer.sendSystemMessage(Component.literal(""));
                 serverPlayer.sendSystemMessage(Component.translatable("server.reignofnether.outside_border"));
                 serverPlayer.sendSystemMessage(Component.literal(""));
@@ -362,12 +362,12 @@ public class PlayerServerEvents {
             ResourcesServerEvents.assignResources(playerName);
             PlayerClientboundPacket.enableRTSStatus(playerName);
 
-            ServerLevel level = serverPlayer.getLevel();
+            ServerLevel level = (ServerLevel) serverPlayer.level();
             ArrayList<Entity> workers = new ArrayList<>();
             for (int i = -1; i <= 1; i++) {
                 Entity entity = entityType != null ? entityType.create(level) : null;
                 if (entity != null) {
-                    BlockPos bp = MiscUtil.getHighestNonAirBlock(level, new BlockPos(pos.x + i, 0, pos.z))
+                    BlockPos bp = MiscUtil.getHighestNonAirBlock(level, new BlockPos((int) (pos.x + i), 0, (int) pos.z))
                         .above()
                         .above();
                     ((Unit) entity).setOwnerName(playerName);
@@ -409,7 +409,7 @@ public class PlayerServerEvents {
                     }
                 };
                 if (buildingName != null) {
-                    BlockPos bp = getBuildingOriginPos(new BlockPos(pos.x, pos.y, pos.z), blocks);
+                    BlockPos bp = getBuildingOriginPos(new BlockPos((int) pos.x, (int) pos.y, (int) pos.z), blocks);
                     for (int i = 0; i < workers.size(); i++) {
                         workers.get(i).moveTo(bp.offset(i, 0, 0), 0, 0);
                         level.addFreshEntity(workers.get(i));
@@ -445,7 +445,7 @@ public class PlayerServerEvents {
             if (players.isEmpty()) {
                 return;
             } else {
-                level = players.get(0).getLevel();
+                level = (ServerLevel) players.get(0).level();
             }
 
             EntityType<? extends Unit> entityType = switch (faction) {
@@ -461,7 +461,7 @@ public class PlayerServerEvents {
             for (int i = -1; i <= 1; i++) {
                 Entity entity = entityType != null ? entityType.create(level) : null;
                 if (entity != null) {
-                    BlockPos bp = MiscUtil.getHighestNonAirBlock(level, new BlockPos(pos.x + i, 0, pos.z))
+                    BlockPos bp = MiscUtil.getHighestNonAirBlock(level, new BlockPos((int) (pos.x + i), 0, (int) pos.z))
                         .above()
                         .above();
                     ((Unit) entity).setOwnerName(bot.name);
@@ -484,7 +484,7 @@ public class PlayerServerEvents {
 
     // commands for ops to give resources
     @SubscribeEvent
-    public static void onPlayerChat(ServerChatEvent.Submitted evt) {
+    public static void onPlayerChat(ServerChatEvent evt) {
         /*
         if (evt.getMessage().getString().equals("test spiders")) {
             UnitServerEvents.convertAllToUnit(

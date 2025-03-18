@@ -130,7 +130,7 @@ public class UnitRangedAttackGoal<T extends net.minecraft.world.entity.Mob> exte
             if (distToTarget <= attackRange && canSeeTarget && this.seeTime >= -60 && attackCooldown <= 0) {
 
                 if (attackWindupTicksLeft == attackWindupTicksMax &&
-                    mob instanceof KeyframeAnimated && !mob.level.isClientSide())
+                    mob instanceof KeyframeAnimated && !mob.level().isClientSide())
                     UnitAnimationClientboundPacket.sendBasicPacket(UnitAnimationAction.ATTACK_UNIT, mob);
 
                 attackWindupTicksLeft -= 1;

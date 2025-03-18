@@ -200,7 +200,7 @@ public class NecromancerUnit extends Skeleton implements Unit, AttackerUnit, Ran
         Unit.tick(this);
         AttackerUnit.tick(this);
 
-        if (level.isClientSide()) {
+        if (level().isClientSide()) {
             if (animateTicks > 0) {
                 animateTicks -= 1;
             }
@@ -268,9 +268,9 @@ public class NecromancerUnit extends Skeleton implements Unit, AttackerUnit, Ran
 
         abstractarrow.shoot(d0, d1 + d3 * 0.20000000298023224, d2, 1.6F, 0);
         this.playSound(SoundEvents.SHULKER_SHOOT, 3.0F, 1.0F / (this.getRandom().nextFloat() * 0.4F + 0.8F));
-        this.level.addFreshEntity(abstractarrow);
+        this.level().addFreshEntity(abstractarrow);
 
-        if (!level.isClientSide() && pTarget instanceof Unit unit)
+        if (!level().isClientSide() && pTarget instanceof Unit unit)
             FogOfWarClientboundPacket.revealRangedUnit(unit.getOwnerName(), this.getId());
     }
 }

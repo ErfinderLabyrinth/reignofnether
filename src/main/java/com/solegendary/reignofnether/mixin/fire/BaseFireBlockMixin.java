@@ -45,7 +45,7 @@ public abstract class BaseFireBlockMixin {
                 pEntity.setRemainingFireTicks((8 * 20) - 1); // prevent damage from being ON fire from happening every tick
             boolean isDamageTick = pEntity.tickCount % DAMAGE_DELAY == 0;
             if (isDamageTick && !researchImmune(pState, pLevel, pEntity)) {
-                pEntity.hurt(DamageSource.IN_FIRE, DAMAGE);
+                pEntity.hurt(pEntity.damageSources().inFire(), DAMAGE);
             }
         }
     }

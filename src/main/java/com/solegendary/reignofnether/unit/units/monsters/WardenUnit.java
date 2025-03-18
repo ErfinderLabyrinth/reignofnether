@@ -1,6 +1,6 @@
 package com.solegendary.reignofnether.unit.units.monsters;
 
-import com.mojang.math.Vector3d;
+import org.joml.Vector3d;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.SonicBoom;
 import com.solegendary.reignofnether.building.Building;
@@ -195,7 +195,7 @@ public class WardenUnit extends Warden implements Unit, AttackerUnit {
         this.sonicBoomGoal.tick();
 
         // apply slowness level 2 during daytime for a short time repeatedly
-        if (tickCount % 10 == 0 && !this.level.isClientSide() && this.level.isDay() &&
+        if (tickCount % 10 == 0 && !this.level().isClientSide() && this.level().isDay() &&
                 !NightUtils.isInRangeOfNightSource(this.getEyePosition(), false) &&
                 !ResearchServerEvents.playerHasCheat(getOwnerName(), "slipslopslap"))
             this.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 15, 1));
@@ -243,14 +243,14 @@ public class WardenUnit extends Warden implements Unit, AttackerUnit {
         Vec3 normTargetPos = targetPos.normalize();
 
         this.playSound(SoundEvents.WARDEN_SONIC_BOOM, 3.0F, 1.0F);
-        if (!this.level.isClientSide()) {
-            ServerLevel level = (ServerLevel) this.level;
+        if (!this.level().isClientSide()) {
+            ServerLevel level = (ServerLevel) this.level();
             for(int i = 1; i < Mth.floor(targetPos.length()) + 7; ++i) {
                 Vec3 particlePos = startPos.add(normTargetPos.scale(i));
                 level.sendParticles(ParticleTypes.SONIC_BOOM, particlePos.x, particlePos.y, particlePos.z, 1, 0,0,0,0);
             }
         }
-        targetEntity.hurt(DamageSource.sonicBoom(this), SONIC_BOOM_DAMAGE);
+        targetEntity.hurt(damageSources().sonicBoom(this), SONIC_BOOM_DAMAGE);
         double knockbackY = 0.5 * (1.0 - targetEntity.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE));
         double knockbackXZ = 2.0 * (1.0 - targetEntity.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE));
         targetEntity.push(normTargetPos.x() * knockbackXZ, normTargetPos.y() * knockbackY, normTargetPos.z() * knockbackXZ);
@@ -266,15 +266,15 @@ public class WardenUnit extends Warden implements Unit, AttackerUnit {
         Vec3 normTargetPos = targetPos.normalize();
 
         this.playSound(SoundEvents.WARDEN_SONIC_BOOM, 3.0F, 1.0F);
-        if (!this.level.isClientSide()) {
-            ServerLevel level = (ServerLevel) this.level;
+        if (!this.level().isClientSide()) {
+            ServerLevel level = (ServerLevel) this.level();
             for(int i = 1; i < Mth.floor(targetPos.length()) + 7; ++i) {
                 Vec3 particlePos = startPos.add(normTargetPos.scale(i));
                 level.sendParticles(ParticleTypes.SONIC_BOOM, particlePos.x, particlePos.y, particlePos.z, 1, 0,0,0,0);
             }
         }
         boolean hasResearch;
-        if (this.level.isClientSide())
+        if (this.level().isClientSide())
             hasResearch = ResearchClient.hasResearch(ResearchSculkAmplifiers.itemName);
         else
             hasResearch = ResearchServerEvents.playerHasResearch(getOwnerName(), ResearchSculkAmplifiers.itemName);
@@ -282,7 +282,7 @@ public class WardenUnit extends Warden implements Unit, AttackerUnit {
         if (hasResearch && targetBuilding instanceof SculkCatalyst) {
             List<Mob> nearbyEnemies = MiscUtil.getEntitiesWithinRange(
                             new Vector3d(targetBuilding.centrePos.getX(), targetBuilding.centrePos.getY(), targetBuilding.centrePos.getZ()),
-                            ResearchSculkAmplifiers.SPLIT_BOOM_RANGE, Mob.class, this.level)
+                            ResearchSculkAmplifiers.SPLIT_BOOM_RANGE, Mob.class, this.level())
                     .stream().filter(mob -> mob instanceof Unit unit &&
                             UnitServerEvents.getUnitToEntityRelationship(this, mob) == Relationship.HOSTILE)
                     .toList();

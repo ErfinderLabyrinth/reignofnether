@@ -2,7 +2,6 @@ package com.solegendary.reignofnether.tps;
 
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -49,13 +48,13 @@ public class TPSClientEvents {
             col = 0xFFFF00;
         }
         String tickStr = "Tick: " + String.format("%.2f", tickTime);
-        GuiComponent.drawString(evt.getPoseStack(), MC.font, tickStr, x,y, col);
+        evt.getGuiGraphics().drawString(MC.font, tickStr, x,y, col);
 
         // technically is bound to 20TPS but good to see the theoretical amount
         String tpsStr = "TPS: " + String.format("%.2f", worldTPS);
-        GuiComponent.drawString(evt.getPoseStack(), MC.font, tpsStr, x,y + 10, col);
+        evt.getGuiGraphics().drawString(MC.font, tpsStr, x,y + 10, col);
 
         String fpsStr = "FPS: " + Minecraft.getInstance().fpsString.substring(0,6).replace("fps","");
-        GuiComponent.drawString(evt.getPoseStack(), MC.font, fpsStr, x,y + 20, 0xFFFFFFFF);
+        evt.getGuiGraphics().drawString(MC.font, fpsStr, x,y + 20, 0xFFFFFFFF);
     }
 }

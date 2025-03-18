@@ -39,7 +39,7 @@ public class Bloodlust extends Ability {
     public Bloodlust(Unit unit) {
         super(
                 UnitAction.BLOOD_LUST,
-                ((Entity) unit).level,
+                ((Entity) unit).level(),
                 0,
                 0,
                 0,
@@ -86,7 +86,7 @@ public class Bloodlust extends Ability {
         if (((LivingEntity) unit).getHealth() <= HEALTH_COST)
             return;
         else
-            ((LivingEntity) unit).hurt(DamageSource.MAGIC, HEALTH_COST);
+            ((LivingEntity) unit).hurt(level.damageSources().magic(), HEALTH_COST);
 
         if (unit instanceof HeadhunterUnit headhunterUnit) {
             headhunterUnit.bloodlustTicks = duration;

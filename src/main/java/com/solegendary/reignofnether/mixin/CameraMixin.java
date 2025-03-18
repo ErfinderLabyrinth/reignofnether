@@ -1,6 +1,6 @@
 package com.solegendary.reignofnether.mixin;
 
-import com.mojang.math.Vector3f;
+import org.joml.Vector3f;
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
 import net.minecraft.client.Camera;
 import net.minecraft.core.Direction;

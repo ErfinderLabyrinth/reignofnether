@@ -31,8 +31,9 @@ import com.solegendary.reignofnether.unit.units.villagers.PillagerUnit;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.EntityDamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobSpawnType;
@@ -45,9 +46,10 @@ import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.Tags;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
-import net.minecraftforge.event.entity.living.LivingSpawnEvent;
+import net.minecraftforge.event.entity.living.MobSpawnEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.level.ExplosionEvent;
@@ -310,7 +312,7 @@ public class BuildingServerEvents {
         while (yBelow > -MAX_SCAFFOLD_DEPTH) {
             yBelow--;
             bsBelow = serverLevel.getBlockState(basePos.offset(0, yBelow, 0));
-            if (bsBelow.getMaterial().isSolidBlocking()) {
+            if (bsBelow.isSolid()) {
                 break; // Found a solid block, exit loop
             }
         }
@@ -479,8 +481,8 @@ public class BuildingServerEvents {
 
     // prevent dungeons spawners from actually spawning
     @SubscribeEvent
-    public static void onLivingSpawn(LivingSpawnEvent.SpecialSpawn evt) {
-        if (evt.getSpawnReason() == MobSpawnType.SPAWNER) {
+    public static void onLivingSpawn(MobSpawnEvent.FinalizeSpawn evt) {
+        if (evt.getSpawnType() == MobSpawnType.SPAWNER) {
             if (evt.getSpawner() != null && evt.getSpawner().getSpawnerBlockEntity() != null) {
                 BlockEntity be = evt.getSpawner().getSpawnerBlockEntity();
                 BlockPos bp = evt.getSpawner().getSpawnerBlockEntity().getBlockPos();
@@ -552,16 +554,16 @@ public class BuildingServerEvents {
         CreeperUnit creeperUnit = null;
         PillagerUnit pillagerUnit = null;
 
-        if (evt.getExplosion().getSourceMob() instanceof CreeperUnit cUnit) {
+        if (evt.getExplosion().getExploder() instanceof CreeperUnit cUnit) {
             creeperUnit = cUnit;
         } // generic means it was from random blocks broken, so don't consider it or we might keep chaining
-        else if (evt.getExplosion().getSourceMob() instanceof PillagerUnit pUnit) {
+        else if (evt.getExplosion().getExploder() instanceof PillagerUnit pUnit) {
             pillagerUnit = pUnit;
-        } else if (exp.getDamageSource() != DamageSource.GENERIC) {
+        } else if (!evt.getAffectedEntities().isEmpty() && exp.getDamageSource() != evt.getAffectedEntities().get(0).damageSources().generic()) {
             for (Entity entity : evt.getAffectedEntities()) {
                 if (entity instanceof LargeFireball fireball && fireball.getOwner() instanceof GhastUnit gUnit) {
                     ghastUnit = gUnit;
-                    exp.damageSource = new EntityDamageSource("explosion", ghastUnit);
+                    exp.damageSource = entity.damageSources().mobProjectile(entity, ghastUnit);
                 }
             }
         }
@@ -571,7 +573,7 @@ public class BuildingServerEvents {
             List<BlockPos> flammableBps = evt.getAffectedBlocks().stream().filter(bp -> {
                 BlockState bs = evt.getLevel().getBlockState(bp);
                 BlockState bsAbove = evt.getLevel().getBlockState(bp.above());
-                return bs.getMaterial().isSolidBlocking() && bsAbove.isAir()
+                return bs.isSolid() && bsAbove.isAir()
                     || bsAbove.getBlock() instanceof TallGrassBlock || bsAbove.getBlock() instanceof RootsBlock;
             }).toList();
 
@@ -584,12 +586,12 @@ public class BuildingServerEvents {
             }
         }
 
-        if (exp.getExploder() == null && exp.getSourceMob() == null && ghastUnit == null) {
+        if (exp.getExploder() == null && exp.getExploder() == null && ghastUnit == null) {
             evt.getAffectedEntities().clear();
         }
 
         // explosive arrows from mounted pillagers
-        if (exp.getSourceMob() instanceof PillagerUnit pUnit && pUnit.isPassenger()) {
+        if (exp.getExploder() instanceof PillagerUnit pUnit && pUnit.isPassenger()) {
             for (Entity entity : evt.getAffectedEntities())
                 if (entity instanceof LivingEntity le) {
                     le.setHealth(le.getHealth() - 2); // for some reason there's still iframes so we cant use hurt()
@@ -655,7 +657,7 @@ public class BuildingServerEvents {
 
     @SubscribeEvent
     public static void onEntityTravelToDimension(EntityTravelToDimensionEvent evt) {
-        Building building = BuildingUtils.findBuilding(evt.getEntity().getLevel().isClientSide(), evt.getEntity().getOnPos());
+        Building building = BuildingUtils.findBuilding(evt.getEntity().level().isClientSide(), evt.getEntity().getOnPos());
         if (building != null) {
             evt.setCanceled(true);
 
@@ -677,7 +679,7 @@ public class BuildingServerEvents {
 
     @SubscribeEvent
     public static void onCropTrample(BlockEvent.FarmlandTrampleEvent evt) {
-        if (BuildingUtils.isPosInsideAnyBuilding(evt.getEntity().getLevel().isClientSide(), evt.getPos())) {
+        if (BuildingUtils.isPosInsideAnyBuilding(evt.getEntity().level().isClientSide(), evt.getPos())) {
             evt.setCanceled(true);
         }
     }
@@ -715,7 +717,7 @@ public class BuildingServerEvents {
                 BlockPos bp = block.getBlockPos();
                 BlockState bs = block.getBlockState(); // building block
 
-                if (bs.getMaterial().isSolid()) {
+                if (bs.isSolid()) {
                     blocksBelow += 1;
                     if (NetherBlocks.isNetherBlock(level, bp.below())) {
                         netherBlocksBelow += 1;

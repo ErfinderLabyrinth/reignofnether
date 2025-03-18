@@ -26,7 +26,7 @@ public class Eject extends Ability {
     public Eject(LivingEntity entity) {
         super(
             UnitAction.EJECT,
-            entity.level,
+            entity.level(),
             0,
             0,
             0,

@@ -9,7 +9,7 @@ import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
 import com.solegendary.reignofnether.util.MiscUtil;
 import com.solegendary.reignofnether.util.MyRenderer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FormattedCharSequence;
@@ -154,19 +154,19 @@ public class Button {
                     HealthBarClientEvents.RenderMode.GUI_ICON);
     }
 
-    public void render(PoseStack poseStack, int x, int y, int mouseX, int mouseY) {
+    public void render(GuiGraphics guiGraphics, int x, int y, int mouseX, int mouseY) {
         this.x = x;
         this.y = y;
 
         int xyDiff = (DEFAULT_ICON_SIZE - iconSize) / 2;
 
         if (this.frameResource != null) {
-            MyRenderer.renderIconFrameWithBg(poseStack, this.frameResource, x + xyDiff, y + xyDiff, iconFrameSize, 0x64000000);
+            MyRenderer.renderIconFrameWithBg(guiGraphics, this.frameResource, x + xyDiff, y + xyDiff, iconFrameSize, 0x64000000);
         }
 
         if (bgIconResource != null) {
             MyRenderer.renderIcon(
-                    poseStack,
+                    guiGraphics,
                     bgIconResource,
                     frameResource != null ? x+4 + (7 - iconSize/2) : x + (7 - iconSize/2),
                     frameResource != null ? y+4 + (7 - iconSize/2) : y + (7 - iconSize/2),
@@ -176,7 +176,7 @@ public class Button {
         // item/unit icon
         if (iconResource != null) {
             MyRenderer.renderIcon(
-                    poseStack,
+                    guiGraphics,
                     iconResource,
                     x+4 + (7 - xyDiff - iconSize/2), y+4 + (7 - xyDiff - iconSize/2),
                     DEFAULT_ICON_SIZE
@@ -186,7 +186,7 @@ public class Button {
         if (this.hotkey != null) {
             String hotkeyStr = hotkey.buttonLabel;
             hotkeyStr = hotkeyStr.substring(0,Math.min(3, hotkeyStr.length()));
-            GuiComponent.drawCenteredString(poseStack, MC.font,
+            guiGraphics.drawCenteredString( MC.font,
                     hotkeyStr,
                     x + iconSize + 8 - (hotkeyStr.length() * 4),
                     y + iconSize - 1,
@@ -203,7 +203,7 @@ public class Button {
             if (frameResource != null) {
                 ResourceLocation iconFrameSelectedResource = new ResourceLocation(ReignOfNether.MOD_ID, "textures/hud/icon_frame_selected.png");
                 MyRenderer.renderIcon(
-                        poseStack,
+                        guiGraphics,
                         iconFrameSelectedResource,
                         x-1 + xyDiff,y-1 + xyDiff,
                         iconSelectedFrameSize
@@ -212,7 +212,7 @@ public class Button {
         }
         // light up on hover
         if (isEnabled.get() && isMouseOver(mouseX, mouseY)) {
-            GuiComponent.fill(poseStack, // x1,y1, x2,y2,
+            guiGraphics.fill( // x1,y1, x2,y2,
                     x + xyDiff, y + xyDiff,
                     x + xyDiff + iconFrameSize,
                     y + xyDiff + iconFrameSize,
@@ -224,7 +224,7 @@ public class Button {
             if (!isEnabled.get())
                 greyHeightPx = 0;
 
-            GuiComponent.fill(poseStack, // x1,y1, x2,y2,
+            guiGraphics.fill( // x1,y1, x2,y2,
                     x + xyDiff,
                     y + xyDiff + greyHeightPx,
                     x + xyDiff + iconFrameSize,
@@ -233,8 +233,8 @@ public class Button {
         }
     }
 
-    public void renderTooltip(PoseStack poseStack, int mouseX, int mouseY) {
-        MyRenderer.renderTooltip(poseStack, tooltipLines, mouseX, mouseY + tooltipOffsetY);
+    public void renderTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        MyRenderer.renderTooltip(guiGraphics, tooltipLines, mouseX, mouseY + tooltipOffsetY);
     }
 
     public boolean isMouseOver(int mouseX, int mouseY) {
@@ -252,11 +252,11 @@ public class Button {
 
         if (isMouseOver(mouseX, mouseY) && MC.player != null) {
             if (leftClick && this.onLeftClick != null) {
-                MC.player.playSound(SoundEvents.UI_BUTTON_CLICK, 0.2f, 1.0f);
+                MC.player.playSound(SoundEvents.UI_BUTTON_CLICK.get(), 0.2f, 1.0f);
                 this.onLeftClick.run();
             }
             else if (!leftClick && this.onRightClick != null) {
-                MC.player.playSound(SoundEvents.UI_BUTTON_CLICK, 0.2f, 1.0f);
+                MC.player.playSound(SoundEvents.UI_BUTTON_CLICK.get(), 0.2f, 1.0f);
                 this.onRightClick.run();
             }
         }
@@ -269,7 +269,7 @@ public class Button {
 
         if (hotkey != null && hotkey.key == key) {
             if (MC.player != null)
-                MC.player.playSound(SoundEvents.UI_BUTTON_CLICK, 0.2f, 1.0f);
+                MC.player.playSound(SoundEvents.UI_BUTTON_CLICK.get(), 0.2f, 1.0f);
             this.onLeftClick.run();
         }
     }

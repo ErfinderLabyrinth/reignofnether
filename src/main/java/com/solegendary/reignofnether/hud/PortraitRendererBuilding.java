@@ -3,8 +3,11 @@ package com.solegendary.reignofnether.hud;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Quaternion;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.world.item.ItemDisplayContext;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingClientEvents;
 import com.solegendary.reignofnether.building.buildings.monsters.SculkCatalyst;
@@ -13,7 +16,6 @@ import com.solegendary.reignofnether.healthbars.HealthBarClientEvents;
 import com.solegendary.reignofnether.unit.Relationship;
 import com.solegendary.reignofnether.util.MyRenderer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -37,7 +39,7 @@ class PortraitRendererBuilding {
     // - healthbar
     // - building name
     // Must be called from DrawScreenEvent
-    public RectZone render(PoseStack poseStack, int x, int y, Building building) {
+    public RectZone render(GuiGraphics guiGraphics, int x, int y, Building building) {
         Relationship rs = BuildingClientEvents.getPlayerToBuildingRelationship(building);
 
         String name = building.name;
@@ -55,8 +57,8 @@ class PortraitRendererBuilding {
             name += " (" + sc.getNightRange() + "/" + SculkCatalyst.nightRangeMax + " range)";
 
         // draw name
-        GuiComponent.drawString(
-                poseStack, Minecraft.getInstance().font,
+        guiGraphics.drawString(
+                Minecraft.getInstance().font,
                 name,
                 x+4,y-9,
                 0xFFFFFFFF
@@ -68,7 +70,7 @@ class PortraitRendererBuilding {
             case NEUTRAL  -> bgCol = 0x90909000;
             case HOSTILE  -> bgCol = 0x90900000;
         }
-        MyRenderer.renderFrameWithBg(poseStack, x, y,
+        MyRenderer.renderFrameWithBg(guiGraphics, x, y,
                 frameWidth,
                 frameHeight,
                 bgCol);
@@ -76,12 +78,12 @@ class PortraitRendererBuilding {
         drawBlockOnScreen(x, y, building);
 
         // draw health bar and write min/max hp
-        HealthBarClientEvents.renderForBuilding(poseStack, building,
+        HealthBarClientEvents.renderForBuilding(guiGraphics.pose(), building,
                 x+(frameWidth/2f), y+frameHeight-15,
                 frameWidth-9, HealthBarClientEvents.RenderMode.GUI_PORTRAIT);
 
-        GuiComponent.drawCenteredString(
-                poseStack, Minecraft.getInstance().font,
+        guiGraphics.drawCenteredString(
+                Minecraft.getInstance().font,
                 building.getHealth() + "/" + building.getMaxHealth(),
                 x+(frameWidth/2), y+frameHeight-13,
                 0xFFFFFFFF
@@ -103,8 +105,8 @@ class PortraitRendererBuilding {
         RenderSystem.applyModelViewMatrix();
 
         float angle = (System.currentTimeMillis() / 100) % 360;
-        Quaternion quaternion = Vector3f.XP.rotationDegrees(25);
-        Quaternion quaternion2 = Vector3f.YP.rotationDegrees(angle);
+        Quaternionf quaternion = Axis.XP.rotationDegrees(25);
+        Quaternionf quaternion2 = Axis.YP.rotationDegrees(angle);
         quaternion.mul(quaternion2);
         PoseStack blockPoseStack = new PoseStack();
         blockPoseStack.pushPose();
@@ -113,9 +115,9 @@ class PortraitRendererBuilding {
         MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
 
         Minecraft.getInstance().getItemRenderer().renderStatic(
-                item, ItemTransforms.TransformType.FIXED,
+                item, ItemDisplayContext.FIXED,
                 15728880, OverlayTexture.NO_OVERLAY,
-                blockPoseStack, bufferSource, 0);
+                blockPoseStack, bufferSource, null, 0);
         bufferSource.endBatch();
 
         poseStack.popPose();

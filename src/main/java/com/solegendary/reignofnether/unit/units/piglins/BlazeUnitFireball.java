@@ -31,19 +31,19 @@ public class BlazeUnitFireball extends SmallFireball {
     @Override
     public void tick() {
         super.tick();
-        if (!this.level.isClientSide() && isFirewallShot) {
-            Block block = this.level.getBlockState(this.getOnPos()).getBlock();
-            Block blockBelow = this.level.getBlockState(this.getOnPos().below()).getBlock();
-            Block blockBelow2 = this.level.getBlockState(this.getOnPos().below().below()).getBlock();
+        if (!this.level().isClientSide() && isFirewallShot) {
+            Block block = this.level().getBlockState(this.getOnPos()).getBlock();
+            Block blockBelow = this.level().getBlockState(this.getOnPos().below()).getBlock();
+            Block blockBelow2 = this.level().getBlockState(this.getOnPos().below().below()).getBlock();
 
             if (List.of(Blocks.AIR, Blocks.TALL_GRASS, Blocks.GRASS, Blocks.CRIMSON_ROOTS).contains(blockBelow2)) {
-                this.level.setBlockAndUpdate(this.getOnPos().below().below(), Blocks.FIRE.defaultBlockState());
+                this.level().setBlockAndUpdate(this.getOnPos().below().below(), Blocks.FIRE.defaultBlockState());
             }
             if (List.of(Blocks.AIR, Blocks.TALL_GRASS, Blocks.GRASS, Blocks.CRIMSON_ROOTS).contains(blockBelow)) {
-                this.level.setBlockAndUpdate(this.getOnPos().below(), Blocks.FIRE.defaultBlockState());
+                this.level().setBlockAndUpdate(this.getOnPos().below(), Blocks.FIRE.defaultBlockState());
             }
             else if (List.of(Blocks.AIR, Blocks.TALL_GRASS, Blocks.GRASS, Blocks.CRIMSON_ROOTS).contains(block)) {
-                this.level.setBlockAndUpdate(this.getOnPos(), Blocks.FIRE.defaultBlockState());
+                this.level().setBlockAndUpdate(this.getOnPos(), Blocks.FIRE.defaultBlockState());
             }
         }
         if (tickCount > MAX_TICKS || (tickCount > MAX_TICKS_FIREWALL && isFirewallShot))
@@ -61,18 +61,18 @@ public class BlazeUnitFireball extends SmallFireball {
             boolean targetOnFire = entityHitResult.getEntity().isOnFire();
 
             this.onHitEntity(entityHitResult);
-            this.level.gameEvent(GameEvent.PROJECTILE_LAND, pResult.getLocation(), GameEvent.Context.of(this, null));
+            this.level().gameEvent(GameEvent.PROJECTILE_LAND, pResult.getLocation(), GameEvent.Context.of(this, null));
 
-            if (!this.level.isClientSide && !targetOnFire && !this.isFirewallShot)
+            if (!this.level().isClientSide && !targetOnFire && !this.isFirewallShot)
                 this.discard();
 
         } else if (hitresult$type == HitResult.Type.BLOCK && !isNoPhysics()) {
             BlockHitResult blockhitresult = (BlockHitResult)pResult;
             //this.onHitBlock(blockhitresult);
             BlockPos blockpos = blockhitresult.getBlockPos();
-            this.level.gameEvent(GameEvent.PROJECTILE_LAND, blockpos, GameEvent.Context.of(this, this.level.getBlockState(blockpos)));
+            this.level().gameEvent(GameEvent.PROJECTILE_LAND, blockpos, GameEvent.Context.of(this, this.level().getBlockState(blockpos)));
 
-            if (!this.level.isClientSide)
+            if (!this.level().isClientSide)
                 this.discard();
         }
     }

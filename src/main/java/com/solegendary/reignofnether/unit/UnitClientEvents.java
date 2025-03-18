@@ -1,7 +1,7 @@
 package com.solegendary.reignofnether.unit;
 
 import com.mojang.datafixers.util.Pair;
-import com.mojang.math.Vector3d;
+import org.joml.Vector3d;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.alliance.AlliancesClient;
 import com.solegendary.reignofnether.building.*;
@@ -371,7 +371,7 @@ public class UnitClientEvents {
             }
         }
         // if the unit doesn't exist at all clientside, create a MinimapUnit to at least track its minimap position
-        MinimapClientEvents.syncMinimapUnits(new BlockPos(pos.x, pos.y, pos.z), entityId, ownerName);
+        MinimapClientEvents.syncMinimapUnits(new BlockPos((int) pos.x, (int) pos.y, (int) pos.z), entityId, ownerName);
     }
 
     public static void syncWorkerUnit(int entityId, boolean isBuilding, ResourceName gatherName, BlockPos gatherPos, int gatherTicks) {

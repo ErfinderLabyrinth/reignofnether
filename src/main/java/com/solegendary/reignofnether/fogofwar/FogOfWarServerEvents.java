@@ -6,11 +6,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
-import net.minecraftforge.client.event.RegisterClientCommandsEvent;
+import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -86,10 +86,7 @@ public class FogOfWarServerEvents {
                 for (int z = 0; z < 16; z++) {
                     BlockPos bp = renderChunkOrigin.offset(x,y,z);
                     BlockState bs = serverLevel.getBlockState(bp);
-                    if (bs.getMaterial() == Material.PLANT ||
-                        bs.getMaterial() == Material.REPLACEABLE_PLANT ||
-                        bs.getMaterial() == Material.REPLACEABLE_WATER_PLANT ||
-                        bs.getMaterial() == Material.REPLACEABLE_FIREPROOF_PLANT) {
+                    if (bs.is(BlockTags.REPLACEABLE_BY_TREES) || bs.getBlock() instanceof IPlantable) {
                         plants.add(new Pair<>(bp, bs));
                     }
                 }

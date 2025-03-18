@@ -29,7 +29,7 @@ public class Teleport extends Ability {
     private final EndermanUnit unit;
 
     public Teleport(EndermanUnit unit) {
-        super(UnitAction.TELEPORT, unit.level, CD_MAX_SECONDS * ResourceCost.TICKS_PER_SECOND, RANGE, 0, false);
+        super(UnitAction.TELEPORT, unit.level(), CD_MAX_SECONDS * ResourceCost.TICKS_PER_SECOND, RANGE, 0, false);
         this.unit = unit;
     }
 

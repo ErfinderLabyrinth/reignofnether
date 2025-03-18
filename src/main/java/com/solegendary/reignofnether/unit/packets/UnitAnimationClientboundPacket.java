@@ -97,9 +97,9 @@ public class UnitAnimationClientboundPacket {
                 () -> () -> {
                     switch (this.animAction) {
                         case NON_KEYFRAME_START -> UnitClientEvents.syncUnitAnimation(this.animAction, true,
-                                this.entityId, this.targetId, new BlockPos(this.posX, this.posY, this.posZ));
+                                this.entityId, this.targetId, new BlockPos((int) this.posX, (int) this.posY, (int) this.posZ));
                         case NON_KEYFRAME_STOP -> UnitClientEvents.syncUnitAnimation(this.animAction, false,
-                                this.entityId, this.targetId, new BlockPos(this.posX, this.posY, this.posZ));
+                                this.entityId, this.targetId, new BlockPos((int) this.posX, (int) this.posY, (int) this.posZ));
                         case NON_KEYFRAME_ATTACK -> UnitClientEvents.playAttackAnimation(this.entityId);
                         default -> UnitClientEvents.playKeyframeAnimation(this.animAction, this.entityId);
                     }

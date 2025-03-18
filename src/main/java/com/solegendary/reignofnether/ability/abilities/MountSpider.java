@@ -33,7 +33,7 @@ public class MountSpider extends Ability {
     private final LivingEntity entity;
 
     public MountSpider(LivingEntity entity) {
-        super(UnitAction.MOUNT_SPIDER, entity.level, 0, 0, 0, true);
+        super(UnitAction.MOUNT_SPIDER, entity.level(), 0, 0, 0, true);
         this.entity = entity;
     }
 

@@ -47,7 +47,7 @@ public class BuildRepairGoal extends MoveToTargetBlockGoal {
     }
 
     public boolean startNextQueuedBuilding() {
-        queuedBuildings.removeIf(b -> !BuildingUtils.isBuildingBuildable(this.mob.level.isClientSide(), b));
+        queuedBuildings.removeIf(b -> !BuildingUtils.isBuildingBuildable(this.mob.level().isClientSide(), b));
         if (queuedBuildings.size() > 0) {
             setBuildingTarget(queuedBuildings.get(0));
             return true;
@@ -57,9 +57,9 @@ public class BuildRepairGoal extends MoveToTargetBlockGoal {
 
     public void tick() {
         if (buildingTarget == null) {
-            if (!this.mob.level.isClientSide() && WorkerUnit.isIdle((WorkerUnit) this.mob) && autocastRepair) {
+            if (!this.mob.level().isClientSide() && WorkerUnit.isIdle((WorkerUnit) this.mob) && autocastRepair) {
                 Building building = BuildingUtils.findClosestBuilding(
-                        this.mob.level.isClientSide(),
+                        this.mob.level().isClientSide(),
                         this.mob.getEyePosition(),
                         b -> b.getBlocksPlaced() < b.getBlocksTotal() &&
                         BuildingServerEvents.getUnitToBuildingRelationship((Unit) this.mob, b) != Relationship.HOSTILE
@@ -69,7 +69,7 @@ public class BuildRepairGoal extends MoveToTargetBlockGoal {
             }
             return;
         }
-        if (!BuildingUtils.isBuildingBuildable(this.mob.level.isClientSide(), buildingTarget)) {
+        if (!BuildingUtils.isBuildingBuildable(this.mob.level().isClientSide(), buildingTarget)) {
             if (!startNextQueuedBuilding()) {
                 if (buildingTarget.name.contains(" Farm") && mob instanceof WorkerUnit workerUnit) {
                     ((WorkerUnit) mob).getGatherResourceGoal().setTargetResourceName(ResourceName.FOOD);
@@ -99,7 +99,7 @@ public class BuildRepairGoal extends MoveToTargetBlockGoal {
 
     // only count as building if in range of the target - building is actioned in Building.tick()
     public boolean isBuilding() {
-        if (this.mob.level.isClientSide())
+        if (this.mob.level().isClientSide())
             return isBuildingServerside;
 
         if (buildingTarget != null && this.moveTarget != null)

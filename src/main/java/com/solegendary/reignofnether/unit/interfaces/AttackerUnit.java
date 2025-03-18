@@ -59,7 +59,7 @@ public interface AttackerUnit {
             else if (attackBuildingGoal instanceof MeleeAttackBuildingGoal mabg)
                 mabg.setBuildingTarget(preselectedBlockPos);
         } else {
-            Level level = ((LivingEntity) this).getLevel();
+            Level level = ((LivingEntity) this).level();
             Building building = BuildingUtils.findBuilding(level.isClientSide(), preselectedBlockPos);
 
             if (building != null) {
@@ -73,7 +73,7 @@ public interface AttackerUnit {
                     targetPos = targetPos.above();
 
                 ((Unit) this).setMoveTarget(targetPos);
-                if (((LivingEntity) this).getLevel().isClientSide)
+                if (((LivingEntity) this).level().isClientSide)
                     MiscUtil.addUnitCheckpoint((Unit) this, groundCentrePos, false);
             }
         }
@@ -112,7 +112,7 @@ public interface AttackerUnit {
         Mob unitMob = (Mob) attackerUnit;
         Unit unit = (Unit) attackerUnit;
 
-        if (!unitMob.level.isClientSide) {
+        if (!unitMob.level().isClientSide) {
             if (attackerUnit.getAttackGoal() instanceof AbstractMeleeAttackUnitGoal meleeAttackUnitGoal)
                 meleeAttackUnitGoal.tickAttackCooldown();
             else if (attackerUnit.getAttackGoal() instanceof UnitRangedAttackGoal rangedAttackGoal)
@@ -129,13 +129,13 @@ public interface AttackerUnit {
                 rangedAttackerUnit.setFogRevealDuration(revealDuration - 1);
         }
 
-        if (!unitMob.level.isClientSide && unitMob.tickCount % 4 == 0) {
+        if (!unitMob.level().isClientSide && unitMob.tickCount % 4 == 0) {
             boolean isAttackingBuilding = isAttackingBuilding(attackerUnit);
 
             // enact attack moving
             // prioritises units and will chase them, resuming attack move once dead or out of range/sight
             if (attackerUnit.getAttackMoveTarget() != null && !unit.hasLivingTarget() && !isAttackingBuilding) {
-                attackerUnit.attackClosestEnemy((ServerLevel) unitMob.level);
+                attackerUnit.attackClosestEnemy((ServerLevel) unitMob.level());
 
                 if (unit.getTargetGoal().getTarget() == null &&
                     unit.getMoveGoal().getMoveTarget() == null &&
@@ -170,13 +170,13 @@ public interface AttackerUnit {
             }
             // enact aggression when idle
             if (unit.isIdle() && !isAttackingBuilding && attackerUnit.getAggressiveWhenIdle())
-                attackerUnit.attackClosestEnemy((ServerLevel) unitMob.level);
+                attackerUnit.attackClosestEnemy((ServerLevel) unitMob.level());
 
             // if attacking another unit as melee, retarget the closest unit periodically
             // unless targeting a building or targeting a specific unit
             if (!isAttackingBuilding &&
                 !((Unit) attackerUnit).getTargetGoal().forced)
-                attackerUnit.retargetToClosestUnit((ServerLevel) unitMob.level);
+                attackerUnit.retargetToClosestUnit((ServerLevel) unitMob.level());
         }
     }
 

@@ -5,7 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.SheetedDecalTextureGenerator;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.datafixers.util.Pair;
-import com.mojang.math.Matrix4f;
+import org.joml.Matrix4f;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientEvents;
 import com.solegendary.reignofnether.fogofwar.FrozenChunk;
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
@@ -133,7 +133,7 @@ public abstract class LevelRendererMixin {
                 UnitClientEvents.windowUpdateTicks = UnitClientEvents.WINDOW_UPDATE_TICKS_MAX;
                 Vec3 centrePos = MiscUtil.getOrthoviewCentreWorldPos(Minecraft.getInstance());
                 for(LevelRenderer.RenderChunkInfo chunkInfo : this.renderChunksInFrustum) {
-                    BlockPos chunkCentreBp = chunkInfo.chunk.getOrigin().offset(8.5d, 8.5d, 8.5d);
+                    BlockPos chunkCentreBp = chunkInfo.chunk.getOrigin().offset((int) 8.5d, (int) 8.5d, (int) 8.5d);
 
                     List<Pair<BlockPos, Integer>> newChunksToReDirty = new ArrayList<>();
 
@@ -230,7 +230,7 @@ public abstract class LevelRendererMixin {
             }
             ChunkRenderDispatcher.RenderChunk renderChunk = chunkInfo.chunk;
             ChunkPos chunkpos = new ChunkPos(renderChunk.getOrigin());
-            if (renderChunk.isDirty() && this.level.getChunk(chunkpos.x, chunkpos.z).isClientLightReady()) {
+            if (renderChunk.isDirty() && this.level.getChunk(chunkpos.x, chunkpos.z).isLightCorrect()) {
                 boolean flag = false;
                 if (this.minecraft.options.prioritizeChunkUpdates().get() != PrioritizeChunkUpdates.NEARBY) {
                     if (this.minecraft.options.prioritizeChunkUpdates().get() == PrioritizeChunkUpdates.PLAYER_AFFECTED) {
@@ -314,7 +314,7 @@ public abstract class LevelRendererMixin {
                     pPoseStack.pushPose();
                     pPoseStack.translate((double) blockpos2.getX() - d0, (double) blockpos2.getY() - d1, (double) blockpos2.getZ() - d2);
                     PoseStack.Pose posestack$pose = pPoseStack.last();
-                    VertexConsumer vertexconsumer1 = new SheetedDecalTextureGenerator(this.renderBuffers.crumblingBufferSource().getBuffer((RenderType) ModelBakery.DESTROY_TYPES.get(k1)), posestack$pose.pose(), posestack$pose.normal());
+                    VertexConsumer vertexconsumer1 = new SheetedDecalTextureGenerator(this.renderBuffers.crumblingBufferSource().getBuffer((RenderType) ModelBakery.DESTROY_TYPES.get(k1)), posestack$pose.pose(), posestack$pose.normal(), 1);
                     ModelData modelData = this.level.getModelDataManager().getAt(blockpos2);
                     this.minecraft.getBlockRenderer().renderBreakingTexture(this.level.getBlockState(blockpos2), blockpos2, this.level, pPoseStack, vertexconsumer1, modelData == null ? ModelData.EMPTY : modelData);
                     pPoseStack.popPose();

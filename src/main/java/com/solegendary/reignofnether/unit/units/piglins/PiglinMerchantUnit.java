@@ -211,7 +211,7 @@ public class PiglinMerchantUnit extends Piglin implements Unit, AttackerUnit, He
         Unit.tick(this);
         AttackerUnit.tick(this);
 
-        if (level.isClientSide()) {
+        if (level().isClientSide()) {
             if (animateTicks > 0) {
                 animateTicks -= 1;
             }

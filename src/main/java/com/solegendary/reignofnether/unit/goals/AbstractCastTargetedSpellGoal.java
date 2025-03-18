@@ -100,14 +100,14 @@ public abstract class AbstractCastTargetedSpellGoal extends MoveToTargetBlockGoa
                     if (onEntityCast != null && targetEntity != null)
                         onEntityCast.accept(targetEntity);
                     else if (onGroundCast != null || onBuildingCast != null) {
-                        Building targetBuilding = BuildingUtils.findBuilding(mob.level.isClientSide(), castTarget);
+                        Building targetBuilding = BuildingUtils.findBuilding(mob.level().isClientSide(), castTarget);
                         if (onBuildingCast != null && targetBuilding != null) {
                             onBuildingCast.accept(targetBuilding);
                         }
                         else if (onGroundCast != null)
                             onGroundCast.accept(castTarget);
                     }
-                    if (this.ability != null && !this.mob.level.isClientSide())
+                    if (this.ability != null && !this.mob.level().isClientSide())
                         AbilityClientboundPacket.sendSetCooldownPacket(this.mob.getId(), this.ability.action, this.ability.cooldownMax);
                     this.stop();
                 }
