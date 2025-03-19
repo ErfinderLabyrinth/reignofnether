@@ -16,7 +16,16 @@ public interface HeroUnit {
     void updateAbilityButtons();
 
     default void addExperience(int amount) {
-        // TODO: detect level up and award skill points/play sounds accordingly
+        int levelBefore = getHeroLevel();
+        if (levelBefore >= MAX_HERO_LEVEL)
+            return;
+
+        setExperience(getExperience() + amount);
+        int levelDiff = getHeroLevel() - levelBefore;
+
+        if (levelDiff > 0) {
+            setSkillPoints(getSkillPoints() + levelDiff);
+        }
     }
 
     // we always track total exp and then reduce down for the UI
