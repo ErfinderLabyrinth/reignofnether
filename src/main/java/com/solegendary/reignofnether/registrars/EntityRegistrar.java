@@ -1,6 +1,7 @@
 package com.solegendary.reignofnether.registrars;
 
 import com.solegendary.reignofnether.ReignOfNether;
+import com.solegendary.reignofnether.hero.HeroExperienceOrb;
 import com.solegendary.reignofnether.unit.modelling.renderers.GhastUnitRenderer;
 import com.solegendary.reignofnether.unit.modelling.renderers.NecromancerRenderer;
 import com.solegendary.reignofnether.unit.modelling.renderers.PiglinMerchantRenderer;
@@ -269,6 +270,12 @@ public class EntityRegistrar {
                     .sized(EntityType.PHANTOM.getWidth(), EntityType.PHANTOM.getHeight())
                     .clientTrackingRange(UNIT_CLIENT_TRACKING_RANGE)
                     .build(new ResourceLocation(ReignOfNether.MOD_ID, "phantom_summon").toString()));
+
+    public static final RegistryObject<EntityType<HeroExperienceOrb>> HERO_EXPERIENCE_ORB = ENTITIES.register("hero_experience_orb",
+            () -> EntityType.Builder.of(HeroExperienceOrb::new, MobCategory.MISC)
+                    .sized(EntityType.EXPERIENCE_ORB.getWidth(), EntityType.EXPERIENCE_ORB.getHeight())
+                    .clientTrackingRange(UNIT_CLIENT_TRACKING_RANGE)
+                    .build(new ResourceLocation(ReignOfNether.MOD_ID, "hero_experience_orb").toString()));
 
     public static void init() {
         ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());

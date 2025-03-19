@@ -188,6 +188,7 @@ public class RoyalGuardUnit extends Vindicator implements Unit, AttackerUnit, He
     public RoyalGuardUnit(EntityType<? extends Vindicator> entityType, Level level) {
         super(entityType, level);
 
+        /*
         MaceSlam ab1 = new MaceSlam(this);
         TauntingCry ab2 = new TauntingCry(this);
         BattleRagePassive ab3 = new BattleRagePassive(this);
@@ -197,6 +198,7 @@ public class RoyalGuardUnit extends Vindicator implements Unit, AttackerUnit, He
         this.abilities.add(ab3);
         this.abilities.add(ab4);
         updateAbilityButtons();
+         */
     }
 
     public void updateAbilityButtons() {

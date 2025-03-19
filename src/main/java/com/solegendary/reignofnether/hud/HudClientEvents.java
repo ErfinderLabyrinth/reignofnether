@@ -75,6 +75,7 @@ import java.util.*;
 import static com.solegendary.reignofnether.hud.buttons.HelperButtons.*;
 import static com.solegendary.reignofnether.tutorial.TutorialClientEvents.helpButton;
 import static com.solegendary.reignofnether.unit.UnitClientEvents.*;
+import static com.solegendary.reignofnether.util.MiscUtil.fcs;
 
 public class HudClientEvents {
 
@@ -595,9 +596,16 @@ public class HudClientEvents {
             );
             hudZones.add(unitPortraitZone);
 
-            if (hudSelectedEntity instanceof HeroUnit heroUnit)
-                hudZones.add(portraitRendererUnit.renderHeroLevelAndExp(evt.getPoseStack(), blitX + 1, blitY - 5, mouseX, mouseY, heroUnit));
-
+            if (hudSelectedEntity instanceof HeroUnit heroUnit) {
+                RectZone zone = portraitRendererUnit.renderHeroLevelAndExp(evt.getPoseStack(), blitX + 1, blitY - 5, mouseX, mouseY, heroUnit);
+                hudZones.add(zone);
+                if (zone.isMouseOver(mouseX, mouseY)) {
+                    MyRenderer.renderTooltip(evt.getPoseStack(),
+                        List.of(fcs(I18n.get("hud.hero.reignofnether.experience", heroUnit.getExpOnCurrentLevel(), heroUnit.getExpToNextlevel()))),
+                        mouseX, mouseY
+                    );
+                }
+            }
             blitX += portraitRendererUnit.frameWidth;
 
             if (hudSelectedEntity instanceof Unit unit) {

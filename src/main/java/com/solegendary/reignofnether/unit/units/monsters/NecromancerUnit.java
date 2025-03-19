@@ -124,8 +124,8 @@ public class NecromancerUnit extends Skeleton implements Unit, AttackerUnit, Ran
 
     // endregion
 
-    private int skillPoints = 0;
-    private int experience = 3000;
+    private int skillPoints = 4;
+    private int experience = 1000;
     private boolean rankUpMenuOpen = false;
     @Override public int getSkillPoints() { return skillPoints; }
     @Override public void setSkillPoints(int points) { skillPoints = points; }

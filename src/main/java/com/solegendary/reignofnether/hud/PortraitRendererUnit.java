@@ -203,6 +203,8 @@ public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<
         if (!(entity instanceof Player)) {
             GuiComponent.drawString(poseStack, Minecraft.getInstance().font, name, x + 4, y - 9, 0xFFFFFFFF);
         }
+        if (entity instanceof HeroUnit heroUnit)
+            y += 6;
 
         RectZone rectZone = RectZone.getZoneByLW(x, y, frameWidth, frameHeight);
 
@@ -336,7 +338,7 @@ public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<
                 Math.round((float) width * expPercent), height, // dimensions of blit texture
                 width, height // size of texture itself (if < dimensions, texture is repeated)
         );
-        return RectZone.getZoneByLW(x, y, width, height);
+        return RectZone.getZoneByLW(x, y-2, width, height+4);
     }
 
     public RectZone renderResourcesHeld(PoseStack poseStack, String name, int x, int y, Unit unit) {

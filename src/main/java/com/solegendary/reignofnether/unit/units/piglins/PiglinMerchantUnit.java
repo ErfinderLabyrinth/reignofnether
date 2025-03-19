@@ -194,6 +194,7 @@ public class PiglinMerchantUnit extends Piglin implements Unit, AttackerUnit, He
     public PiglinMerchantUnit(EntityType<? extends Piglin> entityType, Level level) {
         super(entityType, level);
 
+        /*
         ThrowTNT ab1 = new ThrowTNT(this);
         FancyFeast ab2 = new FancyFeast(this);
         GreedIsGoodPassive ab3 = new GreedIsGoodPassive(this);
@@ -203,6 +204,7 @@ public class PiglinMerchantUnit extends Piglin implements Unit, AttackerUnit, He
         this.abilities.add(ab3);
         this.abilities.add(ab4);
         updateAbilityButtons();
+         */
     }
 
     public void updateAbilityButtons() {

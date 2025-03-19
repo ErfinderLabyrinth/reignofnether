@@ -594,6 +594,7 @@
     "hud.relationship.reignofnether.neutral": "Neutral",
 
     "hud.hero.reignofnether.level": " (Lvl %d)",
+    "hud.hero.reignofnether.experience": "Experience: %d/%d",
 
     "server.reignofnether.is_defeated": "%s has %s and is defeated!",
     "server.reignofnether.lost_buildings": "lost all their buildings",
