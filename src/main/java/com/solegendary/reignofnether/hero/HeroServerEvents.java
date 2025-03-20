@@ -23,7 +23,7 @@ public class HeroServerEvents {
 
                     if (!AlliancesServerEvents.isAllied(heroOwner, deadOwner) && !heroOwner.equals(deadOwner) &&
                         heroUnit.getHeroLevel() < HeroUnit.MAX_HERO_LEVEL) {
-                        int expValue = (deadUnit.getCost().population + 1) * 10;
+                        int expValue = (deadUnit.getCost().population + 1);
 
                         while (expValue > 0) {
                             HeroExperienceOrb expOrb = HeroExperienceOrb.newOrb(level,

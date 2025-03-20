@@ -185,9 +185,9 @@
     "abilities.reignofnether.soul_siphon.rank3": "Rank 3: 40 max souls, spells use up to 10 souls",
     "abilities.reignofnether.blood_moon": "Blood Moon (Ultimate)",
     "abilities.reignofnether.blood_moon.stats": "\uE004  %ds",
-    "abilities.reignofnether.blood_moon.tooltip1": "Temporarily distorts the time to midnight, ",
-    "abilities.reignofnether.blood_moon.tooltip2": "under a blood red moon, granting friendly ",
-    "abilities.reignofnether.blood_moon.tooltip3": "monster units 20%% increased movement speed.",
+    "abilities.reignofnether.blood_moon.tooltip1": "Distorts day into night under a blood red moon, ",
+    "abilities.reignofnether.blood_moon.tooltip2": "causing neutral undead to spawn all over the map ",
+    "abilities.reignofnether.blood_moon.tooltip3": "and attack enemy bases while active.",
     "abilities.reignofnether.blood_moon.tooltip4": "Lasts %ds + %ds per soul used.",
 
     "abilities.reignofnether.throw_tnt": "TNT Toss",

@@ -1,6 +1,10 @@
 package com.solegendary.reignofnether.unit.interfaces;
 
+import com.solegendary.reignofnether.hero.HeroClientboundPacket;
+import com.solegendary.reignofnether.sounds.SoundAction;
+import com.solegendary.reignofnether.sounds.SoundClientboundPacket;
 import io.netty.util.internal.MathUtil;
+import net.minecraft.world.entity.LivingEntity;
 
 public interface HeroUnit {
 
@@ -23,12 +27,13 @@ public interface HeroUnit {
         setExperience(getExperience() + amount);
         int levelDiff = getHeroLevel() - levelBefore;
 
+        HeroClientboundPacket.setExperience(((LivingEntity) this).getId(), getExperience());
         if (levelDiff > 0) {
             setSkillPoints(getSkillPoints() + levelDiff);
+            HeroClientboundPacket.setSkillPoints(((LivingEntity) this).getId(), getSkillPoints());
+            SoundClientboundPacket.playSoundAtPos(SoundAction.LEVEL_UP, ((LivingEntity) this).getOnPos());
         }
         System.out.println("added exp: " + amount);
-
-        // TODO: send clientbound packet to set exp and skillpoints
     }
 
     // we always track total exp and then reduce down for the UI
