@@ -6,21 +6,20 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Quaternion;
 import com.mojang.math.Vector3f;
 import com.solegendary.reignofnether.api.ReignOfNetherRegistries;
-import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingClientEvents;
 import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.buildings.monsters.SculkCatalyst;
-import com.solegendary.reignofnether.building.buildings.villagers.Library;
 import com.solegendary.reignofnether.building.buildings.placements.SculkCatalystPlacement;
 import com.solegendary.reignofnether.healthbars.HealthBarClientEvents;
 import com.solegendary.reignofnether.unit.Relationship;
+import com.solegendary.reignofnether.util.Faction;
+import com.solegendary.reignofnether.util.LanguageUtil;
 import com.solegendary.reignofnether.util.MyRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
@@ -46,7 +45,7 @@ class PortraitRendererBuilding {
         Relationship rs = BuildingClientEvents.getPlayerToBuildingRelationship(building);
 
         ResourceLocation key = ReignOfNetherRegistries.BUILDING.getKey(building.getBuilding());
-        String name = I18n.get("buildings." + building.getFaction().name().toLowerCase() + "." + key.getNamespace() + "." + key.getPath());
+        String name = LanguageUtil.getTranslation("buildings." + (building.getFaction() != null && building.getFaction() != Faction.NONE ? building.getFaction().name().toLowerCase() : "neutral") + "." + key.getNamespace() + "." + key.getPath());
 
         if (building.getUpgradeLevel() > 0)
             name = building.getUpgradedName();

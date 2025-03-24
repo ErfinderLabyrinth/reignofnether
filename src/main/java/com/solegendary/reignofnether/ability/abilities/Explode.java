@@ -1,14 +1,14 @@
 package com.solegendary.reignofnether.ability.abilities;
 
-import net.minecraft.client.resources.language.I18n;
 import com.solegendary.reignofnether.ReignOfNether;
+import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybinding;
-import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.unit.UnitAction;
 import com.solegendary.reignofnether.unit.UnitClientEvents;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.units.monsters.CreeperUnit;
+import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
@@ -18,10 +18,7 @@ import net.minecraft.world.level.Level;
 import java.util.List;
 
 public class Explode extends Ability {
-
-    private final CreeperUnit creeperUnit;
-
-    public Explode(CreeperUnit creeperUnit) {
+    public Explode() {
         super(
             UnitAction.EXPLODE,
             0,
@@ -29,7 +26,6 @@ public class Explode extends Ability {
             0,
             false
         );
-        this.creeperUnit = creeperUnit;
     }
 
     @Override
@@ -52,6 +48,6 @@ public class Explode extends Ability {
 
     @Override
     public void use(Level level, Unit unitUsing, BlockPos targetBp) {
-        creeperUnit.startToExplode();
+        ((CreeperUnit)unitUsing).startToExplode();
     }
 }

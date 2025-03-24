@@ -1,20 +1,19 @@
 package com.solegendary.reignofnether.ability.abilities;
 
-import com.solegendary.reignofnether.building.production.ProductionItems;
-import com.solegendary.reignofnether.unit.UnitAnimationAction;
-import com.solegendary.reignofnether.unit.packets.UnitAnimationClientboundPacket;
-import net.minecraft.client.resources.language.I18n;
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.ability.Ability;
+import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.research.ResearchClient;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.unit.UnitAction;
+import com.solegendary.reignofnether.unit.UnitAnimationAction;
 import com.solegendary.reignofnether.unit.UnitClientEvents;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
-import com.solegendary.reignofnether.unit.packets.UnitSyncClientboundPacket;
+import com.solegendary.reignofnether.unit.packets.UnitAnimationClientboundPacket;
 import com.solegendary.reignofnether.unit.units.piglins.BruteUnit;
+import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
@@ -31,9 +30,7 @@ public class ToggleShield extends Ability {
 
     private static final int CD_MAX_SECONDS = 0;
 
-    private final BruteUnit bruteUnit;
-
-    public ToggleShield(BruteUnit bruteUnit) {
+    public ToggleShield() {
         super(
                 UnitAction.TOGGLE_SHIELD,
                 CD_MAX_SECONDS * ResourceCost.TICKS_PER_SECOND,
@@ -41,11 +38,11 @@ public class ToggleShield extends Ability {
                 0,
                 false
         );
-        this.bruteUnit = bruteUnit;
     }
 
     @Override
     public AbilityButton getButton(Keybinding hotkey, Unit unit) {
+        BruteUnit bruteUnit = (BruteUnit) unit;
         return new AbilityButton(
                 "Shield Stance",
                 new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/shield.png"),
@@ -69,12 +66,13 @@ public class ToggleShield extends Ability {
 
     @Override
     public void use(Level level, Unit unitUsing, BlockPos targetBp) {
+        BruteUnit bruteUnit = (BruteUnit) unitUsing;
         bruteUnit.isHoldingUpShield = !bruteUnit.isHoldingUpShield;
         if (!level.isClientSide()) {
             if (bruteUnit.isHoldingUpShield)
-                UnitAnimationClientboundPacket.sendBasicPacket(UnitAnimationAction.NON_KEYFRAME_START, this.bruteUnit);
+                UnitAnimationClientboundPacket.sendBasicPacket(UnitAnimationAction.NON_KEYFRAME_START, bruteUnit);
             else
-                UnitAnimationClientboundPacket.sendBasicPacket(UnitAnimationAction.NON_KEYFRAME_STOP, this.bruteUnit);
+                UnitAnimationClientboundPacket.sendBasicPacket(UnitAnimationAction.NON_KEYFRAME_STOP, bruteUnit);
 
             BlockPos bp = unitUsing.getMoveGoal().getMoveTarget();
             unitUsing.getMoveGoal().stopMoving();

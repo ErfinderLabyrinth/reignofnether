@@ -5,17 +5,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.event.entity.item.ItemEvent;
 
 import java.util.ArrayList;
 import java.util.Random;
-
-import java.util.HashSet;
-import java.util.Set;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.logging.Logger;
 
 public class NetherZone {
 

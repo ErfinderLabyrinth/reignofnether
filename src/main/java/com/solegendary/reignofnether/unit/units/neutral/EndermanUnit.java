@@ -1,11 +1,12 @@
 package com.solegendary.reignofnether.unit.units.neutral;
 
+import com.solegendary.reignofnether.ability.Abilities;
+import com.solegendary.reignofnether.ability.Ability;
+import com.solegendary.reignofnether.ability.abilities.Teleport;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
-import com.solegendary.reignofnether.ability.Ability;
-import com.solegendary.reignofnether.ability.abilities.Teleport;
 import com.solegendary.reignofnether.unit.Checkpoint;
 import com.solegendary.reignofnether.unit.goals.*;
 import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
@@ -35,6 +36,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EndermanUnit extends EnderMan implements Unit, AttackerUnit {
+    public static final Abilities ABILITIES = new Abilities();
+    static {
+        ABILITIES.add(new Teleport(), Keybindings.keyQ);
+    }
+
     // region
     private BlockPos anchorPos = new BlockPos(0,0,0);
     public void setAnchor(BlockPos bp) { anchorPos = bp; }
@@ -124,8 +130,8 @@ public class EndermanUnit extends EnderMan implements Unit, AttackerUnit {
     private AbstractMeleeAttackUnitGoal attackGoal;
     private MeleeAttackBuildingGoal attackBuildingGoal;
 
-    private final List<AbilityButton> abilityButtons = new ArrayList<>();
-    private final List<Ability> abilities = new ArrayList<>();
+    private final List<AbilityButton> abilityButtons;
+    private final List<Ability> abilities;
     private final List<ItemStack> items = new ArrayList<>();
 
     // TODO: prevent random teleport on being wet, damaged or being shot (but keep the damage)
@@ -133,11 +139,8 @@ public class EndermanUnit extends EnderMan implements Unit, AttackerUnit {
     public EndermanUnit(EntityType<? extends EnderMan> entityType, Level level) {
         super(entityType, level);
 
-        Teleport ab1 = new Teleport(this);
-        this.abilities.add(ab1);
-
-        if (level.isClientSide())
-            this.abilityButtons.add(ab1.getButton(Keybindings.keyQ));
+        this.abilities = ABILITIES.get();
+        this.abilityButtons = ABILITIES.getButtons(this);
     }
 
     @Override

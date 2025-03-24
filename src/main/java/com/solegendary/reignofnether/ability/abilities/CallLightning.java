@@ -1,17 +1,14 @@
 package com.solegendary.reignofnether.ability.abilities;
 
-import com.ibm.icu.impl.Assert;
 import com.solegendary.reignofnether.ReignOfNether;
-import com.solegendary.reignofnether.building.Building;
+import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.building.BuildingPlacement;
-import com.solegendary.reignofnether.building.Buildings;
 import com.solegendary.reignofnether.building.buildings.monsters.Laboratory;
 import com.solegendary.reignofnether.building.buildings.placements.RangeIndicatorProductionPlacement;
 import com.solegendary.reignofnether.cursor.CursorClientEvents;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.resources.ResourceCost;
-import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.unit.UnitAction;
 import com.solegendary.reignofnether.util.MiscUtil;
 import com.solegendary.reignofnether.util.MyMath;
@@ -56,7 +53,7 @@ public class CallLightning extends Ability {
             () -> lab.getUpgradeLevel() == 0,
             () -> {
                 if (lab.getBuilding() instanceof Laboratory laboratory)
-                    return laboratory.getLightningRodPos() != null;
+                    return laboratory.getLightningRodPos(lab) != null;
                 else
                     return false;
             },

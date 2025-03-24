@@ -1,6 +1,5 @@
 package com.solegendary.reignofnether.fogofwar;
 
-import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingBlock;
 import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.buildings.shared.AbstractBridge;

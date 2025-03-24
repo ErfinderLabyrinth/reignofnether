@@ -2,10 +2,10 @@ package com.solegendary.reignofnether.research.researchItems;
 
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.building.BuildingServerboundPacket;
-import com.solegendary.reignofnether.building.production.ProductionItem;
-import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.building.buildings.placements.ProductionPlacement;
 import com.solegendary.reignofnether.building.buildings.villagers.Castle;
+import com.solegendary.reignofnether.building.production.ProductionItem;
+import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.resources.ResourceCost;
@@ -43,7 +43,7 @@ public class ResearchCastleFlag extends ProductionItem {
             new ResourceLocation(ReignOfNether.MOD_ID, "textures/hud/icon_frame_bronze.png"),
             hotkey,
             () -> false,
-            () -> ProductionItems.RESEARCH_CASTLE_FLAG.itemIsBeingProduced(prodBuilding) || (
+            () -> ProductionItems.RESEARCH_CASTLE_FLAG.itemIsBeingProduced(prodBuilding.ownerName) || (
                 prodBuilding.getBuilding() instanceof Castle castle && prodBuilding.getUpgradeLevel() > 0
             ),
             () -> true,

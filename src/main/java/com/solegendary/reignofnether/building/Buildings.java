@@ -3,6 +3,7 @@ package com.solegendary.reignofnether.building;
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.api.ReignOfNetherRegistries;
 import com.solegendary.reignofnether.building.buildings.monsters.*;
+import com.solegendary.reignofnether.building.buildings.neutral.*;
 import com.solegendary.reignofnether.building.buildings.piglins.*;
 import com.solegendary.reignofnether.building.buildings.villagers.*;
 import net.minecraft.core.Registry;
@@ -44,6 +45,11 @@ public class Buildings {
     public static final Castle CASTLE = register(new ResourceLocation(ReignOfNether.MOD_ID, "castle"), new Castle());
     public static final IronGolemBuilding IRON_GOLEM_BUILDING = register(new ResourceLocation(ReignOfNether.MOD_ID, "iron_golem_building"), new IronGolemBuilding());
     public static final OakBridge OAK_BRIDGE = register(new ResourceLocation(ReignOfNether.MOD_ID, "oak_bridge"), new OakBridge());
+    public static final Beacon BEACON = register(new ResourceLocation(ReignOfNether.MOD_ID, "beacon"), new Beacon());
+    public static final CapturableBeacon CAPTURABLE_BEACON = register(new ResourceLocation(ReignOfNether.MOD_ID, "capturable_beacon"), new CapturableBeacon());
+    public static final EndPortal END_PORTAL = register(new ResourceLocation(ReignOfNether.MOD_ID, "end_portal"), new EndPortal());
+    public static final HealingFountain HEALING_FOUNTAIN = register(new ResourceLocation(ReignOfNether.MOD_ID, "healing_fountain"), new HealingFountain());
+    public static final NeutralTransportPortal NEUTRAL_TRANSPORT_PORTAL = register(new ResourceLocation(ReignOfNether.MOD_ID, "neutral_transport_portal"), new NeutralTransportPortal());
 
     private static <T extends Building> T register(ResourceLocation id, T building) {
         return Registry.register(ReignOfNetherRegistries.BUILDING, id, building);

@@ -9,8 +9,8 @@ import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
 import com.solegendary.reignofnether.unit.Relationship;
 import com.solegendary.reignofnether.unit.UnitClientEvents;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
+import com.solegendary.reignofnether.util.LanguageUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
@@ -24,8 +24,8 @@ import java.util.List;
 
 import static com.solegendary.reignofnether.building.BuildingClientEvents.getPlayerToBuildingRelationship;
 import static com.solegendary.reignofnether.building.BuildingClientEvents.getSelectedBuildings;
-import static com.solegendary.reignofnether.hud.HudClientEvents.hudSelectedPlacement;
 import static com.solegendary.reignofnether.hud.HudClientEvents.hudSelectedEntity;
+import static com.solegendary.reignofnether.hud.HudClientEvents.hudSelectedPlacement;
 import static com.solegendary.reignofnether.unit.UnitClientEvents.*;
 
 // classic RTS control groups that can contain either buildings or units
@@ -160,7 +160,7 @@ public class ControlGroup {
                     clearAll();
             },
             List.of(FormattedCharSequence.forward(
-                I18n.get("hud.control_group.reignofnether.control_group", keybinding.buttonLabel),
+                LanguageUtil.getTranslation("hud.control_group.reignofnether.control_group", keybinding.buttonLabel),
                 Style.EMPTY
             ))
         );

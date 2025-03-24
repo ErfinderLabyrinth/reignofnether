@@ -4,6 +4,8 @@ import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,16 +25,22 @@ public class Abilities {
 
     public List<AbilityButton> getButtons(BuildingPlacement placement) {
         List<AbilityButton> buttons = new ArrayList<>();
-        for (Map.Entry<Ability, Keybinding> ability : abilities.entrySet()) {
-            buttons.add(ability.getKey().getButton(ability.getValue(), placement));
+        //TODO Remove need for Minecraft
+        if (FMLEnvironment.dist == Dist.CLIENT) {
+            for (Map.Entry<Ability, Keybinding> ability : abilities.entrySet()) {
+                buttons.add(ability.getKey().getButton(ability.getValue(), placement));
+            }
         }
         return buttons;
     }
 
     public List<AbilityButton> getButtons(Unit unit) {
         List<AbilityButton> buttons = new ArrayList<>();
-        for (Map.Entry<Ability, Keybinding> ability : abilities.entrySet()) {
-            buttons.add(ability.getKey().getButton(ability.getValue(), unit));
+        //TODO Remove need for I18n
+        if (FMLEnvironment.dist == Dist.CLIENT) {
+            for (Map.Entry<Ability, Keybinding> ability : abilities.entrySet()) {
+                buttons.add(ability.getKey().getButton(ability.getValue(), unit));
+            }
         }
         return buttons;
     }

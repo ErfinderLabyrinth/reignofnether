@@ -2,7 +2,6 @@ package com.solegendary.reignofnether.building.buildings.placements;
 
 import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingBlock;
-import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.BuildingUtils;
 import com.solegendary.reignofnether.resources.*;
 import net.minecraft.core.BlockPos;

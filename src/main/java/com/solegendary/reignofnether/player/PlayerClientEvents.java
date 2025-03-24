@@ -1,6 +1,5 @@
 package com.solegendary.reignofnether.player;
 
-import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingClientEvents;
 import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientEvents;
@@ -266,7 +265,7 @@ public class PlayerClientEvents {
         ResearchClient.removeAllCheats();
         BuildingClientEvents.getSelectedBuildings().clear();
         BuildingClientEvents.getBuildings().removeIf(b -> b.shouldDestroyOnReset || hardReset);
-        for (Building building : BuildingClientEvents.getBuildings())
+        for (BuildingPlacement building : BuildingClientEvents.getBuildings())
             building.ownerName = "";
         ResourcesClientEvents.resourcesList.clear();
         ClientGameModeHelper.gameMode = ClientGameModeHelper.DEFAULT_GAMEMODE;

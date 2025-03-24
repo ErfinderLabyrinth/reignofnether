@@ -1,8 +1,8 @@
 package com.solegendary.reignofnether.unit.units.monsters;
 
 import com.solegendary.reignofnether.ReignOfNether;
-import com.solegendary.reignofnether.building.ProductionBuilding;
-import com.solegendary.reignofnether.building.ProductionItem;
+import com.solegendary.reignofnether.building.buildings.placements.ProductionPlacement;
+import com.solegendary.reignofnether.building.production.ProductionItem;
 import com.solegendary.reignofnether.cursor.CursorClientEvents;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.registrars.EntityRegistrar;
@@ -24,24 +24,20 @@ public class ZombiePiglinProd extends ProductionItem {
     public final static String itemName = "Zombie Piglin";
     public final static ResourceCost cost = ResourceCosts.ZOMBIE_PIGLIN;
 
-    public ZombiePiglinProd(ProductionBuilding building) {
-        super(building, cost.ticks);
-        this.onComplete = (Level level) -> {
+    public ZombiePiglinProd() {
+        super(cost);
+        this.onComplete = (Level level, ProductionPlacement placement) -> {
             if (!level.isClientSide()) {
-                building.produceUnit((ServerLevel) level, EntityRegistrar.ZOMBIE_PIGLIN_UNIT.get(), building.ownerName, true);
+                placement.produceUnit((ServerLevel) level, EntityRegistrar.ZOMBIE_PIGLIN_UNIT.get(), placement.ownerName, true);
             }
         };
-        this.foodCost = cost.food;
-        this.woodCost = cost.wood;
-        this.oreCost = cost.ore;
-        this.popCost = cost.population;
     }
 
     public String getItemName() {
         return ZombiePiglinProd.itemName;
     }
 
-    public static AbilityButton getPlaceButton() {
+    public AbilityButton getPlaceButton() {
         return new AbilityButton(
                 itemName,
                 new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/zombie_piglin.png"),

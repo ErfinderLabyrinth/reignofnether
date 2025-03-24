@@ -6,16 +6,18 @@ import com.solegendary.reignofnether.ability.abilities.ConnectPortal;
 import com.solegendary.reignofnether.ability.abilities.DisconnectPortal;
 import com.solegendary.reignofnether.ability.abilities.GotoPortal;
 import com.solegendary.reignofnether.api.ReignOfNetherRegistries;
-import com.solegendary.reignofnether.building.*;
+import com.solegendary.reignofnether.building.BuildingClientEvents;
+import com.solegendary.reignofnether.building.BuildingPlacement;
+import com.solegendary.reignofnether.building.Buildings;
 import com.solegendary.reignofnether.building.buildings.placements.PortalPlacement;
 import com.solegendary.reignofnether.building.production.ProductionBuilding;
 import com.solegendary.reignofnether.building.production.ProductionItems;
-import com.solegendary.reignofnether.building.buildings.neutral.NeutralTransportPortal;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.research.ResearchClient;
-import com.solegendary.reignofnether.resources.*;
+import com.solegendary.reignofnether.resources.ResourceCost;
+import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.util.Faction;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
@@ -49,7 +51,12 @@ public class Portal extends ProductionBuilding {
     public final static ResourceCost cost = ResourceCosts.BASIC_PORTAL;
 
     public Portal() {
-        super(structureName, cost, false);
+        this(false);
+    }
+
+
+    public Portal(boolean capitol) {
+        super(structureName, cost, capitol);
         this.name = buildingName;
         this.portraitBlock = Blocks.GRAY_GLAZED_TERRACOTTA;
         this.icon = new ResourceLocation("minecraft", "textures/block/gray_glazed_terracotta.png");
@@ -77,7 +84,7 @@ public class Portal extends ProductionBuilding {
     }
 
     @Override
-    public int getUpgradeLevel() {
+    public int getUpgradeLevel(BuildingPlacement placement) {
         if (placement instanceof PortalPlacement portalPlacement) {
             return portalPlacement.portalType != PortalPlacement.PortalType.BASIC ? 1 : 0;
         }else {
@@ -86,7 +93,7 @@ public class Portal extends ProductionBuilding {
     }
 
     @Override
-    public BuildingPlacement createBuildingPlacement(Level level, BlockPos pos, Rotation rotation, String ownerName) {
+    public PortalPlacement createBuildingPlacement(Level level, BlockPos pos, Rotation rotation, String ownerName) {
         return new PortalPlacement(this, level, pos, rotation, ownerName, getCulledBlocks(getAbsoluteBlockData(getRelativeBlockData(level), level, pos, rotation), level), false);
     }
 
@@ -114,6 +121,14 @@ public class Portal extends ProductionBuilding {
             ),
             null
         );
+    }
+
+    public double getMaxRange() {
+        return 20;
+    }
+
+    public double getStartingRange() {
+        return 3;
     }
 }
 

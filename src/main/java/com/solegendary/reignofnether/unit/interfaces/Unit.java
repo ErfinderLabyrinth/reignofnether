@@ -1,8 +1,9 @@
 package com.solegendary.reignofnether.unit.interfaces;
 
+import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.building.BuildingUtils;
-import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.building.buildings.placements.BridgePlacement;
+import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.nether.NetherBlocks;
@@ -10,13 +11,13 @@ import com.solegendary.reignofnether.research.ResearchClient;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
 import com.solegendary.reignofnether.resources.*;
 import com.solegendary.reignofnether.time.NightUtils;
+import com.solegendary.reignofnether.unit.Checkpoint;
 import com.solegendary.reignofnether.unit.UnitAction;
 import com.solegendary.reignofnether.unit.UnitServerEvents;
 import com.solegendary.reignofnether.unit.goals.*;
 import com.solegendary.reignofnether.unit.packets.UnitSyncClientboundPacket;
-import com.solegendary.reignofnether.ability.Ability;
-import com.solegendary.reignofnether.unit.units.piglins.GhastUnit;
 import com.solegendary.reignofnether.unit.units.piglins.BruteUnit;
+import com.solegendary.reignofnether.unit.units.piglins.GhastUnit;
 import com.solegendary.reignofnether.util.Faction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerChunkCache;
@@ -108,7 +109,7 @@ public interface Unit {
             }
         }
         for (Ability ability : unit.getAbilities())
-            ability.tickCooldown();
+            ability.tickCooldown(unitMob.level);
 
         // ------------- CHECKPOINT LOGIC ------------- //
         if (unitMob.level.isClientSide()) {
@@ -119,7 +120,7 @@ public interface Unit {
                 cp.tick();
                 boolean buildingIsDone = false;
                 if (unit instanceof WorkerUnit workerUnit && !cp.isForEntity()) {
-                    if (cp.building != null && cp.building.isBuilt && cp.building.getHealth() >= cp.building.getMaxHealth())
+                    if (cp.placement != null && cp.placement.isBuilt && cp.placement.getHealth() >= cp.placement.getMaxHealth())
                         buildingIsDone = true;
                 }
                 if (((Mob) unit).getOnPos().distToCenterSqr(cp.getPos()) < 4f || buildingIsDone)

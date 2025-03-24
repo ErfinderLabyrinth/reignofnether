@@ -1,18 +1,11 @@
 package com.solegendary.reignofnether.unit.goals;
 
-import com.solegendary.reignofnether.building.BuildingUtils;
 import com.solegendary.reignofnether.registrars.GameRuleRegistrar;
-import com.solegendary.reignofnether.resources.ResourcesServerEvents;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.util.MiscUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.control.MoveControl;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.LeavesBlock;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
 
 import javax.annotation.Nullable;
 

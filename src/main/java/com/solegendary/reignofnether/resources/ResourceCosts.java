@@ -3,7 +3,6 @@ package com.solegendary.reignofnether.resources;
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.config.ReignOfNetherCommonConfigs;
 import com.solegendary.reignofnether.util.MyRenderer;
-import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.util.FormattedCharSequence;
 
 // defined here because we need to be able to access in both

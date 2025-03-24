@@ -31,12 +31,12 @@ public class CastSummonVexes extends Ability {
 
     public CastSummonVexes(EvokerUnit evokerUnit) {
         super(
-            UnitAction.CAST_SUMMON_VEXES,
-            CD_MAX_SECONDS * ResourceCost.TICKS_PER_SECOND,
-            0,
-            0,
-            true,
-            false
+                UnitAction.CAST_SUMMON_VEXES,
+                CD_MAX_SECONDS * ResourceCost.TICKS_PER_SECOND,
+                0,
+                0,
+                true,
+                false
         );
         this.evokerUnit = evokerUnit;
     }
@@ -44,25 +44,25 @@ public class CastSummonVexes extends Ability {
     @Override
     public AbilityButton getButton(Keybinding hotkey, Unit unit) {
         return new AbilityButton(
-            "Summon Vexes",
-            new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/vex.png"),
-            hotkey,
-            () -> {
-                if (this.evokerUnit.getCastSummonVexesGoal() != null)
-                    return this.evokerUnit.getCastSummonVexesGoal().isCasting();
-                return false;
-            },
-            () -> !ResearchClient.hasResearch(ProductionItems.RESEARCH_EVOKER_VEXES),
-            () -> true,
-            () -> UnitClientEvents.sendUnitCommand(UnitAction.CAST_SUMMON_VEXES),
-            null,
-            List.of(
-                FormattedCharSequence.forward(I18n.get("abilities.reignofnether.summon_vexes"), Style.EMPTY.withBold(true)),
-                FormattedCharSequence.forward(I18n.get("abilities.reignofnether.summon_vexes.tooltip1", CD_MAX_SECONDS), MyRenderer.iconStyle),
-                FormattedCharSequence.forward(I18n.get("abilities.reignofnether.summon_vexes.tooltip2", EvokerUnit.SUMMON_VEXES_AMOUNT), Style.EMPTY),
-                FormattedCharSequence.forward(I18n.get("abilities.reignofnether.summon_vexes.tooltip3", VEX_DURATION_SECONDS), Style.EMPTY)
-            ),
-            this
+                "Summon Vexes",
+                new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/vex.png"),
+                hotkey,
+                () -> {
+                    if (this.evokerUnit.getCastSummonVexesGoal() != null)
+                        return this.evokerUnit.getCastSummonVexesGoal().isCasting();
+                    return false;
+                },
+                () -> !ResearchClient.hasResearch(ProductionItems.RESEARCH_EVOKER_VEXES),
+                () -> true,
+                () -> UnitClientEvents.sendUnitCommand(UnitAction.CAST_SUMMON_VEXES),
+                null,
+                List.of(
+                        FormattedCharSequence.forward(I18n.get("abilities.reignofnether.summon_vexes"), Style.EMPTY.withBold(true)),
+                        FormattedCharSequence.forward(I18n.get("abilities.reignofnether.summon_vexes.tooltip1", CD_MAX_SECONDS), MyRenderer.iconStyle),
+                        FormattedCharSequence.forward(I18n.get("abilities.reignofnether.summon_vexes.tooltip2", EvokerUnit.SUMMON_VEXES_AMOUNT), Style.EMPTY),
+                        FormattedCharSequence.forward(I18n.get("abilities.reignofnether.summon_vexes.tooltip3", VEX_DURATION_SECONDS), Style.EMPTY)
+                ),
+                this
         );
     }
 
@@ -79,7 +79,7 @@ public class CastSummonVexes extends Ability {
         if (evokerUnit.hasVigorEnchant())
             setCooldown((int) (cooldownMax * EnchantVigor.cooldownMultiplier), evokerUnit.level);
         else
-            setCooldown(cooldownMax, evokerUnit.level);
+            setToMaxCooldown();
     }
 
     @Override

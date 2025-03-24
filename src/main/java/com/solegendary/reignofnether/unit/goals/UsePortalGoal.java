@@ -1,17 +1,15 @@
 package com.solegendary.reignofnether.unit.goals;
 
-import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.BuildingUtils;
 import com.solegendary.reignofnether.building.buildings.neutral.NeutralTransportPortal;
-import com.solegendary.reignofnether.building.buildings.piglins.Portal;
 import com.solegendary.reignofnether.building.buildings.placements.PortalPlacement;
 import com.solegendary.reignofnether.hud.HudClientEvents;
 import com.solegendary.reignofnether.sounds.SoundAction;
 import com.solegendary.reignofnether.sounds.SoundClientboundPacket;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
+import com.solegendary.reignofnether.util.LanguageUtil;
 import com.solegendary.reignofnether.util.MiscUtil;
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.phys.Vec3;
@@ -69,7 +67,7 @@ public class UsePortalGoal extends MoveToTargetBlockGoal {
                             buildingTarget.centrePos.getZ()
                         ), true);
                     } else {
-                        HudClientEvents.showTemporaryMessage(I18n.get("hud.reignofnether.no_destination"));
+                        HudClientEvents.showTemporaryMessage(LanguageUtil.getTranslation("hud.reignofnether.no_destination"));
                     }
                 }
             } else {

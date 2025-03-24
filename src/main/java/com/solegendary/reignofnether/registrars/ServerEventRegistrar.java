@@ -14,7 +14,6 @@ import com.solegendary.reignofnether.resources.ResourcesServerEvents;
 import com.solegendary.reignofnether.startpos.StartPosServerEvents;
 import com.solegendary.reignofnether.survival.SurvivalServerEvents;
 import com.solegendary.reignofnether.tps.TPSServerEvents;
-import com.solegendary.reignofnether.tutorial.TutorialServerEvents;
 import com.solegendary.reignofnether.unit.UnitServerEvents;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;

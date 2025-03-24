@@ -8,7 +8,6 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.network.PacketDistributor;
 
-import java.util.HashMap;
 import java.util.function.Supplier;
 
 public class ConfigVanillaServerEvents {

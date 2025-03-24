@@ -5,11 +5,11 @@
 
 package com.solegendary.reignofnether.unit.goals;
 
-import java.util.EnumSet;
-
 import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
+
+import java.util.EnumSet;
 
 public class RandomLookAroundUnitGoal extends Goal {
     private final Mob mob;

@@ -1,11 +1,12 @@
 package com.solegendary.reignofnether.unit.units.monsters;
 
 import com.mojang.math.Vector3d;
+import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.SonicBoom;
 import com.solegendary.reignofnether.building.BuildingPlacement;
-import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.building.buildings.placements.SculkCatalystPlacement;
+import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.research.ResearchClient;
@@ -16,7 +17,6 @@ import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.time.NightUtils;
 import com.solegendary.reignofnether.unit.Checkpoint;
 import com.solegendary.reignofnether.unit.Relationship;
-import com.solegendary.reignofnether.unit.UnitClientEvents;
 import com.solegendary.reignofnether.unit.UnitServerEvents;
 import com.solegendary.reignofnether.unit.goals.*;
 import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
@@ -53,6 +53,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WardenUnit extends Warden implements Unit, AttackerUnit {
+    public static final Abilities ABILITIES = new Abilities();
+    static {
+        ABILITIES.add(new SonicBoom(), Keybindings.keyQ);
+    }
     // region
     private BlockPos anchorPos = new BlockPos(0,0,0);
     public void setAnchor(BlockPos bp) { anchorPos = bp; }
@@ -145,8 +149,8 @@ public class WardenUnit extends Warden implements Unit, AttackerUnit {
 
     public SonicBoomGoal getSonicBoomGoal() { return sonicBoomGoal; }
 
-    private final List<AbilityButton> abilityButtons = new ArrayList<>();
-    private final List<Ability> abilities = new ArrayList<>();
+    private final List<AbilityButton> abilityButtons;
+    private final List<Ability> abilities;
     private final List<ItemStack> items = new ArrayList<>();
 
     public static final float SONIC_BOOM_DAMAGE = 75f;
@@ -156,11 +160,8 @@ public class WardenUnit extends Warden implements Unit, AttackerUnit {
     public WardenUnit(EntityType<? extends Warden> entityType, Level level) {
         super(entityType, level);
 
-        SonicBoom ab1 = new SonicBoom(this);
-        this.abilities.add(ab1);
-
-        if (level.isClientSide())
-            this.abilityButtons.add(ab1.getButton(Keybindings.keyQ, this));
+        this.abilities = ABILITIES.get();
+        this.abilityButtons = ABILITIES.getButtons(this);
     }
 
     @Override

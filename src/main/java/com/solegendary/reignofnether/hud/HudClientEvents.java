@@ -5,14 +5,12 @@ import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.CallToArmsUnit;
 import com.solegendary.reignofnether.alliance.AlliancesClient;
-import com.solegendary.reignofnether.alliance.AllianceSystem;
 import com.solegendary.reignofnether.api.ReignOfNetherRegistries;
 import com.solegendary.reignofnether.attackwarnings.AttackWarningClientEvents;
 import com.solegendary.reignofnether.building.*;
-import com.solegendary.reignofnether.building.buildings.neutral.Beacon;
+import com.solegendary.reignofnether.building.buildings.placements.BeaconPlacement;
 import com.solegendary.reignofnether.building.buildings.placements.ProductionPlacement;
 import com.solegendary.reignofnether.building.production.ActiveProduction;
-import com.solegendary.reignofnether.building.production.ProductionItem;
 import com.solegendary.reignofnether.config.ConfigClientEvents;
 import com.solegendary.reignofnether.gamemode.ClientGameModeHelper;
 import com.solegendary.reignofnether.gamemode.GameMode;
@@ -49,13 +47,13 @@ import com.solegendary.reignofnether.unit.units.piglins.HoglinUnit;
 import com.solegendary.reignofnether.unit.units.villagers.PillagerUnit;
 import com.solegendary.reignofnether.unit.units.villagers.RavagerUnit;
 import com.solegendary.reignofnether.unit.units.villagers.VillagerUnit;
+import com.solegendary.reignofnether.util.LanguageUtil;
 import com.solegendary.reignofnether.util.MiscUtil;
 import com.solegendary.reignofnether.util.MyRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.model.Model;
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
@@ -129,7 +127,7 @@ public class HudClientEvents {
             if (le instanceof Unit unit) {
                 for (Ability ability : unit.getAbilities()) {
                     totalCd += ability.getCooldown();
-                    if (ability.isChanneling())
+                    if (ability.isChanneling(unit))
                         totalCd += 10;
                 }
             }
@@ -179,22 +177,22 @@ public class HudClientEvents {
         ItemStack itemStack = ((LivingEntity) entity).getItemBySlot(EquipmentSlot.HEAD);
 
         if (itemStack.getItem() instanceof BannerItem) {
-            name += " " + I18n.get("units.villagers.reignofnether.captain");
+            name += " " + LanguageUtil.getTranslation("units.villagers.reignofnether.captain");
         }
         if (entity.getPassengers().size() == 1) {
             Entity passenger = entity.getPassengers().get(0);
             if (entity instanceof RavagerUnit && passenger instanceof PillagerUnit) {
-                name = I18n.get("units.villagers.reignofnether.ravager_artillery");
+                name = LanguageUtil.getTranslation("units.villagers.reignofnether.ravager_artillery");
             } else if (entity instanceof PoisonSpiderUnit && (
                     passenger instanceof SkeletonUnit || passenger instanceof StrayUnit
             )) {
-                name = I18n.get("units.monsters.reignofnether.poison_spider_jockey");
+                name = LanguageUtil.getTranslation("units.monsters.reignofnether.poison_spider_jockey");
             } else if (entity instanceof SpiderUnit && (
                 passenger instanceof SkeletonUnit || passenger instanceof StrayUnit
             )) {
-                name = I18n.get("units.monsters.reignofnether.spider_jockey");
+                name = LanguageUtil.getTranslation("units.monsters.reignofnether.spider_jockey");
             }else if (entity instanceof HoglinUnit && passenger instanceof HeadhunterUnit) {
-                name = I18n.get("units.piglins.reignofnether.hoglin_rider");
+                name = LanguageUtil.getTranslation("units.piglins.reignofnether.hoglin_rider");
             } else {
                 String pName = getSimpleEntityName(entity.getPassengers().get(0)).replace("_", " ");
                 String nameCap = pName.substring(0, 1).toUpperCase() + pName.substring(1);
@@ -205,39 +203,39 @@ public class HudClientEvents {
             switch (vUnit.getUnitProfession()) {
                 case FARMER -> {
                     if (vUnit.isVeteran())
-                        name = I18n.get("units.reignofnether.veteran_farmer");
+                        name = LanguageUtil.getTranslation("units.reignofnether.veteran_farmer");
                     else
-                        name = I18n.get("units.reignofnether.farmer");
+                        name = LanguageUtil.getTranslation("units.reignofnether.farmer");
                 }
                 case LUMBERJACK -> {
                     if (vUnit.isVeteran())
-                        name = I18n.get("units.reignofnether.veteran_lumberjack");
+                        name = LanguageUtil.getTranslation("units.reignofnether.veteran_lumberjack");
                     else
-                        name = I18n.get("units.reignofnether.lumberjack");
+                        name = LanguageUtil.getTranslation("units.reignofnether.lumberjack");
                 }
                 case MINER -> {
                     if (vUnit.isVeteran())
-                        name = I18n.get("units.reignofnether.veteran_miner");
+                        name = LanguageUtil.getTranslation("units.reignofnether.veteran_miner");
                     else
-                        name = I18n.get("units.reignofnether.miner");
+                        name = LanguageUtil.getTranslation("units.reignofnether.miner");
                 }
                 case MASON -> {
                     if (vUnit.isVeteran())
-                        name = I18n.get("units.reignofnether.veteran_mason");
+                        name = LanguageUtil.getTranslation("units.reignofnether.veteran_mason");
                     else
-                        name = I18n.get("units.reignofnether.mason");
+                        name = LanguageUtil.getTranslation("units.reignofnether.mason");
                 }
                 case HUNTER -> {
                     if (vUnit.isVeteran())
-                        name = I18n.get("units.reignofnether.veteran_hunter");
+                        name = LanguageUtil.getTranslation("units.reignofnether.veteran_hunter");
                     else
-                        name = I18n.get("units.reignofnether.hunter");
+                        name = LanguageUtil.getTranslation("units.reignofnether.hunter");
                 }
-                default -> name = I18n.get("units.villagers.reignofnether.villager");
+                default -> name = LanguageUtil.getTranslation("units.villagers.reignofnether.villager");
             }
         }
         if (entity instanceof CreeperUnit cUnit && cUnit.isPowered()) {
-            name = I18n.get("units.monsters.reignofnether.charged_creeper");
+            name = LanguageUtil.getTranslation("units.monsters.reignofnether.charged_creeper");
         }
         return name;
     }
@@ -408,7 +406,7 @@ public class HudClientEvents {
                                 }
                                 if (building != nextBuilding) {
                                     //TODO
-                                    tooltipLines.add(FormattedCharSequence.forward("x" + numBuildings + " " + I18n.get(ReignOfNetherRegistries.BUILDING.getKey(nextBuilding).getPath()),
+                                    tooltipLines.add(FormattedCharSequence.forward("x" + numBuildings + " " + LanguageUtil.getTranslation(ReignOfNetherRegistries.BUILDING.getKey(nextBuilding).getPath()),
                                         Style.EMPTY
                                     ));
                                     numBuildings = 0;
@@ -627,7 +625,7 @@ public class HudClientEvents {
                             () -> true,
                             () -> sendUnitCommand(UnitAction.RETURN_RESOURCES_TO_CLOSEST),
                             null,
-                            List.of(FormattedCharSequence.forward(I18n.get("hud.reignofnether.drop_off_resources"),
+                            List.of(FormattedCharSequence.forward(LanguageUtil.getTranslation("hud.reignofnether.drop_off_resources"),
                                 Style.EMPTY
                             ))
                         );
@@ -739,7 +737,7 @@ public class HudClientEvents {
                                 nextUnitName = HudClientEvents.getSimpleEntityName(nextUnit);
                             }
                             if (!unitName.equals(nextUnitName)) {
-                                tooltipLines.add(FormattedCharSequence.forward("x" + numUnits + " " + I18n.get(unitName),
+                                tooltipLines.add(FormattedCharSequence.forward("x" + numUnits + " " + LanguageUtil.getTranslation(unitName),
                                     Style.EMPTY
                                 ));
                                 numUnits = 0;
@@ -838,10 +836,10 @@ public class HudClientEvents {
                     String resourceName = UnitClientEvents.getSelectedUnitResourceTarget().toString();
                     String key = String.format("resources.reignofnether.%s", resourceName.toLowerCase(Locale.ENGLISH));
                     actionButton.tooltipLines = List.of(
-                            FormattedCharSequence.forward(I18n.get("hud.reignofnether" + ".gather_resources",
-                                    I18n.get(key)
+                            FormattedCharSequence.forward(LanguageUtil.getTranslation("hud.reignofnether" + ".gather_resources",
+                                    LanguageUtil.getTranslation(key)
                             ), Style.EMPTY),
-                            FormattedCharSequence.forward(I18n.get("hud.reignofnether.change_target_resource"), Style.EMPTY)
+                            FormattedCharSequence.forward(LanguageUtil.getTranslation("hud.reignofnether.change_target_resource"), Style.EMPTY)
                     );
                 }
                 actionButton.render(evt.getPoseStack(), blitX, blitY, mouseX, mouseY);
@@ -962,7 +960,7 @@ public class HudClientEvents {
             if (resources != null) {
                 GuiComponent.drawString(evt.getPoseStack(),
                     MC.font,
-                    I18n.get("hud.reignofnether.players_resources", selPlayerName),
+                    LanguageUtil.getTranslation("hud.reignofnether.players_resources", selPlayerName),
                     blitX + 5,
                     blitY + 5,
                     0xFFFFFF
@@ -970,7 +968,7 @@ public class HudClientEvents {
             } else if (!TutorialClientEvents.isEnabled()) {
                 GuiComponent.drawString(evt.getPoseStack(),
                     MC.font,
-                    I18n.get("hud.reignofnether.you_are_spectator"),
+                    LanguageUtil.getTranslation("hud.reignofnether.you_are_spectator"),
                     blitX + 5,
                     blitY + 5,
                     0xFFFFFF
@@ -1111,16 +1109,16 @@ public class HudClientEvents {
 
             blitY = resourceBlitYStart;
             for (String resourceName : new String[] { "food", "wood", "ore", "population" }) {
-                String locName = I18n.get("resources.reignofnether." + resourceName);
+                String locName = LanguageUtil.getTranslation("resources.reignofnether." + resourceName);
                 List<FormattedCharSequence> tooltip;
                 String key = String.format("resources.reignofnether.%s", resourceName);
                 if (resourceName.equals("population")) {
-                    tooltip = List.of(FormattedCharSequence.forward(I18n.get("hud.reignofnether.max_resources",
-                        I18n.get(key),
+                    tooltip = List.of(FormattedCharSequence.forward(LanguageUtil.getTranslation("hud.reignofnether.max_resources",
+                        LanguageUtil.getTranslation(key),
                         GameruleClient.maxPopulation
                     ), Style.EMPTY));
                 } else {
-                    tooltip = List.of(FormattedCharSequence.forward(I18n.get(key), Style.EMPTY));
+                    tooltip = List.of(FormattedCharSequence.forward(LanguageUtil.getTranslation(key), Style.EMPTY));
                 }
                 if (mouseX >= blitX && mouseY >= blitY && mouseX < blitX + iconFrameSize
                     && mouseY < blitY + iconFrameSize) {
@@ -1137,12 +1135,12 @@ public class HudClientEvents {
                             .toList()
                             .size();
                         tooltipWorkersAssigned =
-                            List.of(FormattedCharSequence.forward(I18n.get("hud.reignofnether.total_workers",
+                            List.of(FormattedCharSequence.forward(LanguageUtil.getTranslation("hud.reignofnether.total_workers",
                             numWorkers
                         ), Style.EMPTY));
                     } else {
                         tooltipWorkersAssigned =
-                            List.of(FormattedCharSequence.forward(I18n.get("hud.reignofnether.workers_on_" + resourceName
+                            List.of(FormattedCharSequence.forward(LanguageUtil.getTranslation("hud.reignofnether.workers_on_" + resourceName
                         ), Style.EMPTY));
                     }
                     MyRenderer.renderTooltip(evt.getPoseStack(), tooltipWorkersAssigned, mouseX + 5, mouseY);
@@ -1421,7 +1419,7 @@ public class HudClientEvents {
             }
         }
 
-        Beacon beacon = BuildingUtils.getBeacon(true);
+        BeaconPlacement beacon = BuildingUtils.getBeacon(true);
         if (beacon != null) {
             Button beaconButton = HelperButtons.getBeaconButton(beacon.ownerName);
             if (!beaconButton.isHidden.get()) {

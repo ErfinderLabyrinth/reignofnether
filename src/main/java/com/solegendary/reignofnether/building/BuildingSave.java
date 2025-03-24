@@ -1,6 +1,5 @@
 package com.solegendary.reignofnether.building;
 
-import com.solegendary.reignofnether.building.buildings.piglins.Portal;
 import com.solegendary.reignofnether.building.buildings.placements.PortalPlacement;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
@@ -18,7 +17,7 @@ public class BuildingSave {
     public boolean isBuilt;
     public boolean isDiagonalBridge;
     public int upgradeLevel; // castle flag, lab rod, etc.
-    Portal.PortalType portalType;
+    PortalPlacement.PortalType portalType;
     public BlockPos portalDestination;
 
     public BuildingSave(BlockPos originPos, Level level, Building building, String ownerName, Rotation rotation, BlockPos rallyPoint,

@@ -1,6 +1,7 @@
 package com.solegendary.reignofnether.unit.units.villagers;
 
 import com.mojang.math.Vector3f;
+import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.MountRavager;
 import com.solegendary.reignofnether.ability.abilities.PromoteIllager;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientboundPacket;
@@ -9,12 +10,10 @@ import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.unit.Checkpoint;
-import com.solegendary.reignofnether.unit.UnitClientEvents;
 import com.solegendary.reignofnether.unit.goals.*;
 import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.RangedAttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
-import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.util.Faction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -165,7 +164,7 @@ public class PillagerUnit extends Pillager implements Unit, AttackerUnit, Ranged
     public PillagerUnit(EntityType<? extends Pillager> entityType, Level level) {
         super(entityType, level);
 
-        MountRavager mountRavagerAbility = new MountRavager(this);
+        MountRavager mountRavagerAbility = new MountRavager();
         this.abilities.add(mountRavagerAbility);
 
         if (level.isClientSide()) {

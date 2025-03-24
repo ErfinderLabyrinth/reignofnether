@@ -1,5 +1,6 @@
 package com.solegendary.reignofnether.unit.units.monsters;
 
+import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.AbilityClientboundPacket;
 import com.solegendary.reignofnether.ability.abilities.Eject;
@@ -13,7 +14,6 @@ import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.time.NightUtils;
 import com.solegendary.reignofnether.unit.Checkpoint;
-import com.solegendary.reignofnether.unit.UnitClientEvents;
 import com.solegendary.reignofnether.unit.goals.*;
 import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.ConvertableUnit;
@@ -51,6 +51,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SpiderUnit extends Spider implements Unit, AttackerUnit, ConvertableUnit {
+    public static final Abilities ABILITIES = new Abilities();
+    static {
+        ABILITIES.add(new Eject(), Keybindings.keyQ);
+        ABILITIES.add(new SpinWebs(), Keybindings.keyW);
+    }
+
     // region
     private BlockPos anchorPos = new BlockPos(0,0,0);
     public void setAnchor(BlockPos bp) { anchorPos = bp; }
@@ -153,21 +159,15 @@ public class SpiderUnit extends Spider implements Unit, AttackerUnit, Convertabl
         return null;
     }
 
-    private final List<AbilityButton> abilityButtons = new ArrayList<>();
-    protected final List<Ability> abilities = new ArrayList<>();
+    private final List<AbilityButton> abilityButtons;
+    protected final List<Ability> abilities;
     private final List<ItemStack> items = new ArrayList<>();
 
     public SpiderUnit(EntityType<? extends Spider> entityType, Level level) {
         super(entityType, level);
 
-        Eject ab1 = new Eject(this);
-        this.abilities.add(ab1);
-        SpinWebs ab2 = new SpinWebs(this);
-        this.abilities.add(ab2);
-        if (level.isClientSide()) {
-            this.abilityButtons.add(ab2.getButton(Keybindings.keyQ, this));
-            this.abilityButtons.add(ab1.getButton(Keybindings.keyW, this));
-        }
+        this.abilities = ABILITIES.get();
+        this.abilityButtons = ABILITIES.getButtons(this);
     }
 
     @Override

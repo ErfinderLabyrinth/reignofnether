@@ -1,7 +1,6 @@
 package com.solegendary.reignofnether.gamemode;
 
 import com.solegendary.reignofnether.registrars.PacketHandler;
-import com.solegendary.reignofnether.survival.SurvivalServerEvents;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 

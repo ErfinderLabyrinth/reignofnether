@@ -3,12 +3,7 @@ package com.solegendary.reignofnether.unit.units.piglins;
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.building.BuildingClientEvents;
 import com.solegendary.reignofnether.building.BuildingServerboundPacket;
-import com.solegendary.reignofnether.building.ProductionBuilding;
-import com.solegendary.reignofnether.building.ProductionItem;
-import com.solegendary.reignofnether.building.buildings.piglins.BasaltSprings;
-import com.solegendary.reignofnether.cursor.CursorClientEvents;
-import com.solegendary.reignofnether.hud.AbilityButton;
-import com.solegendary.reignofnether.building.*;
+import com.solegendary.reignofnether.building.Buildings;
 import com.solegendary.reignofnether.building.buildings.placements.ProductionPlacement;
 import com.solegendary.reignofnether.building.production.ProductionItem;
 import com.solegendary.reignofnether.building.production.ProductionItems;
@@ -48,7 +43,7 @@ public class MagmaCubeProd extends ProductionItem {
         return MagmaCubeProd.itemName;
     }
 
-    public static AbilityButton getPlaceButton() {
+    public AbilityButton getPlaceButton() {
         return new AbilityButton(
                 itemName,
                 new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/magma_cube.png"),

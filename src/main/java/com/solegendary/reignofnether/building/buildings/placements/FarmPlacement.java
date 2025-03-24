@@ -3,7 +3,6 @@ package com.solegendary.reignofnether.building.buildings.placements;
 import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingBlock;
 import com.solegendary.reignofnether.building.BuildingPlacement;
-import com.solegendary.reignofnether.building.buildings.shared.AbstractFarm;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

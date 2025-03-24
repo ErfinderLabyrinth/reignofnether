@@ -1,7 +1,9 @@
 package com.solegendary.reignofnether.survival.spawners;
 
-import com.solegendary.reignofnether.building.*;
-import com.solegendary.reignofnether.building.buildings.piglins.Portal;
+import com.solegendary.reignofnether.building.BuildingBlock;
+import com.solegendary.reignofnether.building.BuildingPlacement;
+import com.solegendary.reignofnether.building.BuildingServerEvents;
+import com.solegendary.reignofnether.building.Buildings;
 import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.player.PlayerServerEvents;
 import com.solegendary.reignofnether.registrars.EntityRegistrar;
@@ -133,7 +135,7 @@ public class PiglinWaveSpawner {
 
             do {
                 tooCloseToAnotherPortal = false;
-                List<BlockPos> spawnBps = WaveSpawner.getValidSpawnPoints(1, level, false);
+                List<BlockPos> spawnBps = WaveSpawner.getValidSpawnPoints(1, level, false, 8);
                 if (!spawnBps.isEmpty())
                     spawnBp = spawnBps.get(0);
                 attempts += 1;
@@ -149,7 +151,7 @@ public class PiglinWaveSpawner {
 
             if (spawnBp != null) {
                 portalBps.add(spawnBp);
-                BuildingPlacement building = BuildingServerEvents.placeBuilding(Portal.buildingName,
+                BuildingPlacement building = BuildingServerEvents.placeBuilding(Buildings.PORTAL,
                         new BlockPos(spawnBp).above(),
                         Rotation.NONE,
                         ENEMY_OWNER_NAME,

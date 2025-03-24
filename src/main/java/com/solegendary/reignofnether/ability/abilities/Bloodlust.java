@@ -32,9 +32,7 @@ public class Bloodlust extends Ability {
     private static final int HEALTH_COST = 10;
     private static final int DURATION_SECONDS = 10;
 
-    private final Unit unit;
-
-    public Bloodlust(Unit unit) {
+    public Bloodlust() {
         super(
                 UnitAction.BLOOD_LUST,
                 0,
@@ -43,7 +41,6 @@ public class Bloodlust extends Ability {
                 false,
                 false
         );
-        this.unit = unit;
     }
 
     private static int getDurationLeft(Unit unit) {
@@ -80,16 +77,16 @@ public class Bloodlust extends Ability {
     @Override
     public void use(Level level, Unit unitUsing, BlockPos targetBp) {
         int duration = DURATION_SECONDS * ResourceCost.TICKS_PER_SECOND;
-        if (((LivingEntity) unit).getHealth() <= HEALTH_COST)
+        if (((LivingEntity) unitUsing).getHealth() <= HEALTH_COST)
             return;
         else
-            ((LivingEntity) unit).hurt(DamageSource.MAGIC, HEALTH_COST);
+            ((LivingEntity) unitUsing).hurt(DamageSource.MAGIC, HEALTH_COST);
 
-        if (unit instanceof HeadhunterUnit headhunterUnit) {
+        if (unitUsing instanceof HeadhunterUnit headhunterUnit) {
             headhunterUnit.bloodlustTicks = duration;
             headhunterUnit.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, duration, 0));
 
-        } else if (unit instanceof BruteUnit bruteUnit) {
+        } else if (unitUsing instanceof BruteUnit bruteUnit) {
             bruteUnit.bloodlustTicks = duration;
             bruteUnit.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, duration, 0));
         }

@@ -2,8 +2,11 @@ package com.solegendary.reignofnether.building;
 
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.api.ReignOfNetherRegistries;
-import com.solegendary.reignofnether.building.buildings.piglins.Portal;
+import com.solegendary.reignofnether.building.buildings.monsters.*;
+import com.solegendary.reignofnether.building.buildings.neutral.*;
+import com.solegendary.reignofnether.building.buildings.piglins.*;
 import com.solegendary.reignofnether.building.buildings.placements.PortalPlacement;
+import com.solegendary.reignofnether.building.buildings.villagers.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -49,7 +52,12 @@ public class BuildingSaveData extends SavedData {
                 CompoundTag btag = (CompoundTag) ctag;
                 BlockPos pos = new BlockPos(btag.getInt("x"), btag.getInt("y"), btag.getInt("z"));
                 Level level = ServerLifecycleHooks.getCurrentServer().getLevel(Level.OVERWORLD);
-                Building name = BuildingUtils.getBuilding(btag.getString("buildingName"));
+                Building building;
+                if (btag.contains("buildingKey")) {
+                    building = ReignOfNetherRegistries.BUILDING.get(ResourceLocation.tryParse(btag.getString("buildingKey")));
+                }else {
+                    building = getOldBuilding(btag.getString("buildingName"));
+                }
                 String ownerName = btag.getString("ownerName");
                 Rotation rotation = Rotation.valueOf(btag.getString("rotation"));
                 BlockPos rallyPoint = new BlockPos(btag.getInt("rallyX"), btag.getInt("rallyY"), btag.getInt("rallyZ"));
@@ -61,7 +69,7 @@ public class BuildingSaveData extends SavedData {
 
                 data.buildings.add(new BuildingSave(pos,
                     level,
-                    name,
+                    building,
                     ownerName,
                     rotation,
                     rallyPoint,
@@ -71,7 +79,7 @@ public class BuildingSaveData extends SavedData {
                     portalType,
                     portalDestination
                 ));
-                ReignOfNether.LOGGER.info("BuildingSaveData.load: " + ownerName + "|" + name);
+                ReignOfNether.LOGGER.info("BuildingSaveData.load: " + ownerName + "|" + ReignOfNetherRegistries.BUILDING.getKey(building).toString());
             }
         }
         return data;
@@ -86,7 +94,7 @@ public class BuildingSaveData extends SavedData {
             String buildingName = ReignOfNetherRegistries.BUILDING.getKey(b.building).toString();
 
             CompoundTag cTag = new CompoundTag();
-            cTag.putString("buildingName", buildingName);
+            cTag.putString("buildingKey", buildingName);
             cTag.putInt("x", b.originPos.getX());
             cTag.putInt("y", b.originPos.getY());
             cTag.putInt("z", b.originPos.getZ());
@@ -98,7 +106,7 @@ public class BuildingSaveData extends SavedData {
             cTag.putBoolean("isDiagonalBridge", b.isDiagonalBridge);
             cTag.putBoolean("isBuilt", b.isBuilt);
             cTag.putInt("upgradeLevel", b.upgradeLevel);
-            cTag.putString("portalType", b.portalType != null ? b.portalType.name() : Portal.PortalType.BASIC.name());
+            cTag.putString("portalType", b.portalType != null ? b.portalType.name() : PortalPlacement.PortalType.BASIC.name());
             cTag.putInt("xp", b.portalDestination != null ? b.portalDestination.getX() : 0);
             cTag.putInt("yp", b.portalDestination != null ? b.portalDestination.getY() : 0);
             cTag.putInt("zp", b.portalDestination != null ? b.portalDestination.getZ() : 0);
@@ -112,5 +120,55 @@ public class BuildingSaveData extends SavedData {
 
     public void save() {
         this.setDirty();
+    }
+
+    private static Building getOldBuilding(String name) {
+        Building building = null;
+        switch(name) {
+            case OakBridge.buildingName -> building = Buildings.OAK_BRIDGE;
+            case SpruceBridge.buildingName -> building = Buildings.SPRUCE_BRIDGE;
+            case BlackstoneBridge.buildingName -> building = Buildings.BLACKSTONE_BRIDGE;
+            case OakStockpile.buildingName -> building = Buildings.OAK_STOCKPILE;
+            case SpruceStockpile.buildingName -> building = Buildings.SPRUCE_STOCKPILE;
+            case VillagerHouse.buildingName -> building = Buildings.VILLAGER_HOUSE;
+            case Graveyard.buildingName -> building = Buildings.GRAVEYARD;
+            case WheatFarm.buildingName -> building = Buildings.WHEAT_FARM;
+            case Laboratory.buildingName -> building = Buildings.LABORATORY;
+            case Barracks.buildingName -> building = Buildings.BARRACKS;
+            case PumpkinFarm.buildingName -> building = Buildings.PUMPKIN_FARM;
+            case HauntedHouse.buildingName -> building = Buildings.HAUNTED_HOUSE;
+            case Blacksmith.buildingName -> building = Buildings.BLACKSMITH;
+            case TownCentre.buildingName -> building = Buildings.TOWN_CENTRE;
+            case IronGolemBuilding.buildingName -> building = Buildings.IRON_GOLEM_BUILDING;
+            case Mausoleum.buildingName -> building = Buildings.MAUSOLEUM;
+            case SculkCatalyst.buildingName -> building = Buildings.SCULK_CATALYST;
+            case SpiderLair.buildingName -> building = Buildings.SPIDER_LAIR;
+            case SlimePit.buildingName -> building = Buildings.SLIME_PIT;
+            case ArcaneTower.buildingName -> building = Buildings.ARCANE_TOWER;
+            case Library.buildingName -> building = Buildings.LIBRARY;
+            case Dungeon.buildingName -> building = Buildings.DUNGEON;
+            case Watchtower.buildingName -> building = Buildings.WATCHTOWER;
+            case DarkWatchtower.buildingName -> building = Buildings.DARK_WATCHTOWER;
+            case Castle.buildingName -> building = Buildings.CASTLE;
+            case Stronghold.buildingName -> building = Buildings.STRONGHOLD;
+            case CentralPortal.buildingName -> building = Buildings.CENTRAL_PORTAL;
+            case Portal.buildingName,
+                 Portal.buildingNameMilitary,
+                 Portal.buildingNameCivilian,
+                 Portal.buildingNameTransport -> building = Buildings.PORTAL;
+            case NetherwartFarm.buildingName -> building = Buildings.NETHERWART_FARM;
+            case Bastion.buildingName -> building = Buildings.BASTION;
+            case HoglinStables.buildingName -> building = Buildings.HOGLIN_STABLES;
+            case FlameSanctuary.buildingName -> building = Buildings.FLAME_SANCTUARY;
+            case WitherShrine.buildingName -> building = Buildings.WITHER_SHRINE;
+            case BasaltSprings.buildingName -> building = Buildings.BASALT_SPRINGS;
+            case Fortress.buildingName -> building = Buildings.FORTRESS;
+            case Beacon.buildingName -> building = Buildings.BEACON;
+            case CapturableBeacon.buildingName -> building = Buildings.CAPTURABLE_BEACON;
+            case EndPortal.buildingName -> building = Buildings.END_PORTAL;
+            case HealingFountain.buildingName -> building = Buildings.HEALING_FOUNTAIN;
+            case NeutralTransportPortal.buildingName -> building = Buildings.NEUTRAL_TRANSPORT_PORTAL;
+        }
+        return building;
     }
 }

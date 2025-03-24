@@ -4,7 +4,6 @@ import com.mojang.math.Vector3d;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.Eject;
 import com.solegendary.reignofnether.ability.abilities.Roar;
-import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.BuildingUtils;
 import com.solegendary.reignofnether.hud.AbilityButton;
@@ -13,7 +12,6 @@ import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.unit.Checkpoint;
 import com.solegendary.reignofnether.unit.Relationship;
-import com.solegendary.reignofnether.unit.UnitClientEvents;
 import com.solegendary.reignofnether.unit.UnitServerEvents;
 import com.solegendary.reignofnether.unit.goals.*;
 import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
@@ -156,8 +154,8 @@ public class RavagerUnit extends Ravager implements Unit, AttackerUnit {
     public RavagerUnit(EntityType<? extends Ravager> entityType, Level level) {
         super(entityType, level);
 
-        Roar ab1 = new Roar(this);
-        Eject ab2 = new Eject(this);
+        Roar ab1 = new Roar();
+        Eject ab2 = new Eject();
         this.abilities.add(ab1);
         this.abilities.add(ab2);
         if (level.isClientSide()) {

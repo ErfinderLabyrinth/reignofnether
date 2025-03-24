@@ -52,7 +52,8 @@ public class CentralPortalPlacement extends ProductionPlacement implements Nethe
     @Override
     public void onBuilt() {
         super.onBuilt();
-        setNetherZone(new NetherZone(centrePos.offset(0,-6,0), getMaxRange(), getStartingRange()));
+        if (getMaxRange() > 0)
+            setNetherZone(new NetherZone(centrePos.offset(0,-6,0), getMaxRange(), getStartingRange()));
     }
 
     @Override

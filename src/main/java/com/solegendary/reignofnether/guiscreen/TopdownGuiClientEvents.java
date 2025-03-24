@@ -1,13 +1,9 @@
 package com.solegendary.reignofnether.guiscreen;
 
-import com.solegendary.reignofnether.building.BuildingServerboundPacket;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.PauseScreen;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.level.ClipContext;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;

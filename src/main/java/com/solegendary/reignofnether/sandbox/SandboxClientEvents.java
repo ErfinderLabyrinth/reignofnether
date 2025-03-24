@@ -1,10 +1,10 @@
 package com.solegendary.reignofnether.sandbox;
 
 import com.solegendary.reignofnether.ReignOfNether;
-import com.solegendary.reignofnether.building.buildings.neutral.EndPortal;
-import com.solegendary.reignofnether.building.buildings.neutral.HealingFountain;
-import com.solegendary.reignofnether.building.buildings.neutral.CapturableBeacon;
-import com.solegendary.reignofnether.building.buildings.neutral.NeutralTransportPortal;
+import com.solegendary.reignofnether.api.ReignOfNetherRegistries;
+import com.solegendary.reignofnether.building.Building;
+import com.solegendary.reignofnether.building.BuildingUtils;
+import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.cursor.CursorClientEvents;
 import com.solegendary.reignofnether.gamemode.ClientGameModeHelper;
 import com.solegendary.reignofnether.gamemode.GameMode;
@@ -20,10 +20,9 @@ import com.solegendary.reignofnether.research.ResearchClient;
 import com.solegendary.reignofnether.research.ResearchServerboundPacket;
 import com.solegendary.reignofnether.unit.Relationship;
 import com.solegendary.reignofnether.unit.UnitClientEvents;
-import com.solegendary.reignofnether.unit.units.monsters.*;
-import com.solegendary.reignofnether.unit.units.neutral.*;
-import com.solegendary.reignofnether.unit.units.piglins.*;
-import com.solegendary.reignofnether.unit.units.villagers.*;
+import com.solegendary.reignofnether.unit.units.monsters.ZombieVillagerUnit;
+import com.solegendary.reignofnether.unit.units.piglins.GruntUnit;
+import com.solegendary.reignofnether.unit.units.villagers.VillagerUnit;
 import com.solegendary.reignofnether.util.Faction;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.I18n;
@@ -32,6 +31,7 @@ import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.solegendary.reignofnether.util.MiscUtil.fcs;
@@ -61,12 +61,17 @@ public class SandboxClientEvents {
     }
 
     public static List<AbilityButton> getNeutralBuildingButtons() {
-        return List.of(
-            CapturableBeacon.getBuildButton(Keybindings.keyQ),
-            HealingFountain.getBuildButton(Keybindings.keyW),
-            EndPortal.getBuildButton(Keybindings.keyE),
-            NeutralTransportPortal.getBuildButton(Keybindings.keyR)
-        );
+        List<AbilityButton> buildingButtons = new ArrayList<>();
+        List<Keybinding> keybindings = BuildingUtils.keybindings;
+        int index = 0;
+
+        for (Building building : ReignOfNetherRegistries.BUILDING) {
+            if (building.getFaction() == Faction.NONE) {
+                buildingButtons.add(building.getBuildButton(index >= keybindings.size() ? null : keybindings.get(index)));
+                index++;
+            }
+        }
+        return buildingButtons;
     }
 
     public static List<AbilityButton> getBuildingButtons() {
@@ -81,49 +86,49 @@ public class SandboxClientEvents {
     public static List<AbilityButton> getUnitButtons() {
         return switch (faction) {
             case VILLAGERS -> List.of(
-                VillagerProd.getPlaceButton(),
-                VindicatorProd.getPlaceButton(),
-                PillagerProd.getPlaceButton(),
-                IronGolemProd.getPlaceButton(),
-                WitchProd.getPlaceButton(),
-                EvokerProd.getPlaceButton(),
-                RavagerProd.getPlaceButton(),
-                RoyalGuardProd.getPlaceButton()
+                ProductionItems.VILLAGER.getPlaceButton(),
+                ProductionItems.VINDICATOR.getPlaceButton(),
+                ProductionItems.PILLAGER.getPlaceButton(),
+                ProductionItems.IRON_GOLEM.getPlaceButton(),
+                ProductionItems.WITCH.getPlaceButton(),
+                ProductionItems.EVOKER.getPlaceButton(),
+                ProductionItems.RAVAGER.getPlaceButton(),
+                ProductionItems.ROYAL_GUARD.getPlaceButton()
             );
             case MONSTERS -> List.of(
-                ZombieVillagerProd.getPlaceButton(),
-                ZombieProd.getPlaceButton(),
-                DrownedProd.getPlaceButton(),
-                HuskProd.getPlaceButton(),
-                SkeletonProd.getPlaceButton(),
-                StrayProd.getPlaceButton(),
-                SpiderProd.getPlaceButton(),
-                PoisonSpiderProd.getPlaceButton(),
-                CreeperProd.getPlaceButton(),
-                SlimeProd.getPlaceButton(),
-                WardenProd.getPlaceButton(),
-                NecromancerProd.getPlaceButton(),
-                ZombiePiglinProd.getPlaceButton(),
-                ZoglinProd.getPlaceButton()
+                ProductionItems.ZOMBIE_VILLAGER.getPlaceButton(),
+                ProductionItems.ZOMBIE.getPlaceButton(),
+                ProductionItems.DROWNED.getPlaceButton(),
+                ProductionItems.HUSK.getPlaceButton(),
+                ProductionItems.SKELETON.getPlaceButton(),
+                ProductionItems.STRAY.getPlaceButton(),
+                ProductionItems.SPIDER.getPlaceButton(),
+                ProductionItems.POISON_SPIDER.getPlaceButton(),
+                ProductionItems.CREEPER.getPlaceButton(),
+                ProductionItems.SLIME.getPlaceButton(),
+                ProductionItems.WARDEN.getPlaceButton(),
+                ProductionItems.NECROMANCER.getPlaceButton(),
+                ProductionItems.ZOMBIE_PIGLIN.getPlaceButton(),
+                ProductionItems.ZOGLIN.getPlaceButton()
             );
             case PIGLINS -> List.of(
-                GruntProd.getPlaceButton(),
-                BruteProd.getPlaceButton(),
-                HeadhunterProd.getPlaceButton(),
-                HoglinProd.getPlaceButton(),
-                BlazeProd.getPlaceButton(),
-                WitherSkeletonProd.getPlaceButton(),
-                MagmaCubeProd.getPlaceButton(),
-                GhastProd.getPlaceButton(),
-                PiglinMerchantProd.getPlaceButton()
+                    ProductionItems.GRUNT.getPlaceButton(),
+                    ProductionItems.BRUTE.getPlaceButton(),
+                    ProductionItems.HEADHUNTER.getPlaceButton(),
+                    ProductionItems.HOGLIN.getPlaceButton(),
+                    ProductionItems.BLAZE.getPlaceButton(),
+                    ProductionItems.WITHER_SKELETON.getPlaceButton(),
+                    ProductionItems.MAGMA_CUBE.getPlaceButton(),
+                    ProductionItems.GHAST.getPlaceButton(),
+                    ProductionItems.PIGLIN_MERCHANT.getPlaceButton()
             );
             case NONE -> List.of(
-                EndermanProd.getPlaceButton(),
-                PolarBearProd.getPlaceButton(),
-                GrizzlyBearProd.getPlaceButton(),
-                PandaProd.getPlaceButton(),
-                WolfProd.getPlaceButton(),
-                LlamaProd.getPlaceButton()
+                    ProductionItems.ENDERMAN.getPlaceButton(),
+                    ProductionItems.POLAR_BEAR.getPlaceButton(),
+                    ProductionItems.GRIZZLY_BEAR.getPlaceButton(),
+                    ProductionItems.PANDA.getPlaceButton(),
+                    ProductionItems.WOLF.getPlaceButton(),
+                    ProductionItems.LLAMA.getPlaceButton()
             );
         };
     }

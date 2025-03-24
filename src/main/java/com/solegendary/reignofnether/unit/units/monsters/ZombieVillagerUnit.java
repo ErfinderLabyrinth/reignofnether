@@ -1,29 +1,23 @@
 package com.solegendary.reignofnether.unit.units.monsters;
 
+import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.api.ReignOfNetherRegistries;
 import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingUtils;
 import com.solegendary.reignofnether.building.production.ProductionItems;
-import com.solegendary.reignofnether.building.buildings.monsters.*;
-import com.solegendary.reignofnether.building.buildings.neutral.Beacon;
-import com.solegendary.reignofnether.building.buildings.villagers.*;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybinding;
-import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.research.ResearchClient;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
-import com.solegendary.reignofnether.research.researchItems.ResearchResourceCapacity;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.time.NightUtils;
-import com.solegendary.reignofnether.unit.UnitClientEvents;
 import com.solegendary.reignofnether.unit.Checkpoint;
 import com.solegendary.reignofnether.unit.goals.*;
 import com.solegendary.reignofnether.unit.interfaces.ArmSwingingUnit;
 import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.interfaces.WorkerUnit;
-import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.unit.modelling.models.VillagerUnitModel;
 import com.solegendary.reignofnether.unit.units.villagers.VillagerUnit;
 import com.solegendary.reignofnether.util.Faction;
@@ -50,10 +44,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ZombieVillagerUnit extends Vindicator implements Unit, WorkerUnit, AttackerUnit, ArmSwingingUnit {
@@ -185,7 +180,7 @@ public class ZombieVillagerUnit extends Vindicator implements Unit, WorkerUnit, 
         int index = 0;
 
         for (Building building : ReignOfNetherRegistries.BUILDING) {
-            if (building.getFaction() == Faction.MONSTERS) {
+            if (building.getFaction() == Faction.MONSTERS || building.getFaction() == null) {
                 buildingButtons.add(building.getBuildButton(index >= keybindings.size() ? null : keybindings.get(index)));
                 index++;
             }
@@ -196,7 +191,8 @@ public class ZombieVillagerUnit extends Vindicator implements Unit, WorkerUnit, 
     public ZombieVillagerUnit(EntityType<? extends Vindicator> entityType, Level level) {
         super(entityType, level);
 
-        if (level.isClientSide()) {
+        //TODO Remove need for I18n
+        if (FMLEnvironment.dist == Dist.CLIENT) {
             this.abilityButtons.addAll(getBuildingButtons());
         }
     }

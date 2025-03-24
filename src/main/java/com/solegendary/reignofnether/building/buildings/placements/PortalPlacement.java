@@ -142,12 +142,12 @@ public class PortalPlacement extends ProductionPlacement implements NetherConver
 
     @Override
     public double getMaxRange() {
-        return 20;
+        return ((Portal)getBuilding()).getMaxRange();
     }
 
     @Override
     public double getStartingRange() {
-        return 3;
+        return ((Portal)getBuilding()).getStartingRange();
     }
 
     @Override
@@ -192,5 +192,12 @@ public class PortalPlacement extends ProductionPlacement implements NetherConver
                 ResourcesClientboundPacket.showFloatingText(res, textPos);
             }
         }
+    }
+
+    public boolean hasDestination() {
+        return isBuilt &&
+                portalType == PortalType.TRANSPORT &&
+                destination != null &&
+                !destination.equals(new BlockPos(0,0,0));
     }
 }

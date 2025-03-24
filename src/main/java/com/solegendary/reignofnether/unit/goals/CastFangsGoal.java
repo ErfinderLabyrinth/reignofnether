@@ -2,7 +2,6 @@ package com.solegendary.reignofnether.unit.goals;
 
 import com.solegendary.reignofnether.unit.UnitAnimationAction;
 import com.solegendary.reignofnether.unit.packets.UnitAnimationClientboundPacket;
-import com.solegendary.reignofnether.unit.packets.UnitSyncClientboundPacket;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 

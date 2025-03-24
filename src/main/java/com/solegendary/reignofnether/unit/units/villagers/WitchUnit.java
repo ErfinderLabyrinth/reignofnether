@@ -1,14 +1,16 @@
 package com.solegendary.reignofnether.unit.units.villagers;
 
-import com.solegendary.reignofnether.ability.abilities.*;
+import com.solegendary.reignofnether.ability.Abilities;
+import com.solegendary.reignofnether.ability.Ability;
+import com.solegendary.reignofnether.ability.abilities.PromoteIllager;
+import com.solegendary.reignofnether.ability.abilities.ThrowLingeringHarmingPotion;
+import com.solegendary.reignofnether.ability.abilities.ThrowLingeringRegenPotion;
 import com.solegendary.reignofnether.building.GarrisonableBuilding;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
-import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.unit.Checkpoint;
-import com.solegendary.reignofnether.unit.UnitClientEvents;
 import com.solegendary.reignofnether.unit.goals.*;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.util.Faction;
@@ -39,6 +41,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WitchUnit extends Witch implements Unit {
+    public static final Abilities ABILITIES = new Abilities();
+    static {
+        ABILITIES.add(new ThrowLingeringHarmingPotion(8), Keybindings.keyQ);
+        ABILITIES.add(new ThrowLingeringRegenPotion(8), Keybindings.keyW);
+    }
     // region
     private BlockPos anchorPos = new BlockPos(0,0,0);
     public void setAnchor(BlockPos bp) { anchorPos = bp; }
@@ -115,22 +122,15 @@ public class WitchUnit extends Witch implements Unit {
     final static public int LINGERING_POTION_DURATION = 5 * ResourceCost.TICKS_PER_SECOND;
     final static public int LINGERING_POTION_DURATION_EXTENDED = 10 * ResourceCost.TICKS_PER_SECOND;
 
-    private final List<AbilityButton> abilityButtons = new ArrayList<>();
-    private final List<Ability> abilities = new ArrayList<>();
+    private final List<AbilityButton> abilityButtons;
+    private final List<Ability> abilities;
     private final List<ItemStack> items = new ArrayList<>();
 
     public WitchUnit(EntityType<? extends Witch> entityType, Level level) {
         super(entityType, level);
 
-        ThrowLingeringHarmingPotion ab1 = new ThrowLingeringHarmingPotion(this);
-        ThrowLingeringRegenPotion ab2 = new ThrowLingeringRegenPotion(this);
-        this.abilities.add(ab1);
-        this.abilities.add(ab2);
-
-        if (level.isClientSide()) {
-            this.abilityButtons.add(ab1.getButton(Keybindings.keyQ, this));
-            this.abilityButtons.add(ab2.getButton(Keybindings.keyW, this));
-        }
+        this.abilities = ABILITIES.get();
+        this.abilityButtons = ABILITIES.getButtons(this);
     }
 
     public int getPotionThrowRange() {

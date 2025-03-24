@@ -1,18 +1,16 @@
 package com.solegendary.reignofnether.unit.units.piglins;
 
 import com.solegendary.reignofnether.ability.Ability;
-import com.solegendary.reignofnether.ability.abilities.*;
-import com.solegendary.reignofnether.building.Building;
+import com.solegendary.reignofnether.ability.abilities.Eject;
+import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.BuildingUtils;
 import com.solegendary.reignofnether.building.buildings.piglins.BasaltSprings;
 import com.solegendary.reignofnether.building.buildings.piglins.FlameSanctuary;
-import com.solegendary.reignofnether.building.buildings.piglins.Fortress;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.unit.Checkpoint;
-import com.solegendary.reignofnether.unit.UnitClientEvents;
 import com.solegendary.reignofnether.unit.goals.*;
 import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
@@ -144,7 +142,7 @@ public class HoglinUnit extends Hoglin implements Unit, AttackerUnit {
     public HoglinUnit(EntityType<? extends Hoglin> entityType, Level level) {
         super(entityType, level);
 
-        Eject ab1 = new Eject(this);
+        Eject ab1 = new Eject();
         this.abilities.add(ab1);
         if (level.isClientSide())
             this.abilityButtons.add(ab1.getButton(Keybindings.keyQ, this));
@@ -245,7 +243,7 @@ public class HoglinUnit extends Hoglin implements Unit, AttackerUnit {
 
     @Override
     public boolean fireImmune() {
-        Building building = BuildingUtils.findBuilding(level.isClientSide(), getOnPos());
-        return super.fireImmune() || building instanceof FlameSanctuary || building instanceof BasaltSprings;
+        BuildingPlacement building = BuildingUtils.findBuilding(level.isClientSide(), getOnPos());
+        return super.fireImmune() || (building != null &&(building.getBuilding() instanceof FlameSanctuary || building.getBuilding() instanceof BasaltSprings));
     }
 }

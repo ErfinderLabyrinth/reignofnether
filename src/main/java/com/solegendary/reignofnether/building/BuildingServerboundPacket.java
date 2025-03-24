@@ -51,17 +51,17 @@ public class BuildingServerboundPacket {
             BuildingAction.CHANGE_PORTAL
     );
 
-    public static void placeBuilding(String itemName, BlockPos originPos, Rotation rotation,
+    public static void placeBuilding(Building building, BlockPos originPos, Rotation rotation,
                                      String ownerName, int[] builderUnitIds, boolean isDiagonalBridge) {
         PacketHandler.INSTANCE.sendToServer(new BuildingServerboundPacket(
                 BuildingAction.PLACE,
-                itemName, originPos, BlockPos.ZERO, rotation, ownerName, builderUnitIds, isDiagonalBridge));
+                ReignOfNetherRegistries.BUILDING.getKey(building).toString(), originPos, BlockPos.ZERO, rotation, ownerName, builderUnitIds, isDiagonalBridge));
     }
-    public static void placeAndQueueBuilding(String itemName, BlockPos originPos, Rotation rotation,
+    public static void placeAndQueueBuilding(Building building, BlockPos originPos, Rotation rotation,
                                              String ownerName, int[] builderUnitIds, boolean isDiagonalBridge) {
         PacketHandler.INSTANCE.sendToServer(new BuildingServerboundPacket(
                 BuildingAction.PLACE_AND_QUEUE,
-                itemName, originPos, BlockPos.ZERO, rotation, ownerName, builderUnitIds, isDiagonalBridge));
+                ReignOfNetherRegistries.BUILDING.getKey(building).toString(), originPos, BlockPos.ZERO, rotation, ownerName, builderUnitIds, isDiagonalBridge));
     }
     public static void cancelBuilding(BlockPos buildingPos, String ownerName) {
         PacketHandler.INSTANCE.sendToServer(new BuildingServerboundPacket(
@@ -166,10 +166,10 @@ public class BuildingServerboundPacket {
             }
             switch (this.action) {
                 case PLACE -> {
-                    BuildingServerEvents.placeBuilding(this.itemName, this.buildingPos, this.rotation, this.ownerName, this.builderUnitIds, false, isDiagonalBridge);
+                    BuildingServerEvents.placeBuilding(ReignOfNetherRegistries.BUILDING.get(ResourceLocation.tryParse(this.itemName)), this.buildingPos, this.rotation, this.ownerName, this.builderUnitIds, false, isDiagonalBridge);
                 }
                 case PLACE_AND_QUEUE -> {
-                    BuildingServerEvents.placeBuilding(this.itemName, this.buildingPos, this.rotation, this.ownerName, this.builderUnitIds, true, isDiagonalBridge);
+                    BuildingServerEvents.placeBuilding(ReignOfNetherRegistries.BUILDING.get(ResourceLocation.tryParse(this.itemName)), this.buildingPos, this.rotation, this.ownerName, this.builderUnitIds, true, isDiagonalBridge);
                 }
                 case DESTROY -> {
                     BuildingServerEvents.cancelBuilding(building, this.ownerName);

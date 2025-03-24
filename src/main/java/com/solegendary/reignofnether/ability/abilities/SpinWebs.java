@@ -17,7 +17,6 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.monster.Spider;
 import net.minecraft.world.level.Level;
 
 import java.util.List;
@@ -30,9 +29,7 @@ public class SpinWebs extends Ability {
     public static final int RANGE = 8;
     public static final int DURATION_SECONDS = 5;
 
-    private final Spider spider;
-
-    public SpinWebs(Spider spider) {
+    public SpinWebs() {
         super(
             UnitAction.SPIN_WEBS,
             CD_MAX_SECONDS * ResourceCost.TICKS_PER_SECOND,
@@ -41,7 +38,6 @@ public class SpinWebs extends Ability {
             true,
             true
         );
-        this.spider = spider;
         this.canAutocast = true;
     }
 

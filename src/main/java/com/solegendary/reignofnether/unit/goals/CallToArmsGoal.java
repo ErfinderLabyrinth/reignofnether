@@ -1,28 +1,17 @@
 package com.solegendary.reignofnether.unit.goals;
 
-import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.BuildingServerEvents;
 import com.solegendary.reignofnether.building.BuildingUtils;
-import com.solegendary.reignofnether.building.buildings.shared.AbstractBridge;
-import com.solegendary.reignofnether.building.buildings.villagers.OakStockpile;
 import com.solegendary.reignofnether.building.buildings.villagers.TownCentre;
-import com.solegendary.reignofnether.registrars.EntityRegistrar;
-import com.solegendary.reignofnether.resources.ResourceName;
 import com.solegendary.reignofnether.unit.Relationship;
-import com.solegendary.reignofnether.unit.interfaces.ConvertableUnit;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
-import com.solegendary.reignofnether.unit.interfaces.WorkerUnit;
-import com.solegendary.reignofnether.unit.packets.UnitConvertClientboundPacket;
-import com.solegendary.reignofnether.unit.units.villagers.MilitiaUnit;
 import com.solegendary.reignofnether.unit.units.villagers.VillagerUnit;
 import com.solegendary.reignofnether.util.MiscUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Mob;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
 
 // Move a villager towards a building to become a militia
 
@@ -61,7 +50,7 @@ public class CallToArmsGoal extends MoveToTargetBlockGoal {
     public void setNearestTownCentreAsTarget() {
         BuildingPlacement building = BuildingUtils.findClosestBuilding(mob.level.isClientSide(), this.mob.getEyePosition(),
                 (b) -> b.isBuilt && b.ownerName.equals(((Unit) mob).getOwnerName()) && b.getBuilding() instanceof TownCentre);
-        if (building.getBuilding() instanceof TownCentre)
+        if (building != null && building.getBuilding() instanceof TownCentre)
             setBuildingTarget(building);
     }
 

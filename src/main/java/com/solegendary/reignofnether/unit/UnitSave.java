@@ -1,6 +1,5 @@
 package com.solegendary.reignofnether.unit;
 
-import com.solegendary.reignofnether.resources.Resources;
 import net.minecraft.core.BlockPos;
 
 public class UnitSave {

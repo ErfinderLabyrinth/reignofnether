@@ -2,7 +2,6 @@ package com.solegendary.reignofnether.research;
 
 import com.mojang.datafixers.util.Pair;
 import com.solegendary.reignofnether.ReignOfNether;
-import com.solegendary.reignofnether.api.ReignOfNetherRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;

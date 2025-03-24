@@ -1,19 +1,9 @@
 package com.solegendary.reignofnether.config;
 
 import com.solegendary.reignofnether.resources.ResourceCost;
-import com.solegendary.reignofnether.resources.ResourceCosts;
-import com.solegendary.reignofnether.unit.units.monsters.CreeperProd;
-import net.minecraft.network.chat.Component;
 import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.loading.FMLEnvironment;
-import org.apache.commons.compress.archivers.sevenz.CLI;
-import oshi.util.tuples.Pair;
 
-import javax.annotation.Nullable;
-import javax.naming.spi.ResolveResult;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class ResourceCostConfigEntry {

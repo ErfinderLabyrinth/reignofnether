@@ -3,7 +3,6 @@ package com.solegendary.reignofnether.sounds;
 import com.solegendary.reignofnether.registrars.SoundRegistrar;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.sounds.MusicManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;

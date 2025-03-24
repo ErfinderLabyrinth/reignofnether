@@ -1,7 +1,6 @@
 package com.solegendary.reignofnether.ability.abilities;
 
 import com.solegendary.reignofnether.ability.Ability;
-import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.BuildingUtils;
 import com.solegendary.reignofnether.cursor.CursorClientEvents;
@@ -28,9 +27,7 @@ public class SonicBoom extends Ability {
 
     public static final int CD_MAX_SECONDS = 60;
 
-    private final WardenUnit wardenUnit;
-
-    public SonicBoom(WardenUnit wardenUnit) {
+    public SonicBoom() {
         super(UnitAction.CAST_SONIC_BOOM,
             CD_MAX_SECONDS * ResourceCost.TICKS_PER_SECOND,
             WardenUnit.SONIC_BOOM_RANGE,
@@ -38,12 +35,11 @@ public class SonicBoom extends Ability {
             true,
             true
         );
-        this.wardenUnit = wardenUnit;
     }
 
     @Override
-    public boolean isChanneling() {
-        SonicBoomGoal goal = this.wardenUnit.getSonicBoomGoal();
+    public boolean isChanneling(Unit unit) {
+        SonicBoomGoal goal = ((WardenUnit)unit).getSonicBoomGoal();
         if (goal == null)
             return false;
         return goal.isCasting() || goal.getMoveTarget() != null || goal.getTargetEntity() != null;
@@ -77,7 +73,7 @@ public class SonicBoom extends Ability {
 
     @Override
     public void use(Level level, Unit unitUsing, LivingEntity targetEntity) {
-        if (targetEntity instanceof Unit unit && unit.equals(this.wardenUnit)) {
+        if (targetEntity instanceof Unit unit && unit.equals(unitUsing)) {
             return;
         }
         ((WardenUnit) unitUsing).getSonicBoomGoal().setAbility(this);

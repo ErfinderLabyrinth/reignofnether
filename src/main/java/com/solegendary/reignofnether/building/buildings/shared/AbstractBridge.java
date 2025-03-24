@@ -1,20 +1,17 @@
 package com.solegendary.reignofnether.building.buildings.shared;
 
-import com.solegendary.reignofnether.building.*;
+import com.solegendary.reignofnether.building.Building;
+import com.solegendary.reignofnether.building.BuildingBlock;
+import com.solegendary.reignofnether.building.BuildingBlockData;
+import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.buildings.placements.BridgePlacement;
 import com.solegendary.reignofnether.resources.ResourceCost;
-import com.solegendary.reignofnether.util.Faction;
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.block.*;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
-import org.apache.commons.lang3.math.Fraction;
+import net.minecraft.world.level.block.Rotation;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import static com.solegendary.reignofnether.building.BuildingUtils.getAbsoluteBlockData;
 

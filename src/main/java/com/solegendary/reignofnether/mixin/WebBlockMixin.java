@@ -1,5 +1,6 @@
 package com.solegendary.reignofnether.mixin;
 
+import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.BuildingUtils;
 import com.solegendary.reignofnether.building.buildings.monsters.SpiderLair;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
@@ -22,7 +23,8 @@ public abstract class WebBlockMixin {
             cancellable = true
     )
     private void entityInside(BlockState pState, Level pLevel, BlockPos pPos, Entity pEntity, CallbackInfo ci) {
-        if (BuildingUtils.findBuilding(pLevel.isClientSide, pPos) instanceof SpiderLair spiderLair &&
+        BuildingPlacement building = BuildingUtils.findBuilding(pLevel.isClientSide, pPos);
+        if (building != null && building.getBuilding() instanceof SpiderLair spiderLair &&
             pEntity instanceof Unit unit && unit.getFaction() == Faction.MONSTERS)
             ci.cancel();
     }

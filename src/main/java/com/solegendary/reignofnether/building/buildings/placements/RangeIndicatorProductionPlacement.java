@@ -2,7 +2,6 @@ package com.solegendary.reignofnether.building.buildings.placements;
 
 import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingBlock;
-import com.solegendary.reignofnether.building.Buildings;
 import com.solegendary.reignofnether.building.RangeIndicator;
 import com.solegendary.reignofnether.time.TimeClientEvents;
 import com.solegendary.reignofnether.util.MiscUtil;
@@ -33,7 +32,7 @@ public class RangeIndicatorProductionPlacement extends ProductionPlacement imple
     }
 
     public int getRange() {
-        return ((!checkUpgraded || isUpgraded()) && isBuilt) ? range : 0;
+        return ((!checkUpgraded || getUpgradeLevel() > 0) && isBuilt) ? range : 0;
     }
 
     @Override

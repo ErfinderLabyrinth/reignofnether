@@ -1,7 +1,7 @@
 package com.solegendary.reignofnether.mixin;
 
 import com.solegendary.reignofnether.building.BuildingUtils;
-import com.solegendary.reignofnether.building.buildings.neutral.Beacon;
+import com.solegendary.reignofnether.building.buildings.placements.BeaconPlacement;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.level.block.entity.BeaconBlockEntity;
@@ -31,7 +31,7 @@ public class BeaconBlockEntityMixin extends BlockEntity {
         if (level == null || !level.isClientSide())
             return;
 
-        Beacon beacon = BuildingUtils.getBeacon(level.isClientSide());
+        BeaconPlacement beacon = BuildingUtils.getBeacon(level.isClientSide());
 
         if (beacon != null && beacon.getUpgradeLevel() > 0 && worldPosition.equals(beacon.beaconPos)) {
             if (beacon.isBeaconActive()) {

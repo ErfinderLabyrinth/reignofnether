@@ -1,18 +1,18 @@
 package com.solegendary.reignofnether.unit.units.piglins;
 
+import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.WitherCloud;
-import com.solegendary.reignofnether.building.Building;
+import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.BuildingUtils;
 import com.solegendary.reignofnether.building.buildings.piglins.BasaltSprings;
 import com.solegendary.reignofnether.building.buildings.piglins.FlameSanctuary;
-import com.solegendary.reignofnether.building.buildings.piglins.Fortress;
+import com.solegendary.reignofnether.building.buildings.placements.FlameSanctuaryPlacement;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.unit.Checkpoint;
-import com.solegendary.reignofnether.unit.UnitClientEvents;
 import com.solegendary.reignofnether.unit.goals.*;
 import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
@@ -46,6 +46,10 @@ import java.util.List;
 import java.util.UUID;
 
 public class WitherSkeletonUnit extends WitherSkeleton implements Unit, AttackerUnit {
+    public static final Abilities ABILITIES = new Abilities();
+    static {
+        ABILITIES.add(new WitherCloud(), Keybindings.keyQ);
+    }
     // region
     private BlockPos anchorPos = new BlockPos(0,0,0);
     public void setAnchor(BlockPos bp) { anchorPos = bp; }
@@ -134,18 +138,15 @@ public class WitherSkeletonUnit extends WitherSkeleton implements Unit, Attacker
 
     public int deathCloudTicks = 0;
 
-    private final List<AbilityButton> abilityButtons = new ArrayList<>();
-    private final List<Ability> abilities = new ArrayList<>();
+    private final List<AbilityButton> abilityButtons;
+    private final List<Ability> abilities;
     private final List<ItemStack> items = new ArrayList<>();
 
     public WitherSkeletonUnit(EntityType<? extends WitherSkeleton> entityType, Level level) {
         super(entityType, level);
 
-        WitherCloud ab1 = new WitherCloud(this);
-        this.abilities.add(ab1);
-        if (level.isClientSide()) {
-            this.abilityButtons.add(ab1.getButton(Keybindings.keyQ, this));
-        }
+        this.abilities = ABILITIES.get();
+        this.abilityButtons = ABILITIES.getButtons(this);
     }
 
     @Override
@@ -271,7 +272,7 @@ public class WitherSkeletonUnit extends WitherSkeleton implements Unit, Attacker
 
     @Override
     public boolean fireImmune() {
-        Building building = BuildingUtils.findBuilding(level.isClientSide(), getOnPos());
-        return super.fireImmune() || building instanceof FlameSanctuary || building instanceof BasaltSprings;
+        BuildingPlacement building = BuildingUtils.findBuilding(level.isClientSide(), getOnPos());
+        return super.fireImmune() || (building != null &&(building.getBuilding() instanceof FlameSanctuary || building.getBuilding() instanceof BasaltSprings));
     }
 }

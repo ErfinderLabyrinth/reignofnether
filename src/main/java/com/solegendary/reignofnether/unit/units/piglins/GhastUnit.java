@@ -1,8 +1,8 @@
 package com.solegendary.reignofnether.unit.units.piglins;
 
+import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.AttackGround;
-import com.solegendary.reignofnether.building.GarrisonableBuilding;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientboundPacket;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybindings;
@@ -10,14 +10,12 @@ import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.unit.Checkpoint;
 import com.solegendary.reignofnether.unit.UnitAnimationAction;
-import com.solegendary.reignofnether.unit.UnitClientEvents;
 import com.solegendary.reignofnether.unit.controls.GhastUnitMoveControl;
 import com.solegendary.reignofnether.unit.goals.*;
 import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.RangedAttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.packets.UnitAnimationClientboundPacket;
-import com.solegendary.reignofnether.unit.packets.UnitSyncClientboundPacket;
 import com.solegendary.reignofnether.util.Faction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -53,6 +51,12 @@ import java.util.Iterator;
 import java.util.List;
 
 public class GhastUnit extends Ghast implements Unit, AttackerUnit, RangedAttackerUnit {
+    final static public float attackRange = 30; // only used by ranged units or melee building attackers
+
+    public static final Abilities ABILITIES = new Abilities();
+    static {
+        ABILITIES.add(new AttackGround(attackRange), Keybindings.keyQ);
+    }
     // region
     private BlockPos anchorPos = new BlockPos(0,0,0);
     public void setAnchor(BlockPos bp) { anchorPos = bp; }
@@ -131,7 +135,6 @@ public class GhastUnit extends Ghast implements Unit, AttackerUnit, RangedAttack
 
     final static public float attackDamage = 8.0f;
     final static public float attacksPerSecond = 0.15f;
-    final static public float attackRange = 30; // only used by ranged units or melee building attackers
     final static public float aggroRange = 30;
     final static public boolean willRetaliate = true; // will attack when hurt by an enemy
     final static public boolean aggressiveWhenIdle = true;
@@ -145,8 +148,8 @@ public class GhastUnit extends Ghast implements Unit, AttackerUnit, RangedAttack
     public int getFogRevealDuration() { return fogRevealDuration; }
     public void setFogRevealDuration(int duration) { fogRevealDuration = duration; }
 
-    private final List<AbilityButton> abilityButtons = new ArrayList<>();
-    private final List<Ability> abilities = new ArrayList<>();
+    private final List<AbilityButton> abilityButtons;
+    private final List<Ability> abilities;
     private final List<ItemStack> items = new ArrayList<>();
 
     public static final int EXPLOSION_POWER = 2;
@@ -167,10 +170,8 @@ public class GhastUnit extends Ghast implements Unit, AttackerUnit, RangedAttack
         super(entityType, level);
         this.moveControl = new GhastUnitMoveControl(this);
 
-        AttackGround ab1 = new AttackGround(this);
-        this.abilities.add(ab1);
-        if (level.isClientSide())
-            this.abilityButtons.add(ab1.getButton(Keybindings.keyQ, this));
+        this.abilities = ABILITIES.get();
+        this.abilityButtons = ABILITIES.getButtons(this);
     }
 
     @Override

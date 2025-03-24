@@ -22,11 +22,12 @@ import java.util.function.Supplier;
 import static com.solegendary.reignofnether.building.BuildingUtils.findBuilding;
 
 public class BuildingClientboundPacket {
+    public static final ResourceLocation EMPTY = new ResourceLocation("", "");
 
     // pos is used to identify the building object serverside
     public BuildingAction action;
     public BlockPos buildingPos;
-    public String itemName;
+    public ResourceLocation itemKey;
     public Rotation rotation;
     public String ownerName;
     public int blocksPlaced; // for syncing out-of-view clientside buildings
@@ -40,7 +41,7 @@ public class BuildingClientboundPacket {
 
     public static void placeBuilding(
         BlockPos buildingPos,
-        String itemName,
+        Building building,
         Rotation rotation,
         String ownerName,
         int numQueuedBlocks,
@@ -52,7 +53,7 @@ public class BuildingClientboundPacket {
         boolean forPlayerLoggingIn
     ) {
         PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(), new BuildingClientboundPacket(BuildingAction.PLACE,
-            itemName,
+            ReignOfNetherRegistries.BUILDING.getKey(building),
             buildingPos,
             rotation,
             ownerName,
@@ -70,7 +71,7 @@ public class BuildingClientboundPacket {
     public static void syncBuilding(BlockPos buildingPos, int blocksPlaced, String ownerName) {
         PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(),
             new BuildingClientboundPacket(BuildingAction.SYNC_BLOCKS_AND_OWNER,
-                "",
+                EMPTY,
                 buildingPos,
                 Rotation.NONE,
                 ownerName,
@@ -89,7 +90,7 @@ public class BuildingClientboundPacket {
     public static void startProduction(BlockPos buildingPos, ProductionItem item) {
         PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(),
             new BuildingClientboundPacket(BuildingAction.START_PRODUCTION,
-                ReignOfNetherRegistries.PRODUCTION_ITEM.getKey(item).toString(),
+                ReignOfNetherRegistries.PRODUCTION_ITEM.getKey(item),
                 buildingPos,
                 Rotation.NONE,
                 "",
@@ -110,7 +111,7 @@ public class BuildingClientboundPacket {
             new BuildingClientboundPacket(frontItem
                                           ? BuildingAction.CANCEL_PRODUCTION
                                           : BuildingAction.CANCEL_BACK_PRODUCTION,
-                ReignOfNetherRegistries.PRODUCTION_ITEM.getKey(item).toString(),
+                ReignOfNetherRegistries.PRODUCTION_ITEM.getKey(item),
                 buildingPos,
                 Rotation.NONE,
                 "",
@@ -129,7 +130,7 @@ public class BuildingClientboundPacket {
     public static void changePortal(BlockPos buildingPos, PortalPlacement.PortalType type) {
         PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(),
             new BuildingClientboundPacket(BuildingAction.CHANGE_PORTAL,
-                type.name(),
+                new ResourceLocation("", type.name().toLowerCase()),
                 buildingPos,
                 Rotation.NONE,
                 "",
@@ -148,7 +149,7 @@ public class BuildingClientboundPacket {
     public static void clearQueue(BlockPos buildingPos) {
         PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(),
                 new BuildingClientboundPacket(BuildingAction.CLEAR_PRODUCTION,
-                        "",
+                        EMPTY,
                         buildingPos,
                         Rotation.NONE,
                         "",
@@ -167,7 +168,7 @@ public class BuildingClientboundPacket {
     public static void completeProduction(BlockPos buildingPos) {
         PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(),
                 new BuildingClientboundPacket(BuildingAction.COMPLETE_PRODUCTION,
-                        "",
+                        new ResourceLocation("", ""),
                         buildingPos,
                         Rotation.NONE,
                         "",
@@ -185,7 +186,7 @@ public class BuildingClientboundPacket {
 
     public BuildingClientboundPacket(
         BuildingAction action,
-        String itemName,
+        ResourceLocation itemKey,
         BlockPos buildingPos,
         Rotation rotation,
         String ownerName,
@@ -199,7 +200,7 @@ public class BuildingClientboundPacket {
         boolean forPlayerLoggingIn
     ) {
         this.action = action;
-        this.itemName = itemName;
+        this.itemKey = itemKey;
         this.buildingPos = buildingPos;
         this.rotation = rotation;
         this.ownerName = ownerName;
@@ -215,7 +216,7 @@ public class BuildingClientboundPacket {
 
     public BuildingClientboundPacket(FriendlyByteBuf buffer) {
         this.action = buffer.readEnum(BuildingAction.class);
-        this.itemName = buffer.readUtf();
+        this.itemKey = buffer.readResourceLocation();
         this.buildingPos = buffer.readBlockPos();
         this.rotation = buffer.readEnum(Rotation.class);
         this.ownerName = buffer.readUtf();
@@ -231,7 +232,7 @@ public class BuildingClientboundPacket {
 
     public void encode(FriendlyByteBuf buffer) {
         buffer.writeEnum(this.action);
-        buffer.writeUtf(this.itemName);
+        buffer.writeResourceLocation(this.itemKey);
         buffer.writeBlockPos(this.buildingPos);
         buffer.writeEnum(this.rotation);
         buffer.writeUtf(this.ownerName);
@@ -266,7 +267,7 @@ public class BuildingClientboundPacket {
                 }
                 switch (action) {
                     case PLACE -> BuildingClientEvents.placeBuilding(
-                        ReignOfNetherRegistries.BUILDING.get(ResourceLocation.tryParse(this.itemName)),
+                        ReignOfNetherRegistries.BUILDING.get(this.itemKey),
                         this.buildingPos,
                         this.rotation,
                         this.ownerName,
@@ -281,27 +282,27 @@ public class BuildingClientboundPacket {
                     case SYNC_BLOCKS_AND_OWNER -> BuildingClientEvents.syncBuilding(building, this.blocksPlaced, this.ownerName);
                     case START_PRODUCTION -> {
                         ((ProductionPlacement) building).startProductionItem(
-                            ReignOfNetherRegistries.PRODUCTION_ITEM.get(ResourceLocation.tryParse(this.itemName)),
+                            ReignOfNetherRegistries.PRODUCTION_ITEM.get(itemKey),
                             this.buildingPos
                         );
                     }
                     case CANCEL_PRODUCTION -> {
                         ((ProductionPlacement) building).cancelProductionItem(
-                                ReignOfNetherRegistries.PRODUCTION_ITEM.get(ResourceLocation.tryParse(this.itemName)),
+                                ReignOfNetherRegistries.PRODUCTION_ITEM.get(itemKey),
                             this.buildingPos,
                             true
                         );
                     }
                     case CANCEL_BACK_PRODUCTION -> {
                         ((ProductionPlacement) building).cancelProductionItem(
-                                ReignOfNetherRegistries.PRODUCTION_ITEM.get(ResourceLocation.tryParse(this.itemName)),
+                                ReignOfNetherRegistries.PRODUCTION_ITEM.get(itemKey),
                             this.buildingPos,
                             false
                         );
                     }
                     case CHANGE_PORTAL -> {
                         if (building instanceof PortalPlacement portal) {
-                            portal.changeStructure(PortalPlacement.PortalType.valueOf(itemName));
+                            portal.changeStructure(PortalPlacement.PortalType.valueOf(itemKey.getPath().toUpperCase()));
                         }
                     }
                     case CLEAR_PRODUCTION -> {

@@ -2,7 +2,6 @@ package com.solegendary.reignofnether.unit.interfaces;
 
 import com.solegendary.reignofnether.unit.UnitAnimationAction;
 import net.minecraft.client.animation.AnimationDefinition;
-import net.minecraft.world.entity.AnimationState;
 
 public interface KeyframeAnimated {
     public void stopAllAnimations();

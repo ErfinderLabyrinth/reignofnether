@@ -1,9 +1,7 @@
 package com.solegendary.reignofnether.unit.modelling.renderers;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.unit.modelling.models.RoyalGuardModel;
-import com.solegendary.reignofnether.unit.units.monsters.NecromancerUnit;
 import com.solegendary.reignofnether.unit.units.villagers.RoyalGuardUnit;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;

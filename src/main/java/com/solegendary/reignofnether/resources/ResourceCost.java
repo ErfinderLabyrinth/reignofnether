@@ -1,11 +1,7 @@
 package com.solegendary.reignofnether.resources;
 
-import com.solegendary.reignofnether.config.ReignOfNetherCommonConfigs;
 import com.solegendary.reignofnether.config.ResourceCostConfigEntry;
-import net.minecraft.resources.ResourceKey;
-import net.minecraftforge.fml.common.Mod;
 
-import javax.annotation.Nullable;
 import java.util.HashMap;
 
 // defined here because we need to be able to access in both

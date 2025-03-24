@@ -2,9 +2,7 @@ package com.solegendary.reignofnether.startpos;
 
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.building.BuildingClientEvents;
-import com.solegendary.reignofnether.building.buildings.monsters.Mausoleum;
-import com.solegendary.reignofnether.building.buildings.piglins.CentralPortal;
-import com.solegendary.reignofnether.building.buildings.villagers.TownCentre;
+import com.solegendary.reignofnether.building.Buildings;
 import com.solegendary.reignofnether.gamemode.ClientGameModeHelper;
 import com.solegendary.reignofnether.gamemode.GameMode;
 import com.solegendary.reignofnether.hud.Button;
@@ -197,9 +195,9 @@ public class StartPosClientEvents {
         for (StartPos startPos : startPoses) {
             if (startPos.faction != Faction.NONE) {
                 switch (startPos.faction) {
-                    case VILLAGERS -> BuildingClientEvents.setBuildingToPlace(TownCentre.class);
-                    case MONSTERS -> BuildingClientEvents.setBuildingToPlace(Mausoleum.class);
-                    case PIGLINS -> BuildingClientEvents.setBuildingToPlace(CentralPortal.class);
+                    case VILLAGERS -> BuildingClientEvents.setBuildingToPlace(Buildings.TOWN_CENTRE);
+                    case MONSTERS -> BuildingClientEvents.setBuildingToPlace(Buildings.MAUSOLEUM);
+                    case PIGLINS -> BuildingClientEvents.setBuildingToPlace(Buildings.CENTRAL_PORTAL);
                 }
                 int forceColour = 2;
                 if (startPos.playerName.equals(MC.player.getName().getString()))

@@ -5,15 +5,12 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Vector3d;
 import com.solegendary.reignofnether.alliance.AlliancesClient;
-import com.solegendary.reignofnether.blocks.RTSStartBlock;
 import com.solegendary.reignofnether.building.*;
-import com.solegendary.reignofnether.building.buildings.shared.AbstractBridge;
+import com.solegendary.reignofnether.building.buildings.placements.BridgePlacement;
 import com.solegendary.reignofnether.cursor.CursorClientEvents;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
-import com.solegendary.reignofnether.registrars.BlockRegistrar;
 import com.solegendary.reignofnether.registrars.GameRuleRegistrar;
-import com.solegendary.reignofnether.resources.ResourceSources;
 import com.solegendary.reignofnether.time.NightCircleMode;
 import com.solegendary.reignofnether.time.TimeClientEvents;
 import com.solegendary.reignofnether.unit.Checkpoint;
@@ -27,7 +24,6 @@ import com.solegendary.reignofnether.unit.units.piglins.GhastUnit;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiComponent;
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntArrayTag;
@@ -290,7 +286,7 @@ public class MiscUtil {
         return closestBuilding;
     }
 
-    private static boolean isBuildingAttackable(Mob unitMob, Building building) {
+    private static boolean isBuildingAttackable(Mob unitMob, BuildingPlacement building) {
         // Get the relationship between the unit and the building's owner
         Relationship relationship = UnitServerEvents.getUnitToBuildingRelationship((Unit) unitMob, building);
 
@@ -342,6 +338,17 @@ public class MiscUtil {
             GuiComponent.drawString(stack, font, str, 0,y, 0xFFFFFF);
             y += 10;
         }
+    }
+
+    public static Relationship getClientsideRelationship(String playerName1, String playerName2) {
+        if (playerName1.isEmpty() || playerName2.isEmpty())
+            return Relationship.NEUTRAL;
+        else if (playerName1.equals(playerName2))
+            return Relationship.OWNED;
+        else if (AlliancesClient.isAllied(playerName1, playerName2))
+            return Relationship.FRIENDLY;
+        else
+            return Relationship.HOSTILE;
     }
 
     // lightens or darkens a hex RGB value
@@ -566,5 +573,11 @@ public class MiscUtil {
         }
     }
 
+    public static FormattedCharSequence fcs(String string) {
+        return FormattedCharSequence.forward(string, Style.EMPTY);
+    }
 
+    public static FormattedCharSequence fcs(String string, boolean bold) {
+        return FormattedCharSequence.forward(string, bold ? Style.EMPTY.withBold(true) : Style.EMPTY);
+    }
 }

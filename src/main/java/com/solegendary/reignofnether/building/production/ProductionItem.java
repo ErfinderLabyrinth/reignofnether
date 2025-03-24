@@ -4,6 +4,7 @@ import com.solegendary.reignofnether.building.BuildingClientEvents;
 import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.BuildingServerEvents;
 import com.solegendary.reignofnether.building.buildings.placements.ProductionPlacement;
+import com.solegendary.reignofnether.gamerules.GameruleClient;
 import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.research.ResearchClient;
@@ -86,7 +87,7 @@ public abstract class ProductionItem {
         for (Resources resources : ResourcesServerEvents.resourcesList) {
             if (resources.ownerName.equals(ownerName)) {
                 if (level.isClientSide())
-                    return (currentPop + cost.population) <= UnitClientEvents.maxPopulation;
+                    return (currentPop + cost.population) <= GameruleClient.maxPopulation;
                 else
                     return (currentPop + cost.population) <= UnitServerEvents.maxPopulation;
             }

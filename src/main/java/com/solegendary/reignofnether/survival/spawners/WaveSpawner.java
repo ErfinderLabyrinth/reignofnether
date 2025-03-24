@@ -1,6 +1,5 @@
 package com.solegendary.reignofnether.survival.spawners;
 
-import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.BuildingServerEvents;
@@ -12,6 +11,7 @@ import com.solegendary.reignofnether.util.MiscUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.material.Material;
@@ -19,7 +19,7 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.*;
 
-import static com.solegendary.reignofnether.survival.SurvivalServerEvents.*;
+import static com.solegendary.reignofnether.survival.SurvivalServerEvents.ENEMY_OWNER_NAME;
 
 public class WaveSpawner {
 
@@ -104,7 +104,7 @@ public class WaveSpawner {
         }
     }
 
-    public static List<BlockPos> getValidSpawnPoints(int amount, Level level, boolean allowLiquid) {
+    public static List<BlockPos> getValidSpawnPoints(int amount, Level level, boolean allowLiquid, int flatnessRadius) {
         List<BuildingPlacement> buildings = BuildingServerEvents.getBuildings()
                 .stream().filter(b -> !ENEMY_OWNER_NAME.equals(b.ownerName) && !b.ownerName.isBlank())
                 .toList();
@@ -123,7 +123,7 @@ public class WaveSpawner {
 
         // calculate all valid buildings to spawn around based on distance from the centroid
         List<BuildingPlacement> sortedBuildings = buildings.stream().sorted(
-            Comparator.comparing((BuildingPlacement b) -> b.centrePos.distToCenterSqr(fCentroid.x, fCentroid.y, fCentroid.z)).reversed()
+                Comparator.comparing((BuildingPlacement b) -> b.centrePos.distToCenterSqr(fCentroid.x, fCentroid.y, fCentroid.z)).reversed()
         ).toList();
 
         int numValidBuildings = (int) (MIN_VALID_BUILDINGS + (buildings.size() * PERCENT_VALID_BUILDINGS));
@@ -133,7 +133,7 @@ public class WaveSpawner {
         BlockState spawnBs;
         BlockPos spawnBp;
         double distSqrToNearestBuilding = 999999;
-        double distSqrToNearestPortal = 999999;
+        double distSqrToNearestEnemyBuilding = 999999;
         int failedBuildings = 0;
         ArrayList<BlockPos> validSpawns = new ArrayList<>();
 
@@ -146,7 +146,7 @@ public class WaveSpawner {
                 int z = building.centrePos.getZ() + random.nextInt(-MAX_SPAWN_RANGE, MAX_SPAWN_RANGE);
                 int y = level.getChunkAt(new BlockPos(x, 0, z)).getHeight(Heightmap.Types.WORLD_SURFACE, x, z);
 
-                spawnBp = MiscUtil.getHighestNonAirBlock(level, new BlockPos(x, y, z), true);
+                spawnBp = MiscUtil.getHighestGroundBlock(level, new BlockPos(x, y, z));
                 spawnBs = level.getBlockState(spawnBp);
                 spawnAttemptsThisBuilding += 1;
                 if (spawnAttemptsThisBuilding > 100) {
@@ -159,20 +159,21 @@ public class WaveSpawner {
                 }
                 Vec3 vec3 = new Vec3(x, y, z);
                 BuildingPlacement b = BuildingUtils.findClosestBuilding(false, vec3, (b1) -> !b1.ownerName.equals(ENEMY_OWNER_NAME));
-                BuildingPlacement p = BuildingUtils.findClosestBuilding(false, vec3, (b1) -> b1.ownerName.equals(ENEMY_OWNER_NAME));
+                BuildingPlacement eb = BuildingUtils.findClosestBuilding(false, vec3, (b1) -> b1.ownerName.equals(ENEMY_OWNER_NAME));
 
                 if (b != null)
                     distSqrToNearestBuilding = b.centrePos.distToCenterSqr(vec3);
-                if (p != null)
-                    distSqrToNearestPortal = p.centrePos.distToCenterSqr(vec3);
+                if (eb != null)
+                    distSqrToNearestEnemyBuilding = eb.centrePos.distToCenterSqr(vec3);
 
             } while (spawnBs.getMaterial() == Material.LEAVES
                     || spawnBs.getMaterial() == Material.WOOD
                     || distSqrToNearestBuilding < (MIN_SPAWN_RANGE * MIN_SPAWN_RANGE)
-                    || distSqrToNearestPortal < (10 * 10)
+                    || distSqrToNearestEnemyBuilding < (10 * 10)
                     || (spawnBs.getMaterial().isLiquid() && !allowLiquid)
                     || BuildingUtils.isPosInsideAnyBuilding(level.isClientSide(), spawnBp)
-                    || BuildingUtils.isPosInsideAnyBuilding(level.isClientSide(), spawnBp.above()));
+                    || BuildingUtils.isPosInsideAnyBuilding(level.isClientSide(), spawnBp.above())
+                    || (flatnessRadius > 0 && getYVariance(level, spawnBp, flatnessRadius) >= flatnessRadius / 2f));
 
             validSpawns.add(spawnBp);
             amount -= 1;
@@ -188,17 +189,17 @@ public class WaveSpawner {
     }
 
     public static BuildingPlacement spawnBuilding(Building building, BlockPos bp) {
-        BuildingPlacement building = BuildingServerEvents.placeBuilding(
-                buildingName, bp,
+        BuildingPlacement placement = BuildingServerEvents.placeBuilding(
+                building, bp,
                 Rotation.NONE,
                 ENEMY_OWNER_NAME,
                 new int[] {},
                 false,
                 false
         );
-        if (building != null)
-            building.selfBuilding = true;
-        BuildingUtils.clearBuildingArea(building);
-        return building;
+        if (placement != null)
+            placement.selfBuilding = true;
+        BuildingUtils.clearBuildingArea(placement);
+        return placement;
     }
 }

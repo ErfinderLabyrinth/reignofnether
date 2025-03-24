@@ -1,10 +1,8 @@
 package com.solegendary.reignofnether.unit.modelling.renderers;
 
 import net.minecraft.client.model.LlamaModel;
-import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.entity.LlamaRenderer;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.client.renderer.entity.layers.LlamaDecorLayer;
 import net.minecraft.resources.ResourceLocation;

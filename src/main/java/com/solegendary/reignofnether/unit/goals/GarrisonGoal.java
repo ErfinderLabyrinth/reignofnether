@@ -2,14 +2,13 @@ package com.solegendary.reignofnether.unit.goals;
 
 import com.solegendary.reignofnether.alliance.AlliancesClient;
 import com.solegendary.reignofnether.alliance.AlliancesServerEvents;
-import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.BuildingUtils;
 import com.solegendary.reignofnether.building.GarrisonableBuilding;
 import com.solegendary.reignofnether.hud.HudClientEvents;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
+import com.solegendary.reignofnether.util.LanguageUtil;
 import com.solegendary.reignofnether.util.MiscUtil;
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.phys.Vec3;
@@ -68,11 +67,11 @@ public class GarrisonGoal extends MoveToTargetBlockGoal {
             if (!(building instanceof GarrisonableBuilding garrisonableBuilding) ||
                 (!building.ownerName.equals(((Unit) mob).getOwnerName()) && !isAllied)) {
                 if (clientside)
-                    HudClientEvents.showTemporaryMessage(I18n.get("hud.reignofnether.not_garrisonable"));
+                    HudClientEvents.showTemporaryMessage(LanguageUtil.getTranslation("hud.reignofnether.not_garrisonable"));
             }
             else if (garrisonableBuilding.isFull()) {
                 if (clientside)
-                    HudClientEvents.showTemporaryMessage(I18n.get("hud.reignofnether.building_full"));
+                    HudClientEvents.showTemporaryMessage(LanguageUtil.getTranslation("hud.reignofnether.building_full"));
             } else {
                 if (clientside) {
                     MiscUtil.addUnitCheckpoint(((Unit) mob), new BlockPos(

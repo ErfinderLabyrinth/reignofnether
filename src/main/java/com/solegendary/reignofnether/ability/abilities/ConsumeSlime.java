@@ -8,14 +8,13 @@ import com.solegendary.reignofnether.hud.HudClientEvents;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.unit.UnitAction;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
-import com.solegendary.reignofnether.unit.units.piglins.MagmaCubeUnit;
 import com.solegendary.reignofnether.unit.units.monsters.SlimeUnit;
+import com.solegendary.reignofnether.unit.units.piglins.MagmaCubeUnit;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.monster.Slime;
 import net.minecraft.world.level.Level;
 
 import java.util.List;
@@ -27,23 +26,21 @@ public class ConsumeSlime extends Ability {
     private static final int CD_MAX = 0;
     private static final int RANGE = 2;
 
-    private Slime slime;
-
-    public ConsumeSlime(Slime slime) {
+    public ConsumeSlime() {
         super(UnitAction.CONSUME_SLIME, CD_MAX, RANGE, 0, true, true);
-        this.slime = slime;
         canAutocast = true;
     }
 
     @Override
     public AbilityButton getButton(Keybinding hotkey, Unit unit) {
+        SlimeUnit slime = (SlimeUnit) unit;
         return new AbilityButton("Consume",
-            this.slime instanceof MagmaCubeUnit ?
+            slime instanceof MagmaCubeUnit ?
                     new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/magma_cube.png") :
                     new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/slime.png"),
             hotkey,
             () -> CursorClientEvents.getLeftClickAction() == UnitAction.CONSUME_SLIME || autocast,
-            () -> this.slime.getSize() <= 1,
+            () -> slime.getSize() <= 1,
             () -> true,
             () -> CursorClientEvents.setLeftClickAction(UnitAction.CONSUME_SLIME),
             () -> sendUnitCommand(UnitAction.AUTOCAST),

@@ -34,7 +34,7 @@ public class ResearchClient {
                 researchItems.add(researchItemName);
                 HudClientEvents.showTemporaryMessage(I18n.get(
                     "research.reignofnether.upgrade_completed",
-                    researchItemName
+                    I18n.get("research." + researchItemName.getNamespace() + "." + researchItemName.getPath())
                 ));
             }
         }

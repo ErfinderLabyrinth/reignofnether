@@ -1,11 +1,8 @@
 package com.solegendary.reignofnether.building.buildings.placements;
 
-import com.solegendary.reignofnether.building.Building;
-import com.solegendary.reignofnether.building.BuildingBlock;
-import com.solegendary.reignofnether.building.BuildingBlockData;
+import com.solegendary.reignofnether.building.*;
 import com.solegendary.reignofnether.building.buildings.monsters.SculkCatalyst;
 import com.solegendary.reignofnether.time.TimeClientEvents;
-import com.solegendary.reignofnether.util.Faction;
 import com.solegendary.reignofnether.util.MiscUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -20,7 +17,7 @@ import java.util.*;
 
 import static com.solegendary.reignofnether.building.BuildingUtils.isPosInsideAnyBuilding;
 
-public class SculkCatalystPlacement extends DarknessProductionBuilding{
+public class SculkCatalystPlacement extends BuildingPlacement implements RangeIndicator, NightSource {
     private final static Random random = new Random();
     private final Set<BlockPos> nightBorderBps = new HashSet<>();
 
@@ -34,7 +31,7 @@ public class SculkCatalystPlacement extends DarknessProductionBuilding{
     private final boolean didSculkFix = false;
     private final BlockPos sculkFixBp = null;
     public SculkCatalystPlacement(Building building, Level level, BlockPos originPos, Rotation rotation, String ownerName, ArrayList<BuildingBlock> blocks, boolean isCapitol) {
-        super(building, level, originPos, rotation, ownerName, blocks, isCapitol, SculkCatalyst.nightRangeMin, false, true);
+        super(building, level, originPos, rotation, ownerName, blocks, isCapitol);
     }
 
     public int getUncappedNightRange() {
@@ -49,6 +46,11 @@ public class SculkCatalystPlacement extends DarknessProductionBuilding{
             return (int) Math.min(SculkCatalyst.nightRangeMin + (sculkBps.size() * RANGE_PER_SCULK), SculkCatalyst.nightRangeMax);
         }
         return 0;
+    }
+
+    @Override
+    public int getNightRange() {
+        return getRange();
     }
 
     @Override

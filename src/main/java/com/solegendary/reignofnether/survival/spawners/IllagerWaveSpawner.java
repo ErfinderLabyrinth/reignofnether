@@ -1,6 +1,8 @@
 package com.solegendary.reignofnether.survival.spawners;
 
 import com.solegendary.reignofnether.ability.abilities.*;
+import com.solegendary.reignofnether.building.BuildingPlacement;
+import com.solegendary.reignofnether.building.Buildings;
 import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.player.PlayerServerEvents;
 import com.solegendary.reignofnether.registrars.EntityRegistrar;
@@ -13,9 +15,7 @@ import com.solegendary.reignofnether.unit.units.villagers.PillagerUnit;
 import com.solegendary.reignofnether.unit.units.villagers.RavagerUnit;
 import com.solegendary.reignofnether.unit.units.villagers.VindicatorUnit;
 import com.solegendary.reignofnether.util.Faction;
-import com.solegendary.reignofnether.util.MiscUtil;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.raid.Raid;
@@ -23,12 +23,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
-import net.minecraft.world.level.block.Rotation;
-import net.minecraft.world.phys.Vec3;
 
 import java.util.*;
 
-import static com.solegendary.reignofnether.survival.SurvivalServerEvents.*;
+import static com.solegendary.reignofnether.survival.SurvivalServerEvents.ENEMY_OWNER_NAME;
+import static com.solegendary.reignofnether.survival.SurvivalServerEvents.lastFaction;
 import static com.solegendary.reignofnether.survival.spawners.WaveSpawner.*;
 
 public class IllagerWaveSpawner {
@@ -128,11 +127,11 @@ public class IllagerWaveSpawner {
         boolean flipCoords = random.nextBoolean();
 
         for (BlockPos bp : spawnBps) {
-            Building building = WaveSpawner.spawnBuilding(Barracks.buildingName, bp.above());
+            BuildingPlacement building = WaveSpawner.spawnBuilding(Buildings.BARRACKS, bp.above());
             if (building != null) {
                 BlockPos bp2 = new BlockPos(building.centrePos.getX() - 2, building.minCorner.getY(), building.centrePos.getZ());
-                WaveSpawner.spawnBuilding(Watchtower.buildingName, bp2.offset(new BlockPos(flipCoords ? 10 : -0,-1, flipCoords ? 0 : 10)));
-                WaveSpawner.spawnBuilding(Watchtower.buildingName, bp2.offset(new BlockPos(flipCoords ? -10 : 0,-1, flipCoords ? 0 : -10)));
+                WaveSpawner.spawnBuilding(Buildings.WATCHTOWER, bp2.offset(new BlockPos(flipCoords ? 10 : -0,-1, flipCoords ? 0 : 10)));
+                WaveSpawner.spawnBuilding(Buildings.WATCHTOWER, bp2.offset(new BlockPos(flipCoords ? -10 : 0,-1, flipCoords ? 0 : -10)));
             }
         }
     }
@@ -143,7 +142,7 @@ public class IllagerWaveSpawner {
 
         final int pop = wave.population * PlayerServerEvents.rtsPlayers.size();
         int remainingPop = wave.population * PlayerServerEvents.rtsPlayers.size();
-        List<BlockPos> spawnBps = getValidSpawnPoints(remainingPop, level, true);
+        List<BlockPos> spawnBps = getValidSpawnPoints(remainingPop, level, true, 6);
         int spawnsThisDir = 0;
         int spawnUntilNextTurn = -2;
 

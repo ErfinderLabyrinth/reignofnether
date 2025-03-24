@@ -22,18 +22,15 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 
 import java.util.List;
 
 public class MountHoglin extends Ability {
-
-    private final LivingEntity entity;
-
-    public MountHoglin(LivingEntity entity) {
+    public MountHoglin() {
         super(UnitAction.MOUNT_HOGLIN, 0, 0, 0, true);
-        this.entity = entity;
     }
 
     @Override
@@ -42,7 +39,7 @@ public class MountHoglin extends Ability {
             new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/hoglin.png"),
             hotkey,
             () -> CursorClientEvents.getLeftClickAction() == UnitAction.MOUNT_HOGLIN,
-            () -> entity.isPassenger() || !ResearchClient.hasResearch(ProductionItems.RESEARCH_HOGLIN_CAVALRY),
+            () -> ((Entity)unit).isPassenger() || !ResearchClient.hasResearch(ProductionItems.RESEARCH_HOGLIN_CAVALRY),
             () -> true,
             () -> CursorClientEvents.setLeftClickAction(UnitAction.MOUNT_HOGLIN),
             () -> UnitClientEvents.sendUnitCommand(UnitAction.MOUNT_HOGLIN),
@@ -51,7 +48,7 @@ public class MountHoglin extends Ability {
         );
     }
 
-    private MountGoal getMountGoal() {
+    private MountGoal getMountGoal(Entity entity) {
         if (entity instanceof PillagerUnit pillagerUnit) {
             return pillagerUnit.getMountGoal();
         }
@@ -71,16 +68,16 @@ public class MountHoglin extends Ability {
     // right click
     @Override
     public void use(Level level, Unit unitUsing, BlockPos targetBp) {
-        MountGoal mountGoal = getMountGoal();
+        MountGoal mountGoal = getMountGoal((Entity) unitUsing);
         if (mountGoal != null)
             mountGoal.autofind = true;
     }
 
     @Override
     public void use(Level level, Unit unitUsing, LivingEntity targetEntity) {
-        MountGoal mountGoal = getMountGoal();
+        MountGoal mountGoal = getMountGoal((Entity) unitUsing);
         if (mountGoal != null && targetEntity instanceof HoglinUnit) {
-            getMountGoal().setTarget(targetEntity);
+            getMountGoal((Entity) unitUsing).setTarget(targetEntity);
         } else if (level.isClientSide()) {
             HudClientEvents.showTemporaryMessage(I18n.get("abilities.reignofnether.mount_hoglin.error1"));
         }

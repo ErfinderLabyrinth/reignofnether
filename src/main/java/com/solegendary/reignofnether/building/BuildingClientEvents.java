@@ -4,13 +4,18 @@ import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.solegendary.reignofnether.alliance.AlliancesClient;
+import com.solegendary.reignofnether.api.ReignOfNetherRegistries;
 import com.solegendary.reignofnether.building.buildings.monsters.Laboratory;
-import com.solegendary.reignofnether.building.buildings.neutral.Beacon;
 import com.solegendary.reignofnether.building.buildings.neutral.NeutralTransportPortal;
+import com.solegendary.reignofnether.building.buildings.piglins.CentralPortal;
 import com.solegendary.reignofnether.building.buildings.piglins.Portal;
+import com.solegendary.reignofnether.building.buildings.placements.BeaconPlacement;
+import com.solegendary.reignofnether.building.buildings.placements.PortalPlacement;
+import com.solegendary.reignofnether.building.buildings.placements.ProductionPlacement;
 import com.solegendary.reignofnether.building.buildings.shared.AbstractBridge;
 import com.solegendary.reignofnether.building.buildings.villagers.Castle;
 import com.solegendary.reignofnether.building.buildings.villagers.Library;
+import com.solegendary.reignofnether.building.buildings.villagers.TownCentre;
 import com.solegendary.reignofnether.cursor.CursorClientEvents;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientEvents;
 import com.solegendary.reignofnether.gamerules.GameruleClient;
@@ -20,13 +25,13 @@ import com.solegendary.reignofnether.nether.NetherBlocks;
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
 import com.solegendary.reignofnether.research.ResearchClient;
 import com.solegendary.reignofnether.sandbox.SandboxClientEvents;
-import com.solegendary.reignofnether.startpos.StartPosClientEvents;
 import com.solegendary.reignofnether.tutorial.TutorialClientEvents;
 import com.solegendary.reignofnether.unit.Relationship;
 import com.solegendary.reignofnether.unit.UnitAction;
 import com.solegendary.reignofnether.unit.UnitClientEvents;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.interfaces.WorkerUnit;
+import com.solegendary.reignofnether.util.Faction;
 import com.solegendary.reignofnether.util.MiscUtil;
 import com.solegendary.reignofnether.util.MyRenderer;
 import net.minecraft.client.Minecraft;
@@ -45,7 +50,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
@@ -57,7 +61,6 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.lwjgl.glfw.GLFW;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -87,8 +90,8 @@ public class BuildingClientEvents {
     private static final ArrayList<BuildingPlacement> buildings = new ArrayList<>();
 
     private static final ArrayList<BuildingPlacement> selectedBuildings = new ArrayList<>();
-    private static Class<? extends Building> buildingToPlace = null;
-    private static Class<? extends Building> lastBuildingToPlace = null;
+    private static Building buildingToPlace = null;
+    private static Building lastBuildingToPlace = null;
     private static ArrayList<BuildingBlock> blocksToDraw = new ArrayList<>();
     private static boolean replacedTexture = false;
     private static Rotation buildingRotation = Rotation.NONE;
@@ -140,27 +143,27 @@ public class BuildingClientEvents {
         }
 
         selectedBuildings.add(building);
-        selectedBuildings.sort(Comparator.comparing(b -> b.name));
+        selectedBuildings.sort(Comparator.comparing(b -> ReignOfNetherRegistries.BUILDING.getKey(b.getBuilding()).toString()));
         UnitClientEvents.clearSelectedUnits();
     }
 
     private static boolean isBuildingToPlaceABridge() {
-        return buildingToPlace != null && buildingToPlace.getName().toLowerCase().contains("bridge");
+        return buildingToPlace instanceof AbstractBridge;
     }
 
     // switch to the building with the least production, so we can spread out production items
     public static void switchHudToIdlestBuilding() {
-        if (hudSelectedBuilding == null || MC.player == null)
+        if (hudSelectedPlacement == null || MC.player == null)
             return;
         BuildingPlacement idlestBuilding = null;
 
         List<BuildingPlacement> sameNameBuildings = selectedBuildings.stream().filter(
-                b -> b.name.equals(hudSelectedBuilding.name) && b.isBuilt && b.ownerName.equals(MC.player.getName().getString())
+                b -> b.getBuilding().equals(hudSelectedPlacement.getBuilding()) && b.isBuilt && b.ownerName.equals(MC.player.getName().getString())
         ).toList();
 
         float prodTicksLeftMax = Float.MAX_VALUE;
         for (BuildingPlacement building : sameNameBuildings) {
-            if (building.getBuilding() instanceof ProductionBuilding prodB) {
+            if (building instanceof ProductionPlacement prodB) {
                 Float prodTicksLeft = prodB.productionQueue.stream().map(p -> p.ticksLeft).reduce(0F, Float::sum);
                 if (prodTicksLeft < prodTicksLeftMax) {
                     prodTicksLeftMax = prodTicksLeft;
@@ -169,26 +172,19 @@ public class BuildingClientEvents {
             }
         }
         if (idlestBuilding != null)
-            hudSelectedBuilding = idlestBuilding;
+            hudSelectedPlacement = idlestBuilding;
     }
 
-    public static void setBuildingToPlace(Class<? extends Building> building) {
+    public static void setBuildingToPlace(Building building) {
         buildingToPlace = building;
 
         if ((buildingToPlace != lastBuildingToPlace) && buildingToPlace != null) {
             // load the new buildingToPlace's data
             try {
-                if (isBuildingToPlaceABridge()) {
-                    Class<?>[] paramTypes = { LevelAccessor.class, boolean.class };
-                    Method getRelativeBlockData = buildingToPlace.getMethod("getRelativeBlockData", paramTypes);
-                    blocksToDraw = (ArrayList<BuildingBlock>) getRelativeBlockData.invoke(null,
-                        MC.level,
-                        isBridgeDiagonal()
-                    );
+                if (buildingToPlace instanceof AbstractBridge bridge) {
+                    blocksToDraw = bridge.getRelativeBlockData(MC.level, isBridgeDiagonal());
                 } else {
-                    Class<?>[] paramTypes = { LevelAccessor.class };
-                    Method getRelativeBlockData = buildingToPlace.getMethod("getRelativeBlockData", paramTypes);
-                    blocksToDraw = (ArrayList<BuildingBlock>) getRelativeBlockData.invoke(null, MC.level);
+                    blocksToDraw = buildingToPlace.getRelativeBlockData(MC.level);
                 }
                 buildingDimensions = BuildingUtils.getBuildingSize(blocksToDraw);
                 buildingRotation = Rotation.NONE;
@@ -199,7 +195,7 @@ public class BuildingClientEvents {
         }
     }
 
-    public static Class<? extends Building> getBuildingToPlace() {
+    public static Building getBuildingToPlace() {
         return buildingToPlace;
     }
 
@@ -245,7 +241,7 @@ public class BuildingClientEvents {
         int maxZ = -999999;
 
         for (BuildingBlock block : blocksToDraw) {
-            if (buildingToPlace != null && buildingToPlace.getName().toLowerCase().contains("bridge")
+            if (buildingToPlace != null && isBuildingToPlaceABridge()
                 && MC.level != null && AbstractBridge.shouldCullBlock(originPos.offset(0, 1, 0), block, MC.level)) {
                 continue;
             }
@@ -308,9 +304,7 @@ public class BuildingClientEvents {
         float g = valid ? 1.0f : 0;
         // highlight yellow if we are placing a portal on overworld terrain
         if (valid) {
-            String buildingName = buildingToPlace.getName().toLowerCase();
-            if (buildingName.contains("portal") &&
-                    !buildingName.contains("central_portal") &&
+            if (buildingToPlace instanceof Portal &&
                     !isOnNetherBlocks(blocksToDraw, originPos)) {
                 r = 0.5f;
                 g = 0.5f;
@@ -437,14 +431,13 @@ public class BuildingClientEvents {
     }
 
     private static boolean isNonPiglinOrOnNetherBlocks(BlockPos originPos) {
-        String buildingName = buildingToPlace.getName().toLowerCase();
-        if (buildingName.contains("bridge")) {
+        if (isBuildingToPlaceABridge()) {
             return true;
         }
-        if (!buildingName.contains("buildings.piglins.") || buildingName.contains("central_portal")) {
+        if (buildingToPlace.getFaction() != Faction.PIGLINS || buildingToPlace instanceof CentralPortal) {
             return true;
         }
-        if (buildingName.contains("portal")) {
+        if (buildingToPlace instanceof Portal) {
             return true;
         }
 
@@ -530,7 +523,7 @@ public class BuildingClientEvents {
             return true;
         }
 
-        if (!buildingToPlace.getName().toLowerCase().contains("centre")) {
+        if (!(buildingToPlace instanceof TownCentre)) {
             return true;
         }
 
@@ -661,7 +654,7 @@ public class BuildingClientEvents {
 
         // draw rally point and line
         for (BuildingPlacement selBuilding : selectedBuildings) {
-            if (selBuilding.getBuilding() instanceof ProductionBuilding selProdBuilding) {
+            if (selBuilding instanceof ProductionPlacement selProdBuilding) {
                 float a = MiscUtil.getOscillatingFloat(0.25f, 0.75f);
 
                 if (selProdBuilding.getRallyPoint() != null) {
@@ -690,7 +683,7 @@ public class BuildingClientEvents {
                     MyRenderer.drawLineBoxOutlineOnly(evt.getPoseStack(), le.getBoundingBox(), 0, 1.0f, 0, a, false);
                 }
             }
-            if (selBuilding.getBuilding() instanceof Portal portal && portal.hasDestination()) {
+            if (selBuilding instanceof PortalPlacement portal && portal.hasDestination()) {
                 float a = MiscUtil.getOscillatingFloat(0.25f, 0.75f);
                 MyRenderer.drawLine(evt.getPoseStack(), selBuilding.centrePos, portal.destination, 0, 1, 0, a);
             }
@@ -711,7 +704,7 @@ public class BuildingClientEvents {
     @SubscribeEvent
     public static void onMouseScroll(ScreenEvent.MouseScrolled.Post evt) {
         if (buildingToPlace != null) {
-            if (isBuildingToPlaceABridge()) {
+            if (buildingToPlace instanceof AbstractBridge bridge) {
                 bridgePlaceState += evt.getScrollDelta() > 0 ? 1 : -1;
                 if (bridgePlaceState < 0) {
                     bridgePlaceState = 3;
@@ -719,12 +712,7 @@ public class BuildingClientEvents {
                     bridgePlaceState = 0;
                 }
                 try {
-                    Class<?>[] paramTypes = { LevelAccessor.class, boolean.class };
-                    Method getRelativeBlockData = buildingToPlace.getMethod("getRelativeBlockData", paramTypes);
-                    blocksToDraw = (ArrayList<BuildingBlock>) getRelativeBlockData.invoke(null,
-                        MC.level,
-                        isBridgeDiagonal()
-                    );
+                    blocksToDraw = bridge.getRelativeBlockData(MC.level, isBridgeDiagonal());
                     buildingDimensions = BuildingUtils.getBuildingSize(blocksToDraw);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -766,7 +754,7 @@ public class BuildingClientEvents {
 
             // place a new building
             if (buildingToPlace != null && isBuildingPlacementValid(pos) && MC.player != null) {
-                String buildingName = (String) buildingToPlace.getField("buildingName").get(null);
+                Building building = buildingToPlace;
 
                 ArrayList<Integer> builderIds = new ArrayList<>();
                 for (LivingEntity builderEntity : getSelectedUnits())
@@ -775,7 +763,7 @@ public class BuildingClientEvents {
                     }
 
                 if (Keybindings.shiftMod.isDown()) {
-                    BuildingServerboundPacket.placeAndQueueBuilding(buildingName,
+                    BuildingServerboundPacket.placeAndQueueBuilding(building,
                         isBuildingToPlaceABridge() && bridgePlaceState == 2 ? pos.offset(-5, 0, -5) : pos,
                         buildingRotation,
                         MC.player.getName().getString(),
@@ -805,13 +793,13 @@ public class BuildingClientEvents {
                     }
                     String ownerName = MC.player.getName().getString();
                     if (SandboxClientEvents.isSandboxPlayer(ownerName) && !hasSelectedWorkers &&
-                        !buildingName.toLowerCase().contains("bridge")) {
+                        !(buildingToPlace instanceof AbstractBridge)) {
                         if (SandboxClientEvents.relationship == Relationship.NEUTRAL)
                             ownerName = "";
                         else if (SandboxClientEvents.relationship == Relationship.HOSTILE)
                             ownerName = "Enemy";
                     }
-                    BuildingServerboundPacket.placeBuilding(buildingName,
+                    BuildingServerboundPacket.placeBuilding(buildingToPlace,
                         isBuildingToPlaceABridge() && bridgePlaceState == 2 ? pos.offset(-5, 0, -5) : pos,
                         buildingRotation,
                         ownerName,
@@ -848,7 +836,7 @@ public class BuildingClientEvents {
                             centre.getZ()
                         ),
                         OrthoviewClientEvents.getZoom() * 2,
-                        selBuilding.name
+                        selBuilding.getBuilding()
                     );
                     clearSelectedBuildings();
                     for (BuildingPlacement building : nearbyBuildings)
@@ -891,7 +879,7 @@ public class BuildingClientEvents {
             // set rally points
             if (!Keybindings.altMod.isDown()) {
                 for (BuildingPlacement selBuilding : selectedBuildings) {
-                    if (selBuilding.getBuilding() instanceof ProductionBuilding selProdBuilding
+                    if (selBuilding instanceof ProductionPlacement selProdBuilding
                         && getPlayerToBuildingRelationship(selBuilding) == Relationship.OWNED) {
                         if (!UnitClientEvents.getPreselectedUnits().isEmpty()) {
                             LivingEntity rallyPointEntity = UnitClientEvents.getPreselectedUnits().get(0);
@@ -917,10 +905,10 @@ public class BuildingClientEvents {
         }
         if (evt.getKeyCode() == GLFW.GLFW_KEY_DELETE) {
             boolean isSandboxPlayer = MC.player != null && SandboxClientEvents.isSandboxPlayer(MC.player.getName().getString());
-            BuildingPlacement building = HudClientEvents.hudSelectedBuilding;
+            BuildingPlacement building = HudClientEvents.hudSelectedPlacement;
             if (building != null &&
                 ((building.isBuilt && getPlayerToBuildingRelationship(building) == Relationship.OWNED) || isSandboxPlayer)) {
-                HudClientEvents.hudSelectedBuilding = null;
+                HudClientEvents.hudSelectedPlacement = null;
                 BuildingServerboundPacket.cancelBuilding(building.minCorner, MC.player.getName().getString());
             }
         }
@@ -976,7 +964,7 @@ public class BuildingClientEvents {
     public static void onScreenOpen(ScreenEvent.Opening evt) {
         if (evt.getScreen() instanceof BeaconScreen) {
             BlockPos bp = Item.getPlayerPOVHitResult(MC.level, MC.player, ClipContext.Fluid.NONE).getBlockPos();
-            if (BuildingUtils.findBuilding(true, bp) instanceof Beacon)
+            if (BuildingUtils.findBuilding(true, bp) instanceof BeaconPlacement)
                 evt.setCanceled(true);
         }
     }
@@ -990,14 +978,14 @@ public class BuildingClientEvents {
         }
     }
 
-    public static ArrayList<BuildingPlacement> getBuildingsWithinRange(Vec3 pos, float range, String buildingName) {
+    public static ArrayList<BuildingPlacement> getBuildingsWithinRange(Vec3 pos, float range, Building building) {
         ArrayList<BuildingPlacement> retBuildings = new ArrayList<>();
-        for (BuildingPlacement building : buildings) {
-            if (building.name.equals(buildingName)) {
-                BlockPos centre = building.centrePos;
+        for (BuildingPlacement placement : buildings) {
+            if (placement.getBuilding().equals(building)) {
+                BlockPos centre = placement.centrePos;
                 Vec3 centreVec3 = new Vec3(centre.getX(), centre.getY(), centre.getZ());
                 if (pos.distanceTo(centreVec3) <= range) {
-                    retBuildings.add(building);
+                    retBuildings.add(placement);
                 }
             }
         }
@@ -1006,7 +994,7 @@ public class BuildingClientEvents {
 
     // place a building clientside that has already been registered on serverside
     public static void placeBuilding(
-        String buildingName,
+        Building building,
         BlockPos pos,
         Rotation rotation,
         String ownerName,
@@ -1014,12 +1002,12 @@ public class BuildingClientEvents {
         boolean isDiagonalBridge,
         int upgradeLevel,
         boolean isBuilt,
-        Portal.PortalType portalType,
+        PortalPlacement.PortalType portalType,
         BlockPos portalDestination,
         boolean forPlayerLoggingIn
     ) {
 
-        BuildingPlacement newBuilding = BuildingUtils.getNewBuilding(buildingName,
+        BuildingPlacement newBuilding = BuildingUtils.getNewBuilding(building,
             MC.level,
             pos,
             rotation,
@@ -1027,8 +1015,8 @@ public class BuildingClientEvents {
             isDiagonalBridge
         );
 
-        for (BuildingPlacement building : buildings)
-            if (newBuilding.originPos.equals(building.originPos)) {
+        for (BuildingPlacement placement : buildings)
+            if (newBuilding.originPos.equals(placement.originPos)) {
                 return; // skip, building already exists clientside
             }
 
@@ -1046,9 +1034,9 @@ public class BuildingClientEvents {
 
             if (upgradeLevel > 0) {
                 if (newBuilding.getBuilding() instanceof Castle castle) {
-                    castle.changeStructure(Castle.upgradedStructureName);
+                    newBuilding.changeStructure(Castle.upgradedStructureName);
                 } else if (newBuilding.getBuilding() instanceof Laboratory lab) {
-                    lab.changeStructure(Laboratory.upgradedStructureName);
+                    newBuilding.changeStructure(Laboratory.upgradedStructureName);
                 } else if (newBuilding instanceof PortalPlacement portal) {
                     if (!(newBuilding.getBuilding() instanceof NeutralTransportPortal)) {
                         portal.changeStructure(portalType);
@@ -1056,8 +1044,8 @@ public class BuildingClientEvents {
                     if (portalType == PortalPlacement.PortalType.TRANSPORT)
                         portal.destination = portalDestination;
                 } else if (newBuilding.getBuilding() instanceof Library library) {
-                    library.changeStructure(Library.upgradedStructureName);
-                } else if (newBuilding.getBuilding() instanceof Beacon beacon) {
+                    newBuilding.changeStructure(Library.upgradedStructureName);
+                } else if (newBuilding instanceof BeaconPlacement beacon) {
                     beacon.changeStructure(upgradeLevel);
                 }
             }
@@ -1116,9 +1104,9 @@ public class BuildingClientEvents {
     }
 
     // does the player own one of these buildings?
-    public static boolean hasFinishedBuilding(String buildingName) {
+    public static boolean hasFinishedBuilding(Building building2) {
         for (BuildingPlacement building : buildings)
-            if (building.name.equals(buildingName) && building.isBuilt && MC.player != null
+            if (building.getBuilding().equals(building2) && building.isBuilt && MC.player != null
                     && building.ownerName.equals(MC.player.getName().getString())) {
                 return true;
             }
@@ -1126,12 +1114,12 @@ public class BuildingClientEvents {
     }
 
     public static void syncBeacon(UnitAction action, BlockPos beaconPos, boolean activate) {
-        Beacon beacon = BuildingUtils.getBeacon(true);
+        BeaconPlacement beacon = BuildingUtils.getBeacon(true);
         if (beacon == null)
             return;
 
         if (activate) {
-            MobEffect effect = Beacon.getMobEffectForAction(action);
+            MobEffect effect = BeaconPlacement.getMobEffectForAction(action);
             if (effect != null)
                 beacon.activate(effect);
         } else {

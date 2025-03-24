@@ -1,20 +1,11 @@
 package com.solegendary.reignofnether.votesystem;
 
-import com.mojang.brigadier.CommandDispatcher;
-import com.solegendary.reignofnether.registrars.PacketHandler;
-import com.solegendary.reignofnether.votesystem.networking.ClientboundOpenVotenScreenPacket;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.Commands;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.network.PacketDistributor;
 
 import java.util.List;
-import java.util.function.Supplier;
 
 @Mod.EventBusSubscriber
 public class VoteCommand {

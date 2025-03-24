@@ -1,15 +1,12 @@
 package com.solegendary.reignofnether.unit;
 
 import com.solegendary.reignofnether.ability.Ability;
-import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.BuildingUtils;
 import com.solegendary.reignofnether.building.GarrisonableBuilding;
-import com.solegendary.reignofnether.building.buildings.piglins.Portal;
 import com.solegendary.reignofnether.building.buildings.placements.FarmPlacement;
 import com.solegendary.reignofnether.building.buildings.placements.PortalPlacement;
 import com.solegendary.reignofnether.hud.HudClientEvents;
-import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.resources.ResourceName;
 import com.solegendary.reignofnether.resources.ResourceSources;
 import com.solegendary.reignofnether.sandbox.SandboxClientEvents;
@@ -19,8 +16,8 @@ import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.ConvertableUnit;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.interfaces.WorkerUnit;
+import com.solegendary.reignofnether.util.LanguageUtil;
 import com.solegendary.reignofnether.util.MiscUtil;
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -205,7 +202,7 @@ public class UnitActionItem {
                         goal.setMoveTarget(preselectedBlockPos);
                         if (Unit.atMaxResources((Unit) workerUnit)) {
                             if (level.isClientSide()) {
-                                HudClientEvents.showTemporaryMessage(I18n.get("hud.reignofnether.worker_inv_full"));
+                                HudClientEvents.showTemporaryMessage(LanguageUtil.getTranslation("hud.reignofnether.worker_inv_full"));
                             }
                             goal.saveAndReturnResources();
                         }
@@ -284,7 +281,7 @@ public class UnitActionItem {
                                 goal.setTargetFarm(building);
                                 if (Unit.atMaxResources((Unit) workerUnit)) {
                                     if (level.isClientSide()) {
-                                        HudClientEvents.showTemporaryMessage(I18n.get(
+                                        HudClientEvents.showTemporaryMessage(LanguageUtil.getTranslation(
                                             "hud.reignofnether.worker_inv_full"));
                                     }
                                     goal.saveAndReturnResources();

@@ -1,7 +1,9 @@
 package com.solegendary.reignofnether.research.researchItems;
 
 import com.solegendary.reignofnether.ReignOfNether;
-import com.solegendary.reignofnether.building.*;
+import com.solegendary.reignofnether.building.BuildingClientEvents;
+import com.solegendary.reignofnether.building.BuildingServerboundPacket;
+import com.solegendary.reignofnether.building.Buildings;
 import com.solegendary.reignofnether.building.buildings.monsters.Laboratory;
 import com.solegendary.reignofnether.building.buildings.placements.ProductionPlacement;
 import com.solegendary.reignofnether.building.production.ProductionItem;
@@ -37,7 +39,7 @@ public class ResearchLabLightningRod extends ProductionItem {
             new ResourceLocation(ReignOfNether.MOD_ID, "textures/hud/icon_frame_bronze.png"),
             hotkey,
             () -> false,
-            () -> prodBuilding.productionQueue.stream().map(ProductionItem::getItemName).toList().contains(itemName) ||
+            () -> prodBuilding.productionQueue.stream().map(item -> item.item.getItemName()).toList().contains(itemName) ||
                     (prodBuilding.getBuilding() instanceof Laboratory && prodBuilding.getUpgradeLevel() > 0),
             () -> BuildingClientEvents.hasFinishedBuilding(Buildings.DUNGEON),
             () -> BuildingServerboundPacket.startProduction(prodBuilding.originPos, ProductionItems.RESEARCH_LAB_LIGHTNING_ROD),

@@ -1,7 +1,8 @@
 package com.solegendary.reignofnether.network;
-import static net.minecraftforge.network.HandshakeMessages.C2SAcknowledge;
 
 import net.minecraft.network.FriendlyByteBuf;
+
+import static net.minecraftforge.network.HandshakeMessages.C2SAcknowledge;
 
 public class S2CReset extends C2SAcknowledge {
 

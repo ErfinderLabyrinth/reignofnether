@@ -22,22 +22,20 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 
 import java.util.List;
 
 public class MountRavager extends Ability {
-
-    private final LivingEntity entity;
-
-    public MountRavager(LivingEntity entity) {
+    public MountRavager() {
         super(UnitAction.MOUNT_RAVAGER, 0, 0, 0, true);
-        this.entity = entity;
     }
 
     @Override
     public AbilityButton getButton(Keybinding hotkey, Unit unit) {
+        Entity entity = (Entity) unit;
         return new AbilityButton("Mount Ravager",
             new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/ravager.png"),
             hotkey,
@@ -54,7 +52,7 @@ public class MountRavager extends Ability {
         );
     }
 
-    private MountGoal getMountGoal() {
+    private MountGoal getMountGoal(Entity entity) {
         if (entity instanceof PillagerUnit pillagerUnit) {
             return pillagerUnit.getMountGoal();
         }
@@ -73,14 +71,14 @@ public class MountRavager extends Ability {
     // right click
     @Override
     public void use(Level level, Unit unitUsing, BlockPos targetBp) {
-        MountGoal mountGoal = getMountGoal();
+        MountGoal mountGoal = getMountGoal((Entity) unitUsing);
         if (mountGoal != null)
             mountGoal.autofind = true;
     }
 
     @Override
     public void use(Level level, Unit unitUsing, LivingEntity targetEntity) {
-        MountGoal mountGoal = getMountGoal();
+        MountGoal mountGoal = getMountGoal((Entity) unitUsing);
         if (mountGoal != null && targetEntity instanceof RavagerUnit) {
             mountGoal.setTarget(targetEntity);
         } else if (level.isClientSide()) {

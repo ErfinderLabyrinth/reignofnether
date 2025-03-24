@@ -1,9 +1,5 @@
 package com.solegendary.reignofnether.unit.goals;
 
-import java.util.EnumSet;
-import java.util.Random;
-
-import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.GarrisonableBuilding;
 import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
@@ -18,6 +14,9 @@ import net.minecraft.world.entity.monster.RangedAttackMob;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.item.CrossbowItem;
 import net.minecraft.world.item.ItemStack;
+
+import java.util.EnumSet;
+import java.util.Random;
 
 // modified version of RangedBowAttackGoal which:
 // - has an attack cooldown parameter in the constructor

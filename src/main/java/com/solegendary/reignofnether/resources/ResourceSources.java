@@ -7,7 +7,6 @@ import net.minecraft.world.entity.animal.*;
 import net.minecraft.world.entity.animal.goat.Goat;
 import net.minecraft.world.entity.animal.horse.Donkey;
 import net.minecraft.world.entity.animal.horse.Horse;
-import net.minecraft.world.entity.animal.horse.Llama;
 import net.minecraft.world.entity.animal.horse.Mule;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;

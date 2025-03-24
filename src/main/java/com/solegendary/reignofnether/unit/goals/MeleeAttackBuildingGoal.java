@@ -1,28 +1,21 @@
 package com.solegendary.reignofnether.unit.goals;
 
-import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.BuildingUtils;
 import com.solegendary.reignofnether.unit.UnitAnimationAction;
 import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
-import com.solegendary.reignofnether.unit.interfaces.RangedAttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.packets.UnitAnimationClientboundPacket;
-import com.solegendary.reignofnether.unit.packets.UnitSyncClientboundPacket;
-import com.solegendary.reignofnether.unit.units.monsters.SpiderUnit;
 import com.solegendary.reignofnether.unit.units.monsters.WardenUnit;
 import com.solegendary.reignofnether.unit.units.monsters.ZoglinUnit;
 import com.solegendary.reignofnether.unit.units.piglins.HoglinUnit;
-import com.solegendary.reignofnether.unit.units.piglins.MagmaCubeUnit;
 import com.solegendary.reignofnether.unit.units.villagers.IronGolemUnit;
-import com.solegendary.reignofnether.unit.units.villagers.PillagerUnit;
 import com.solegendary.reignofnether.unit.units.villagers.RavagerUnit;
 import com.solegendary.reignofnether.util.MiscUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.monster.Slime;
-import net.minecraft.world.entity.monster.Zombie;
 
 import java.util.Random;
 
@@ -125,7 +118,7 @@ public class MeleeAttackBuildingGoal extends MoveToTargetBlockGoal {
     public void setBuildingTarget(BlockPos blockPos) {
         if (blockPos != null) {
             if (this.mob.level.isClientSide()) {
-                Building b = BuildingUtils.findBuilding(this.mob.level.isClientSide(), blockPos);
+                BuildingPlacement b = BuildingUtils.findBuilding(this.mob.level.isClientSide(), blockPos);
                 if (b != null && !b.invulnerable) {
                     this.buildingTarget = b;
                     MiscUtil.addUnitCheckpoint(((Unit) mob), new BlockPos(
@@ -137,7 +130,7 @@ public class MeleeAttackBuildingGoal extends MoveToTargetBlockGoal {
                 }
             }
             else {
-                Building b = BuildingUtils.findBuilding(this.mob.level.isClientSide(), blockPos);
+                BuildingPlacement b = BuildingUtils.findBuilding(this.mob.level.isClientSide(), blockPos);
                 if (b != null && !b.invulnerable) {
                     this.buildingTarget = b;
                     if (this.mob.isVehicle() && this.mob.getFirstPassenger() instanceof AttackerUnit aUnit &&

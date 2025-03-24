@@ -1,10 +1,9 @@
 package com.solegendary.reignofnether.tutorial;
 
 import com.solegendary.reignofnether.ReignOfNether;
-import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.BuildingServerEvents;
-import com.solegendary.reignofnether.building.buildings.monsters.*;
+import com.solegendary.reignofnether.building.Buildings;
 import com.solegendary.reignofnether.building.buildings.villagers.Barracks;
 import com.solegendary.reignofnether.building.buildings.villagers.TownCentre;
 import com.solegendary.reignofnether.player.PlayerServerEvents;
@@ -233,7 +232,7 @@ public class TutorialServerEvents {
             .mapToInt(Entity::getId)
             .toArray();
         if (builderUnitIds.length > 0) {
-            BuildingServerEvents.placeBuilding(Mausoleum.buildingName,
+            BuildingServerEvents.placeBuilding(Buildings.MAUSOLEUM,
                 new BlockPos(MAUSOLEUM_POS.getX(), MAUSOLEUM_POS.getY(), MAUSOLEUM_POS.getZ()),
                 Rotation.NONE,
                 TUTORIAL_ENEMY_NAME,
@@ -253,7 +252,7 @@ public class TutorialServerEvents {
 
         for (int i = 0; i < builderUnitIds.length; i++) {
             switch (i) {
-                case 0 -> BuildingServerEvents.placeBuilding(PumpkinFarm.buildingName,
+                case 0 -> BuildingServerEvents.placeBuilding(Buildings.PUMPKIN_FARM,
                     new BlockPos(FARM_POS_1),
                     Rotation.NONE,
                     TUTORIAL_ENEMY_NAME,
@@ -261,7 +260,7 @@ public class TutorialServerEvents {
                     false,
                     false
                 );
-                case 1 -> BuildingServerEvents.placeBuilding(PumpkinFarm.buildingName,
+                case 1 -> BuildingServerEvents.placeBuilding(Buildings.PUMPKIN_FARM,
                     new BlockPos(FARM_POS_2),
                     Rotation.CLOCKWISE_90,
                     TUTORIAL_ENEMY_NAME,
@@ -282,7 +281,7 @@ public class TutorialServerEvents {
 
         for (int i = 0; i < builderUnitIds.length; i++) {
             switch (i) {
-                case 0 -> BuildingServerEvents.placeBuilding(Graveyard.buildingName,
+                case 0 -> BuildingServerEvents.placeBuilding(Buildings.GRAVEYARD,
                     new BlockPos(GRAVEYARD_POS),
                     Rotation.NONE,
                     TUTORIAL_ENEMY_NAME,
@@ -290,7 +289,7 @@ public class TutorialServerEvents {
                     false,
                     false
                 );
-                case 1 -> BuildingServerEvents.placeBuilding(DarkWatchtower.buildingName,
+                case 1 -> BuildingServerEvents.placeBuilding(Buildings.DARK_WATCHTOWER,
                     new BlockPos(TOWER_POS),
                     Rotation.NONE,
                     TUTORIAL_ENEMY_NAME,
@@ -298,7 +297,7 @@ public class TutorialServerEvents {
                     false,
                     false
                 );
-                case 2 -> BuildingServerEvents.placeBuilding(SpiderLair.buildingName,
+                case 2 -> BuildingServerEvents.placeBuilding(Buildings.SPIDER_LAIR,
                     new BlockPos(SPIDER_LAIR_POS),
                     Rotation.NONE,
                     TUTORIAL_ENEMY_NAME,

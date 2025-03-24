@@ -1,7 +1,6 @@
 package com.solegendary.reignofnether.mixin;
 
 import com.google.common.collect.Lists;
-import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.GarrisonableBuilding;
 import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;

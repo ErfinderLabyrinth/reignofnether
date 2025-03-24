@@ -4,18 +4,13 @@ import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.alliance.AlliancesServerEvents;
 import com.solegendary.reignofnether.alliance.AllyCommand;
 import com.solegendary.reignofnether.building.*;
-import com.solegendary.reignofnether.building.buildings.monsters.Mausoleum;
 import com.solegendary.reignofnether.building.buildings.neutral.Beacon;
-import com.solegendary.reignofnether.building.buildings.piglins.CentralPortal;
-import com.solegendary.reignofnether.building.buildings.villagers.TownCentre;
+import com.solegendary.reignofnether.building.buildings.placements.ProductionPlacement;
 import com.solegendary.reignofnether.gamemode.GameMode;
 import com.solegendary.reignofnether.gamemode.GameModeClientboundPacket;
-import com.solegendary.reignofnether.building.*;
-import com.solegendary.reignofnether.building.buildings.placements.ProductionPlacement;
 import com.solegendary.reignofnether.guiscreen.TopdownGuiContainer;
 import com.solegendary.reignofnether.registrars.EntityRegistrar;
 import com.solegendary.reignofnether.registrars.GameRuleRegistrar;
-import com.solegendary.reignofnether.research.ResearchClient;
 import com.solegendary.reignofnether.research.ResearchClientboundPacket;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
 import com.solegendary.reignofnether.resources.ResourceCost;
@@ -26,9 +21,10 @@ import com.solegendary.reignofnether.startpos.StartPosServerEvents;
 import com.solegendary.reignofnether.survival.SurvivalServerEvents;
 import com.solegendary.reignofnether.time.TimeUtils;
 import com.solegendary.reignofnether.tutorial.TutorialServerEvents;
-import com.solegendary.reignofnether.unit.UnitClientEvents;
 import com.solegendary.reignofnether.unit.UnitServerEvents;
+import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
+import com.solegendary.reignofnether.unit.interfaces.WorkerUnit;
 import com.solegendary.reignofnether.unit.packets.UnitSyncClientboundPacket;
 import com.solegendary.reignofnether.util.Faction;
 import com.solegendary.reignofnether.util.MiscUtil;
@@ -136,7 +132,6 @@ public class PlayerServerEvents {
                 }
             }
             UnitServerEvents.maxPopulation = level.getGameRules().getInt(GameRuleRegistrar.MAX_POPULATION);
-            PlayerClientboundPacket.syncMaxPopulation(UnitServerEvents.maxPopulation);
         }
     }
 
@@ -392,31 +387,31 @@ public class PlayerServerEvents {
             ResourcesServerEvents.resetResources(playerName);
 
             if (readiedStart) {
-                String buildingName = null;
+                Building building = null;
                 ArrayList<BuildingBlock> blocks = null;
 
                 switch (faction) {
                     case VILLAGERS -> {
-                        buildingName = TownCentre.buildingName;
-                        blocks = TownCentre.getRelativeBlockData(level);
+                        building = Buildings.TOWN_CENTRE;
+                        blocks = Buildings.TOWN_CENTRE.getRelativeBlockData(level);
                     }
                     case MONSTERS -> {
-                        buildingName = Mausoleum.buildingName;
-                        blocks = Mausoleum.getRelativeBlockData(level);
+                        building = Buildings.MAUSOLEUM;
+                        blocks = Buildings.MAUSOLEUM.getRelativeBlockData(level);
                     }
                     case PIGLINS -> {
-                        buildingName = CentralPortal.buildingName;
-                        blocks = CentralPortal.getRelativeBlockData(level);
+                        building = Buildings.CENTRAL_PORTAL;
+                        blocks = Buildings.CENTRAL_PORTAL.getRelativeBlockData(level);
                     }
                 };
-                if (buildingName != null) {
+                if (building != null) {
                     BlockPos bp = getBuildingOriginPos(new BlockPos(pos.x, pos.y, pos.z), blocks);
                     for (int i = 0; i < workers.size(); i++) {
                         workers.get(i).moveTo(bp.offset(i, 0, 0), 0, 0);
                         level.addFreshEntity(workers.get(i));
                     }
                     int[] workerIds = workers.stream().map(Entity::getId).mapToInt(Integer::intValue).toArray();
-                    BuildingServerEvents.placeBuilding(buildingName, bp, Rotation.NONE, playerName, workerIds, false, false);
+                    BuildingServerEvents.placeBuilding(building, bp, Rotation.NONE, playerName, workerIds, false, false);
                 }
             }
 
@@ -723,7 +718,7 @@ public class PlayerServerEvents {
                     }
                     for (BuildingPlacement building : BuildingServerEvents.getBuildings()) {
                         if (building.ownerName.equals(playerName)) {
-                            if (building instanceof ProductionBuilding productionBuilding)
+                            if (building instanceof ProductionPlacement productionBuilding)
                                 productionBuilding.productionQueue.clear();
                             building.ownerName = "";
                         }
@@ -825,7 +820,7 @@ public class PlayerServerEvents {
                     building.destroy((ServerLevel) building.getLevel());
             }
             BuildingServerEvents.getBuildings().removeIf(b -> b.shouldDestroyOnReset || hardReset);
-            for (Building building : BuildingServerEvents.getBuildings())
+            for (BuildingPlacement building : BuildingServerEvents.getBuildings())
                 building.ownerName = "";
             ResearchServerEvents.removeAllResearch();
             ResearchServerEvents.removeAllCheats();

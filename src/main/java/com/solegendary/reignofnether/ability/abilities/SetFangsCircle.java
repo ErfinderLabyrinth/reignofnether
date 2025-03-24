@@ -27,10 +27,10 @@ public class SetFangsCircle extends Ability {
 
     public SetFangsCircle(EvokerUnit evokerUnit) {
         super(UnitAction.SET_FANGS_CIRCLE,
-            CD_MAX_SECONDS * ResourceCost.TICKS_PER_SECOND,
-            EvokerUnit.FANGS_RANGE_CIRCLE,
-            0,
-            true
+                CD_MAX_SECONDS * ResourceCost.TICKS_PER_SECOND,
+                EvokerUnit.FANGS_RANGE_CIRCLE,
+                0,
+                true
         );
         this.evokerUnit = evokerUnit;
     }
@@ -38,31 +38,31 @@ public class SetFangsCircle extends Ability {
     @Override
     public AbilityButton getButton(Keybinding hotkey, Unit unit) {
         return new AbilityButton("Evoker Fangs (Circular)",
-            new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/shears.png"),
-            hotkey,
-            () -> !evokerUnit.isUsingLineFangs,
-            () -> false,
-            () -> true,
-            () -> UnitClientEvents.sendUnitCommand(UnitAction.SET_FANGS_CIRCLE),
-            null,
-            List.of(FormattedCharSequence.forward(
-                    I18n.get("abilities.reignofnether.evoker_fangs_circular"),
-                    Style.EMPTY.withBold(true)
+                new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/shears.png"),
+                hotkey,
+                () -> !evokerUnit.isUsingLineFangs,
+                () -> false,
+                () -> true,
+                () -> UnitClientEvents.sendUnitCommand(UnitAction.SET_FANGS_CIRCLE),
+                null,
+                List.of(FormattedCharSequence.forward(
+                                I18n.get("abilities.reignofnether.evoker_fangs_circular"),
+                                Style.EMPTY.withBold(true)
+                        ),
+                        FormattedCharSequence.forward(I18n.get("abilities.reignofnether.evoker_fangs_circular.tooltip1",
+                                EvokerUnit.FANGS_DAMAGE * 2,
+                                CD_MAX_SECONDS
+                        ) + EvokerUnit.FANGS_RANGE_CIRCLE, MyRenderer.iconStyle),
+                        FormattedCharSequence.forward(
+                                I18n.get("abilities.reignofnether.evoker_fangs_circular.tooltip2"),
+                                Style.EMPTY
+                        ),
+                        FormattedCharSequence.forward(
+                                I18n.get("abilities.reignofnether.evoker_fangs_circular.tooltip3"),
+                                Style.EMPTY
+                        )
                 ),
-                FormattedCharSequence.forward(I18n.get("abilities.reignofnether.evoker_fangs_circular.tooltip1",
-                    EvokerUnit.FANGS_DAMAGE * 2,
-                    CD_MAX_SECONDS
-                ) + EvokerUnit.FANGS_RANGE_CIRCLE, MyRenderer.iconStyle),
-                FormattedCharSequence.forward(
-                    I18n.get("abilities.reignofnether.evoker_fangs_circular.tooltip2"),
-                    Style.EMPTY
-                ),
-                FormattedCharSequence.forward(
-                    I18n.get("abilities.reignofnether.evoker_fangs_circular.tooltip3"),
-                    Style.EMPTY
-                )
-            ),
-            this
+                this
         );
     }
 

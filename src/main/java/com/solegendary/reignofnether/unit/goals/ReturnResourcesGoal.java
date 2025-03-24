@@ -1,10 +1,11 @@
 package com.solegendary.reignofnether.unit.goals;
 
-import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.BuildingServerEvents;
-import com.solegendary.reignofnether.resources.*;
-import com.solegendary.reignofnether.unit.*;
+import com.solegendary.reignofnether.resources.Resources;
+import com.solegendary.reignofnether.resources.ResourcesClientboundPacket;
+import com.solegendary.reignofnether.resources.ResourcesServerEvents;
+import com.solegendary.reignofnether.unit.Relationship;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.interfaces.WorkerUnit;
 import com.solegendary.reignofnether.unit.packets.UnitSyncClientboundPacket;

@@ -4,6 +4,7 @@ import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.api.ReignOfNetherRegistries;
 import com.solegendary.reignofnether.research.researchItems.*;
 import com.solegendary.reignofnether.unit.units.monsters.*;
+import com.solegendary.reignofnether.unit.units.neutral.*;
 import com.solegendary.reignofnether.unit.units.piglins.*;
 import com.solegendary.reignofnether.unit.units.villagers.*;
 import net.minecraft.core.Registry;
@@ -37,6 +38,17 @@ public class ProductionItems {
     public static final WitherSkeletonProd WITHER_SKELETON = register(new ResourceLocation(ReignOfNether.MOD_ID, "wither_skeleton"), new WitherSkeletonProd());
     public static final MagmaCubeProd MAGMA_CUBE = register(new ResourceLocation(ReignOfNether.MOD_ID, "magma_cube"), new MagmaCubeProd());
     public static final GhastProd GHAST = register(new ResourceLocation(ReignOfNether.MOD_ID, "ghast"), new GhastProd());
+    public static final RoyalGuardProd ROYAL_GUARD = register(new ResourceLocation(ReignOfNether.MOD_ID, "royal_guard"), new RoyalGuardProd());
+    public static final NecromancerProd NECROMANCER = register(new ResourceLocation(ReignOfNether.MOD_ID, "necromancer"), new NecromancerProd());
+    public static final ZombiePiglinProd ZOMBIE_PIGLIN = register(new ResourceLocation(ReignOfNether.MOD_ID, "zombie_piglin"), new ZombiePiglinProd());
+    public static final ZoglinProd ZOGLIN = register(new ResourceLocation(ReignOfNether.MOD_ID, "zoglin"), new ZoglinProd());
+    public static final PiglinMerchantProd PIGLIN_MERCHANT = register(new ResourceLocation(ReignOfNether.MOD_ID, "piglin_merchant"), new PiglinMerchantProd());
+    public static final EndermanProd ENDERMAN = register(new ResourceLocation(ReignOfNether.MOD_ID, "enderman"), new EndermanProd());
+    public static final PolarBearProd POLAR_BEAR = register(new ResourceLocation(ReignOfNether.MOD_ID, "polar_bear"), new PolarBearProd());
+    public static final GrizzlyBearProd GRIZZLY_BEAR = register(new ResourceLocation(ReignOfNether.MOD_ID, "grizzly_bear"), new GrizzlyBearProd());
+    public static final PandaProd PANDA = register(new ResourceLocation(ReignOfNether.MOD_ID, "panda"), new PandaProd());
+    public static final WolfProd WOLF = register(new ResourceLocation(ReignOfNether.MOD_ID, "wolf"), new WolfProd());
+    public static final LlamaProd LLAMA = register(new ResourceLocation(ReignOfNether.MOD_ID, "llama"), new LlamaProd());
 
     public static final ResearchVindicatorAxes RESEARCH_VINDICATOR_AXES = register(new ResourceLocation(ReignOfNether.MOD_ID, "research_vindicator_axes"), new ResearchVindicatorAxes());
     public static final ResearchPillagerCrossbows RESEARCH_PILLAGER_CROSSBOWS = register(new ResourceLocation(ReignOfNether.MOD_ID, "research_pillager_crossbows"), new ResearchPillagerCrossbows());
@@ -71,6 +83,11 @@ public class ProductionItems {
     public static final ResearchPortalForCivilian RESEARCH_PORTAL_FOR_CIVILIAN = register(new ResourceLocation(ReignOfNether.MOD_ID, "research_portal_for_civilian"), new ResearchPortalForCivilian());
     public static final ResearchPortalForMilitary RESEARCH_PORTAL_FOR_MILITARY = register(new ResourceLocation(ReignOfNether.MOD_ID, "research_portal_for_military"), new ResearchPortalForMilitary());
     public static final ResearchPortalForTransport RESEARCH_PORTAL_FOR_TRANSPORT = register(new ResourceLocation(ReignOfNether.MOD_ID, "research_portal_for_transport"), new ResearchPortalForTransport());
+    public static final ResearchBeaconLevel1 RESEARCH_BEACON_LEVEL_1 = register(new ResourceLocation(ReignOfNether.MOD_ID, "research_beacon_level_1"), new ResearchBeaconLevel1());
+    public static final ResearchBeaconLevel2 RESEARCH_BEACON_LEVEL_2 = register(new ResourceLocation(ReignOfNether.MOD_ID, "research_beacon_level_2"), new ResearchBeaconLevel2());
+    public static final ResearchBeaconLevel3 RESEARCH_BEACON_LEVEL_3 = register(new ResourceLocation(ReignOfNether.MOD_ID, "research_beacon_level_3"), new ResearchBeaconLevel3());
+    public static final ResearchBeaconLevel4 RESEARCH_BEACON_LEVEL_4 = register(new ResourceLocation(ReignOfNether.MOD_ID, "research_beacon_level_4"), new ResearchBeaconLevel4());
+    public static final ResearchBeaconLevel5 RESEARCH_BEACON_LEVEL_5 = register(new ResourceLocation(ReignOfNether.MOD_ID, "research_beacon_level_5"), new ResearchBeaconLevel5());
 
 
 

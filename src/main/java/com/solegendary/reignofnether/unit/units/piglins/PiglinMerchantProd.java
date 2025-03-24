@@ -2,8 +2,8 @@ package com.solegendary.reignofnether.unit.units.piglins;
 
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.building.BuildingServerboundPacket;
-import com.solegendary.reignofnether.building.ProductionBuilding;
-import com.solegendary.reignofnether.building.ProductionItem;
+import com.solegendary.reignofnether.building.buildings.placements.ProductionPlacement;
+import com.solegendary.reignofnether.building.production.ProductionItem;
 import com.solegendary.reignofnether.cursor.CursorClientEvents;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.hud.Button;
@@ -27,23 +27,19 @@ public class PiglinMerchantProd extends ProductionItem {
     public final static String itemName = "piglin_merchant";
     public final static ResourceCost cost = ResourceCosts.PIGLIN_MERCHANT;
 
-    public PiglinMerchantProd(ProductionBuilding building) {
-        super(building, cost.ticks);
-        this.onComplete = (Level level) -> {
+    public PiglinMerchantProd() {
+        super(cost);
+        this.onComplete = (Level level, ProductionPlacement placement) -> {
             if (!level.isClientSide())
-                building.produceUnit((ServerLevel) level, EntityRegistrar.PIGLIN_MERCHANT_UNIT.get(), building.ownerName, true);
+                placement.produceUnit((ServerLevel) level, EntityRegistrar.PIGLIN_MERCHANT_UNIT.get(), placement.ownerName, true);
         };
-        this.foodCost = cost.food;
-        this.woodCost = cost.wood;
-        this.oreCost = cost.ore;
-        this.popCost = cost.population;
     }
 
     public String getItemName() {
         return PiglinMerchantProd.itemName;
     }
 
-    public static AbilityButton getPlaceButton() {
+    public AbilityButton getPlaceButton() {
         return new AbilityButton(
                 itemName,
                 new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/piglin_merchant.png"),
@@ -69,7 +65,7 @@ public class PiglinMerchantProd extends ProductionItem {
         );
     }
 
-    public static Button getStartButton(ProductionBuilding prodBuilding, Keybinding hotkey) {
+    public Button getStartButton(ProductionPlacement prodBuilding, Keybinding hotkey) {
         return new Button(
                 PiglinMerchantProd.itemName,
                 14,
@@ -78,7 +74,7 @@ public class PiglinMerchantProd extends ProductionItem {
                 () -> false,
                 () -> false,
                 () -> true,
-                () -> BuildingServerboundPacket.startProduction(prodBuilding.originPos, itemName),
+                () -> BuildingServerboundPacket.startProduction(prodBuilding.originPos, this),
                 null,
                 List.of(
                         FormattedCharSequence.forward(
@@ -94,7 +90,7 @@ public class PiglinMerchantProd extends ProductionItem {
         );
     }
 
-    public Button getCancelButton(ProductionBuilding prodBuilding, boolean first) {
+    public Button getCancelButton(ProductionPlacement prodBuilding, boolean first) {
         return new Button(
                 PiglinMerchantProd.itemName,
                 14,
@@ -103,7 +99,7 @@ public class PiglinMerchantProd extends ProductionItem {
                 () -> false,
                 () -> false,
                 () -> true,
-                () -> BuildingServerboundPacket.cancelProduction(prodBuilding.originPos, itemName, first),
+                () -> BuildingServerboundPacket.cancelProduction(prodBuilding.originPos, this, first),
                 null,
                 null
         );

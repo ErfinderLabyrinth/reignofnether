@@ -2,15 +2,12 @@ package com.solegendary.reignofnether.building.buildings.placements;
 
 import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingBlock;
-import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.GarrisonableBuilding;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Rotation;
 
 import java.util.ArrayList;
-
-import static com.solegendary.reignofnether.building.BuildingUtils.getAbsoluteBlockData;
 
 public class BastionPlacement extends ProductionPlacement implements GarrisonableBuilding {
     public final static int MAX_OCCUPANTS = 4;

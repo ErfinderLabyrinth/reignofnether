@@ -1,9 +1,6 @@
 package com.solegendary.reignofnether.startpos;
 
 import com.solegendary.reignofnether.registrars.PacketHandler;
-import com.solegendary.reignofnether.survival.SurvivalClientEvents;
-import com.solegendary.reignofnether.survival.SurvivalServerEvents;
-import com.solegendary.reignofnether.survival.WaveDifficulty;
 import com.solegendary.reignofnether.util.Faction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;

@@ -3,7 +3,6 @@ package com.solegendary.reignofnether.registrars;
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.unit.modelling.renderers.GhastUnitRenderer;
 import com.solegendary.reignofnether.unit.modelling.renderers.NecromancerRenderer;
-import com.solegendary.reignofnether.unit.modelling.renderers.PiglinMerchantRenderer;
 import com.solegendary.reignofnether.unit.modelling.renderers.RoyalGuardRenderer;
 import com.solegendary.reignofnether.unit.units.monsters.*;
 import com.solegendary.reignofnether.unit.units.neutral.*;
@@ -14,9 +13,9 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 
 
 public class EntityRegistrar {

@@ -1,12 +1,13 @@
 package com.solegendary.reignofnether.building.buildings.shared;
 
 import com.solegendary.reignofnether.ReignOfNether;
-import com.solegendary.reignofnether.building.*;
+import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.buildings.placements.StockpilePlacement;
 import com.solegendary.reignofnether.building.production.ProductionBuilding;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.research.researchItems.ResearchResourceCapacity;
-import com.solegendary.reignofnether.resources.*;
+import com.solegendary.reignofnether.resources.ResourceCost;
+import com.solegendary.reignofnether.resources.ResourceCosts;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;

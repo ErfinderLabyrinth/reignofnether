@@ -2,7 +2,6 @@ package com.solegendary.reignofnether.cursor;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.math.Vector3d;
-import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingClientEvents;
 import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.BuildingUtils;

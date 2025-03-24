@@ -2,13 +2,11 @@ package com.solegendary.reignofnether.building;
 
 // class for static building functions
 
-import com.solegendary.reignofnether.building.buildings.monsters.*;
-import com.solegendary.reignofnether.building.buildings.neutral.*;
-import com.solegendary.reignofnether.building.buildings.piglins.*;
-import com.solegendary.reignofnether.building.buildings.piglins.BlackstoneBridge;
-import com.solegendary.reignofnether.building.buildings.villagers.OakStockpile;
-import com.solegendary.reignofnether.building.buildings.villagers.OakBridge;
-import com.solegendary.reignofnether.building.buildings.villagers.*;
+import com.solegendary.reignofnether.building.buildings.monsters.SculkCatalyst;
+import com.solegendary.reignofnether.building.buildings.placements.BeaconPlacement;
+import com.solegendary.reignofnether.building.buildings.placements.SculkCatalystPlacement;
+import com.solegendary.reignofnether.building.buildings.shared.AbstractBridge;
+import com.solegendary.reignofnether.keybinds.Keybinding;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.entity.LivingEntity;
@@ -21,13 +19,16 @@ import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
 
 public class BuildingUtils {
 
+    public static List<Keybinding> keybindings = Arrays.asList();
+
     public static int getTotalCompletedBuildingsOwned(boolean isClientSide, String ownerName) {
-        List<Building> buildings;
+        List<BuildingPlacement> buildings;
         if (isClientSide)
             buildings = BuildingClientEvents.getBuildings();
         else
@@ -36,7 +37,7 @@ public class BuildingUtils {
         return buildings.stream().filter(b -> b.isBuilt && b.ownerName.equals(ownerName)).toList().size();
     }
 
-    public static boolean isBuildingBuildable(boolean isClientSide, Building building) {
+    public static boolean isBuildingBuildable(boolean isClientSide, BuildingPlacement building) {
         if (isClientSide)
             return BuildingClientEvents.getBuildings().stream().map(b -> b.originPos).toList().contains(building.originPos) &&
                     building.getBlocksPlaced() < building.getBlocksTotal();
@@ -46,7 +47,7 @@ public class BuildingUtils {
     }
 
     // returns a list of BPs that may reside in unique chunks for fog of war calcs
-    public static ArrayList<BlockPos> getUniqueChunkBps(Building building) {
+    public static ArrayList<BlockPos> getUniqueChunkBps(BuildingPlacement building) {
         AABB aabb = new AABB(
                 building.minCorner,
                 building.maxCorner.offset(1,1,1)
@@ -75,71 +76,27 @@ public class BuildingUtils {
     }
 
 
-    // given a string name return a new instance of that building
-    public static Building getNewBuilding(String buildingName, Level level, BlockPos pos, Rotation rotation, String ownerName, boolean isDiagonalBridge) {
-        if (buildingName.toLowerCase().contains("bridge"))
-            ownerName = "";
-
-        if (buildingName.equals(Beacon.buildingName))
-            if (BuildingUtils.getBeacon(level.isClientSide) != null)
-                return null;
-
-        Building building = null;
-        switch(buildingName) {
-            case OakBridge.buildingName -> building = new OakBridge(level, pos, rotation, ownerName, isDiagonalBridge);
-            case SpruceBridge.buildingName -> building = new SpruceBridge(level, pos, rotation, ownerName, isDiagonalBridge);
-            case BlackstoneBridge.buildingName -> building = new BlackstoneBridge(level, pos, rotation, ownerName, isDiagonalBridge);
-            case OakStockpile.buildingName -> building = new OakStockpile(level, pos, rotation, ownerName);
-            case SpruceStockpile.buildingName -> building = new SpruceStockpile(level, pos, rotation, ownerName);
-            case VillagerHouse.buildingName -> building = new VillagerHouse(level, pos, rotation, ownerName);
-            case Graveyard.buildingName -> building = new Graveyard(level, pos, rotation, ownerName);
-            case WheatFarm.buildingName -> building = new WheatFarm(level, pos, rotation, ownerName);
-            case Laboratory.buildingName -> building = new Laboratory(level, pos, rotation, ownerName);
-            case Barracks.buildingName -> building = new Barracks(level, pos, rotation, ownerName);
-            case PumpkinFarm.buildingName -> building = new PumpkinFarm(level, pos, rotation, ownerName);
-            case HauntedHouse.buildingName -> building = new HauntedHouse(level, pos, rotation, ownerName);
-            case Blacksmith.buildingName -> building = new Blacksmith(level, pos, rotation, ownerName);
-            case TownCentre.buildingName -> building = new TownCentre(level, pos, rotation, ownerName);
-            case IronGolemBuilding.buildingName -> building = new IronGolemBuilding(level, pos, rotation, ownerName);
-            case Mausoleum.buildingName -> building = new Mausoleum(level, pos, rotation, ownerName);
-            case SculkCatalyst.buildingName -> building = new SculkCatalyst(level, pos, rotation, ownerName);
-            case SpiderLair.buildingName -> building = new SpiderLair(level, pos, rotation, ownerName);
-            case SlimePit.buildingName -> building = new SlimePit(level, pos, rotation, ownerName);
-            case ArcaneTower.buildingName -> building = new ArcaneTower(level, pos, rotation, ownerName);
-            case Library.buildingName -> building = new Library(level, pos, rotation, ownerName);
-            case Dungeon.buildingName -> building = new Dungeon(level, pos, rotation, ownerName);
-            case Watchtower.buildingName -> building = new Watchtower(level, pos, rotation, ownerName);
-            case DarkWatchtower.buildingName -> building = new DarkWatchtower(level, pos, rotation, ownerName);
-            case Castle.buildingName -> building = new Castle(level, pos, rotation, ownerName);
-            case Stronghold.buildingName -> building = new Stronghold(level, pos, rotation, ownerName);
-            case CentralPortal.buildingName -> building = new CentralPortal(level, pos, rotation, ownerName);
-            case Portal.buildingName,
-                 Portal.buildingNameMilitary,
-                 Portal.buildingNameCivilian,
-                 Portal.buildingNameTransport -> building = new Portal(level, pos, rotation, ownerName, false);
-            case NetherwartFarm.buildingName -> building = new NetherwartFarm(level, pos, rotation, ownerName);
-            case Bastion.buildingName -> building = new Bastion(level, pos, rotation, ownerName);
-            case HoglinStables.buildingName -> building = new HoglinStables(level, pos, rotation, ownerName);
-            case FlameSanctuary.buildingName -> building = new FlameSanctuary(level, pos, rotation, ownerName);
-            case WitherShrine.buildingName -> building = new WitherShrine(level, pos, rotation, ownerName);
-            case BasaltSprings.buildingName -> building = new BasaltSprings(level, pos, rotation, ownerName);
-            case Fortress.buildingName -> building = new Fortress(level, pos, rotation, ownerName);
-            case Beacon.buildingName -> building = new Beacon(level, pos, rotation, ownerName);
-            case CapturableBeacon.buildingName -> building = new CapturableBeacon(level, pos, rotation, ownerName);
-            case EndPortal.buildingName -> building = new EndPortal(level, pos, rotation, ownerName);
-            case HealingFountain.buildingName -> building = new HealingFountain(level, pos, rotation, ownerName);
-            case NeutralTransportPortal.buildingName -> building = new NeutralTransportPortal(level, pos, rotation, ownerName);
+    @Deprecated
+    public static BuildingPlacement getNewBuilding(Building building, Level level, BlockPos pos, Rotation rotation, String ownerName, boolean isDiagonalBridge) {
+        BuildingPlacement buildingPlacement = null;
+        if (building instanceof AbstractBridge bridge) {
+            buildingPlacement = bridge.createBuildingPlacement(level, pos, rotation, ownerName, isDiagonalBridge);
+        } else {
+            buildingPlacement = building.createBuildingPlacement(level, pos, rotation, ownerName);
         }
-        if (building != null)
-            building.setLevel(level);
-        return building;
+
+        if (buildingPlacement != null) {
+            buildingPlacement.setLevel(level);
+        }
+
+        return buildingPlacement;
     }
 
     // note originPos may be an air block
-    public static Building findBuilding(boolean isClientSide, BlockPos pos) {
-        List<Building> buildings = isClientSide ? BuildingClientEvents.getBuildings() : BuildingServerEvents.getBuildings();
+    public static BuildingPlacement findBuilding(boolean isClientSide, BlockPos pos) {
+        List<BuildingPlacement> buildings = isClientSide ? BuildingClientEvents.getBuildings() : BuildingServerEvents.getBuildings();
 
-        for (Building building : buildings)
+        for (BuildingPlacement building : buildings)
             if (building.originPos.equals(pos) || building.isPosInsideBuilding(pos))
                 return building;
         return null;
@@ -235,7 +192,7 @@ public class BuildingUtils {
     // returns whether the given pos is part of ANY building in the level
     // WARNING: very processing expensive!
     public static boolean isPosPartOfAnyBuilding(boolean isClientSide, BlockPos bp, boolean onlyPlacedBlocks, int range) {
-        List<Building> buildings = isClientSide
+        List<BuildingPlacement> buildings = isClientSide
                 ? BuildingClientEvents.getBuildings()
                 : BuildingServerEvents.getBuildings();
 
@@ -251,29 +208,29 @@ public class BuildingUtils {
 
     // returns whether the given pos is part of ANY building in the level
     public static boolean isPosInsideAnyBuilding(boolean isClientSide, BlockPos bp) {
-        List<Building> buildings;
+        List<BuildingPlacement> buildings;
         if (isClientSide)
             buildings = BuildingClientEvents.getBuildings();
         else
             buildings = BuildingServerEvents.getBuildings();
 
-        for (Building building : buildings)
+        for (BuildingPlacement building : buildings)
             if (building.isPosInsideBuilding(bp))
                 return true;
         return false;
     }
 
     @Nullable
-    public static Building findClosestBuilding(boolean isClientSide, Vec3 pos, Predicate<Building> condition) {
-        List<Building> buildings;
+    public static BuildingPlacement findClosestBuilding(boolean isClientSide, Vec3 pos, Predicate<BuildingPlacement> condition) {
+        List<BuildingPlacement> buildings;
         if (isClientSide)
             buildings = BuildingClientEvents.getBuildings();
         else
             buildings = BuildingServerEvents.getBuildings();
 
         double closestDist = 9999;
-        Building closestBuilding = null;
-        for (Building building : buildings) {
+        BuildingPlacement closestBuilding = null;
+        for (BuildingPlacement building : buildings) {
             if (condition.test(building)) {
                 BlockPos bp = building.centrePos;
                 Vec3 bpVec3 = new Vec3(bp.getX(), bp.getY(), bp.getZ());
@@ -288,9 +245,9 @@ public class BuildingUtils {
     }
 
     public static boolean isInNetherRange(boolean isClientSide, BlockPos bp) {
-        List<Building> buildings = getBuildingsList(isClientSide);
+        List<BuildingPlacement> buildings = getBuildingsList(isClientSide);
 
-        for (Building building : buildings) {
+        for (BuildingPlacement building : buildings) {
             if (building instanceof NetherConvertingBuilding netherBuilding) {
                 double maxRangeSquared = Math.pow(netherBuilding.getMaxRange(), 2);
                 if (bp.distSqr(building.centrePos) <= maxRangeSquared) {
@@ -302,12 +259,12 @@ public class BuildingUtils {
     }
 
     public static boolean isWithinRangeOfMaxedCatalyst(LivingEntity entity) {
-        List<Building> buildings = getBuildingsList(entity.level.isClientSide());
+        List<BuildingPlacement> buildings = getBuildingsList(entity.level.isClientSide());
 
         double maxCatalystRangeSquared = SculkCatalyst.ESTIMATED_RANGE * SculkCatalyst.ESTIMATED_RANGE;
 
-        for (Building building : buildings) {
-            if (building instanceof SculkCatalyst sc) {
+        for (BuildingPlacement building : buildings) {
+            if (building instanceof SculkCatalystPlacement sc) {
                 if (entity.distanceToSqr(Vec3.atCenterOf(sc.centrePos)) < maxCatalystRangeSquared &&
                         sc.getUncappedNightRange() >= SculkCatalyst.nightRangeMax * 1.5f) {
                     return true;
@@ -318,21 +275,21 @@ public class BuildingUtils {
     }
 
     // Helper method to get the buildings list based on client or server side.
-    private static List<Building> getBuildingsList(boolean isClientSide) {
+    private static List<BuildingPlacement> getBuildingsList(boolean isClientSide) {
         return isClientSide
                 ? BuildingClientEvents.getBuildings()
                 : BuildingServerEvents.getBuildings();
     }
 
-    public static Beacon getBeacon(boolean isClientSide) {
-        List<Building> buildings = getBuildingsList(isClientSide);
-        for (Building building : buildings)
-            if (building instanceof Beacon beacon)
+    public static BeaconPlacement getBeacon(boolean isClientSide) {
+        List<BuildingPlacement> buildings = getBuildingsList(isClientSide);
+        for (BuildingPlacement building : buildings)
+            if (building instanceof BeaconPlacement beacon)
                 return beacon;
         return null;
     }
 
-    public static void clearBuildingArea(Building building) {
+    public static void clearBuildingArea(BuildingPlacement building) {
         if (building != null) {
             for (int x = building.minCorner.getX() - 1; x < building.maxCorner.getX() + 2; x++)
                 for (int y = building.minCorner.getY(); y < building.maxCorner.getY() + 2; y++)

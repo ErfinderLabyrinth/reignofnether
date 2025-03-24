@@ -1,6 +1,5 @@
 package com.solegendary.reignofnether.unit.goals;
 
-import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingBlock;
 import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.BuildingUtils;
@@ -55,7 +54,7 @@ public class RangedAttackBuildingGoal<T extends net.minecraft.world.entity.Mob> 
     public void setBuildingTarget(BlockPos blockPos) {
         if (blockPos != null) {
             if (this.mob.level.isClientSide()) {
-                Building b = BuildingUtils.findBuilding(this.mob.level.isClientSide(), blockPos);
+                BuildingPlacement b = BuildingUtils.findBuilding(this.mob.level.isClientSide(), blockPos);
                 if (b != null && !b.invulnerable) {
                     this.buildingTarget = b;
                         MiscUtil.addUnitCheckpoint(((Unit) mob), new BlockPos(
@@ -67,7 +66,7 @@ public class RangedAttackBuildingGoal<T extends net.minecraft.world.entity.Mob> 
                 }
             }
             else {
-                Building b = BuildingUtils.findBuilding(this.mob.level.isClientSide(), blockPos);
+                BuildingPlacement b = BuildingUtils.findBuilding(this.mob.level.isClientSide(), blockPos);
                 if (b != null && !b.invulnerable) {
                     this.buildingTarget = b;
                     setNextBlockTarget();

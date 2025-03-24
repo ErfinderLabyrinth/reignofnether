@@ -3,6 +3,8 @@ package com.solegendary.reignofnether.building.production;
 import com.solegendary.reignofnether.building.buildings.placements.ProductionPlacement;
 import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.keybinds.Keybinding;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,8 +24,11 @@ public class ProductionItemList {
 
     public List<Button> getButtons(ProductionPlacement placement) {
         List<Button> buttons = new ArrayList<>();
-        for (Map.Entry<ProductionItem, Keybinding> production : productions.entrySet()) {
-            buttons.add(production.getKey().getStartButton(placement, production.getValue()));
+        //TODO Remove need for I18n
+        if (FMLEnvironment.dist == Dist.CLIENT) {
+            for (Map.Entry<ProductionItem, Keybinding> production : productions.entrySet()) {
+                buttons.add(production.getKey().getStartButton(placement, production.getValue()));
+            }
         }
         return buttons;
     }

@@ -1,10 +1,9 @@
 package com.solegendary.reignofnether.hud.buttons;
 
 import com.solegendary.reignofnether.ReignOfNether;
-import com.solegendary.reignofnether.building.BuildingServerboundPacket;
-import com.solegendary.reignofnether.building.BuildingUtils;
 import com.solegendary.reignofnether.building.*;
 import com.solegendary.reignofnether.building.buildings.neutral.Beacon;
+import com.solegendary.reignofnether.building.buildings.placements.BeaconPlacement;
 import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.hud.HudClientEvents;
 import com.solegendary.reignofnether.keybinds.Keybinding;
@@ -156,7 +155,7 @@ public class HelperButtons {
 
     private static List<FormattedCharSequence> getBeaconButtonTooltip(String ownerName) {
         ArrayList<FormattedCharSequence> fcsList = new ArrayList<>();
-        Beacon beacon = BuildingUtils.getBeacon(true);
+        BeaconPlacement beacon = BuildingUtils.getBeacon(true);
         if (beacon == null)
             return fcsList;
 
@@ -201,7 +200,7 @@ public class HelperButtons {
                 () -> BuildingUtils.getBeacon(true) == null,
                 () -> true,
                 () -> {
-                    List<Building> beacons = BuildingClientEvents.getBuildings().stream().filter(b -> b instanceof Beacon).toList();
+                    List<BuildingPlacement> beacons = BuildingClientEvents.getBuildings().stream().filter(b -> b instanceof BeaconPlacement).toList();
                     if (!beacons.isEmpty()) {
                         BlockPos bp = beacons.get(0).centrePos;
                         OrthoviewClientEvents.centreCameraOnPos(bp);

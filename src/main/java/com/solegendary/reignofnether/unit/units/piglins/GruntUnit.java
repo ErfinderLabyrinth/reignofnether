@@ -1,23 +1,19 @@
 package com.solegendary.reignofnether.unit.units.piglins;
 
+import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.api.ReignOfNetherRegistries;
 import com.solegendary.reignofnether.building.Building;
+import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.BuildingUtils;
+import com.solegendary.reignofnether.building.buildings.piglins.BasaltSprings;
+import com.solegendary.reignofnether.building.buildings.piglins.FlameSanctuary;
 import com.solegendary.reignofnether.building.production.ProductionItems;
-import com.solegendary.reignofnether.ability.Ability;
-import com.solegendary.reignofnether.building.Building;
-import com.solegendary.reignofnether.building.BuildingUtils;
-import com.solegendary.reignofnether.building.buildings.neutral.Beacon;
-import com.solegendary.reignofnether.building.buildings.piglins.*;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybinding;
-import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.research.ResearchClient;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
-import com.solegendary.reignofnether.research.researchItems.ResearchResourceCapacity;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
-import com.solegendary.reignofnether.unit.UnitClientEvents;
 import com.solegendary.reignofnether.unit.Checkpoint;
 import com.solegendary.reignofnether.unit.goals.*;
 import com.solegendary.reignofnether.unit.interfaces.ArmSwingingUnit;
@@ -42,6 +38,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -174,7 +172,7 @@ public class GruntUnit extends Piglin implements Unit, WorkerUnit, AttackerUnit,
         int index = 0;
 
         for (Building building : ReignOfNetherRegistries.BUILDING) {
-            if (building.getFaction() == Faction.PIGLINS) {
+            if (building.getFaction() == Faction.PIGLINS || building.getFaction() == null) {
                 buildingButtons.add(building.getBuildButton(index >= keybindings.size() ? null : keybindings.get(index)));
                 index++;
             }
@@ -185,7 +183,8 @@ public class GruntUnit extends Piglin implements Unit, WorkerUnit, AttackerUnit,
     public GruntUnit(EntityType<? extends Piglin> entityType, Level level) {
         super(entityType, level);
 
-        if (level.isClientSide()) {
+        //TODO Remove need for I18n
+        if (FMLEnvironment.dist == Dist.CLIENT) {
             this.abilityButtons.addAll(getBuildingButtons());
         }
     }
@@ -269,7 +268,7 @@ public class GruntUnit extends Piglin implements Unit, WorkerUnit, AttackerUnit,
 
     @Override
     public boolean fireImmune() {
-        Building building = BuildingUtils.findBuilding(level.isClientSide(), getOnPos());
-        return super.fireImmune() || building instanceof FlameSanctuary || building instanceof BasaltSprings;
+        BuildingPlacement building = BuildingUtils.findBuilding(level.isClientSide(), getOnPos());
+        return super.fireImmune() || (building != null &&(building.getBuilding() instanceof FlameSanctuary || building.getBuilding() instanceof BasaltSprings));
     }
 }

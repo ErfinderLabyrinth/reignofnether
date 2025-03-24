@@ -1,6 +1,5 @@
 package com.solegendary.reignofnether.ability;
 
-import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.hud.HudClientEvents;
@@ -9,7 +8,6 @@ import com.solegendary.reignofnether.tps.TPSClientEvents;
 import com.solegendary.reignofnether.unit.UnitAction;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 
@@ -51,7 +49,7 @@ public class Ability {
         }
     }
 
-    public boolean isChanneling() { return false; }
+    public boolean isChanneling(Unit unit) { return false; }
 
     public float getCooldown() { return this.cooldown; }
 

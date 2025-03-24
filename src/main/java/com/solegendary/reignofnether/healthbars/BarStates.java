@@ -1,10 +1,11 @@
 package com.solegendary.reignofnether.healthbars;
 
-import java.util.HashMap;
-import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class BarStates {
 

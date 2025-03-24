@@ -25,21 +25,19 @@ public class ThrowLingeringHarmingPotion extends Ability {
 
     public static final int CD_MAX_SECONDS = 10;
 
-    private final WitchUnit witchUnit;
-
-    public ThrowLingeringHarmingPotion(WitchUnit witchUnit) {
+    public ThrowLingeringHarmingPotion(int potionThrowRange) {
         super(UnitAction.THROW_LINGERING_HARMING_POTION,
             CD_MAX_SECONDS * ResourceCost.TICKS_PER_SECOND,
-            witchUnit.getPotionThrowRange(),
+            potionThrowRange,
             0,
             true,
             true
         );
-        this.witchUnit = witchUnit;
     }
 
     @Override
     public AbilityButton getButton(Keybinding hotkey, Unit unit) {
+        WitchUnit witchUnit = (WitchUnit) unit;
         return new AbilityButton("Lingering Harming Potion",
             new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/lingering_potion_harming.png"),
             hotkey,

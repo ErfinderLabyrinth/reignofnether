@@ -1,21 +1,20 @@
 package com.solegendary.reignofnether.unit.units.piglins;
 
+import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.Bloodlust;
 import com.solegendary.reignofnether.ability.abilities.MountHoglin;
-import com.solegendary.reignofnether.building.production.ProductionItems;
-import com.solegendary.reignofnether.building.Building;
+import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.BuildingUtils;
 import com.solegendary.reignofnether.building.buildings.piglins.BasaltSprings;
 import com.solegendary.reignofnether.building.buildings.piglins.FlameSanctuary;
+import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientboundPacket;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
-import com.solegendary.reignofnether.research.researchItems.ResearchHeavyTridents;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
-import com.solegendary.reignofnether.unit.UnitClientEvents;
 import com.solegendary.reignofnether.unit.Checkpoint;
 import com.solegendary.reignofnether.unit.goals.*;
 import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
@@ -50,6 +49,11 @@ import java.util.List;
 import java.util.UUID;
 
 public class HeadhunterUnit extends PiglinBrute implements Unit, AttackerUnit, RangedAttackerUnit {
+    public static final Abilities ABILITIES = new Abilities();
+    static {
+        ABILITIES.add(new MountHoglin(), Keybindings.keyQ);
+        ABILITIES.add(new Bloodlust(), Keybindings.keyW);
+    }
     // region
     private BlockPos anchorPos = new BlockPos(0,0,0);
     public void setAnchor(BlockPos bp) { anchorPos = bp; }
@@ -156,21 +160,15 @@ public class HeadhunterUnit extends PiglinBrute implements Unit, AttackerUnit, R
     public int getFogRevealDuration() { return fogRevealDuration; }
     public void setFogRevealDuration(int duration) { fogRevealDuration = duration; }
 
-    private final List<AbilityButton> abilityButtons = new ArrayList<>();
-    private final List<Ability> abilities = new ArrayList<>();
+    private final List<AbilityButton> abilityButtons;
+    private final List<Ability> abilities;
     private final List<ItemStack> items = new ArrayList<>();
 
     public HeadhunterUnit(EntityType<? extends PiglinBrute> entityType, Level level) {
         super(entityType, level);
 
-        MountHoglin mountHoglinAbility = new MountHoglin(this);
-        this.abilities.add(mountHoglinAbility);
-        Bloodlust bloodlust = new Bloodlust(this);
-        this.abilities.add(bloodlust);
-        if (level.isClientSide()) {
-            this.abilityButtons.add(mountHoglinAbility.getButton(Keybindings.keyQ, this));
-            this.abilityButtons.add(bloodlust.getButton(Keybindings.keyW, this));
-        }
+        this.abilities = ABILITIES.get();
+        this.abilityButtons = ABILITIES.getButtons(this);
     }
 
     @Override
@@ -277,7 +275,7 @@ public class HeadhunterUnit extends PiglinBrute implements Unit, AttackerUnit, R
 
     @Override
     public boolean fireImmune() {
-        Building building = BuildingUtils.findBuilding(level.isClientSide(), getOnPos());
-        return super.fireImmune() || building instanceof FlameSanctuary || building instanceof BasaltSprings;
+        BuildingPlacement building = BuildingUtils.findBuilding(level.isClientSide(), getOnPos());
+        return super.fireImmune() || (building != null &&(building.getBuilding() instanceof FlameSanctuary || building.getBuilding() instanceof BasaltSprings));
     }
 }

@@ -28,11 +28,8 @@ public class FirewallShot extends Ability {
     public static final int CD_MAX_SECONDS = 20;
     public static final int RANGE = 15;
 
-    private final BlazeUnit blazeUnit;
-
     public FirewallShot(BlazeUnit blazeUnit) {
         super(UnitAction.SHOOT_FIREWALL, CD_MAX_SECONDS * ResourceCost.TICKS_PER_SECOND, RANGE, 0, true, true);
-        this.blazeUnit = blazeUnit;
     }
 
     @Override
@@ -68,10 +65,11 @@ public class FirewallShot extends Ability {
 
     @Override
     public void use(Level level, Unit unitUsing, BlockPos targetBp) {
-        this.blazeUnit.shootFirewallShot(targetBp);
+        BlazeUnit blazeUnit = (BlazeUnit) unitUsing;
+        blazeUnit.shootFirewallShot(targetBp);
         this.setToMaxCooldown();
         if (!level.isClientSide()) {
-            AbilityClientboundPacket.sendSetCooldownPacket(this.blazeUnit.getId(), this.action, this.cooldownMax);
+            AbilityClientboundPacket.sendSetCooldownPacket(blazeUnit.getId(), this.action, this.cooldownMax);
         }
     }
 }

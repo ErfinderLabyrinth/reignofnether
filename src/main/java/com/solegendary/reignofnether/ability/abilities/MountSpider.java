@@ -12,7 +12,6 @@ import com.solegendary.reignofnether.unit.UnitAction;
 import com.solegendary.reignofnether.unit.UnitClientEvents;
 import com.solegendary.reignofnether.unit.goals.MountGoal;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
-import com.solegendary.reignofnether.unit.units.monsters.PoisonSpiderUnit;
 import com.solegendary.reignofnether.unit.units.monsters.SkeletonUnit;
 import com.solegendary.reignofnether.unit.units.monsters.SpiderUnit;
 import com.solegendary.reignofnether.unit.units.monsters.StrayUnit;
@@ -23,22 +22,20 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 
 import java.util.List;
 
 public class MountSpider extends Ability {
-
-    private final LivingEntity entity;
-
-    public MountSpider(LivingEntity entity) {
+    public MountSpider() {
         super(UnitAction.MOUNT_SPIDER, 0, 0, 0, true);
-        this.entity = entity;
     }
 
     @Override
-    public AbilityButton getButton(Keybinding hotkey) {
+    public AbilityButton getButton(Keybinding hotkey, Unit unit) {
+        Entity entity = (Entity) unit;
         return new AbilityButton("Mount Spider",
             new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/spider.png"),
             hotkey,
@@ -52,7 +49,7 @@ public class MountSpider extends Ability {
         );
     }
 
-    private MountGoal getMountGoal() {
+    private MountGoal getMountGoal(Entity entity) {
         if (entity instanceof PillagerUnit pillagerUnit) {
             return pillagerUnit.getMountGoal();
         }
@@ -71,14 +68,14 @@ public class MountSpider extends Ability {
     // right click
     @Override
     public void use(Level level, Unit unitUsing, BlockPos targetBp) {
-        MountGoal mountGoal = getMountGoal();
+        MountGoal mountGoal = getMountGoal((Entity) unitUsing);
         if (mountGoal != null)
             mountGoal.autofind = true;
     }
 
     @Override
     public void use(Level level, Unit unitUsing, LivingEntity targetEntity) {
-        MountGoal mountGoal = getMountGoal();
+        MountGoal mountGoal = getMountGoal((Entity) unitUsing);
         if (mountGoal != null && targetEntity instanceof SpiderUnit) {
             mountGoal.setTarget(targetEntity);
         } else if (level.isClientSide()) {
