@@ -142,7 +142,7 @@ public class BuildingServerEvents {
             BuildingSaveData buildingData = BuildingSaveData.getInstance(level);
             NetherZoneSaveData netherData = NetherZoneSaveData.getInstance(level);
             ArrayList<BlockPos> placedNZs = new ArrayList<>();
-
+            BuildingServerEvents.getBuildings().clear();
             buildingData.buildings.forEach(b -> {
                 Building building = BuildingUtils.getNewBuilding(b.name,
                     level,
@@ -509,7 +509,6 @@ public class BuildingServerEvents {
             for (Building building : buildings)
                 BuildingClientboundPacket.syncBuilding(building.originPos, building.getBlocksPlaced(), building.ownerName);
         }
-
         // need to remove from the list first as destroy() will read it to check defeats
         List<Building> buildingsToDestroy = buildings.stream().filter(Building::shouldBeDestroyed).toList();
         buildings.removeIf(b -> {
