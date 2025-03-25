@@ -4,7 +4,9 @@ import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.datafixers.util.Pair;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraftforge.event.TickEvent;
 import org.joml.Matrix4f;
 import org.joml.Vector3d;
 import com.solegendary.reignofnether.ReignOfNether;
@@ -19,7 +21,6 @@ import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
 import com.solegendary.reignofnether.player.PlayerClientEvents;
-import com.solegendary.reignofnether.player.PlayerServerEvents;
 import com.solegendary.reignofnether.player.PlayerServerboundPacket;
 import com.solegendary.reignofnether.startpos.StartPos;
 import com.solegendary.reignofnether.startpos.StartPosClientEvents;
@@ -739,7 +740,8 @@ public class MinimapClientEvents {
             && z < zc_world + worldRadius;
     }
 
-    private static void renderMap(PoseStack stack) {
+    private static void renderMap(GuiGraphics guiGraphics) {
+        PoseStack stack = guiGraphics.pose();
         Matrix4f matrix4f = stack.last().pose();
 
         // place vertices in a diamond shape - left, centre, right, top, centre, bottom
@@ -889,33 +891,35 @@ public class MinimapClientEvents {
             toggleMapSize();
         }
 
-        refreshTicks -= 1;
-        if (refreshTicks <= 0) {
-            updateMapTerrain(terrainPartition, darkTerrainPartition);
-            mapColoursOverlays = new int[worldRadius * 2][worldRadius * 2];
-            if (TimeClientEvents.nightCircleMode != NightCircleMode.OFF)
-                updateNightCircles();
-            updateMapUnitsAndBuildings();
-            updateMapViewQuad();
-
-            // as the map area increases, decrease refresh rate to maintain FPS
-            refreshTicks = (worldRadius * 2) / TERRAIN_PARTITIONS_MAX;
-            terrainPartition += 1;
-            if (terrainPartition > TERRAIN_PARTITIONS_MAX) {
-                terrainPartition = 1;
-
-                darkTerrainPartition += 1;
-                if (darkTerrainPartition > DARK_TERRAIN_PARTITIONS_MAX) {
-                    darkTerrainPartition = 1;
-                }
-            }
-
-            updateMapTexture();
-        }
-
-        renderMap(evt.getGuiGraphics().pose());
+        renderMap(evt.getGuiGraphics());
 
         //MiscUtil.drawDebugStrings(evt.getMatrixStack(), MC.font, new String[] {
         //});
+    }
+
+    @SubscribeEvent
+    public static void onClientTick(TickEvent.ClientTickEvent evt) {
+        if (evt.phase != TickEvent.Phase.END)
+            return;
+
+        updateMapTerrain(terrainPartition, darkTerrainPartition);
+        mapColoursOverlays = new int[worldRadius * 2][worldRadius * 2];
+        if (TimeClientEvents.nightCircleMode != NightCircleMode.OFF)
+            updateNightCircles();
+        updateMapUnitsAndBuildings();
+        updateMapViewQuad();
+
+        // as the map area increases, decrease refresh rate to maintain FPS
+        terrainPartition += 1;
+        if (terrainPartition > TERRAIN_PARTITIONS_MAX) {
+            terrainPartition = 1;
+
+            darkTerrainPartition += 1;
+            if (darkTerrainPartition > DARK_TERRAIN_PARTITIONS_MAX) {
+                darkTerrainPartition = 1;
+            }
+        }
+
+        updateMapTexture();
     }
 }
