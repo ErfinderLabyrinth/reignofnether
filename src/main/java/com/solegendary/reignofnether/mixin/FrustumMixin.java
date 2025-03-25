@@ -20,20 +20,20 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Frustum.class)
 public class FrustumMixin {
-    // I have no idea why this is needed but without it the game freezes and gets stuck inside
-    // this function forever a few seconds after activating orthoView
-    @Inject(
-            method = "cubeInFrustum",
-            at = @At("HEAD"),
-            cancellable = true
-    )
-    private void cubeCompletelyInFrustum(
-            double pMinX, double pMinY, double pMinZ, double pMaxX, double pMaxY, double pMaxZ, CallbackInfoReturnable<Boolean> cir
-    ) {
-        if (OrthoviewClientEvents.isEnabled()) {
-            cir.setReturnValue(true);
-        }
-    }
+//    // I have no idea why this is needed but without it the game freezes and gets stuck inside
+//    // this function forever a few seconds after activating orthoView
+//    @Inject(
+//            method = "cubeInFrustum",
+//            at = @At("HEAD"),
+//            cancellable = true
+//    )
+//    private void cubeCompletelyInFrustum(
+//            double pMinX, double pMinY, double pMinZ, double pMaxX, double pMaxY, double pMaxZ, CallbackInfoReturnable<Boolean> cir
+//    ) {
+//        if (OrthoviewClientEvents.isEnabled()) {
+//            cir.setReturnValue(true);
+//        }
+//    }
 
     // see IForgeBlockEntity.getRenderBoundingBox()
     @Inject(
