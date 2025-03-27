@@ -1,11 +1,13 @@
 package com.solegendary.reignofnether.mixin;
 
+import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.util.Mth;
 import net.minecraftforge.client.event.CustomizeGuiOverlayEvent;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.minecraftforge.common.MinecraftForge;
@@ -35,11 +37,14 @@ public class ForgeGuiMixin extends Gui {
         ci.cancel();
 
         this.minecraft.getProfiler().push("chat");
-        CustomizeGuiOverlayEvent.Chat event = new CustomizeGuiOverlayEvent.Chat(this.minecraft.getWindow(), guiGraphics, this.minecraft.getFrameTime(), 0, height - 48);
+        Window window = this.minecraft.getWindow();
+        CustomizeGuiOverlayEvent.Chat event = new CustomizeGuiOverlayEvent.Chat(window, guiGraphics, this.minecraft.getFrameTime(), 0, height - 40);
         MinecraftForge.EVENT_BUS.post(event);
         guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(event.getPosX(), event.getPosY() - 50, 0.0);
-        this.chat.render(guiGraphics, this.tickCount, 0, 0);
+        guiGraphics.pose().translate((double)event.getPosX(), (double)(event.getPosY() - height - 15) / this.chat.getScale(), 0.0);
+        int mouseX = Mth.floor(this.minecraft.mouseHandler.xpos() * (double)window.getGuiScaledWidth() / (double)window.getScreenWidth());
+        int mouseY = Mth.floor(this.minecraft.mouseHandler.ypos() * (double)window.getGuiScaledHeight() / (double)window.getScreenHeight());
+        this.chat.render(guiGraphics, this.tickCount, mouseX, mouseY);
         guiGraphics.pose().popPose();
         this.minecraft.getProfiler().pop();
     }
