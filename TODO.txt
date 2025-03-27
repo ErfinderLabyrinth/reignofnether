@@ -24,7 +24,7 @@ April fools mob ;)
 Bugfixes
 --------
 [❌] Prevent superflat worlds generating regular worlds after a certain range
-[❌] Kicked for sending too many packets when spam clicking large army
+[❌] Kicked for sending too many packets when spam clicking large army (rate-limit in server.properties?)
 [❌] groundYlevel not working if you're already below it?
 [❌] gui scale not working?
 
