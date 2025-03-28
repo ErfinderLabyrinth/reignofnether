@@ -183,8 +183,8 @@ public class MiscUtil {
         // for some reason position is off by some y coord so just move it down manually
         return new Vector3d(
                 MC.player.xo - XZRotated.x,
-                MC.player.yo + y + 1.5,
-                MC.player.zo - XZRotated.y
+                MC.player.yo + y,
+                MC.player.zo - XZRotated.y - 2.0f
         );
     }
 

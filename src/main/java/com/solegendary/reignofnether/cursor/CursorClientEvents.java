@@ -169,6 +169,7 @@ public class CursorClientEvents {
             RenderSystem.setShaderTexture(0, TEXTURE_CURSOR);
             texture = TEXTURE_CURSOR;
         }
+        evt.getGuiGraphics().pose().translate(0,0,1000);
         evt.getGuiGraphics().blit(texture,
                 cursorDrawX, cursorDrawY,
                 16,
@@ -176,6 +177,7 @@ public class CursorClientEvents {
                 16, 16,
                 16, 16
         );
+        evt.getGuiGraphics().pose().translate(0,0,-1000);
 
         // ***********************************************
         // Convert cursor on-screen 2d pos to world 3d pos

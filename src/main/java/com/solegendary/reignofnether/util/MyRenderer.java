@@ -383,7 +383,9 @@ public class MyRenderer {
         if (MC.screen != null && tooltipLines != null && tooltipLines.size() > 0) {
             if (mouseY < MC.screen.height / 2)
                 mouseY += (tooltipLines.size() * 10);
+            guiGraphics.pose().translate(0,0,100);
             guiGraphics.renderTooltip(MC.font, tooltipLines, mouseX, mouseY - (9 * (tooltipLines.size() - 1)));
+            guiGraphics.pose().translate(0,0,-100);
         }
     }
 }
