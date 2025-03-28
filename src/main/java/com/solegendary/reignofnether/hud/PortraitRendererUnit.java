@@ -10,6 +10,7 @@ import com.mojang.math.Axis;
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.unit.interfaces.HeroUnit;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.resources.language.I18n;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import com.solegendary.reignofnether.ability.abilities.EnchantMaiming;
@@ -197,8 +198,16 @@ public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<
         }
 
         // draw name (unless a player, since their nametag will be rendered anyway)
+        // draw name (unless a player, since their nametag will be rendered anyway)
+        if (entity instanceof HeroUnit heroUnit) {
+            y -= 6;
+            name += I18n.get("hud.hero.reignofnether.level", heroUnit.getHeroLevel());
+        }
         if (!(entity instanceof Player)) {
             guiGraphics.drawString(Minecraft.getInstance().font, name, x + 4, y - 9, 0xFFFFFFFF);
+        }
+        if (entity instanceof HeroUnit heroUnit) {
+            y += 6;
         }
 
         RectZone rectZone = RectZone.getZoneByLW(x, y, frameWidth, frameHeight);

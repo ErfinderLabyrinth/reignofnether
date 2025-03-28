@@ -52,14 +52,14 @@ public class GenericUntargetedSpellGoal extends Goal {
         if (isCasting) {
             ticksCasting += 1;
             if (ticksCasting >= channelTicksMax) {
-                if (!this.mob.level.isClientSide()) {
+                if (!this.mob.level().isClientSide()) {
                     if (castAnimation != null) {
                         UnitAnimationClientboundPacket.sendBasicPacket(castAnimation, this.mob);
                     }
                     onCast.run();
                 }
-                if (this.ability != null && !this.mob.level.isClientSide()) {
-                    if (!this.mob.level.isClientSide())
+                if (this.ability != null && !this.mob.level().isClientSide()) {
+                    if (!this.mob.level().isClientSide())
                         AbilityClientboundPacket.sendSetCooldownPacket(this.mob.getId(), this.ability.action, this.ability.cooldownMax);
                     else
                         this.ability.setToMaxCooldown();
@@ -77,7 +77,7 @@ public class GenericUntargetedSpellGoal extends Goal {
 
     public void startCasting() {
         this.isCasting = true;
-        if (!this.mob.level.isClientSide()) {
+        if (!this.mob.level().isClientSide()) {
             UnitAnimationClientboundPacket.sendBasicPacket(startAnimation, this.mob);
         }
     }
@@ -86,7 +86,7 @@ public class GenericUntargetedSpellGoal extends Goal {
     public void stop() {
         this.ticksCasting = 0;
         this.isCasting = false;
-        if (!this.mob.level.isClientSide())
+        if (!this.mob.level().isClientSide())
             UnitAnimationClientboundPacket.sendBasicPacket(stopAnimation, this.mob);
     }
 }

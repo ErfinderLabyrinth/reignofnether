@@ -223,7 +223,7 @@ public class PiglinMerchantUnit extends Piglin implements Unit, AttackerUnit, He
     }
 
     public void updateAbilityButtons() {
-        if (level.isClientSide()) {
+        if (level().isClientSide()) {
             this.abilityButtons.clear();
             this.abilityButtons.add(this.abilities.get(0).getButton(Keybindings.keyQ));
             this.abilityButtons.add(this.abilities.get(1).getButton(Keybindings.keyW));
@@ -261,7 +261,7 @@ public class PiglinMerchantUnit extends Piglin implements Unit, AttackerUnit, He
         Unit.tick(this);
         AttackerUnit.tick(this);
 
-        if (level.isClientSide() && animateTicks > 0) {
+        if (level().isClientSide() && animateTicks > 0) {
             animateTicks -= 1;
         }
     }

@@ -107,7 +107,7 @@ public class GreedIsGoodPassive extends HeroAbility {
     public int checkAndSpendResources(ResourceName resName) {
         int totalSpent = 0;
         String ownerName = ((Unit) hero).getOwnerName();
-        if (active && !((LivingEntity) hero).getLevel().isClientSide()) {
+        if (active && !((LivingEntity) hero).level().isClientSide()) {
             for (Resources resources : ResourcesServerEvents.resourcesList) {
                 if (resources.ownerName.equals(ownerName)) {
                     for (int i = 0; i < rank; i++) {

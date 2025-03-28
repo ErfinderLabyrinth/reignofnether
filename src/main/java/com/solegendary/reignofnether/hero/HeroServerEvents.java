@@ -13,7 +13,7 @@ public class HeroServerEvents {
 
     @SubscribeEvent
     public static void onLivingDeath(LivingDeathEvent evt) {
-        Level level = evt.getEntity().getLevel();
+        Level level = evt.getEntity().level();
         if (evt.getEntity() instanceof Unit deadUnit) {
             for (LivingEntity unit : UnitServerEvents.getAllUnits()) {
                 boolean inRange = unit.distanceToSqr((LivingEntity) deadUnit) < HeroExperienceOrb.RANGE * HeroExperienceOrb.RANGE;
@@ -34,7 +34,7 @@ public class HeroServerEvents {
                                 expValue >= 2 ? 2 : 1
                             );
                             expValue -= expValue >= 2 ? 2 : 1;
-                            evt.getEntity().level.addFreshEntity(expOrb);
+                            evt.getEntity().level().addFreshEntity(expOrb);
                         }
                     }
                 }

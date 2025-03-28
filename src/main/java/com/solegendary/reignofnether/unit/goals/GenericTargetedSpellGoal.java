@@ -143,7 +143,7 @@ public class GenericTargetedSpellGoal extends MoveToTargetBlockGoal {
     public void startCasting() {
         this.isCasting = true;
         this.castTarget = moveTarget;
-        if (!this.mob.level.isClientSide()) {
+        if (!this.mob.level().isClientSide()) {
             if (!hasKeyframeAnimations) {
                 UnitAnimationClientboundPacket.sendBasicPacket(UnitAnimationAction.NON_KEYFRAME_START, this.mob);
             } else if (animationStart != null) {
@@ -155,7 +155,7 @@ public class GenericTargetedSpellGoal extends MoveToTargetBlockGoal {
         this.isCasting = false;
         this.ticksCasting = 0;
         this.castTarget = null;
-        if (!this.mob.level.isClientSide() && ticksCasting < channelTicks) {
+        if (!this.mob.level().isClientSide() && ticksCasting < channelTicks) {
             if (!hasKeyframeAnimations) {
                 UnitAnimationClientboundPacket.sendBasicPacket(UnitAnimationAction.NON_KEYFRAME_STOP, this.mob);
             } else {

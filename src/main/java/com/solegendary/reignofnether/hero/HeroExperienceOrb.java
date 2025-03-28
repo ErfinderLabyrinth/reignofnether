@@ -48,12 +48,12 @@ public class HeroExperienceOrb extends ExperienceOrb {
         this.horizontalCollision = false;
         this.verticalCollision = false;
 
-        this.level.getProfiler().push("entityBaseTick");
+        this.level().getProfiler().push("entityBaseTick");
         this.xRotO = this.getXRot();
         this.yRotO = this.getYRot();
-        this.checkOutOfWorld();
+        this.checkBelowWorld();
         this.firstTick = false;
-        this.level.getProfiler().pop();
+        this.level().getProfiler().pop();
 
         this.xo = this.getX();
         this.yo = this.getY();
@@ -83,7 +83,7 @@ public class HeroExperienceOrb extends ExperienceOrb {
     }
 
     private void checkTouchedHero() {
-        if (followingHero != null && !followingHero.isDeadOrDying() && !this.level.isClientSide()) {
+        if (followingHero != null && !followingHero.isDeadOrDying() && !this.level().isClientSide()) {
             AABB aabb = followingHero.getBoundingBox().inflate(0.5, 0.25, 0.5);
             if (aabb.contains(this.position())) {
                 followingHero.take(this, count);

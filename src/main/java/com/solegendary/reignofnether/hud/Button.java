@@ -241,7 +241,7 @@ public class Button {
         }
 
         if (isFlashing.get()) {
-            GuiComponent.fill(poseStack, x, y,
+            guiGraphics.fill(x, y,
                 x + iconFrameSize,
                 y + iconFrameSize,
                 (0xFFFFFF | ((int) (0x80 * MiscUtil.getOscillatingFloat(0,1)) << 24))

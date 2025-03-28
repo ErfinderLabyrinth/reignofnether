@@ -140,7 +140,7 @@ public final class PacketHandler {
 
         INSTANCE.messageBuilder(AbilityServerboundPacket.class, index++, NetworkDirection.PLAY_TO_SERVER)
                 .encoder(AbilityServerboundPacket::encode).decoder(AbilityServerboundPacket::new)
-                .consumer(AbilityServerboundPacket::handle).add();
+                .consumerMainThread(AbilityServerboundPacket::handle).add();
 
         INSTANCE.messageBuilder(EnchantAbilityServerboundPacket.class, index++, NetworkDirection.PLAY_TO_SERVER)
                 .encoder(EnchantAbilityServerboundPacket::encode).decoder(EnchantAbilityServerboundPacket::new)
@@ -259,7 +259,7 @@ public final class PacketHandler {
         INSTANCE.messageBuilder(HeroClientboundPacket.class, index++, NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(HeroClientboundPacket::encode)
                 .decoder(HeroClientboundPacket::new)
-                .consumer(HeroClientboundPacket::handle)
+                .consumerMainThread(HeroClientboundPacket::handle)
                 .add();
     }
 }
