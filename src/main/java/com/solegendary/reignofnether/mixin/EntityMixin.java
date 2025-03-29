@@ -1,16 +1,23 @@
 package com.solegendary.reignofnether.mixin;
 
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
+import com.solegendary.reignofnether.resources.BlockUtils;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageSources;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Entity.class)
@@ -55,12 +62,11 @@ public abstract class EntityMixin {
     @Shadow public int getTicksFrozen() { return 0; }
 
     @Shadow public abstract DamageSources damageSources();
-
     @Shadow public abstract Component getName();
-
     @Shadow public abstract void remove(Entity.RemovalReason pReason);
-
     @Shadow public abstract AABB getBoundingBox();
+    @Shadow public abstract BlockPos getOnPos();
+    @Shadow public abstract Level level();
 
     @Inject(
             method = "getPercentFrozen",
@@ -73,7 +79,6 @@ public abstract class EntityMixin {
         cir.setReturnValue(Math.min(percent, 0.5f));
     }
 
-    /*
     @Inject(
             method = "collide",
             at = @At("TAIL"),
@@ -83,13 +88,37 @@ public abstract class EntityMixin {
         if (!getName().getString().contains("magma"))
             return;
 
-        // TODO: detect if bb contains log or leaf blocks
-        // boolean isNearLogs = this.getBoundingBox().get
-
         Vec3 result = cir.getReturnValue();
 
-        cir.setReturnValue(new Vec3(pVec.x, result.y, pVec.z));
-    }
-     */
+        boolean isNearLeafOrLog = false;
 
+        AABB aabb = getBoundingBox().inflate(0.5f);
+        outerloop:
+        for (int x = (int) aabb.minX; x < aabb.maxX; x++) {
+            for (int y = (int) aabb.minY; y < aabb.maxY; y++) {
+                for (int z = (int) aabb.minZ; z < aabb.maxZ; z++) {
+                    BlockState bs = level().getBlockState(new BlockPos(x,y,z));
+                    if (BlockUtils.isLogBlock(bs) ||
+                        BlockUtils.isFallingLogBlock(bs) ||
+                        BlockUtils.isLeafBlock(bs)) {
+                        isNearLeafOrLog = true;
+                        break outerloop;
+                    }
+                }
+            }
+        }
+        if (!isNearLeafOrLog)
+            return;
+
+        BlockState bs = level().getBlockState(getOnPos());
+        BlockState bsBelow = level().getBlockState(getOnPos().below());
+
+        if (BlockUtils.isLogBlock(bs) || BlockUtils.isLogBlock(bsBelow) ||
+            BlockUtils.isFallingLogBlock(bs) || BlockUtils.isFallingLogBlock(bsBelow) ||
+            BlockUtils.isLeafBlock(bs) || BlockUtils.isLeafBlock(bsBelow)) {
+            cir.setReturnValue(new Vec3(pVec.x, pVec.y, pVec.z));
+        } else {
+            cir.setReturnValue(new Vec3(pVec.x, result.y, pVec.z));
+        }
+    }
 }

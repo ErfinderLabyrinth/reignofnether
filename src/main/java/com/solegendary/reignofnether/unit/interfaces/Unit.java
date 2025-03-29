@@ -194,7 +194,9 @@ public interface Unit {
             } else if (unit.getFaction() == Faction.PIGLINS &&
                     le.tickCount % PIGLIN_HEALING_TICKS == 0 &&
                     !(unit instanceof Slime) &&
-                    (NetherBlocks.isNetherBlock(le.level(), le.getOnPos()) || unit instanceof GhastUnit)) {
+                    ((le.getVehicle() != null && NetherBlocks.isNetherBlock(le.level(), le.getVehicle().getOnPos())) ||
+                    NetherBlocks.isNetherBlock(le.level(), le.getOnPos()) ||
+                    unit instanceof GhastUnit)) {
                 le.heal(1);
             }
         }
