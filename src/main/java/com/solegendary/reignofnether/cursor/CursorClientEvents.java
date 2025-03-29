@@ -188,6 +188,8 @@ public class CursorClientEvents {
                 cursorWorldPos.z
         );
         cursorWorldPos = MiscUtil.screenPosToWorldPos(MC, evt.getMouseX(), evt.getMouseY());
+        cursorWorldPos.y -= 1.3f;
+        cursorWorldPos.z -= 2.0f;
 
         // calc near and far cursorWorldPos to get a cursor line vector
         Vector3d lookVector = MiscUtil.getPlayerLookVector(MC);
@@ -204,7 +206,8 @@ public class CursorClientEvents {
             boolean usingPosAbove = false;
 
             // if we clipped a non-solid block (eg. tall grass) search adjacent blocks for a next-best match
-            if (!MC.level.getBlockState(preselectedBlockPos).isSolid()) {
+            /*
+            if (!MiscUtil.isSolidBlocking(MC.level, preselectedBlockPos)) {
                 preselectedBlockPos = getRefinedBlockPos(preselectedBlockPos, cursorWorldPosNear);
                 // disallow selecting a block just below a fluid block
                 if (!MC.level.getBlockState(preselectedBlockPos.above()).getFluidState().isEmpty()) {
@@ -212,6 +215,7 @@ public class CursorClientEvents {
                     usingPosAbove = true;
                 }
             }
+             */
             if (!usingPosAbove &&
                     !BuildingUtils.isPosInsideAnyBuilding(true, preselectedBlockPos) &&
                     BuildingUtils.isPosInsideAnyBuilding(true, preselectedBlockPos.above()) &&
@@ -236,7 +240,14 @@ public class CursorClientEvents {
             // inflate by set amount to improve click accuracy
             AABB entityaabb = entity.getBoundingBox().inflate(0.1);
 
-            if (MyMath.rayIntersectsAABBCustom(cursorWorldPosNear, MiscUtil.getPlayerLookVector(MC), entityaabb)) {
+            Vector3d cursorWorldPosAdj = new Vector3d(
+                    cursorWorldPos.x,
+                    cursorWorldPos.y + 1.3f,
+                    cursorWorldPos.z + 2.0f
+            );
+            Vector3d cursorWorldPosNearAdj = MyMath.addVector3d(cursorWorldPosAdj, lookVector, -200);
+
+            if (MyMath.rayIntersectsAABBCustom(cursorWorldPosNearAdj, MiscUtil.getPlayerLookVector(MC), entityaabb)) {
                 UnitClientEvents.addPreselectedUnit(entity);
                 if (UnitClientEvents.getPreselectedUnits().size() > 0)
                     break; // only allow one moused-over unit at a time
@@ -466,6 +477,8 @@ public class CursorClientEvents {
                 Block block = level.getBlockState(result.getBlockPos()).getBlock();
                 if (OrthoviewClientEvents.shouldHideLeaves() && level.getBlockState(result.getBlockPos()).getBlock() instanceof LeavesBlock)
                     result = null;
+                else if (!MiscUtil.isSolidBlocking(level, result.getBlockPos()))
+                    result = null;
                 else if (block instanceof SnowLayerBlock)
                     result = null;
             }
@@ -525,7 +538,7 @@ public class CursorClientEvents {
                     isBlockSelectableResource = ResourceSources.getFromBlockPos(block, MC.level) != null;
 
                 BlockState bs = MC.level.getBlockState(block);
-                if ((bs.isSolid() || isBlockSelectableResource) &&
+                if ((MiscUtil.isSolidBlocking(MC.level, block) || isBlockSelectableResource) &&
                         (!(bs.getBlock() instanceof LeavesBlock) || !OrthoviewClientEvents.shouldHideLeaves()) &&
                         !(bs.getBlock() instanceof SnowLayerBlock) &&
                         MyMath.rayIntersectsAABBCustom(cursorWorldPosNear, lookVector, new AABB(block)) &&

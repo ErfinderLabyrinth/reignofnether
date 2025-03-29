@@ -124,7 +124,7 @@ public class MiscUtil {
                 BuildingUtils.isPosInsideAnyBuilding(level.isClientSide, bp) ||
                 bs.getBlock() == Blocks.LIGHT ||
                 bs.getBlock() == Blocks.STRUCTURE_VOID ||
-                (!bs.isSolid() &&
+                (!isSolidBlocking(level, bp) &&
                 bs.getFluidState().isEmpty()) ||
                 bs.is(BlockTags.LEAVES) ||
                 bs.is(BlockTags.LOGS) || bs.is(BlockTags.PLANKS)) && y > -63);
@@ -134,13 +134,15 @@ public class MiscUtil {
     public static BlockPos getHighestNonAirBlock(Level level, BlockPos blockPos, boolean ignoreLeaves) {
         int y = level.getHeight();
         BlockState bs;
+        BlockPos bp;
         do {
-            bs = level.getBlockState(new BlockPos(blockPos.getX(), y, blockPos.getZ()));
+            bp = new BlockPos(blockPos.getX(), y, blockPos.getZ());
+            bs = level.getBlockState(bp);
             y -= 1;
         } while((bs.isAir() ||
                 bs.getBlock() == Blocks.LIGHT ||
                 bs.getBlock() == Blocks.STRUCTURE_VOID ||
-                (!bs.isSolid() && bs.getFluidState().isEmpty()) ||
+                (!isSolidBlocking(level, bp) && bs.getFluidState().isEmpty()) ||
                 (ignoreLeaves && bs.is(BlockTags.LEAVES))) && y > -63);
         return new BlockPos(blockPos.getX(), y, blockPos.getZ());
     }
@@ -183,8 +185,8 @@ public class MiscUtil {
         // for some reason position is off by some y coord so just move it down manually
         return new Vector3d(
                 MC.player.xo - XZRotated.x,
-                MC.player.yo + y,
-                MC.player.zo - XZRotated.y - 2.0f
+                MC.player.yo + y + 1.5f,
+                MC.player.zo - XZRotated.y
         );
     }
 
@@ -595,5 +597,10 @@ public class MiscUtil {
 
     public static FormattedCharSequence fcs(String string, Style style) {
         return FormattedCharSequence.forward(string, style);
+    }
+
+    public static boolean isSolidBlocking(Level level, BlockPos bp) {
+        BlockState bs = level.getBlockState(bp);
+        return !bs.getCollisionShape(level, bp).isEmpty() && bs.isSolid();
     }
 }

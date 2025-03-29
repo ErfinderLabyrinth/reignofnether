@@ -28,6 +28,7 @@ import com.solegendary.reignofnether.unit.interfaces.WorkerUnit;
 import com.solegendary.reignofnether.unit.units.monsters.CreeperUnit;
 import com.solegendary.reignofnether.unit.units.piglins.GhastUnit;
 import com.solegendary.reignofnether.unit.units.villagers.PillagerUnit;
+import com.solegendary.reignofnether.util.MiscUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -311,8 +312,8 @@ public class BuildingServerEvents {
         // Search downward for a solid block up to -5 levels below
         while (yBelow > -MAX_SCAFFOLD_DEPTH) {
             yBelow--;
-            bsBelow = serverLevel.getBlockState(basePos.offset(0, yBelow, 0));
-            if (bsBelow.isSolid()) {
+            BlockPos bpBelow = basePos.offset(0, yBelow, 0);
+            if (MiscUtil.isSolidBlocking(newBuilding.level, bpBelow)) {
                 break; // Found a solid block, exit loop
             }
         }
@@ -572,7 +573,7 @@ public class BuildingServerEvents {
             List<BlockPos> flammableBps = evt.getAffectedBlocks().stream().filter(bp -> {
                 BlockState bs = evt.getLevel().getBlockState(bp);
                 BlockState bsAbove = evt.getLevel().getBlockState(bp.above());
-                return bs.isSolid() && bsAbove.isAir()
+                return MiscUtil.isSolidBlocking(evt.getLevel(), bp) && bsAbove.isAir()
                     || bsAbove.getBlock() instanceof TallGrassBlock || bsAbove.getBlock() instanceof RootsBlock;
             }).toList();
 
