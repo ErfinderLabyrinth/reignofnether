@@ -32,6 +32,8 @@ Bugfixes
 [🟡] tutorial camera centering is off
 [🟡] Mounted piglins don't heal from nether terrain
 
+[❌] cursor off in server but not on singleplayer?
+
 
 Quality of Life
 ---------------

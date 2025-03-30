@@ -1,6 +1,10 @@
 package com.solegendary.reignofnether.resources;
 
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.solegendary.reignofnether.ReignOfNether;
+import com.solegendary.reignofnether.alliance.AlliancesServerEvents;
 import com.solegendary.reignofnether.building.*;
 import com.solegendary.reignofnether.player.PlayerServerEvents;
 import com.solegendary.reignofnether.registrars.BlockRegistrar;
@@ -11,14 +15,20 @@ import com.solegendary.reignofnether.tutorial.TutorialServerEvents;
 import com.solegendary.reignofnether.unit.UnitServerEvents;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.level.BlockEvent;
@@ -282,29 +292,80 @@ public class ResourcesServerEvents {
         }
     }
 
-    public static void trySendingResources(String playerGiving, String playerReceiving, ResourceName resourceName, int amount) {
-        if (canAfford(playerGiving, resourceName, amount)) {
-            addSubtractResources(new Resources(playerGiving,
-                resourceName == ResourceName.FOOD ? amount : 0,
-                resourceName == ResourceName.WOOD ? amount : 0,
-                resourceName == ResourceName.ORE ? amount : 0
-            ));
-            String resString = null;
-            switch (resourceName) {
-                case FOOD -> resString = I18n.get("resources.reignofnether.food");
-                case WOOD -> resString = I18n.get("resources.reignofnether.wood");
-                case ORE -> resString = I18n.get("resources.reignofnether.ore");
-            }
-            if (resString != null) {
-                PlayerServerEvents.sendMessageToPlayer(playerGiving, I18n.get("server.resources.reignofnether.sent_resources", amount, resString, playerReceiving));
-                PlayerServerEvents.sendMessageToPlayer(playerReceiving, I18n.get("server.resources.reignofnether.received_resources", amount, resString, playerGiving));
-            }
-        } else {
-            ResourcesClientboundPacket.warnInsufficientResources(playerGiving,
-                resourceName == ResourceName.FOOD,
-                resourceName == ResourceName.WOOD,
-                resourceName == ResourceName.ORE
+    @SubscribeEvent
+    public static void onRegisterCommand(RegisterCommandsEvent evt) {
+
+        evt.getDispatcher().register(Commands.literal("send-food")
+            .then(Commands.argument("player", EntityArgument.player())
+            .then(Commands.argument("amount", IntegerArgumentType.integer(0, Integer.MAX_VALUE))
+            .executes((command) -> trySendingResources(command, ResourceName.FOOD)))));
+
+        evt.getDispatcher().register(Commands.literal("send-wood")
+            .then(Commands.argument("player", EntityArgument.player())
+            .then(Commands.argument("amount", IntegerArgumentType.integer(0, Integer.MAX_VALUE))
+            .executes((command) -> trySendingResources(command, ResourceName.WOOD)))));
+
+        evt.getDispatcher().register(Commands.literal("send-ore")
+            .then(Commands.argument("player", EntityArgument.player())
+            .then(Commands.argument("amount", IntegerArgumentType.integer(0, Integer.MAX_VALUE))
+            .executes((command) -> trySendingResources(command, ResourceName.ORE)))));
+    }
+
+    public static int trySendingResources(CommandContext<CommandSourceStack> context, ResourceName resourceName) throws CommandSyntaxException {
+        Player sendingPlayer = context.getSource().getPlayer();
+        Player receivingPlayer = EntityArgument.getPlayer(context, "player");
+        int amount = IntegerArgumentType.getInteger(context, "amount");
+        if (sendingPlayer == null)
+            return 0;
+        String sendingPlayerName = sendingPlayer.getName().getString();
+        String receivingPlayerName = receivingPlayer.getName().getString();
+
+        Resources res = null;
+        for (Resources resources : resourcesList)
+            if (resources.ownerName.equals(sendingPlayer.getName().getString()))
+                res = resources;
+        if (res == null)
+            return 0;
+
+        if (sendingPlayerName.equals(receivingPlayerName)) {
+            PlayerServerEvents.sendMessageToPlayer(sendingPlayerName, "server.resources.reignofnether.sending_to_self");
+            return 0;
+        } else if (!AlliancesServerEvents.isAllied(sendingPlayerName, receivingPlayerName)) {
+            PlayerServerEvents.sendMessageToPlayer(sendingPlayerName, "server.resources.reignofnether.not_allies");
+            return 0;
+        } else if (!canAfford(sendingPlayerName, resourceName, amount)) {
+            ResourcesClientboundPacket.warnInsufficientResources(sendingPlayerName,
+                    resourceName == ResourceName.FOOD,
+                    resourceName == ResourceName.WOOD,
+                    resourceName == ResourceName.ORE
             );
+            return 0;
+        } else {
+            addSubtractResources(new Resources(sendingPlayerName,
+                    resourceName == ResourceName.FOOD ? -amount : 0,
+                    resourceName == ResourceName.WOOD ? -amount : 0,
+                    resourceName == ResourceName.ORE ? -amount : 0
+            ));
+            addSubtractResources(new Resources(receivingPlayerName,
+                    resourceName == ResourceName.FOOD ? -amount : 0,
+                    resourceName == ResourceName.WOOD ? -amount : 0,
+                    resourceName == ResourceName.ORE ? -amount : 0
+            ));
+            switch (resourceName) {
+                case FOOD -> {
+                    PlayerServerEvents.sendMessageToPlayer(sendingPlayerName, "server.resources.reignofnether.sent_food", false, amount, receivingPlayerName);
+                    PlayerServerEvents.sendMessageToPlayer(receivingPlayerName, "server.resources.reignofnether.received_food", false, amount, sendingPlayerName);
+                }
+                case WOOD -> {
+                    PlayerServerEvents.sendMessageToPlayer(sendingPlayerName, "server.resources.reignofnether.sent_wood", false, amount, receivingPlayerName);
+                    PlayerServerEvents.sendMessageToPlayer(receivingPlayerName, "server.resources.reignofnether.received_wood", false, amount, sendingPlayerName);
+                }
+                case ORE -> {
+                    PlayerServerEvents.sendMessageToPlayer(sendingPlayerName, "server.resources.reignofnether.sent_ore", false, amount, receivingPlayerName);
+                    PlayerServerEvents.sendMessageToPlayer(receivingPlayerName, "server.resources.reignofnether.received_ore", false, amount, sendingPlayerName);
+                }
+            }
+            return 1;
         }
     }
 

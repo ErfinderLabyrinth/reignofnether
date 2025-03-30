@@ -49,22 +49,6 @@ public class PlayerClientEvents {
 
     @SubscribeEvent
     public static void onRegisterCommand(RegisterClientCommandsEvent evt) {
-
-        evt.getDispatcher().register(Commands.literal("send-food")
-            .then(Commands.argument("player", EntityArgument.player())
-            .then(Commands.argument("amount", IntegerArgumentType.integer(0,Integer.MAX_VALUE))
-            .executes((command) -> ResourcesClientEvents.trySendingResources(command, ResourceName.FOOD)))));
-
-        evt.getDispatcher().register(Commands.literal("send-wood")
-            .then(Commands.argument("player", EntityArgument.player())
-            .then(Commands.argument("amount", IntegerArgumentType.integer(0,Integer.MAX_VALUE))
-            .executes((command) -> ResourcesClientEvents.trySendingResources(command, ResourceName.WOOD)))));
-
-        evt.getDispatcher().register(Commands.literal("send-ore")
-            .then(Commands.argument("player", EntityArgument.player())
-            .then(Commands.argument("amount", IntegerArgumentType.integer(0,Integer.MAX_VALUE))
-            .executes((command) -> ResourcesClientEvents.trySendingResources(command, ResourceName.ORE)))));
-
         evt.getDispatcher().register(Commands.literal("rts-camera").executes((command) -> {
             OrthoviewClientEvents.tryToToggleEnable();
             return 1;

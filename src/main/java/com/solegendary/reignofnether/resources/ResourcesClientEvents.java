@@ -200,43 +200,4 @@ public class ResourcesClientEvents {
         }
         floatingTexts.removeIf(t -> t.tickAge > FLOATING_TEXT_MAX_AGE);
     }
-
-    public static int trySendingResources(CommandContext<CommandSourceStack> context, ResourceName resourceName) throws CommandSyntaxException {
-        Player thisPlayer = context.getSource().getPlayer();
-        Player sendToPlayer = EntityArgument.getPlayer(context, "player");
-        int amount = IntegerArgumentType.getInteger(context, "amount");
-
-        Resources res = getOwnResources();
-        if (res == null || thisPlayer == null)
-            return 0;
-
-        if (!AlliancesClient.isAllied(thisPlayer.getName().getString(), sendToPlayer.getName().getString())) {
-            thisPlayer.sendSystemMessage(Component.literal(""));
-            thisPlayer.sendSystemMessage(Component.literal(I18n.get("server.resources.reignofnether.not_allies")));
-            thisPlayer.sendSystemMessage(Component.literal(""));
-        }
-
-        switch (resourceName) {
-            case FOOD -> {
-                if (res.food < amount) {
-                    thisPlayer.sendSystemMessage(Component.translatable(I18n.get("server.resources.reignofnether.not_enough_food")));
-                    return 0;
-                }
-            }
-            case WOOD -> {
-                if (res.wood < amount) {
-                    thisPlayer.sendSystemMessage(Component.translatable(I18n.get("server.resources.reignofnether.not_enough_food")));
-                    return 0;
-                }
-            }
-            case ORE -> {
-                if (res.ore < amount) {
-                    thisPlayer.sendSystemMessage(Component.translatable(I18n.get("server.resources.reignofnether.not_enough_food")));
-                    return 0;
-                }
-            }
-        }
-        ResourcesServerboundPacket.sendResources(thisPlayer.getName().getString(), sendToPlayer.getName().getString(), resourceName, amount);
-        return 1;
-    }
 }
