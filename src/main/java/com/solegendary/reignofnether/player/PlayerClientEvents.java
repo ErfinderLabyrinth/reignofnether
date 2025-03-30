@@ -1,5 +1,6 @@
 package com.solegendary.reignofnether.player;
 
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingClientEvents;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientEvents;
@@ -10,6 +11,7 @@ import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
 import com.solegendary.reignofnether.registrars.SoundRegistrar;
 import com.solegendary.reignofnether.research.ResearchClient;
+import com.solegendary.reignofnether.resources.ResourceName;
 import com.solegendary.reignofnether.resources.ResourcesClientEvents;
 import com.solegendary.reignofnether.sandbox.SandboxClientEvents;
 import com.solegendary.reignofnether.startpos.StartPosClientEvents;
@@ -20,8 +22,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.client.event.RegisterClientCommandsEvent;
 import net.minecraftforge.client.event.ScreenEvent;
@@ -44,6 +49,22 @@ public class PlayerClientEvents {
 
     @SubscribeEvent
     public static void onRegisterCommand(RegisterClientCommandsEvent evt) {
+
+        evt.getDispatcher().register(Commands.literal("send-food")
+            .then(Commands.argument("player", EntityArgument.player())
+            .then(Commands.argument("amount", IntegerArgumentType.integer(0,Integer.MAX_VALUE))
+            .executes((command) -> ResourcesClientEvents.trySendingResources(command, ResourceName.FOOD)))));
+
+        evt.getDispatcher().register(Commands.literal("send-wood")
+            .then(Commands.argument("player", EntityArgument.player())
+            .then(Commands.argument("amount", IntegerArgumentType.integer(0,Integer.MAX_VALUE))
+            .executes((command) -> ResourcesClientEvents.trySendingResources(command, ResourceName.WOOD)))));
+
+        evt.getDispatcher().register(Commands.literal("send-ore")
+            .then(Commands.argument("player", EntityArgument.player())
+            .then(Commands.argument("amount", IntegerArgumentType.integer(0,Integer.MAX_VALUE))
+            .executes((command) -> ResourcesClientEvents.trySendingResources(command, ResourceName.ORE)))));
+
         evt.getDispatcher().register(Commands.literal("rts-camera").executes((command) -> {
             OrthoviewClientEvents.tryToToggleEnable();
             return 1;

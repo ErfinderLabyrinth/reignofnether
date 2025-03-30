@@ -10,6 +10,7 @@ import com.solegendary.reignofnether.sandbox.SandboxServer;
 import com.solegendary.reignofnether.tutorial.TutorialServerEvents;
 import com.solegendary.reignofnether.unit.UnitServerEvents;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
+import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
@@ -278,6 +279,32 @@ public class ResourcesServerEvents {
                 bpsExcluded.add(bpAdj);
                 fellAdjacentLogs(bpAdj, bpsExcluded, level);
             }
+        }
+    }
+
+    public static void trySendingResources(String playerGiving, String playerReceiving, ResourceName resourceName, int amount) {
+        if (canAfford(playerGiving, resourceName, amount)) {
+            addSubtractResources(new Resources(playerGiving,
+                resourceName == ResourceName.FOOD ? amount : 0,
+                resourceName == ResourceName.WOOD ? amount : 0,
+                resourceName == ResourceName.ORE ? amount : 0
+            ));
+            String resString = null;
+            switch (resourceName) {
+                case FOOD -> resString = I18n.get("resources.reignofnether.food");
+                case WOOD -> resString = I18n.get("resources.reignofnether.wood");
+                case ORE -> resString = I18n.get("resources.reignofnether.ore");
+            }
+            if (resString != null) {
+                PlayerServerEvents.sendMessageToPlayer(playerGiving, I18n.get("server.resources.reignofnether.sent_resources", amount, resString, playerReceiving));
+                PlayerServerEvents.sendMessageToPlayer(playerReceiving, I18n.get("server.resources.reignofnether.received_resources", amount, resString, playerGiving));
+            }
+        } else {
+            ResourcesClientboundPacket.warnInsufficientResources(playerGiving,
+                resourceName == ResourceName.FOOD,
+                resourceName == ResourceName.WOOD,
+                resourceName == ResourceName.ORE
+            );
         }
     }
 

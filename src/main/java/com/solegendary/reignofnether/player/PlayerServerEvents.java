@@ -388,6 +388,8 @@ public class PlayerServerEvents {
                 } else {
                     level.setDayTime(MONSTER_START_TIME_OF_DAY);
                 }
+            } else {
+                enableAllCheats(playerName);
             }
             ResourcesServerEvents.resetResources(playerName);
 
@@ -573,14 +575,17 @@ public class PlayerServerEvents {
             ) {
                 ResourcesServerEvents.addSubtractResources(new Resources(playerName, 99999, 99999, 99999));
                 UnitServerEvents.maxPopulation = 99999;
-
-                for (String cheatName : singleWordCheats) {
-                    ResearchServerEvents.addCheat(playerName, cheatName);
-                    ResearchClientboundPacket.addCheat(playerName, cheatName);
-                    evt.setCanceled(true);
-                }
+                enableAllCheats(playerName);
+                evt.setCanceled(true);
                 sendMessageToAllPlayers("server.reignofnether.all_cheats", false, playerName);
             }
+        }
+    }
+
+    public static void enableAllCheats(String playerName) {
+        for (String cheatName : singleWordCheats) {
+            ResearchServerEvents.addCheat(playerName, cheatName);
+            ResearchClientboundPacket.addCheat(playerName, cheatName);
         }
     }
 
@@ -681,6 +686,25 @@ public class PlayerServerEvents {
                 player.sendSystemMessage(Component.translatable(msg, formatArgs).withStyle(Style.EMPTY.withBold(true)));
             } else {
                 player.sendSystemMessage(Component.translatable(msg, formatArgs));
+            }
+        }
+    }
+
+    public static void sendMessageToPlayer(String playerName, String msg) {
+        sendMessageToPlayer(playerName, msg, false);
+    }
+
+    public static void sendMessageToPlayer(String playerName, String msg, boolean bold, Object... formatArgs) {
+        for (ServerPlayer player : players) {
+            if (player.getName().getString().equals(playerName)) {
+                player.sendSystemMessage(Component.literal(""));
+                if (bold) {
+                    player.sendSystemMessage(Component.translatable(msg, formatArgs).withStyle(Style.EMPTY.withBold(true)));
+                } else {
+                    player.sendSystemMessage(Component.translatable(msg, formatArgs));
+                }
+                player.sendSystemMessage(Component.literal(""));
+                return;
             }
         }
     }

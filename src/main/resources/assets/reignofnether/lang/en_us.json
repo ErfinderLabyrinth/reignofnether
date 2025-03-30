@@ -158,6 +158,8 @@
     "abilities.reignofnether.consume.error1": "Already at max size!",
     "abilities.reignofnether.consume.error2": "Can only target Magma Cubes or Slimes you own",
     "abilities.reignofnether.consume.error3": "Can only eat equal or smaller Cubes or Slimes",
+    "abilities.reignofnether.spider_climbing_on": "Wall climbing: ON",
+    "abilities.reignofnether.spider_climbing_off": "Wall climbing: OFF",
 
     "abilities.reignofnether.raise_dead": "Raise Dead",
     "abilities.reignofnether.raise_dead.stats": "\uE004  %ds",
@@ -635,6 +637,9 @@
     "server.resources.reignofnether.not_enough_ore": "You don't have enough ore",
     "server.resources.reignofnether.not_enough_pop": "You don't have enough population supply",
     "server.resources.reignofnether.max_pop": "You have reached the maximum population",
+
+    "server.resources.reignofnether.sent_resources": "You gave %d %s to %d!",
+    "server.resources.reignofnether.received_resources": "You received %d %s from %d!",
 
     "research.reignofnether.upgrade_completed": "Upgrade completed: %s",
     "research.reignofnether.advanced_portals": "Advanced Portals",

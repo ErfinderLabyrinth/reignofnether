@@ -3,6 +3,7 @@ package com.solegendary.reignofnether.unit.units.monsters;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.AbilityClientboundPacket;
 import com.solegendary.reignofnether.ability.abilities.Eject;
+import com.solegendary.reignofnether.ability.abilities.SpiderClimbing;
 import com.solegendary.reignofnether.ability.abilities.SpinWebs;
 import com.solegendary.reignofnether.blocks.BlockServerEvents;
 import com.solegendary.reignofnether.hud.AbilityButton;
@@ -36,6 +37,8 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
+import net.minecraft.world.entity.ai.navigation.WallClimberNavigation;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Spider;
 import net.minecraft.world.item.ItemStack;
@@ -139,12 +142,15 @@ public class SpiderUnit extends Spider implements Unit, AttackerUnit, Convertabl
     final static public boolean willRetaliate = true; // will attack when hurt by an enemy
     final static public boolean aggressiveWhenIdle = true;
 
+    private boolean wallClimbing = true;
+
     public int maxResources = 100;
 
     private AbstractMeleeAttackUnitGoal attackGoal;
     private MeleeAttackBuildingGoal attackBuildingGoal;
     private GenericTargetedSpellGoal webGoal;
     public GenericTargetedSpellGoal getWebGoal() { return webGoal; }
+
     @Nullable
     public SpinWebs getWebAbility() {
         for (Ability ability : this.getAbilities())
@@ -160,14 +166,42 @@ public class SpiderUnit extends Spider implements Unit, AttackerUnit, Convertabl
     public SpiderUnit(EntityType<? extends Spider> entityType, Level level) {
         super(entityType, level);
 
-        Eject ab1 = new Eject(this);
+        SpiderClimbing ab1 = new SpiderClimbing(this);
         this.abilities.add(ab1);
-        SpinWebs ab2 = new SpinWebs(this);
+        Eject ab2 = new Eject(this);
         this.abilities.add(ab2);
-        if (level.isClientSide()) {
-            this.abilityButtons.add(ab2.getButton(Keybindings.keyQ));
-            this.abilityButtons.add(ab1.getButton(Keybindings.keyW));
+        SpinWebs ab3 = new SpinWebs(this);
+        this.abilities.add(ab3);
+        updateAbilityButtons();
+    }
+
+    public void updateAbilityButtons() {
+        if (level().isClientSide()) {
+            this.abilityButtons.clear();
+            this.abilityButtons.add(this.abilities.get(0).getButton(Keybindings.keyQ));
+            this.abilityButtons.add(this.abilities.get(1).getButton(Keybindings.keyW));
+            this.abilityButtons.add(this.abilities.get(2).getButton(Keybindings.keyE));
         }
+    }
+
+    public boolean isWallClimbing() { return wallClimbing; }
+
+    public boolean toggleWallClimbing() {
+        wallClimbing = !wallClimbing;
+        if (wallClimbing) {
+            this.navigation = new WallClimberNavigation(this, level());
+        } else {
+            this.navigation = new GroundPathNavigation(this, level());
+        }
+        return wallClimbing;
+    }
+
+    @Override
+    public boolean isClimbing() {
+        if (wallClimbing)
+            return super.isClimbing();
+        else
+            return false;
     }
 
     @Override

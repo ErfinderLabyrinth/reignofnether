@@ -7,6 +7,7 @@ import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.unit.UnitAction;
 import com.solegendary.reignofnether.unit.interfaces.HeroUnit;
+import com.solegendary.reignofnether.unit.interfaces.Unit;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
@@ -81,7 +82,7 @@ public abstract class HeroAbility extends Ability {
             () -> {
                 if (rankUp()) {
                     AbilityServerboundPacket.rankUpAbility(((Entity) hero).getId(), action);
-                    hero.updateAbilityButtons();
+                    ((Unit) hero).updateAbilityButtons();
                 }
                 if (hero.getSkillPoints() <= 0)
                     hero.showRankUpMenu(false);

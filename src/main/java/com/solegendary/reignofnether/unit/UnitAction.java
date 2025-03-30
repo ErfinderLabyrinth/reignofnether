@@ -60,6 +60,7 @@ public enum UnitAction {
     BACK_TO_WORK_BUILDING,
     BACK_TO_WORK_UNIT,
     CONSUME_SLIME,
+    TOGGLE_SPIDER_CLIMBING,
 
     // hero abilities
     BLOOD_MOON,

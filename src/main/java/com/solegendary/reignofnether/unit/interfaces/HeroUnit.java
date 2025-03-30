@@ -17,7 +17,6 @@ public interface HeroUnit {
     void showRankUpMenu(boolean show);
     int getExperience();
     void setExperience(int experience);
-    void updateAbilityButtons();
 
     default void addExperience(int amount) {
         int levelBefore = getHeroLevel();

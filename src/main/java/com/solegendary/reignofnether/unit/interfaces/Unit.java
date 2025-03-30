@@ -76,6 +76,8 @@ public interface Unit {
     public List<ItemStack> getItems();
     public int getMaxResources();
 
+    default public void updateAbilityButtons() {}
+
     // note that attackGoal is specific to unit types
     public MoveToTargetBlockGoal getMoveGoal();
     public SelectedTargetGoal<?> getTargetGoal();
