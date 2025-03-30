@@ -64,19 +64,12 @@ public class UnitSaveData extends SavedData {
         ListTag list = new ListTag();
         this.units.forEach(u -> {
             CompoundTag cTag = new CompoundTag();
-
             cTag.putString("name", u.name);
             cTag.putString("ownerName", u.ownerName);
             cTag.putString("uuid", u.uuid);
-            if (u instanceof Unit unit && Unit.hasAnchor(unit)) {
-                cTag.putInt("anchorPosX", u.anchorPos.getX());
-                cTag.putInt("anchorPosY", u.anchorPos.getY());
-                cTag.putInt("anchorPosZ", u.anchorPos.getZ());
-            } else {
-                cTag.putInt("anchorPosX", 0);
-                cTag.putInt("anchorPosY", 0);
-                cTag.putInt("anchorPosZ", 0);
-            }
+            cTag.putInt("anchorPosX", u.anchorPos.getX());
+            cTag.putInt("anchorPosY", u.anchorPos.getY());
+            cTag.putInt("anchorPosZ", u.anchorPos.getZ());
             list.add(cTag);
 
             ReignOfNether.LOGGER.info("UnitSaveData.save: " + u.ownerName + "|" + u.name + "|" + u.uuid);

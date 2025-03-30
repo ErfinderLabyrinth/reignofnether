@@ -228,7 +228,6 @@ public interface Unit {
             !le.getOnPos().equals(unit.getAnchor())) {
             fullResetBehaviours(unit);
             unit.getMoveGoal().setMoveTarget(unit.getAnchor());
-            System.out.println("retreating!");
         }
     }
 

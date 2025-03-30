@@ -34,7 +34,7 @@ Bugfixes
 [❌] Recreate tutorial world in 1.20.1
 [🟡] Fixed camera centering on the tutorial world
 [🟡] Mounted piglins don't heal from nether terrain
-[❌] Anchors not saving properly?
+[🟡] Anchors not saving properly?
 
 Quality of Life
 ---------------
