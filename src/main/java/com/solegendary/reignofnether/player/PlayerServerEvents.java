@@ -30,6 +30,7 @@ import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.interfaces.WorkerUnit;
 import com.solegendary.reignofnether.unit.packets.UnitSyncClientboundPacket;
+import com.solegendary.reignofnether.unit.units.neutral.KillerRabbitUnit;
 import com.solegendary.reignofnether.util.Faction;
 import com.solegendary.reignofnether.util.MiscUtil;
 import net.minecraft.core.BlockPos;
@@ -43,6 +44,7 @@ import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.monster.Phantom;
 import net.minecraft.world.inventory.MenuConstructor;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
@@ -98,6 +100,7 @@ public class PlayerServerEvents {
     // foodforthought - ignore soft population caps
     // thereisnospoon - allow changing survival wave by clicking the wave indicator and using debug commands
     // slipslopslap - monster units are unaffected by sunlight
+    // thebeastofcaerbannog - spawns the Killer Rabbit
     public static final List<String> singleWordCheats = List.of(
         "warpten",
         "operationcwal",
@@ -387,6 +390,8 @@ public class PlayerServerEvents {
                 } else {
                     level.setDayTime(MONSTER_START_TIME_OF_DAY);
                 }
+            } else {
+                enableAllCheats(playerName);
             }
             ResourcesServerEvents.resetResources(playerName);
 
@@ -482,24 +487,17 @@ public class PlayerServerEvents {
         }
     }
 
-    // commands for ops to give resources
     @SubscribeEvent
     public static void onPlayerChat(ServerChatEvent evt) {
-        /*
-        if (evt.getMessage().getString().equals("test spiders")) {
-            UnitServerEvents.convertAllToUnit(
-                    evt.getPlayer().getName().getString(),
-                    evt.getPlayer().getLevel(),
-                    (LivingEntity entity) ->
-                            entity instanceof SpiderUnit sUnit &&
-                                    sUnit.getOwnerName().equals(evt.getPlayer().getName().getString()),
-                    EntityRegistrar.POISON_SPIDER_UNIT.get()
-            );
-        }*/
         if (evt.getPlayer().hasPermissions(4)) {
             String msg = evt.getMessage().getString();
             String[] words = msg.split(" ");
             String playerName = evt.getPlayer().getName().getString();
+
+            if (words.length == 1 && words[0].equalsIgnoreCase("thebeastofcaerbannog")) {
+                UnitServerEvents.spawnMob(EntityRegistrar.getEntityType("Killer Rabbit"), serverLevel, evt.getPlayer().getOnPos(), playerName);
+                sendMessageToAllPlayers("server.reignofnether.used_cheat",false, playerName, words[0]);
+            }
 
             if (words.length == 2) {
                 try {
@@ -512,7 +510,7 @@ public class PlayerServerEvents {
                                     amount
                             ));
                             evt.setCanceled(true);
-                            sendMessageToAllPlayers("server.reignofnether.used_cheat",
+                            sendMessageToAllPlayers("server.reignofnether.used_cheat_amount",
                                     false,
                                     playerName,
                                     words[0],
@@ -536,7 +534,7 @@ public class PlayerServerEvents {
                                 case "ore" -> ResourcesServerEvents.addSubtractResources(new Resources(playerName, 0, 0, amount));
                             }
                             evt.setCanceled(true);
-                            sendMessageToAllPlayers("server.reignofnether.used_cheat",
+                            sendMessageToAllPlayers("server.reignofnether.used_cheat_amount",
                                     false,
                                     playerName,
                                     words[0] + " " + words[1],
@@ -572,14 +570,17 @@ public class PlayerServerEvents {
             ) {
                 ResourcesServerEvents.addSubtractResources(new Resources(playerName, 99999, 99999, 99999));
                 UnitServerEvents.maxPopulation = 99999;
-
-                for (String cheatName : singleWordCheats) {
-                    ResearchServerEvents.addCheat(playerName, cheatName);
-                    ResearchClientboundPacket.addCheat(playerName, cheatName);
-                    evt.setCanceled(true);
-                }
+                enableAllCheats(playerName);
+                evt.setCanceled(true);
                 sendMessageToAllPlayers("server.reignofnether.all_cheats", false, playerName);
             }
+        }
+    }
+
+    public static void enableAllCheats(String playerName) {
+        for (String cheatName : singleWordCheats) {
+            ResearchServerEvents.addCheat(playerName, cheatName);
+            ResearchClientboundPacket.addCheat(playerName, cheatName);
         }
     }
 
@@ -680,6 +681,25 @@ public class PlayerServerEvents {
                 player.sendSystemMessage(Component.translatable(msg, formatArgs).withStyle(Style.EMPTY.withBold(true)));
             } else {
                 player.sendSystemMessage(Component.translatable(msg, formatArgs));
+            }
+        }
+    }
+
+    public static void sendMessageToPlayer(String playerName, String msg) {
+        sendMessageToPlayer(playerName, msg, false);
+    }
+
+    public static void sendMessageToPlayer(String playerName, String msg, boolean bold, Object... formatArgs) {
+        for (ServerPlayer player : players) {
+            if (player.getName().getString().equals(playerName)) {
+                player.sendSystemMessage(Component.literal(""));
+                if (bold) {
+                    player.sendSystemMessage(Component.translatable(msg, formatArgs).withStyle(Style.EMPTY.withBold(true)));
+                } else {
+                    player.sendSystemMessage(Component.translatable(msg, formatArgs));
+                }
+                player.sendSystemMessage(Component.literal(""));
+                return;
             }
         }
     }

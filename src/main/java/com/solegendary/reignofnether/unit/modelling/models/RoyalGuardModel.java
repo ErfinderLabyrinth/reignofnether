@@ -126,6 +126,17 @@ public class RoyalGuardModel<T extends Entity> extends KeyframeHierarchicalModel
 		this.root().getAllParts().forEach(ModelPart::resetPose);
 		RoyalGuardUnit royalGuard = ((RoyalGuardUnit) entity);
 
+		if (royalGuard.animateScale > 0 && royalGuard.animateScaleReducing) {
+			royalGuard.animateScale -= 0.02f;
+		}
+		if (royalGuard.animateScale <= 0) {
+			royalGuard.animateScale = 1.0f;
+			royalGuard.activeAnimDef = null;
+			royalGuard.activeAnimState = null;
+			royalGuard.animateScaleReducing = false;
+			royalGuard.stopAllAnimations();
+		}
+
 		AttributeInstance ms = royalGuard.getAttribute(Attributes.MOVEMENT_SPEED);
 		if (ms == null)
 			return;

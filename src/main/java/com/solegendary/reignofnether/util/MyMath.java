@@ -205,4 +205,9 @@ public class MyMath {
 
         return new BlockPos((int) x3, originPos.getY(), (int) z3);
     }
+
+    public static double round(double value, int precision) {
+        int scale = (int) Math.pow(10, precision);
+        return (double) Math.round(value * scale) / scale;
+    }
 }

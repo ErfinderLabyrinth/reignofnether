@@ -353,6 +353,13 @@ public class ResourceSources {
                     1,
                     ResourceName.ORE
             ),
+            new ResourceSource("Dripstone",
+                    List.of(Blocks.POINTED_DRIPSTONE),
+                    List.of(Items.POINTED_DRIPSTONE),
+                    20,
+                    1,
+                    ResourceName.ORE
+            ),
             new ResourceSource("Tier 1 Nether Ores",
                     List.of(Blocks.NETHER_QUARTZ_ORE),
                     List.of(Items.QUARTZ),

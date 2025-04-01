@@ -36,7 +36,6 @@ public class Button {
     public static int DEFAULT_ICON_FRAME_SIZE = 22;
     public static int DEFAULT_ICON_SELECTED_FRAME_SIZE = 24;
     public int tooltipOffsetY = 0;
-
     public static final int itemIconSize = DEFAULT_ICON_SIZE;
 
     public ResourceLocation iconResource;
@@ -59,6 +58,8 @@ public class Button {
     public Runnable onLeftClick;
     public Runnable onRightClick;
     public List<FormattedCharSequence> tooltipLines;
+
+    public Supplier<Boolean> isFlashing = () -> false;
 
     // used for cooldown indication, productionItem progress, etc.
     // @ 0.0, appears clear and normal
@@ -237,6 +238,14 @@ public class Button {
                     x + xyDiff + iconFrameSize,
                     y + xyDiff + iconFrameSize,
                     0x99000000); //ARGB(hex); note that alpha ranges between ~0-16, not 0-255
+        }
+
+        if (isFlashing.get()) {
+            guiGraphics.fill(x, y,
+                x + iconFrameSize,
+                y + iconFrameSize,
+                (0xFFFFFF | ((int) (0x80 * MiscUtil.getOscillatingFloat(0,1)) << 24))
+            ); //ARGB(hex); note that alpha ranges between ~0-16, not 0-255
         }
     }
 

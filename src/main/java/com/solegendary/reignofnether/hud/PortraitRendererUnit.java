@@ -7,7 +7,10 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Axis;
+import com.solegendary.reignofnether.ReignOfNether;
+import com.solegendary.reignofnether.unit.interfaces.HeroUnit;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.resources.language.I18n;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import com.solegendary.reignofnether.ability.abilities.EnchantMaiming;
@@ -55,8 +58,7 @@ import java.util.List;
 
 // Renders a Unit's portrait including its animated head, name, healthbar, list of stats and UI frames for these
 
-public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<T>, R extends LivingEntityRenderer<T,
-    M>> {
+public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<T>, R extends LivingEntityRenderer<T, M>> {
     public R renderer;
     public Model model;
 
@@ -196,8 +198,16 @@ public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<
         }
 
         // draw name (unless a player, since their nametag will be rendered anyway)
+        // draw name (unless a player, since their nametag will be rendered anyway)
+        if (entity instanceof HeroUnit heroUnit) {
+            y -= 6;
+            name += I18n.get("hud.hero.reignofnether.level", heroUnit.getHeroLevel());
+        }
         if (!(entity instanceof Player)) {
             guiGraphics.drawString(Minecraft.getInstance().font, name, x + 4, y - 9, 0xFFFFFFFF);
+        }
+        if (entity instanceof HeroUnit heroUnit) {
+            y += 6;
         }
 
         RectZone rectZone = RectZone.getZoneByLW(x, y, frameWidth, frameHeight);
@@ -309,6 +319,31 @@ public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<
             blitYIcon += 10;
         }
         return RectZone.getZoneByLW(x, y, statsWidth, statsHeight);
+    }
+
+    public RectZone renderHeroLevelAndExp(GuiGraphics guiGraphics, int x, int y, int mouseX, int mouseY, HeroUnit heroUnit) {
+        int width = 101;
+        int height = 5;
+        ResourceLocation expBarEmptyRl = new ResourceLocation(ReignOfNether.MOD_ID, "textures/hud/experience_bar_empty.png");
+        RenderSystem.setShaderTexture(0, expBarEmptyRl);
+        guiGraphics.blit(expBarEmptyRl,
+                x, y, 0,
+                0,0, // where on texture to start drawing from
+                width, height, // dimensions of blit texture
+                width, height // size of texture itself (if < dimensions, texture is repeated)
+        );
+        ResourceLocation expBarFullRl = new ResourceLocation(ReignOfNether.MOD_ID, "textures/hud/experience_bar_full.png");
+        RenderSystem.setShaderTexture(0, expBarFullRl);
+        float expPercent = (float) heroUnit.getExpOnCurrentLevel() / heroUnit.getExpToNextlevel();
+        if (heroUnit.getHeroLevel() >= HeroUnit.MAX_HERO_LEVEL)
+            expPercent = 1.0f;
+        guiGraphics.blit(expBarFullRl,
+                x, y, 0,
+                0,0, // where on texture to start drawing from
+                Math.round((float) width * expPercent), height, // dimensions of blit texture
+                width, height // size of texture itself (if < dimensions, texture is repeated)
+        );
+        return RectZone.getZoneByLW(x, y-2, width, height+4);
     }
 
     public RectZone renderResourcesHeld(GuiGraphics guiGraphics, String name, int x, int y, Unit unit) {

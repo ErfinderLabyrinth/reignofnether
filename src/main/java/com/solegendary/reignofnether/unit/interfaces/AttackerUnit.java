@@ -6,6 +6,7 @@ import com.solegendary.reignofnether.building.GarrisonableBuilding;
 import com.solegendary.reignofnether.unit.Relationship;
 import com.solegendary.reignofnether.unit.UnitServerEvents;
 import com.solegendary.reignofnether.unit.goals.*;
+import com.solegendary.reignofnether.unit.units.villagers.RavagerUnit;
 import com.solegendary.reignofnether.util.MiscUtil;
 import com.solegendary.reignofnether.util.MyMath;
 import net.minecraft.core.BlockPos;
@@ -213,7 +214,7 @@ public interface AttackerUnit {
             setUnitAttackTarget(entity);
             return;
         }
-        if (canAttackBuildings()) {
+        if (canAttackBuildings() && !(this instanceof RavagerUnit && ((LivingEntity) this).isVehicle())) {
             Building closestBuilding = MiscUtil.findClosestAttackableBuilding((Mob) this, aggroRange, level);
             if (closestBuilding != null) {
                 ((Unit) this).getMoveGoal().stopMoving();

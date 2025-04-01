@@ -4,16 +4,19 @@ import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.AbilityClientboundPacket;
 import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingUtils;
+import com.solegendary.reignofnether.keybinds.Keybindings;
+import com.solegendary.reignofnether.unit.UnitAnimationAction;
+import com.solegendary.reignofnether.unit.interfaces.Unit;
+import com.solegendary.reignofnether.unit.packets.UnitAnimationClientboundPacket;
 import com.solegendary.reignofnether.util.MyMath;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 
 import javax.annotation.Nullable;
 import java.util.function.Consumer;
 
-public abstract class AbstractCastTargetedSpellGoal extends MoveToTargetBlockGoal {
+public class GenericTargetedSpellGoal extends MoveToTargetBlockGoal {
 
     protected LivingEntity targetEntity = null;
     protected Ability ability; // used for syncing cooldown with clientside
@@ -26,14 +29,32 @@ public abstract class AbstractCastTargetedSpellGoal extends MoveToTargetBlockGoa
     public Consumer<LivingEntity> onEntityCast;
     public Consumer<BlockPos> onGroundCast;
     public Consumer<Building> onBuildingCast;
+    public boolean hasKeyframeAnimations = false;
+    protected int bonusChannelingRange = 0; // extra range added while channeling
+    protected final UnitAnimationAction animationStart;
 
-    public AbstractCastTargetedSpellGoal(Mob mob, int channelTicks, int range,
-                                         @Nullable Consumer<LivingEntity> onEntityCast,
-                                         @Nullable Consumer<BlockPos> onGroundCast,
-                                         @Nullable Consumer<Building> onBuildingCast) {
+    public GenericTargetedSpellGoal(Mob mob, int channelTicks, int range,
+                                    UnitAnimationAction animationStart,
+                                    @Nullable Consumer<LivingEntity> onEntityCast,
+                                    @Nullable Consumer<BlockPos> onGroundCast,
+                                    @Nullable Consumer<Building> onBuildingCast) {
         super(mob, false, 0);
         this.channelTicks = channelTicks;
         this.range = range;
+        this.animationStart = animationStart;
+        this.onEntityCast = onEntityCast;
+        this.onGroundCast = onGroundCast;
+        this.onBuildingCast = onBuildingCast;
+    }
+
+    public GenericTargetedSpellGoal(Mob mob, int channelTicks, int range,
+                                    @Nullable Consumer<LivingEntity> onEntityCast,
+                                    @Nullable Consumer<BlockPos> onGroundCast,
+                                    @Nullable Consumer<Building> onBuildingCast) {
+        super(mob, false, 0);
+        this.channelTicks = channelTicks;
+        this.range = range;
+        this.animationStart = null;
         this.onEntityCast = onEntityCast;
         this.onGroundCast = onGroundCast;
         this.onBuildingCast = onBuildingCast;
@@ -63,13 +84,17 @@ public abstract class AbstractCastTargetedSpellGoal extends MoveToTargetBlockGoa
     }
 
     protected boolean isInRange() {
+        int finalRange = range;
+        if (isCasting())
+            finalRange += bonusChannelingRange;
+
         if (moveTarget != null && MyMath.distance(
                 this.mob.getX(), this.mob.getZ(),
-                moveTarget.getX(), moveTarget.getZ()) <= range)
+                moveTarget.getX(), moveTarget.getZ()) <= finalRange)
             return true;
         if (castTarget != null && MyMath.distance(
                 this.mob.getX(), this.mob.getZ(),
-                castTarget.getX(), castTarget.getZ()) <= range)
+                castTarget.getX(), castTarget.getZ()) <= finalRange)
             return true;
         return false;
     }
@@ -109,7 +134,7 @@ public abstract class AbstractCastTargetedSpellGoal extends MoveToTargetBlockGoa
                     }
                     if (this.ability != null && !this.mob.level().isClientSide())
                         AbilityClientboundPacket.sendSetCooldownPacket(this.mob.getId(), this.ability.action, this.ability.cooldownMax);
-                    this.stop();
+                    this.stopExceptAnimations();
                 }
             }
         }
@@ -118,11 +143,25 @@ public abstract class AbstractCastTargetedSpellGoal extends MoveToTargetBlockGoa
     public void startCasting() {
         this.isCasting = true;
         this.castTarget = moveTarget;
+        if (!this.mob.level().isClientSide()) {
+            if (!hasKeyframeAnimations) {
+                UnitAnimationClientboundPacket.sendBasicPacket(UnitAnimationAction.NON_KEYFRAME_START, this.mob);
+            } else if (animationStart != null) {
+                UnitAnimationClientboundPacket.sendBasicPacket(animationStart, this.mob);
+            }
+        }
     }
     public void stopCasting() {
         this.isCasting = false;
         this.ticksCasting = 0;
         this.castTarget = null;
+        if (!this.mob.level().isClientSide() && ticksCasting < channelTicks) {
+            if (!hasKeyframeAnimations) {
+                UnitAnimationClientboundPacket.sendBasicPacket(UnitAnimationAction.NON_KEYFRAME_STOP, this.mob);
+            } else {
+                UnitAnimationClientboundPacket.sendBasicPacket(UnitAnimationAction.STOP, this.mob);
+            }
+        }
     }
 
     @Override
@@ -130,5 +169,13 @@ public abstract class AbstractCastTargetedSpellGoal extends MoveToTargetBlockGoa
         this.stopMoving();
         this.setTarget((LivingEntity) null);
         this.stopCasting();
+    }
+
+    public void stopExceptAnimations() {
+        this.stopMoving();
+        this.setTarget((LivingEntity) null);
+        this.isCasting = false;
+        this.ticksCasting = 0;
+        this.castTarget = null;
     }
 }

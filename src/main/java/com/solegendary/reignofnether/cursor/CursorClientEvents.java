@@ -169,6 +169,7 @@ public class CursorClientEvents {
             RenderSystem.setShaderTexture(0, TEXTURE_CURSOR);
             texture = TEXTURE_CURSOR;
         }
+        evt.getGuiGraphics().pose().translate(0,0,1000);
         evt.getGuiGraphics().blit(texture,
                 cursorDrawX, cursorDrawY,
                 16,
@@ -176,6 +177,7 @@ public class CursorClientEvents {
                 16, 16,
                 16, 16
         );
+        evt.getGuiGraphics().pose().translate(0,0,-1000);
 
         // ***********************************************
         // Convert cursor on-screen 2d pos to world 3d pos
@@ -197,12 +199,13 @@ public class CursorClientEvents {
 
             Vec3 hitPos = getRefinedCursorWorldPos(cursorWorldPosNear, cursorWorldPosFar);
             cursorWorldPos = new Vector3d(hitPos.x, hitPos.y, hitPos.z);
-            preselectedBlockPos = new BlockPos((int) hitPos.x, (int) hitPos.y, (int) hitPos.z);
+            preselectedBlockPos = new BlockPos((int) Math.floor(hitPos.x), (int) Math.floor(hitPos.y), (int) Math.floor(hitPos.z));
 
             boolean usingPosAbove = false;
 
             // if we clipped a non-solid block (eg. tall grass) search adjacent blocks for a next-best match
-            if (!MC.level.getBlockState(preselectedBlockPos).isSolid()) {
+            /*
+            if (!MiscUtil.isSolidBlocking(MC.level, preselectedBlockPos)) {
                 preselectedBlockPos = getRefinedBlockPos(preselectedBlockPos, cursorWorldPosNear);
                 // disallow selecting a block just below a fluid block
                 if (!MC.level.getBlockState(preselectedBlockPos.above()).getFluidState().isEmpty()) {
@@ -210,6 +213,7 @@ public class CursorClientEvents {
                     usingPosAbove = true;
                 }
             }
+             */
             if (!usingPosAbove &&
                     !BuildingUtils.isPosInsideAnyBuilding(true, preselectedBlockPos) &&
                     BuildingUtils.isPosInsideAnyBuilding(true, preselectedBlockPos.above()) &&
@@ -461,10 +465,12 @@ public class CursorClientEvents {
             BlockHitResult result = d0 <= d1 ? blockhitresult : blockhitresult1;
 
             if (result != null) {
-                Block block = level.getBlockState(result.getBlockPos()).getBlock();
+                BlockState bs = level.getBlockState(result.getBlockPos());
                 if (OrthoviewClientEvents.shouldHideLeaves() && level.getBlockState(result.getBlockPos()).getBlock() instanceof LeavesBlock)
                     result = null;
-                else if (block instanceof SnowLayerBlock)
+                else if (!MiscUtil.isSolidBlocking(level, result.getBlockPos()) && bs.getFluidState().isEmpty())
+                    result = null;
+                else if (bs.getBlock() instanceof SnowLayerBlock)
                     result = null;
             }
             return result;
@@ -523,7 +529,7 @@ public class CursorClientEvents {
                     isBlockSelectableResource = ResourceSources.getFromBlockPos(block, MC.level) != null;
 
                 BlockState bs = MC.level.getBlockState(block);
-                if ((bs.isSolid() || isBlockSelectableResource) &&
+                if ((MiscUtil.isSolidBlocking(MC.level, block) || isBlockSelectableResource) &&
                         (!(bs.getBlock() instanceof LeavesBlock) || !OrthoviewClientEvents.shouldHideLeaves()) &&
                         !(bs.getBlock() instanceof SnowLayerBlock) &&
                         MyMath.rayIntersectsAABBCustom(cursorWorldPosNear, lookVector, new AABB(block)) &&

@@ -76,6 +76,8 @@ public interface Unit {
     public List<ItemStack> getItems();
     public int getMaxResources();
 
+    default public void updateAbilityButtons() {}
+
     // note that attackGoal is specific to unit types
     public MoveToTargetBlockGoal getMoveGoal();
     public SelectedTargetGoal<?> getTargetGoal();
@@ -194,7 +196,9 @@ public interface Unit {
             } else if (unit.getFaction() == Faction.PIGLINS &&
                     le.tickCount % PIGLIN_HEALING_TICKS == 0 &&
                     !(unit instanceof Slime) &&
-                    (NetherBlocks.isNetherBlock(le.level(), le.getOnPos()) || unit instanceof GhastUnit)) {
+                    ((le.getVehicle() != null && NetherBlocks.isNetherBlock(le.level(), le.getVehicle().getOnPos())) ||
+                    NetherBlocks.isNetherBlock(le.level(), le.getOnPos()) ||
+                    unit instanceof GhastUnit)) {
                 le.heal(1);
             }
         }
@@ -224,7 +228,6 @@ public interface Unit {
             !le.getOnPos().equals(unit.getAnchor())) {
             fullResetBehaviours(unit);
             unit.getMoveGoal().setMoveTarget(unit.getAnchor());
-            System.out.println("retreating!");
         }
     }
 

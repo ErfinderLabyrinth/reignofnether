@@ -9,6 +9,7 @@ import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.unit.Checkpoint;
+import com.solegendary.reignofnether.unit.UnitAnimationAction;
 import com.solegendary.reignofnether.unit.goals.*;
 import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.RangedAttackerUnit;
@@ -127,12 +128,12 @@ public class EvokerUnit extends Evoker implements Unit, AttackerUnit, RangedAtta
 
     // endregion
 
-    private CastFangsGoal castFangsGoal;
-    public CastFangsGoal getCastFangsGoal() {
+    private GenericTargetedSpellGoal castFangsGoal;
+    public GenericTargetedSpellGoal getCastFangsGoal() {
         return castFangsGoal;
     }
-    private CastSummonVexesGoal castSummonVexesGoal;
-    public CastSummonVexesGoal getCastSummonVexesGoal() {
+    private GenericUntargetedSpellGoal castSummonVexesGoal;
+    public GenericUntargetedSpellGoal getCastSummonVexesGoal() {
         return castSummonVexesGoal;
     }
 
@@ -222,8 +223,17 @@ public class EvokerUnit extends Evoker implements Unit, AttackerUnit, RangedAtta
         this.garrisonGoal = new GarrisonGoal(this);
         this.attackGoal = new UnitBowAttackGoal<>(this);
         this.returnResourcesGoal = new ReturnResourcesGoal(this);
-        this.castFangsGoal = new CastFangsGoal(this, FANGS_CHANNEL_SECONDS * ResourceCost.TICKS_PER_SECOND, FANGS_RANGE_LINE, this::createEvokerFangs);
-        this.castSummonVexesGoal = new CastSummonVexesGoal(this);
+        this.castFangsGoal = new GenericTargetedSpellGoal(this,
+            FANGS_CHANNEL_SECONDS * ResourceCost.TICKS_PER_SECOND, FANGS_RANGE_LINE,
+            this::createEvokerFangs, null, null
+        );
+        this.castSummonVexesGoal = new GenericUntargetedSpellGoal(
+            this,
+            4 * ResourceCost.TICKS_PER_SECOND,
+            this::summonVexes,
+            UnitAnimationAction.NON_KEYFRAME_START,
+            UnitAnimationAction.NON_KEYFRAME_STOP
+        );
     }
 
     @Override

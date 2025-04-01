@@ -1,8 +1,11 @@
 package com.solegendary.reignofnether.resources;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.math.Axis;
-import org.joml.Vector3f;
+import com.solegendary.reignofnether.alliance.AlliancesClient;
 import com.solegendary.reignofnether.hud.HudClientEvents;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
@@ -12,6 +15,8 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -86,7 +91,7 @@ public class ResourcesClientEvents {
             HudClientEvents.showTemporaryMessage(loc);
 
             // remove checkpoints from a failed building placement since the client has no knowledge of resource costs
-            if (loc.contains("You don't have enough")) {
+            if (msg.contains("not_enough")) {
                 for (LivingEntity entity : getSelectedUnits())
                     if (entity instanceof Unit unit)
                         if (((Entity) unit).level().isClientSide() && !Keybindings.shiftMod.isDown())
@@ -121,15 +126,15 @@ public class ResourcesClientEvents {
 
         int tickAge = 0;
         if (res.food > 0) {
-            floatingTexts.add(new FloatingText("+" + res.food + "  \uD83D\uDD0D", pos, tickAge));
+            floatingTexts.add(new FloatingText("+" + res.food + "  \uE000", pos, tickAge));
             tickAge -= 25;
         }
         if (res.wood > 0) {
-            floatingTexts.add(new FloatingText("+" + res.wood + "  ✓", pos, tickAge));
+            floatingTexts.add(new FloatingText("+" + res.wood + "  \uE001", pos, tickAge));
             tickAge -= 25;
         }
         if (res.ore > 0) {
-            floatingTexts.add(new FloatingText("+" + res.ore + "  ■", pos, tickAge));
+            floatingTexts.add(new FloatingText("+" + res.ore + "  \uE002", pos, tickAge));
         }
     }
 
@@ -163,6 +168,7 @@ public class ResourcesClientEvents {
                     poseStack.scale(-0.05F, -0.05F, 0.05F);
                 }
                 Font font = MC.font;
+
                 float f2 = (float) (-font.width(component) / 2);
                 float f1 = Minecraft.getInstance().options.getBackgroundOpacity(0.25F);
                 float alphaPercent =
@@ -176,7 +182,7 @@ public class ResourcesClientEvents {
                 int textCol = 0x00FFFFFF + ((int) (0xFF * alphaPercent) << 24);
                 int bgCol = (int) (f1 * 255.0F * alphaPercent) << 24;
 
-                font.drawInBatch(component.getString(),
+                font.drawInBatch(component,
                     f2,
                     0,
                     textCol,
@@ -185,7 +191,7 @@ public class ResourcesClientEvents {
                     MC.renderBuffers().bufferSource(),
                     Font.DisplayMode.NORMAL,
                     bgCol,
-                    255, false
+                    255
                 );
 
                 poseStack.popPose();

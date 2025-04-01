@@ -1,5 +1,5 @@
 
-1.19.2-1.1.3a
+1.19.2-1.1.4
 
 [✔] Done and tested
 [🟡] Partially done and/or needs testing
@@ -8,19 +8,35 @@
 
 Features
 --------
-
+HEROES (in order of priority)
+    - spells
+    - spell animations
+    - spell particles
+    - levelling and exp
+        - exp bar/level number above portrait, below name
+    - spell levelling and requirements
+    - mana?
+    - equipment
 
 
 Bugfixes
 --------
-[✔] Fixed Pillagers not attacking
-[✔] Healing fountains now remove their water blocks when deleted
-[✔] Beacon win timers are now saved between server restarts
+[❌] Prevent superflat worlds generating regular worlds after a certain range
+[❌] Kicked for sending too many packets when spam clicking large army (rate-limit in server.properties?)
 
+
+Quality of Life
+---------------
 
 
 Balancing
 ---------
+- Nerf sculk amplifiers? (can reduce damage)
+- Nerf ravager artillery? (take away bonus damage?)
+- Buff creepers?
+- Give witches autocast and attack move
+    - Make AOE spherical instead of hemispherical
+    - Add antifire and healing potions with upgrades
 
 
 Villagers

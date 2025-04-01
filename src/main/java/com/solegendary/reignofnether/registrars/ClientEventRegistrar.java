@@ -15,6 +15,7 @@ import com.solegendary.reignofnether.gamerules.GameruleServerEvents;
 import com.solegendary.reignofnether.guiscreen.TopdownGuiClientEvents;
 import com.solegendary.reignofnether.healthbars.HealthBarClientEvents;
 import com.solegendary.reignofnether.attackwarnings.AttackWarningClientEvents;
+import com.solegendary.reignofnether.hero.HeroServerEvents;
 import com.solegendary.reignofnether.hud.HudClientEvents;
 import com.solegendary.reignofnether.hud.TitleClientEvents;
 import com.solegendary.reignofnether.minimap.MinimapClientEvents;
@@ -90,5 +91,6 @@ public class ClientEventRegistrar {
         vanillaEventBus.register(GameModeServerEvents.class);
         vanillaEventBus.register(StartPosServerEvents.class);
         vanillaEventBus.register(AlliancesServerEvents.class);
+        vanillaEventBus.register(HeroServerEvents.class);
     }
 }

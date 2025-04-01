@@ -126,6 +126,10 @@ public abstract class AbstractMeleeAttackUnitGoal extends Goal {
         }
     }
 
+    public void checkAndPerformAttackIgnoreDist(LivingEntity target) {
+        checkAndPerformAttack(target, 0);
+    }
+
     protected void checkAndPerformAttack(LivingEntity target, double distSqr) {
         double d = this.getAttackReachSqr(target);
         if (distSqr <= d && this.ticksUntilNextAttack <= 0) {

@@ -2,6 +2,14 @@ package com.solegendary.reignofnether.unit.units.piglins;
 
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.Eject;
+import com.solegendary.reignofnether.ability.heroAbilities.monster.BloodMoon;
+import com.solegendary.reignofnether.ability.heroAbilities.monster.InsomniaCurse;
+import com.solegendary.reignofnether.ability.heroAbilities.monster.RaiseDead;
+import com.solegendary.reignofnether.ability.heroAbilities.monster.SoulSiphonPassive;
+import com.solegendary.reignofnether.ability.heroAbilities.piglin.FancyFeast;
+import com.solegendary.reignofnether.ability.heroAbilities.piglin.GreedIsGoodPassive;
+import com.solegendary.reignofnether.ability.heroAbilities.piglin.LootExplosion;
+import com.solegendary.reignofnether.ability.heroAbilities.piglin.ThrowTNT;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.resources.ResourceCost;
@@ -71,6 +79,11 @@ public class PiglinMerchantUnit extends Piglin implements Unit, AttackerUnit, He
     public ReturnResourcesGoal getReturnResourcesGoal() {return returnResourcesGoal;}
     public int getMaxResources() {return maxResources;}
 
+    public GenericTargetedSpellGoal castFancyFeastGoal;
+    public GenericTargetedSpellGoal castFancyFeastGoal() {
+        return castFancyFeastGoal;
+    }
+
     private MoveToTargetBlockGoal moveGoal;
     private SelectedTargetGoal<? extends LivingEntity> targetGoal;
     private ReturnResourcesGoal returnResourcesGoal;
@@ -121,6 +134,16 @@ public class PiglinMerchantUnit extends Piglin implements Unit, AttackerUnit, He
 
     // endregion
 
+    private int skillPoints = 10;
+    private int experience = 10000;
+    private boolean rankUpMenuOpen = false;
+    @Override public int getSkillPoints() { return skillPoints; }
+    @Override public void setSkillPoints(int points) { skillPoints = points; }
+    @Override public boolean isRankUpMenuOpen() { return rankUpMenuOpen; }
+    @Override public void showRankUpMenu(boolean show) { rankUpMenuOpen = show; }
+    @Override public int getExperience() { return experience; }
+    @Override public void setExperience(int amount) { experience = amount; }
+
     final static public float attackDamage = 6.0f;
     final static public float attacksPerSecond = 0.45f;
     final static public float attackRange = 2; // only used by ranged units or melee building attackers
@@ -170,16 +193,43 @@ public class PiglinMerchantUnit extends Piglin implements Unit, AttackerUnit, He
                 animateScale = 1.0f;
                 startAnimation(PiglinMerchantAnimations.ATTACK);
             }
+            case CHARGE_SPELL -> {
+                activeAnimDef = PiglinMerchantAnimations.SPELL_CHARGE;
+                activeAnimState = spellChargeAnimState;
+                animateScale = 1.0f;
+                startAnimation(activeAnimDef);
+            }
+            case CAST_SPELL -> {
+                activeAnimDef = PiglinMerchantAnimations.SPELL_ACT;
+                activeAnimState = spellActivateAnimState;
+                animateScale = 1.0f;
+                startAnimation(activeAnimDef);
+            }
         }
     }
 
     public PiglinMerchantUnit(EntityType<? extends Piglin> entityType, Level level) {
         super(entityType, level);
 
-        Eject ab1 = new Eject(this);
+        ThrowTNT ab1 = new ThrowTNT(this);
+        FancyFeast ab2 = new FancyFeast(this);
+        GreedIsGoodPassive ab3 = new GreedIsGoodPassive(this);
+        LootExplosion ab4 = new LootExplosion(this);
         this.abilities.add(ab1);
-        if (level.isClientSide())
-            this.abilityButtons.add(ab1.getButton(Keybindings.keyQ));
+        this.abilities.add(ab2);
+        this.abilities.add(ab3);
+        this.abilities.add(ab4);
+        updateAbilityButtons();
+    }
+
+    public void updateAbilityButtons() {
+        if (level().isClientSide()) {
+            this.abilityButtons.clear();
+            this.abilityButtons.add(this.abilities.get(0).getButton(Keybindings.keyQ));
+            this.abilityButtons.add(this.abilities.get(1).getButton(Keybindings.keyW));
+            this.abilityButtons.add(this.abilities.get(2).getButton(Keybindings.keyE));
+            this.abilityButtons.add(this.abilities.get(3).getButton(Keybindings.keyR));
+        }
     }
 
     @Override
@@ -211,19 +261,8 @@ public class PiglinMerchantUnit extends Piglin implements Unit, AttackerUnit, He
         Unit.tick(this);
         AttackerUnit.tick(this);
 
-        if (level().isClientSide()) {
-            if (animateTicks > 0) {
-                animateTicks -= 1;
-            }
-            if (animateScale > 0 && animateScaleReducing) {
-                animateScale -= 0.1f;
-            }
-            if (animateScale <= 0) {
-                activeAnimDef = null;
-                activeAnimState = null;
-                animateScaleReducing = false;
-                stopAllAnimations();
-            }
+        if (level().isClientSide() && animateTicks > 0) {
+            animateTicks -= 1;
         }
     }
 

@@ -120,8 +120,8 @@ public class OrthoviewClientEvents {
 
     public static void setMinOrthoviewY(double value) {
         minOrthoviewY = value;
-        if (MC.level != null && MC.player != null && MC.player.getY() < value) {
-            MC.player.move(MoverType.SELF, new Vec3(0, minOrthoviewY - MC.player.getY(), 0));
+        if (MC.level != null && MC.player != null && MC.player.getY() < value + 15) {
+            MC.player.move(MoverType.SELF, new Vec3(0, minOrthoviewY - MC.player.getY() + 15, 0));
         }
     }
 
@@ -157,7 +157,7 @@ public class OrthoviewClientEvents {
             int avgHeight = count > 0 ? sumHeights / count : playerPos.getY();
 
             // Update ORTHOVIEW values based on the average height
-            orthoviewPlayerBaseY = Math.max(avgHeight + 40, minOrthoviewY);
+            orthoviewPlayerBaseY = Math.max(avgHeight + 30, minOrthoviewY);
             orthoviewPlayerMaxY = avgHeight + 100;
         }
     }

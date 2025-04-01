@@ -1,6 +1,5 @@
 package com.solegendary.reignofnether.tutorial;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingClientEvents;
@@ -68,19 +67,19 @@ public class TutorialClientEvents {
 
     private static final ArrayList<Building> damagedBuildings = new ArrayList<>();
 
+
     // all these positions are for camera only, actual spawn locations differ slightly on the serverside
-    private static final Vec3i SPAWN_POS = new Vec3i(-2950, 0, -1166);
-    public static final Vec3i BUILD_CAM_POS = new Vec3i(-2944, 0, -1200);
+    private static final Vec3i SPAWN_CAM_POS = new Vec3i(-2960, 0, -1156);
+    public static final Vec3i BUILD_CAM_POS = new Vec3i(-2954, 0, -1190);
+    private static final Vec3i WOOD_CAM_POS = new Vec3i(-2929, 0, -1186);
+    private static final Vec3i ORE_CAM_POS = new Vec3i(-2961, 0, -1214);
+    private static final Vec3i FOOD_CAM_POS = new Vec3i(-2949, 0, -1163);
+    private static final Vec3i MONSTER_CAM_POS = new Vec3i(-2993, 64, -1189);
+    private static final Vec3i BRIDGE_CAM_POS = new Vec3i(-3007, 0, -1196);
+    private static final Vec3i ARMY_CAM_POS = new Vec3i(-2973, 64, -1150);
+
     public static final Vec3i BUILD_CAPITOL_POS = new Vec3i(-2936, 67, -1217);
-    private static final Vec3i WOOD_POS = new Vec3i(-2919, 0, -1196);
-    private static final Vec3i ORE_POS = new Vec3i(-2951, 0, -1224);
-    private static final Vec3i FOOD_POS = new Vec3i(-2939, 0, -1173);
-
-    private static final Vec3i MONSTER_CAMERA_POS = new Vec3i(-2983, 64, -1199);
     private static final Vec3i MONSTER_BASE_POS = new Vec3i(-3085, 72, -1277);
-
-    private static final Vec3i BRIDGE_POS = new Vec3i(-2997, 0, -1206);
-    private static final Vec3i ARMY_POS = new Vec3i(-2963, 64, -1160);
 
     private static Supplier<Boolean> shouldPauseTicking = () -> false;
 
@@ -430,7 +429,7 @@ public class TutorialClientEvents {
                     progressStageAfterDelay(120);
                 } else if (stageProgress == 1) {
                     msg("tutorial.reignofnether.spawn_villagers");
-                    OrthoviewClientEvents.forceMoveCam(SPAWN_POS, 50);
+                    OrthoviewClientEvents.forceMoveCam(SPAWN_CAM_POS, 50);
                     OrthoviewClientEvents.lockCam();
                     nextStageAfterDelay(100);
                 }
@@ -614,7 +613,7 @@ public class TutorialClientEvents {
                     progressStageAfterDelay(120);
                 } else if (stageProgress == 1) {
                     msg("tutorial.reignofnether.forest");
-                    OrthoviewClientEvents.forceMoveCam(WOOD_POS, 100);
+                    OrthoviewClientEvents.forceMoveCam(WOOD_CAM_POS, 100);
                     progressStageAfterDelay(120);
                 } else if (stageProgress == 2) {
                     msg("tutorial.reignofnether.gather_wood");
@@ -642,7 +641,7 @@ public class TutorialClientEvents {
                     progressStageAfterDelay(100);
                 } else if (stageProgress == 1) {
                     msg("tutorial.reignofnether.beach_ore");
-                    OrthoviewClientEvents.forceMoveCam(ORE_POS, 50);
+                    OrthoviewClientEvents.forceMoveCam(ORE_CAM_POS, 50);
                     progressStageAfterDelay(120);
                 } else if (stageProgress == 2) {
                     msg("tutorial.reignofnether.click_ore");
@@ -669,7 +668,7 @@ public class TutorialClientEvents {
                     msg("tutorial.reignofnether.gather_food");
                     progressStageAfterDelay(120);
                 } else if (stageProgress == 1) {
-                    OrthoviewClientEvents.forceMoveCam(FOOD_POS, 50);
+                    OrthoviewClientEvents.forceMoveCam(FOOD_CAM_POS, 50);
                     TutorialServerboundPacket.doServerAction(TutorialAction.SPAWN_ANIMALS);
                     msg("tutorial.reignofnether.pigs");
                     progressStageAfterDelay(140);
@@ -844,7 +843,7 @@ public class TutorialClientEvents {
                     msg("tutorial.reignofnether.monster_attack");
                     TutorialServerboundPacket.doServerAction(TutorialAction.SET_NIGHT_TIME);
                     TutorialServerboundPacket.doServerAction(TutorialAction.SPAWN_MONSTERS_A);
-                    OrthoviewClientEvents.forceMoveCam(MONSTER_CAMERA_POS, 50);
+                    OrthoviewClientEvents.forceMoveCam(MONSTER_CAM_POS, 50);
                     progressStageAfterDelay(120);
                 }
                 if (stageProgress == 1) {
@@ -869,7 +868,7 @@ public class TutorialClientEvents {
                         .isEmpty()) {
                         msg("tutorial.reignofnether.more_incoming");
                         TutorialServerboundPacket.doServerAction(TutorialAction.SPAWN_MONSTERS_B);
-                        OrthoviewClientEvents.forceMoveCam(MONSTER_CAMERA_POS, 50);
+                        OrthoviewClientEvents.forceMoveCam(MONSTER_CAM_POS, 50);
                         progressStageAfterDelay(100);
                     }
                 } else if (stageProgress == 4) {
@@ -943,7 +942,7 @@ public class TutorialClientEvents {
                     msg("tutorial.reignofnether.build_bridge");
                     progressStageAfterDelay(100);
                 } else if (stageProgress == 2) {
-                    OrthoviewClientEvents.forceMoveCam(BRIDGE_POS, 50);
+                    OrthoviewClientEvents.forceMoveCam(BRIDGE_CAM_POS, 50);
                     msg("tutorial.reignofnether.build_bridge2");
                     setHelpButtonText("tutorial.reignofnether.build_bridge3");
                     progressStage();
@@ -977,7 +976,7 @@ public class TutorialClientEvents {
                 if (stageProgress == 0) {
                     msg("tutorial.reignofnether.reinforcements");
                     TutorialServerboundPacket.doServerAction(TutorialAction.SPAWN_FRIENDLY_ARMY);
-                    OrthoviewClientEvents.forceMoveCam(ARMY_POS, 50);
+                    OrthoviewClientEvents.forceMoveCam(ARMY_CAM_POS, 50);
                     progressStageAfterDelay(160);
                 } else if (stageProgress == 1) {
                     msg("tutorial.reignofnether.iron_golem");

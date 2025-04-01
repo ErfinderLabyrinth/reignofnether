@@ -131,6 +131,17 @@ public class PiglinMerchantModel<T extends Entity> extends KeyframeHierarchicalM
 		this.root().getAllParts().forEach(ModelPart::resetPose);
 		PiglinMerchantUnit merchant = ((PiglinMerchantUnit) entity);
 
+		if (merchant.animateScale > 0 && merchant.animateScaleReducing) {
+			merchant.animateScale -= 0.02f;
+		}
+		if (merchant.animateScale <= 0) {
+			merchant.animateScale = 1.0f;
+			merchant.activeAnimDef = null;
+			merchant.activeAnimState = null;
+			merchant.animateScaleReducing = false;
+			merchant.stopAllAnimations();
+		}
+
 		AttributeInstance ms = merchant.getAttribute(Attributes.MOVEMENT_SPEED);
 		if (ms == null)
 			return;

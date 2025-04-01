@@ -1,5 +1,6 @@
 package com.solegendary.reignofnether.registrars;
 
+import com.solegendary.reignofnether.ability.AbilityServerboundPacket;
 import com.solegendary.reignofnether.alliance.AllianceClientboundAddPacket;
 import com.solegendary.reignofnether.alliance.AllianceClientboundRemovePacket;
 import com.solegendary.reignofnether.ReignOfNether;
@@ -17,6 +18,7 @@ import com.solegendary.reignofnether.gamerules.GameruleClientboundPacket;
 import com.solegendary.reignofnether.gamerules.GameruleServerboundPacket;
 import com.solegendary.reignofnether.guiscreen.TopdownGuiServerboundPacket;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientboundPacket;
+import com.solegendary.reignofnether.hero.HeroClientboundPacket;
 import com.solegendary.reignofnether.player.PlayerClientboundPacket;
 import com.solegendary.reignofnether.player.PlayerServerboundPacket;
 import com.solegendary.reignofnether.research.ResearchClientboundPacket;
@@ -136,6 +138,10 @@ public final class PacketHandler {
                 .encoder(AbilityClientboundPacket::encode).decoder(AbilityClientboundPacket::new)
                 .consumerMainThread(AbilityClientboundPacket::handle).add();
 
+        INSTANCE.messageBuilder(AbilityServerboundPacket.class, index++, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(AbilityServerboundPacket::encode).decoder(AbilityServerboundPacket::new)
+                .consumerMainThread(AbilityServerboundPacket::handle).add();
+
         INSTANCE.messageBuilder(EnchantAbilityServerboundPacket.class, index++, NetworkDirection.PLAY_TO_SERVER)
                 .encoder(EnchantAbilityServerboundPacket::encode).decoder(EnchantAbilityServerboundPacket::new)
                 .consumerMainThread(EnchantAbilityServerboundPacket::handle).add();
@@ -248,6 +254,12 @@ public final class PacketHandler {
                 .encoder(StartPosClientboundPacket::encode)
                 .decoder(StartPosClientboundPacket::new)
                 .consumerMainThread(StartPosClientboundPacket::handle)
+                .add();
+
+        INSTANCE.messageBuilder(HeroClientboundPacket.class, index++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(HeroClientboundPacket::encode)
+                .decoder(HeroClientboundPacket::new)
+                .consumerMainThread(HeroClientboundPacket::handle)
                 .add();
     }
 }

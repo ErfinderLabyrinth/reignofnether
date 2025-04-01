@@ -8,9 +8,9 @@ import com.solegendary.reignofnether.registrars.BlockRegistrar;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
 import com.solegendary.reignofnether.resources.*;
 import com.solegendary.reignofnether.unit.TargetResourcesSave;
-import com.solegendary.reignofnether.unit.packets.UnitSyncClientboundPacket;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.interfaces.WorkerUnit;
+import com.solegendary.reignofnether.unit.packets.UnitSyncClientboundPacket;
 import com.solegendary.reignofnether.unit.units.villagers.VillagerUnit;
 import com.solegendary.reignofnether.unit.units.villagers.VillagerUnitProfession;
 import com.solegendary.reignofnether.util.MiscUtil;
@@ -21,7 +21,6 @@ import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.AABB;
 
 import javax.annotation.Nullable;
@@ -295,8 +294,9 @@ public class GatherResourcesGoal extends MoveToTargetBlockGoal {
                         gatherTicksLeft = DEFAULT_MAX_GATHER_TICKS;
                         ResourceName resourceName = ResourceSources.getBlockResourceName(this.data.gatherTarget, mob.level());
 
-                        boolean isLogBlock = isLogBlock(this.mob.level().getBlockState(data.gatherTarget));
-                        boolean isFallingLogBlock = isFallingLogBlock(this.mob.level().getBlockState(data.gatherTarget));
+                        BlockState bs = this.mob.level().getBlockState(data.gatherTarget);
+                        boolean isLogBlock = isLogBlock(bs);
+                        boolean isFallingLogBlock = isFallingLogBlock(bs);
                         if (isLogBlock)
                             ResourcesServerEvents.fellAdjacentLogs(data.gatherTarget, new ArrayList<>(), this.mob.level());
 
@@ -305,7 +305,7 @@ public class GatherResourcesGoal extends MoveToTargetBlockGoal {
                             expName = ResourceName.FOOD;
                         else if (ResourceSources.getBlockResourceName(getGatherTarget(), mob.level()) == ResourceName.WOOD && (isLogBlock || isFallingLogBlock))
                             expName = ResourceName.WOOD;
-                        else if (ResourceSources.getBlockResourceName(getGatherTarget(), mob.level()) == ResourceName.ORE)
+                        else if (ResourceSources.getBlockResourceName(getGatherTarget(), mob.level()) == ResourceName.ORE && bs.getBlock() != Blocks.POINTED_DRIPSTONE)
                             expName = ResourceName.ORE;
 
                         if (mob.level().destroyBlock(data.gatherTarget, false)) {
@@ -320,7 +320,7 @@ public class GatherResourcesGoal extends MoveToTargetBlockGoal {
                             }
 
                             // replace workers' mine ores with cobble to prevent creating potholes
-                            if (data.targetResourceSource.resourceName == ResourceName.ORE) {
+                            if (data.targetResourceSource.resourceName == ResourceName.ORE && bsTarget.getBlock() != Blocks.POINTED_DRIPSTONE) {
                                 BlockState replaceBs;
                                 if (BuildingUtils.isInNetherRange(mob.level().isClientSide(), data.gatherTarget))
                                     replaceBs = BlockRegistrar.WALKABLE_MAGMA_BLOCK.get().defaultBlockState();

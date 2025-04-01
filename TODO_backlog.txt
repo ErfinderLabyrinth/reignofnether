@@ -6,20 +6,15 @@
 Features
 --------
 
-[❌] Piglin mines
-    - Static defense for piglins, but can also be used to siege
-    - When built, can be exploded manaully (or set to autoexplode on nearby enemies approaching)
-    - Explodes into combination of soulsand and magma
+[❌] Import the Bedrock Minecraft Movie addon piglins
 
+[❌] Add basic controls for non-rts units (so you can control modded units)
 
+[❌] Config to allow changing resource block values, including modded blocks
 
 
 Bugfixes
 --------
-
-[❌] Workers on a building that is still auto-building the foundation layer actually slows down building
-
-[❌] Central portals sometimes do not ignite (and this somehow makes grunts spawn underground)
 
 [❌] Dying in survival puts you in a bugged survival mode
 
@@ -33,16 +28,16 @@ Quality of Life Features
 
 [❌] Added /gamerule for bridges over void
 
-[❌] Save transport portal links between server restarts
-
 [❌] restore ores on /rts-reset
     - Have to track each ore block when it is mined or converted into nether terrain
 
-
+[❌] buff/debuff icons in vertical list to right of unit stats
+    - potion effects
+    - auras
+    - hero passives
+    - enchantments
 
 Balancing
 ---------
 
 [❌] Soulfires created by blazes need to be made temporary
-
-[❌] let allied survival players use transport portals

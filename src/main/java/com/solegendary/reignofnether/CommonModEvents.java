@@ -106,6 +106,9 @@ public class CommonModEvents {
         evt.registerEntityRenderer(EntityRegistrar.PANDA_UNIT.get(), PandaRenderer::new);
         evt.registerEntityRenderer(EntityRegistrar.WOLF_UNIT.get(), WolfRenderer::new);
         evt.registerEntityRenderer(EntityRegistrar.LLAMA_UNIT.get(), LlamaUnitRenderer::new);
+
+        evt.registerEntityRenderer(EntityRegistrar.PHANTOM_SUMMON.get(), PhantomRenderer::new);
+        evt.registerEntityRenderer(EntityRegistrar.KILLER_RABBIT_UNIT.get(), RabbitRenderer::new);
     }
 
     @SubscribeEvent
@@ -115,6 +118,7 @@ public class CommonModEvents {
         evt.put(EntityRegistrar.PANDA_UNIT.get(), PandaUnit.createAttributes().build());
         evt.put(EntityRegistrar.WOLF_UNIT.get(), WolfUnit.createAttributes().build());
         evt.put(EntityRegistrar.LLAMA_UNIT.get(), WolfUnit.createAttributes().build());
+        evt.put(EntityRegistrar.PHANTOM_SUMMON.get(), PhantomSummon.createAttributes().build());
 
         evt.put(EntityRegistrar.ZOMBIE_UNIT.get(), ZombieUnit.createAttributes().build());
         evt.put(EntityRegistrar.ZOMBIE_PIGLIN_UNIT.get(), ZombiePiglinUnit.createAttributes().build());
@@ -150,7 +154,7 @@ public class CommonModEvents {
         evt.put(EntityRegistrar.ROYAL_GUARD_UNIT.get(), RoyalGuardUnit.createAttributes().build());
         evt.put(EntityRegistrar.NECROMANCER_UNIT.get(), NecromancerUnit.createAttributes().build());
         evt.put(EntityRegistrar.PIGLIN_MERCHANT_UNIT.get(), PiglinMerchantUnit.createAttributes().build());
-
+        evt.put(EntityRegistrar.KILLER_RABBIT_UNIT.get(), KillerRabbitUnit.createAttributes().build());
     }
 
     @SubscribeEvent
@@ -214,7 +218,6 @@ public class CommonModEvents {
             event.accept(ItemRegistrar.ROYAL_GUARD_UNIT_SPAWN_EGG);
             event.accept(ItemRegistrar.NECROMANCER_UNIT_SPAWN_EGG);
             event.accept(ItemRegistrar.PIGLIN_MERCHANT_UNIT_SPAWN_EGG);
-
         }
     }
 }

@@ -15,7 +15,7 @@ import net.minecraft.world.level.Level;
 public class Ability {
     public final UnitAction action; // null for worker building production items (handled specially in BuildingClientEvents)
     public final Level level;
-    public final float cooldownMax;
+    public float cooldownMax;
     private float cooldown = 0;
     public final float range; // if <= 0, is melee
     public final float radius; // if <= 0, is single target

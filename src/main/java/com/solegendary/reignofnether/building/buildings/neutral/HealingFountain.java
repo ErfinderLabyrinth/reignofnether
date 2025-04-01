@@ -87,9 +87,13 @@ public class HealingFountain extends Building implements RangeIndicator {
                 LivingEntity.class,
                 this.level);
 
-        for (LivingEntity le : nearbyEntities)
-            if (isBuilt && tickAgeAfterBuilt % 100 == 0) // only 1hp/4s
-                le.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 100, 0));
+        for (LivingEntity le : nearbyEntities) {
+            if (isBuilt && tickAgeAfterBuilt % 20 == 0)  {
+                // this actually isn't enough to cause a healing tick, but is just for effects
+                le.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 20, 0));
+                le.heal(Math.min(1, le.getMaxHealth() / 100));
+            }
+        }
 
         // spawn random healing particle
         if (!waterBlocks.isEmpty() && isBuilt) {
