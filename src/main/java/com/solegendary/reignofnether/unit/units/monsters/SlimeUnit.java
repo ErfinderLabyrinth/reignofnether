@@ -380,7 +380,6 @@ public class SlimeUnit extends Slime implements Unit, AttackerUnit {
     }
 
     // break leaves that are touched
-    /*
     public void aiStep() {
         super.aiStep();
         if (this.isAlive() && getSize() >= 2) {
@@ -409,7 +408,6 @@ public class SlimeUnit extends Slime implements Unit, AttackerUnit {
             }
         }
     }
-     */
 
     // stop moving if we overshoot our move target
     private double lastDistToMoveTargetSqr = 9999;

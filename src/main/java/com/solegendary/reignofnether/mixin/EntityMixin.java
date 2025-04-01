@@ -78,47 +78,4 @@ public abstract class EntityMixin {
         float percent = (float)Math.min(this.getTicksFrozen(), 140) / (float)i;
         cir.setReturnValue(Math.min(percent, 0.5f));
     }
-
-    @Inject(
-            method = "collide",
-            at = @At("TAIL"),
-            cancellable = true
-    )
-    public void collide(Vec3 pVec, CallbackInfoReturnable<Vec3> cir) {
-        if (!getName().getString().contains("magma"))
-            return;
-
-        Vec3 result = cir.getReturnValue();
-
-        boolean isNearLeafOrLog = false;
-
-        AABB aabb = getBoundingBox().inflate(0.5f);
-        outerloop:
-        for (int x = (int) aabb.minX; x < aabb.maxX; x++) {
-            for (int y = (int) aabb.minY; y < aabb.maxY; y++) {
-                for (int z = (int) aabb.minZ; z < aabb.maxZ; z++) {
-                    BlockState bs = level().getBlockState(new BlockPos(x,y,z));
-                    if (BlockUtils.isLogBlock(bs) ||
-                        BlockUtils.isFallingLogBlock(bs) ||
-                        BlockUtils.isLeafBlock(bs)) {
-                        isNearLeafOrLog = true;
-                        break outerloop;
-                    }
-                }
-            }
-        }
-        if (!isNearLeafOrLog)
-            return;
-
-        BlockState bs = level().getBlockState(getOnPos());
-        BlockState bsBelow = level().getBlockState(getOnPos().below());
-
-        if (BlockUtils.isLogBlock(bs) || BlockUtils.isLogBlock(bsBelow) ||
-            BlockUtils.isFallingLogBlock(bs) || BlockUtils.isFallingLogBlock(bsBelow) ||
-            BlockUtils.isLeafBlock(bs) || BlockUtils.isLeafBlock(bsBelow)) {
-            cir.setReturnValue(new Vec3(pVec.x, pVec.y, pVec.z));
-        } else {
-            cir.setReturnValue(new Vec3(pVec.x, result.y, pVec.z));
-        }
-    }
 }

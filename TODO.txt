@@ -32,10 +32,10 @@ Bugfixes
 [❌] Prevent superflat worlds generating regular worlds after a certain range
 [❌] Kicked for sending too many packets when spam clicking large army (rate-limit in server.properties?)
 
-[❌] gui scale not working?
+
 
 [✔] Recreate tutorial world in 1.20.1
-[🟡] Fixed camera centering on the tutorial world
+[✔] Fixed camera centering on the tutorial world
 [✔] Mounted piglins don't heal from nether terrain
 [✔] Anchors are now saved correctly on server restart
 
@@ -46,15 +46,14 @@ Quality of Life
     /sendwood <playername> <amount>
     /sendore <playername> <amount>
 
+[✔] GUI scale in RTS camera now matches your options, but cannot be higher than 3
 [✔] Ravagers that are mounted no longer automatically aggro onto buildings
     - This prevents them hurting themselves from their own splash damage
-[🟡] Spiders now have a button to toggle whether they climb on walls or not
-[🟡] Slimes and magma cubes can now no-clip through log and leaf blocks
+[✔] Spiders now have a button to toggle whether they climb on walls or not
 [✔] Turn cheats on by default for sandbox mode
 [✔] Healing Fountains now heal 1% of hp per second instead of a flat rate, up to a maximum of 1hp/s
-[🟡] Dripstone is now mineable by workers, worth 1 ore each
+[✔] Dripstone is now mineable by workers, worth 1 ore each
 
-[✔] language updates
 
 Balancing
 ---------

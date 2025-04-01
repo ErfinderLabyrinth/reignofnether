@@ -24,7 +24,7 @@ public class TopdownGuiClientEvents {
     private static final Minecraft MC = Minecraft.getInstance();
     private static int noScreenTicks = 0; // ticks that no screen has been opened
     private static boolean shouldPause = false;
-    private static final int GUI_SCALE_MOD = 3;
+    private static final int MAX_GUI_SCALE_MOD = 3;
 
     // if no other screen is open and we've got orthoview enabled, open a screen based on shouldPause
     @SubscribeEvent
@@ -59,7 +59,9 @@ public class TopdownGuiClientEvents {
     @SubscribeEvent
     public static void onScreenOpen(ScreenEvent.Opening evt) {
         if (evt.getScreen() instanceof TopdownGui) {
-            int i = MC.getWindow().calculateScale(GUI_SCALE_MOD, MC.isEnforceUnicode());
+            int i = MC.getWindow().calculateScale(Math.min(MAX_GUI_SCALE_MOD, MC.options.guiScale().get()), MC.isEnforceUnicode());
+            if (MC.options.guiScale().get() == 0)
+                i = MAX_GUI_SCALE_MOD;
             MC.getWindow().setGuiScale(i);
         } else {
             int i = MC.getWindow().calculateScale(MC.options.guiScale().get(), MC.isEnforceUnicode());
