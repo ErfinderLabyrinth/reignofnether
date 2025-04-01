@@ -18,14 +18,6 @@ HEROES (in order of priority)
     - mana?
     - equipment
 
-[✔] Updated the base Minecraft version to 1.20.1
-    - Moving forward, 1.19.2 is no longer supported
-    - Servers can't load worlds that were created before the worldgen datapack was integrated into the mod
-        - To resolve this, just delete the datapacks folder in that world
-        - To load them in single
-
-[✔] Added a new cheatcode: thebeastofcaerbannog
-    - Not even Ghasts are safe from it :smiling_devil:
 
 Bugfixes
 --------
@@ -33,26 +25,8 @@ Bugfixes
 [❌] Kicked for sending too many packets when spam clicking large army (rate-limit in server.properties?)
 
 
-
-[✔] Recreate tutorial world in 1.20.1
-[✔] Fixed camera centering on the tutorial world
-[✔] Mounted piglins don't heal from nether terrain
-[✔] Anchors are now saved correctly on server restart
-
 Quality of Life
 ---------------
-[✔] Added commands to send resources to allies:
-    /sendfood <playername> <amount>
-    /sendwood <playername> <amount>
-    /sendore <playername> <amount>
-
-[✔] GUI scale in RTS camera now matches your options, but cannot be higher than 3
-[✔] Ravagers that are mounted no longer automatically aggro onto buildings
-    - This prevents them hurting themselves from their own splash damage
-[✔] Spiders now have a button to toggle whether they climb on walls or not
-[✔] Turn cheats on by default for sandbox mode
-[✔] Healing Fountains now heal 1% of hp per second instead of a flat rate, up to a maximum of 1hp/s
-[✔] Dripstone is now mineable by workers, worth 1 ore each
 
 
 Balancing
