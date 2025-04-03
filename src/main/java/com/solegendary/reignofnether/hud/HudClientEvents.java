@@ -22,6 +22,7 @@ import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.minimap.MinimapClientEvents;
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
 import com.solegendary.reignofnether.player.PlayerClientEvents;
+import com.solegendary.reignofnether.research.ResearchClient;
 import com.solegendary.reignofnether.resources.ResourceName;
 import com.solegendary.reignofnether.resources.ResourceSources;
 import com.solegendary.reignofnether.resources.Resources;
@@ -33,6 +34,7 @@ import com.solegendary.reignofnether.startpos.StartPosClientEvents;
 import com.solegendary.reignofnether.survival.SurvivalClientEvents;
 import com.solegendary.reignofnether.tutorial.TutorialClientEvents;
 import com.solegendary.reignofnether.tutorial.TutorialStage;
+import com.solegendary.reignofnether.unit.NonUnitClientEvents;
 import com.solegendary.reignofnether.unit.Relationship;
 import com.solegendary.reignofnether.unit.UnitAction;
 import com.solegendary.reignofnether.unit.UnitClientEvents;
@@ -960,6 +962,25 @@ public class HudClientEvents {
                         blitY += iconFrameSize;
                     }
                 }
+            }
+        }
+        // -----------------
+        // Non-unit controls
+        // -----------------
+        else if (!getSelectedUnits().isEmpty() && NonUnitClientEvents.canControlNonUnits()) {
+            blitX = 0;
+            blitY = screenHeight - iconFrameSize;
+            ArrayList<Button> actionButtons = new ArrayList<>();
+
+            if (NonUnitClientEvents.canAttack(getSelectedUnits().get(0)))
+                actionButtons.add(ActionButtons.ATTACK);
+
+            actionButtons.add(ActionButtons.STOP);
+
+            for (Button actionButton : actionButtons) {
+                actionButton.render(evt.getGuiGraphics(), blitX, blitY, mouseX, mouseY);
+                renderedButtons.add(actionButton);
+                blitX += iconFrameSize;
             }
         }
 

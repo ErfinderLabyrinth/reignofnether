@@ -100,6 +100,7 @@ public class PlayerServerEvents {
     // foodforthought - ignore soft population caps
     // thereisnospoon - allow changing survival wave by clicking the wave indicator and using debug commands
     // slipslopslap - monster units are unaffected by sunlight
+    // wouldyoukindly - allow control of non-unit mobs in RTS mode
     // thebeastofcaerbannog - spawns the Killer Rabbit
     public static final List<String> singleWordCheats = List.of(
         "warpten",
@@ -108,7 +109,8 @@ public class PlayerServerEvents {
         "medievalman",
         "foodforthought",
         "thereisnospoon",
-        "slipslopslap"
+        "slipslopslap",
+        "wouldyoukindly"
     );
 
     public static void saveRTSPlayers() {

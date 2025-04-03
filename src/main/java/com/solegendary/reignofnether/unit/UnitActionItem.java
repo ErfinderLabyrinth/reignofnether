@@ -6,7 +6,8 @@ import com.solegendary.reignofnether.building.BuildingUtils;
 import com.solegendary.reignofnether.building.GarrisonableBuilding;
 import com.solegendary.reignofnether.building.buildings.piglins.Portal;
 import com.solegendary.reignofnether.hud.HudClientEvents;
-import com.solegendary.reignofnether.keybinds.Keybindings;
+import com.solegendary.reignofnether.research.ResearchClient;
+import com.solegendary.reignofnether.research.ResearchServerEvents;
 import com.solegendary.reignofnether.resources.ResourceName;
 import com.solegendary.reignofnether.resources.ResourceSources;
 import com.solegendary.reignofnether.sandbox.SandboxClientEvents;
@@ -22,7 +23,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.pathfinder.Path;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -357,12 +360,10 @@ public class UnitActionItem {
             HudClientEvents.setLowestCdHudEntity();
         }
 
-        if (this.selectedBuildingPos.equals(new BlockPos(0, 0, 0))) {
-            return;
+        Building actionableBuilding = null;
+        if (!this.selectedBuildingPos.equals(new BlockPos(0, 0, 0))) {
+            actionableBuilding = BuildingUtils.findBuilding(level.isClientSide(), this.selectedBuildingPos);
         }
-
-        Building actionableBuilding = BuildingUtils.findBuilding(level.isClientSide(), this.selectedBuildingPos);
-
         if (actionableBuilding != null) {
             for (Ability ability : actionableBuilding.getAbilities()) {
                 if (ability.action == action && (ability.isOffCooldown() || ability.canBypassCooldown())) {
@@ -372,6 +373,39 @@ public class UnitActionItem {
                         ability.use(level, actionableBuilding, preselectedBlockPos);
                     }
                 }
+            }
+        }
+
+        ArrayList<PathfinderMob> actionableNonUnits = new ArrayList<>();
+        for (int id : unitIds) {
+            Entity entity = level.getEntity(id);
+            if (entity instanceof PathfinderMob mob) {
+                actionableNonUnits.add(mob);
+            }
+        }
+
+        if ((level.isClientSide() && NonUnitClientEvents.canControlNonUnits()) ||
+            (!level.isClientSide() && NonUnitServerEvents.canControlNonUnits(level, ownerName))) {
+
+            for (PathfinderMob mob : actionableNonUnits) {
+                if (mob instanceof Unit)
+                    continue;
+
+                mob.getNavigation().stop();
+                mob.setTarget(null);
+
+                if (action == UnitAction.MOVE) {
+                    mob.getNavigation().stop();
+                    BlockPos bp = preselectedBlockPos;
+                    Path path = mob.getNavigation().createPath(bp.getX(), bp.getY(), bp.getZ(), 0);
+                    mob.getNavigation().moveTo(path, 1);
+                } else if (action == UnitAction.ATTACK) {
+                    if (level.getEntity(unitId) instanceof LivingEntity le) {
+                        mob.setTarget(le);
+                    }
+                }
+                if (!level.isClientSide())
+                    NonUnitServerEvents.controlledNonUnits.add(mob);
             }
         }
     }

@@ -19,10 +19,22 @@ HEROES (in order of priority)
     - equipment
 
 
+Controlling non-RoN mobs
+------------------------
+
+[❌] Continue moving past the follow range
+    - echo the original packet once we reach the end goal
+    [❌] Sending a move command doesn't immediately enact the move if the unit has a target
+
+[❌] Allow selecting multiple non-units, but do not mix with units (and prioritise units)
+    - Also allow double-click to select multiple
+
+[❌] Attack move (just make it a move action but don't cancel NearestAttackableTargetGoal)
+
+
 Bugfixes
 --------
-[❌] Prevent superflat worlds generating regular worlds after a certain range
-[❌] Kicked for sending too many packets when spam clicking large army (rate-limit in server.properties?)
+
 
 
 Quality of Life

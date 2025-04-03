@@ -15,6 +15,7 @@ Features
 
 Bugfixes
 --------
+[❌] Kicked for sending too many packets when spam clicking large army (rate-limit in server.properties?)
 
 [❌] Dying in survival puts you in a bugged survival mode
 

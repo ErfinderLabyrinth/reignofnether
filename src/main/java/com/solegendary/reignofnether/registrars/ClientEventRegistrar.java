@@ -35,6 +35,8 @@ import com.solegendary.reignofnether.tps.TPSClientEvents;
 import com.solegendary.reignofnether.tps.TPSServerEvents;
 import com.solegendary.reignofnether.tutorial.TutorialClientEvents;
 import com.solegendary.reignofnether.tutorial.TutorialServerEvents;
+import com.solegendary.reignofnether.unit.NonUnitClientEvents;
+import com.solegendary.reignofnether.unit.NonUnitServerEvents;
 import com.solegendary.reignofnether.unit.UnitClientEvents;
 import com.solegendary.reignofnether.unit.UnitServerEvents;
 import com.solegendary.reignofnether.worldborder.WorldBorderClientEvents;
@@ -73,6 +75,7 @@ public class ClientEventRegistrar {
         vanillaEventBus.register(WorldBorderClientEvents.class);
         vanillaEventBus.register(SurvivalClientEvents.class);
         vanillaEventBus.register(StartPosClientEvents.class);
+        vanillaEventBus.register(NonUnitClientEvents.class);
 
         // to allow singleplayer integrated server to work
         vanillaEventBus.register(GameruleServerEvents.class);
@@ -92,5 +95,6 @@ public class ClientEventRegistrar {
         vanillaEventBus.register(StartPosServerEvents.class);
         vanillaEventBus.register(AlliancesServerEvents.class);
         vanillaEventBus.register(HeroServerEvents.class);
+        vanillaEventBus.register(NonUnitServerEvents.class);
     }
 }
