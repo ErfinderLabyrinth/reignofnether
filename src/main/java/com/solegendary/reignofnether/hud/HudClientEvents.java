@@ -23,10 +23,7 @@ import com.solegendary.reignofnether.minimap.MinimapClientEvents;
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
 import com.solegendary.reignofnether.player.PlayerClientEvents;
 import com.solegendary.reignofnether.research.ResearchClient;
-import com.solegendary.reignofnether.resources.ResourceName;
-import com.solegendary.reignofnether.resources.ResourceSources;
-import com.solegendary.reignofnether.resources.Resources;
-import com.solegendary.reignofnether.resources.ResourcesClientEvents;
+import com.solegendary.reignofnether.resources.*;
 import com.solegendary.reignofnether.sandbox.SandboxActionButtons;
 import com.solegendary.reignofnether.sandbox.SandboxClientEvents;
 import com.solegendary.reignofnether.sandbox.SandboxMenuType;
@@ -55,6 +52,7 @@ import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
@@ -62,6 +60,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.item.BannerItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.event.RenderLivingEvent;
@@ -76,6 +75,7 @@ import java.util.*;
 import static com.solegendary.reignofnether.hud.buttons.HelperButtons.*;
 import static com.solegendary.reignofnether.tutorial.TutorialClientEvents.helpButton;
 import static com.solegendary.reignofnether.unit.UnitClientEvents.*;
+import static com.solegendary.reignofnether.util.MiscUtil.capitaliseAndSpace;
 import static com.solegendary.reignofnether.util.MiscUtil.fcs;
 
 public class HudClientEvents {
@@ -167,13 +167,16 @@ public class HudClientEvents {
                     .replace(".none", "");
             }
         } else {
-            return entity.getName().getString();
+            return entity.getName().getString().toLowerCase();
         }
     }
 
     // not to be used for resource paths
     public static String getModifiedEntityName(Entity entity) {
         String name = getSimpleEntityName(entity);
+
+        if (!(entity instanceof Unit))
+            return name.toLowerCase();
 
         ItemStack itemStack = ((LivingEntity) entity).getItemBySlot(EquipmentSlot.HEAD);
 
@@ -619,12 +622,7 @@ public class HudClientEvents {
                 int totalRes = Resources.getTotalResourcesFromItems(unit.getItems()).getTotalValue();
 
                 if (hudSelectedEntity instanceof Mob mob && mob.canPickUpLoot() && totalRes > 0) {
-                    hudZones.add(portraitRendererUnit.renderResourcesHeld(evt.getGuiGraphics(),
-                        nameCap,
-                        blitX,
-                        blitY,
-                        unit
-                    ));
+                    hudZones.add(portraitRendererUnit.renderResourcesHeld(evt.getGuiGraphics(), blitX, blitY, unit));
 
                     // return button
                     if (getPlayerToEntityRelationship(hudSelectedEntity) == Relationship.OWNED) {
@@ -645,7 +643,11 @@ public class HudClientEvents {
                         renderedButtons.add(returnButton);
                     }
                 }
+            } else if (ResourceSources.isHuntableAnimal(hudSelectedEntity)) {
+                hudZones.add(portraitRendererUnit.renderResourcesHeld(evt.getGuiGraphics(), blitX, blitY, (Animal) hudSelectedEntity));
+                blitX += portraitRendererUnit.statsWidth;
             }
+
             if (hudSelectedEntity instanceof Unit unit
                 && Resources.getTotalResourcesFromItems(unit.getItems()).getTotalValue() > 0) {
                 blitX += portraitRendererUnit.statsWidth + 5;
@@ -661,7 +663,7 @@ public class HudClientEvents {
         blitY = screenHeight - iconFrameSize * 2 - 10;
 
         for (LivingEntity unit : selUnits) {
-            if (getPlayerToEntityRelationship(unit) == Relationship.OWNED && unitButtons.size() < (buttonsPerRow * 2)) {
+            if ((getPlayerToEntityRelationship(unit) == Relationship.OWNED || NonUnitClientEvents.canControlNonUnits()) && unitButtons.size() < (buttonsPerRow * 2)) {
                 // mob head icon
                 String unitName = getSimpleEntityName(unit);
                 String buttonImagePath;
@@ -690,7 +692,7 @@ public class HudClientEvents {
                         }
                     },
                     null,
-                    null
+                    List.of(fcs(capitaliseAndSpace(getModifiedEntityName(unit))))
                 );
                 if (unit.isVehicle()) {
                     String passengerName = getSimpleEntityName(unit.getFirstPassenger());
@@ -739,17 +741,17 @@ public class HudClientEvents {
                         for (int i = selUnits.size() - numExtraUnits; i < selUnits.size(); i++) {
 
                             LivingEntity unit = selUnits.get(i);
-                            LivingEntity nextUnit = null;
-                            String unitName = HudClientEvents.getSimpleEntityName(unit);
+                            LivingEntity nextUnit;
+                            String unitName = HudClientEvents.getModifiedEntityName(unit);
                             String nextUnitName = null;
                             numUnits += 1;
 
                             if (i < selUnits.size() - 1) {
                                 nextUnit = selUnits.get(i + 1);
-                                nextUnitName = HudClientEvents.getSimpleEntityName(nextUnit);
+                                nextUnitName = HudClientEvents.getModifiedEntityName(nextUnit);
                             }
                             if (!unitName.equals(nextUnitName)) {
-                                tooltipLines.add(FormattedCharSequence.forward("x" + numUnits + " " + I18n.get(unitName),
+                                tooltipLines.add(FormattedCharSequence.forward("x" + numUnits + " " + capitaliseAndSpace(unitName),
                                     Style.EMPTY
                                 ));
                                 numUnits = 0;

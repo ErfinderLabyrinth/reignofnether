@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.tags.BlockTags;
+import org.apache.commons.lang3.text.WordUtils;
 import org.joml.Vector3d;
 import com.solegendary.reignofnether.alliance.AlliancesClient;
 import com.solegendary.reignofnether.blocks.RTSStartBlock;
@@ -602,5 +603,12 @@ public class MiscUtil {
     public static boolean isSolidBlocking(Level level, BlockPos bp) {
         BlockState bs = level.getBlockState(bp);
         return !bs.getCollisionShape(level, bp).isEmpty() && bs.isSolid();
+    }
+
+    public static String capitaliseAndSpace(String str) {
+        String spacedStr = str.replace('_', ' ');
+        spacedStr = spacedStr.replace('-', ' ');
+        spacedStr = spacedStr.replace('.', ' ');
+        return WordUtils.capitalize(spacedStr);
     }
 }

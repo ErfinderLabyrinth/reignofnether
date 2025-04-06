@@ -8,9 +8,12 @@ import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Axis;
 import com.solegendary.reignofnether.ReignOfNether;
+import com.solegendary.reignofnether.resources.ResourceSource;
+import com.solegendary.reignofnether.resources.ResourceSources;
 import com.solegendary.reignofnether.unit.interfaces.HeroUnit;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.world.entity.animal.Animal;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import com.solegendary.reignofnether.ability.abilities.EnchantMaiming;
@@ -346,10 +349,23 @@ public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<
         return RectZone.getZoneByLW(x, y-2, width, height+4);
     }
 
-    public RectZone renderResourcesHeld(GuiGraphics guiGraphics, String name, int x, int y, Unit unit) {
 
-        int totalRes = Resources.getTotalResourcesFromItems(unit.getItems()).getTotalValue();
+    public RectZone renderResourcesHeld(GuiGraphics guiGraphics, int x, int y, Unit unit) {
+        Resources resources = Resources.getTotalResourcesFromItems(unit.getItems());
+        return renderResourcesHeld(guiGraphics, x, y, resources, Unit.atMaxResources(unit));
+    }
 
+    public RectZone renderResourcesHeld(GuiGraphics guiGraphics, int x, int y, Animal animal) {
+        Resources resources = new Resources("",0,0,0);
+        for (ItemStack itemStack : ResourceSources.getFoodItemsFromAnimal(animal)) {
+            ResourceSource res = ResourceSources.getFromItem(itemStack.getItem());
+            if (res != null)
+                resources.food += res.resourceValue * itemStack.getCount();
+        }
+        return renderResourcesHeld(guiGraphics, x, y, resources, false);
+    }
+
+    public RectZone renderResourcesHeld(GuiGraphics guiGraphics, int x, int y, Resources resources, boolean redText) {
         MyRenderer.renderFrameWithBg(guiGraphics, x, y, statsWidth, statsHeight, 0xA0000000);
 
         int blitXIcon = x + 6;
@@ -362,7 +378,6 @@ public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<
             new ResourceLocation("reignofnether", "textures/icons/items/wood.png"),
             new ResourceLocation("reignofnether", "textures/icons/items/iron_ore.png")
         );
-        Resources resources = Resources.getTotalResourcesFromItems(unit.getItems());
 
         List<String> statStrings = List.of(String.valueOf(resources.food),
             String.valueOf(resources.wood),
@@ -379,18 +394,15 @@ public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<
                     statStrings.get(i),
                     blitXIcon + 12,
                     blitYIcon,
-                    Unit.atMaxResources(unit) ? 0xFF2525 : 0xFFFFFF
+                    redText ? 0xFF2525 : 0xFFFFFF
                 );
                 blitYIcon += 10;
             }
         }
-
-
         return RectZone.getZoneByLW(x, y, statsWidth, statsHeight);
     }
 
     private void drawEntityOnScreen(PoseStack poseStack, LivingEntity entity, int x, int y, int size) {
-
         float f = (float) Math.atan(-lookX / 40F);
         float g = (float) Math.atan(-lookY / 40F);
         PoseStack poseStackModel = RenderSystem.getModelViewStack();

@@ -25,16 +25,17 @@ Controlling non-RoN mobs
 [🟡] Attack move (just make it a move action but don't cancel NearestAttackableTargetGoal)
     - Still only attacks whatever is naturally aggroed with these goals...
 
+[❌] Render GUI for selecting multiple non-units
 
 Bugfixes
 --------
 [🟡] Can no longer send resources to a non-RTS ally
-
+[🟡] Misc language fixes and additions
 
 Quality of Life
 ---------------
 [🟡] Updated /rts-help list
-
+[🟡] Huntable animals now show their food value next to their portrait
 
 
 Balancing
