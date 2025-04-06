@@ -1,7 +1,5 @@
 package com.solegendary.reignofnether.orthoview;
 
-import org.joml.Matrix4f;
-import org.joml.Vector3d;
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.building.BuildingClientEvents;
 import com.solegendary.reignofnether.building.BuildingPlacement;
@@ -41,11 +39,11 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.event.*;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFW;
 
 import java.nio.DoubleBuffer;
-import java.nio.FloatBuffer;
 import java.util.List;
 
 import static com.solegendary.reignofnether.util.MiscUtil.fcs;

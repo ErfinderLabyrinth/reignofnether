@@ -111,7 +111,7 @@ public interface Unit {
             }
         }
         for (Ability ability : unit.getAbilities())
-            ability.tickCooldown(unitMob.level);
+            ability.tickCooldown(unitMob.level());
 
         // ------------- CHECKPOINT LOGIC ------------- //
         if (unitMob.level().isClientSide()) {

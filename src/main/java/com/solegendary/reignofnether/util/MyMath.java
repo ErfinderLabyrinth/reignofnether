@@ -7,12 +7,13 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3d;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.lang.Math.abs;
 import static net.minecraft.util.Mth.cos;
 import static net.minecraft.util.Mth.sin;
+import static net.minecraft.util.Mth.abs;
 
 public class MyMath {
 

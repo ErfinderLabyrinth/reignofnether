@@ -43,7 +43,7 @@ public class BridgePlacement extends BuildingPlacement {
         if (!(bs.getBlock() instanceof FenceBlock)) {
             for (BlockPos bpAdj : List.of(bp.below(), bp.north(), bp.south(), bp.east(), bp.west())) {
                 BlockState bsAdj = level.getBlockState(bpAdj);
-                if (bsAdj.getMaterial().isLiquid())
+                if (!bsAdj.getFluidState().isEmpty())
                     level.setBlockAndUpdate(bp, bsAdj);
             }
         }

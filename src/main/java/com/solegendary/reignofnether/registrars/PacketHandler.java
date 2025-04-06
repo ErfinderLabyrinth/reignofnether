@@ -1,8 +1,8 @@
 package com.solegendary.reignofnether.registrars;
 
-import com.solegendary.reignofnether.ability.AbilityServerboundPacket;
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.ability.AbilityClientboundPacket;
+import com.solegendary.reignofnether.ability.AbilityServerboundPacket;
 import com.solegendary.reignofnether.ability.EnchantAbilityServerboundPacket;
 import com.solegendary.reignofnether.alliance.AllianceClientboundAddPacket;
 import com.solegendary.reignofnether.alliance.AllianceClientboundRemovePacket;
@@ -19,7 +19,6 @@ import com.solegendary.reignofnether.gamemode.GameModeServerboundPacket;
 import com.solegendary.reignofnether.gamerules.GameruleClientboundPacket;
 import com.solegendary.reignofnether.gamerules.GameruleServerboundPacket;
 import com.solegendary.reignofnether.guiscreen.TopdownGuiServerboundPacket;
-import com.solegendary.reignofnether.fogofwar.FogOfWarClientboundPacket;
 import com.solegendary.reignofnether.hero.HeroClientboundPacket;
 import com.solegendary.reignofnether.player.PlayerClientboundPacket;
 import com.solegendary.reignofnether.player.PlayerServerboundPacket;

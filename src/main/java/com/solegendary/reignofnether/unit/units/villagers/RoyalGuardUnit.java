@@ -17,7 +17,6 @@ import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.HeroUnit;
 import com.solegendary.reignofnether.unit.interfaces.KeyframeAnimated;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
-import com.solegendary.reignofnether.unit.modelling.animations.PiglinMerchantAnimations;
 import com.solegendary.reignofnether.unit.modelling.animations.RoyalGuardAnimations;
 import com.solegendary.reignofnether.util.Faction;
 import net.minecraft.client.animation.AnimationDefinition;
@@ -216,10 +215,10 @@ public class RoyalGuardUnit extends Vindicator implements Unit, AttackerUnit, He
     public void updateAbilityButtons() {
         if (level().isClientSide()) {
             this.abilityButtons.clear();
-            this.abilityButtons.add(this.abilities.get(0).getButton(Keybindings.keyQ));
-            this.abilityButtons.add(this.abilities.get(1).getButton(Keybindings.keyW));
-            this.abilityButtons.add(this.abilities.get(2).getButton(Keybindings.keyE));
-            this.abilityButtons.add(this.abilities.get(3).getButton(Keybindings.keyR));
+            this.abilityButtons.add(this.abilities.get(0).getButton(Keybindings.keyQ, this));
+            this.abilityButtons.add(this.abilities.get(1).getButton(Keybindings.keyW, this));
+            this.abilityButtons.add(this.abilities.get(2).getButton(Keybindings.keyE, this));
+            this.abilityButtons.add(this.abilities.get(3).getButton(Keybindings.keyR, this));
         }
     }
 

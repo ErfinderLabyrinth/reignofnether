@@ -24,7 +24,7 @@ public class FlameSanctuaryPlacement extends ProductionPlacement{
             if (bs.hasBlockEntity()) {
                 BlockEntity be = this.getLevel().getBlockEntity(bp);
                 if (be instanceof SpawnerBlockEntity sbe)
-                    sbe.getSpawner().setEntityId(EntityType.BLAZE);
+                    sbe.getSpawner().setEntityId(EntityType.BLAZE, getLevel(), getLevel().random, bp);
             }
         }
     }

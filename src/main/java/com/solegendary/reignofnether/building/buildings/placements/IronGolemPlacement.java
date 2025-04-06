@@ -6,6 +6,7 @@ import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.registrars.EntityRegistrar;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.MobSpawnType;
@@ -25,7 +26,7 @@ public class IronGolemPlacement extends BuildingPlacement {
         if (!this.getLevel().isClientSide()) {
             this.destroy((ServerLevel) this.getLevel());
             Entity entity = EntityRegistrar.IRON_GOLEM_UNIT.get().spawn((ServerLevel) this.getLevel(),
-                    null,
+                    (CompoundTag) null,
                     null,
                     this.centrePos.offset(0, -1, 0),
                     MobSpawnType.SPAWNER,

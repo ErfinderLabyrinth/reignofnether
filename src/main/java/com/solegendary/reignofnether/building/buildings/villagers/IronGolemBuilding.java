@@ -17,7 +17,6 @@ import com.solegendary.reignofnether.unit.units.villagers.IronGolemProd;
 import com.solegendary.reignofnether.util.Faction;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;

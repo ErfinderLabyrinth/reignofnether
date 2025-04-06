@@ -6,6 +6,8 @@ import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.production.ProductionItem;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 
@@ -15,6 +17,6 @@ public class ReignOfNetherRegistries {
 
     private static <T> MappedRegistry<T> createMappedRegistry(ResourceLocation id) {
         ResourceKey<Registry<T>> key = ResourceKey.createRegistryKey(id);
-        return new MappedRegistry<T>(key, Lifecycle.experimental(), null);
+        return new MappedRegistry<T>(key, Lifecycle.experimental(), false);
     }
 }

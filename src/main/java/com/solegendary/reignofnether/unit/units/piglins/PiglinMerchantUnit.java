@@ -1,11 +1,6 @@
 package com.solegendary.reignofnether.unit.units.piglins;
 
 import com.solegendary.reignofnether.ability.Ability;
-import com.solegendary.reignofnether.ability.abilities.Eject;
-import com.solegendary.reignofnether.ability.heroAbilities.monster.BloodMoon;
-import com.solegendary.reignofnether.ability.heroAbilities.monster.InsomniaCurse;
-import com.solegendary.reignofnether.ability.heroAbilities.monster.RaiseDead;
-import com.solegendary.reignofnether.ability.heroAbilities.monster.SoulSiphonPassive;
 import com.solegendary.reignofnether.ability.heroAbilities.piglin.FancyFeast;
 import com.solegendary.reignofnether.ability.heroAbilities.piglin.GreedIsGoodPassive;
 import com.solegendary.reignofnether.ability.heroAbilities.piglin.LootExplosion;

@@ -14,6 +14,7 @@ import com.solegendary.reignofnether.unit.UnitAction;
 import com.solegendary.reignofnether.unit.UnitServerEvents;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -111,7 +112,7 @@ public class ProductionPlacement extends BuildingPlacement{
         else
             spawnPoint = getDefaultOutdoorSpawnPoint();
 
-        Entity entity = entityType.spawn(level, null,
+        Entity entity = entityType.spawn(level, (CompoundTag) null,
                 null,
                 spawnPoint,
                 MobSpawnType.SPAWNER,

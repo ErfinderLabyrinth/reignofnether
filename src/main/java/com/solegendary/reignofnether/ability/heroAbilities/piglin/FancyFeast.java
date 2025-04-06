@@ -6,7 +6,6 @@ package com.solegendary.reignofnether.ability.heroAbilities.piglin;
 
 // TODO: make piglin units stop to eat vanilla food items if they are damaged
 
-import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.ability.HeroAbility;
 import com.solegendary.reignofnether.cursor.CursorClientEvents;
 import com.solegendary.reignofnether.hud.AbilityButton;

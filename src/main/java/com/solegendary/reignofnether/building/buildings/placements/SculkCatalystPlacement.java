@@ -8,10 +8,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
 
 import java.util.*;
 
@@ -126,12 +126,16 @@ public class SculkCatalystPlacement extends BuildingPlacement implements RangeIn
                     bs = level.getBlockState(bp);
                 } while (bs.isAir() && y < 10);
 
-                if (bs.getMaterial() == Material.SCULK) {
+                if (isSculk(bs.getBlock())) {
                     sculkBps.add(bp);
                 }
             }
         }
         Collections.shuffle(sculkBps);
+    }
+
+    public static boolean isSculk(Block block) {
+        return block == Blocks.SCULK || block == Blocks.SCULK_VEIN || block == Blocks.SCULK_CATALYST || block == Blocks.SCULK_SENSOR || block == Blocks.SCULK_SHRIEKER || block == Blocks.CALIBRATED_SCULK_SENSOR;
     }
 
     private static final int destroys = 0;
@@ -172,7 +176,7 @@ public class SculkCatalystPlacement extends BuildingPlacement implements RangeIn
             if (bs.getBlock() == Blocks.SCULK) {
                 for (BlockPos bpAdj : List.of(bp.below(), bp.north(), bp.south(), bp.east(), bp.west())) {
                     BlockState bsAdj = level.getBlockState(bpAdj);
-                    if (!bsAdj.isAir() && bsAdj.getMaterial() != Material.SCULK) {
+                    if (!bsAdj.isAir() && !isSculk(bsAdj.getBlock())) {
                         level.setBlockAndUpdate(bp, bsAdj);
                         restoredSculk += 1;
                         break;

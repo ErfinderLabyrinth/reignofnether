@@ -1,7 +1,6 @@
 package com.solegendary.reignofnether.unit;
 
 import com.solegendary.reignofnether.ReignOfNether;
-import com.solegendary.reignofnether.unit.interfaces.Unit;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;

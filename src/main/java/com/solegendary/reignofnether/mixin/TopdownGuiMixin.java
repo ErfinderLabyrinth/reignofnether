@@ -1,6 +1,5 @@
 package com.solegendary.reignofnether.mixin;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;

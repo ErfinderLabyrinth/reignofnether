@@ -3,7 +3,6 @@ package com.solegendary.reignofnether.unit.interfaces;
 import com.solegendary.reignofnether.hero.HeroClientboundPacket;
 import com.solegendary.reignofnether.sounds.SoundAction;
 import com.solegendary.reignofnether.sounds.SoundClientboundPacket;
-import io.netty.util.internal.MathUtil;
 import net.minecraft.world.entity.LivingEntity;
 
 public interface HeroUnit {

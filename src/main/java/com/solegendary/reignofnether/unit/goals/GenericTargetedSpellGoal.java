@@ -4,9 +4,7 @@ import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.AbilityClientboundPacket;
 import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.BuildingUtils;
-import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.unit.UnitAnimationAction;
-import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.packets.UnitAnimationClientboundPacket;
 import com.solegendary.reignofnether.util.MyMath;
 import net.minecraft.core.BlockPos;
@@ -50,7 +48,7 @@ public class GenericTargetedSpellGoal extends MoveToTargetBlockGoal {
     public GenericTargetedSpellGoal(Mob mob, int channelTicks, int range,
                                     @Nullable Consumer<LivingEntity> onEntityCast,
                                     @Nullable Consumer<BlockPos> onGroundCast,
-                                    @Nullable Consumer<Building> onBuildingCast) {
+                                    @Nullable Consumer<BuildingPlacement> onBuildingCast) {
         super(mob, false, 0);
         this.channelTicks = channelTicks;
         this.range = range;

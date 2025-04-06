@@ -1,6 +1,5 @@
 package com.solegendary.reignofnether.building;
 
-import com.mojang.math.Vector3d;
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.api.ReignOfNetherRegistries;
@@ -11,6 +10,7 @@ import com.solegendary.reignofnether.building.buildings.piglins.FlameSanctuary;
 import com.solegendary.reignofnether.building.buildings.piglins.Fortress;
 import com.solegendary.reignofnether.building.buildings.piglins.Portal;
 import com.solegendary.reignofnether.building.buildings.placements.BeaconPlacement;
+import com.solegendary.reignofnether.building.buildings.placements.BridgePlacement;
 import com.solegendary.reignofnether.building.buildings.shared.AbstractBridge;
 import com.solegendary.reignofnether.building.buildings.shared.AbstractStockpile;
 import com.solegendary.reignofnether.building.buildings.villagers.Watchtower;
@@ -44,7 +44,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -52,7 +53,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.Chicken;
-import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -62,10 +62,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.Heightmap;
-import net.minecraft.world.level.material.Material;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.world.ForgeChunkManager;
+import org.joml.Vector3d;
 
 import java.util.*;
 
@@ -200,9 +200,9 @@ public class BuildingPlacement {
                 blocks.stream().max(Comparator.comparing(block -> block.getBlockPos().getY())).get().getBlockPos().getY(),
                 blocks.stream().max(Comparator.comparing(block -> block.getBlockPos().getZ())).get().getBlockPos().getZ()
         );
-        this.centrePos = new BlockPos((float) (this.minCorner.getX() + this.maxCorner.getX()) / 2,
-                (float) (this.minCorner.getY() + this.maxCorner.getY()) / 2,
-                (float) (this.minCorner.getZ() + this.maxCorner.getZ()) / 2
+        this.centrePos = new BlockPos((int) ((float) (this.minCorner.getX() + this.maxCorner.getX()) / 2),
+                (int) ((float) (this.minCorner.getY() + this.maxCorner.getY()) / 2),
+                (int) ((float) (this.minCorner.getZ() + this.maxCorner.getZ()) / 2)
         );
 
         // re-hide players if they were revealed
@@ -228,6 +228,8 @@ public class BuildingPlacement {
         capturable = building.capturable;
         invulnerable = building.invulnerable;
         shouldDestroyOnReset = building.shouldDestroyOnReset;
+
+        portraitBlock = building.portraitBlock;
     }
 
     public float getMeleeDamageMult() {
@@ -475,14 +477,12 @@ public class BuildingPlacement {
             return;
         ArrayList<BuildingBlock> placedBlocks = new ArrayList<>(blocks.stream()
                 .filter(b -> { // avoid destroying blocks adjacent to liquids unless its a bridge or is itself a liquid
-                    if (!(getBuilding() instanceof AbstractBridge) && !(
-                            this.level.getBlockState(b.getBlockPos()).getMaterial().isLiquid()
-                    ) && (
-                            this.level.getBlockState(b.getBlockPos().above()).getMaterial().isLiquid()
-                                    || this.level.getBlockState(b.getBlockPos().north()).getMaterial().isLiquid()
-                                    || this.level.getBlockState(b.getBlockPos().south()).getMaterial().isLiquid()
-                                    || this.level.getBlockState(b.getBlockPos().east()).getMaterial().isLiquid()
-                                    || this.level.getBlockState(b.getBlockPos().west()).getMaterial().isLiquid()
+                    if (!(this instanceof BridgePlacement) && this.level.getBlockState(b.getBlockPos()).getFluidState().isEmpty() && (
+                            !this.level.getBlockState(b.getBlockPos().above()).getFluidState().isEmpty()
+                                    || !this.level.getBlockState(b.getBlockPos().north()).getFluidState().isEmpty()
+                                    || !this.level.getBlockState(b.getBlockPos().south()).getFluidState().isEmpty()
+                                    || !this.level.getBlockState(b.getBlockPos().east()).getFluidState().isEmpty()
+                                    || !this.level.getBlockState(b.getBlockPos().west()).getFluidState().isEmpty()
                     )) {
                         return false;
                     }
@@ -497,7 +497,7 @@ public class BuildingPlacement {
         for (int i = 0; i < amount && i < placedBlocks.size(); i++) {
             BlockPos bp = placedBlocks.get(i).getBlockPos();
             this.onBlockBreak((ServerLevel) getLevel(), bp, false);
-            if (getLevel().getBlockState(bp).getMaterial().isLiquid()) {
+            if (!getLevel().getBlockState(bp).getFluidState().isEmpty()) {
                 getLevel().setBlockAndUpdate(bp, Blocks.AIR.defaultBlockState());
             } else {
                 getLevel().destroyBlock(bp, false);
@@ -538,7 +538,7 @@ public class BuildingPlacement {
         this.forceChunk(false);
 
         this.blocks.forEach((BuildingBlock block) -> {
-            if (block.getBlockState().getMaterial().isLiquid() ||
+            if (!block.getBlockState().getFluidState().isEmpty() ||
                     (block.getBlockState().hasProperty(BlockStateProperties.WATERLOGGED) &&
                             block.getBlockState().getValue(BlockStateProperties.WATERLOGGED)))
             {
@@ -550,7 +550,7 @@ public class BuildingPlacement {
             int y = block.getBlockPos().getY();
             int z = block.getBlockPos().getZ();
             if (block.isPlaced(serverLevel) && x % 2 == 0 && z % 2 != 0) {
-                serverLevel.explode(null, null, null, x, y, z, 1.0f, false, Explosion.BlockInteraction.BREAK);
+                serverLevel.explode(null, null, null, x, y, z, 1.0f, false, Level.ExplosionInteraction.TNT);
             }
             serverLevel.destroyBlock(block.getBlockPos(), false);
         });
@@ -607,7 +607,7 @@ public class BuildingPlacement {
         // - cause fire if < fireThreshold% blocksPercent
         if (rand.nextFloat(1.0f) < this.explodeChance) {
             level.explode(null,
-                    DamageSource.GENERIC,
+                    level.damageSources().generic(),
                     null,
                     pos.getX(),
                     pos.getY(),
@@ -615,7 +615,7 @@ public class BuildingPlacement {
                     breakBlocks ? this.explodeRadius : 2.0f,
                     this.getBlocksPlacedPercent() < this.fireThreshold,
                     // fire
-                    breakBlocks ? Explosion.BlockInteraction.BREAK : Explosion.BlockInteraction.NONE
+                    breakBlocks ? Level.ExplosionInteraction.TNT : Level.ExplosionInteraction.NONE
             );
         }
     }
@@ -869,7 +869,7 @@ public class BuildingPlacement {
                 level.setBlockAndUpdate(bp, bs);
 
                 // avoid creating a bubble column block
-                if (bs.getMaterial() == Material.WATER) {
+                if (bs.getFluidState().is(FluidTags.WATER)) {
                     if (level.getBlockState(bp.below()).getBlock() == Blocks.SOUL_SAND) {
                         level.setBlockAndUpdate(bp.below(), Blocks.SOUL_SOIL.defaultBlockState());
                     } else if (level.getBlockState(bp.below()).getBlock() == Blocks.MAGMA_BLOCK ||
@@ -933,7 +933,7 @@ public class BuildingPlacement {
             BlockState bs;
             do {
                 bs = level.getBlockState(new BlockPos(x, y, z));
-                if (!bs.getMaterial().isSolid() && !bs.getMaterial().isLiquid() && y > 0) {
+                if (!bs.isSolid() && bs.getFluidState().isEmpty() && y > 0) {
                     y -= 1;
                 } else {
                     break;
@@ -952,10 +952,10 @@ public class BuildingPlacement {
                     return;
                 }
             }
-        } while (!spawnBs.getMaterial().isSolid()
-                || spawnBs.getMaterial() == Material.LEAVES
+        } while (!spawnBs.isSolid()
+                || spawnBs.is(BlockTags.LEAVES)
                 || spawnBs.getBlock() == Blocks.BARRIER
-                || spawnBs.getMaterial() == Material.WOOD
+                || spawnBs.is(BlockTags.LOGS) || spawnBs.is(BlockTags.PLANKS)
                 || spawnBp.distSqr(centrePos) < ANIMAL_SPAWN_RANGE_MIN * ANIMAL_SPAWN_RANGE_MIN
                 || spawnBp.distSqr(centrePos) > range * range
                 || Math.abs(spawnBp.getY() - minCorner.getY()) >= 4
@@ -996,16 +996,16 @@ public class BuildingPlacement {
             }
         }
         List<BlockPos> origins = new ArrayList<>();
-        BlockPos minCorner = getMinCorner(getBlocks()).offset(-addedRange / 2, -1, -addedRange / 2);
-        BlockPos maxCorner = getMaxCorner(getBlocks()).offset(addedRange / 2, -1, addedRange / 2);
+        BlockPos minCorner = getMinCorner(getBlocks()).offset((int) (-addedRange / 2), -1, (int) (-addedRange / 2));
+        BlockPos maxCorner = getMaxCorner(getBlocks()).offset((int) addedRange / 2, -1, (int) addedRange / 2);
 
-        BlockPos minOrigin = new BlockPos(Math.round(Math.floor(minCorner.getX() / 16d) * 16),
-                Math.round(Math.floor(minCorner.getY() / 16d) * 16),
-                Math.round(Math.floor(minCorner.getZ() / 16d) * 16)
+        BlockPos minOrigin = new BlockPos((int) Math.round(Math.floor(minCorner.getX() / 16d) * 16),
+                (int) Math.round(Math.floor(minCorner.getY() / 16d) * 16),
+                (int)  Math.round(Math.floor(minCorner.getZ() / 16d) * 16)
         );
-        BlockPos maxOrigin = new BlockPos(Math.round(Math.floor(maxCorner.getX() / 16d) * 16),
-                Math.round(Math.floor(maxCorner.getY() / 16d) * 16),
-                Math.round(Math.floor(maxCorner.getZ() / 16d) * 16)
+        BlockPos maxOrigin = new BlockPos((int) Math.round(Math.floor(maxCorner.getX() / 16d) * 16),
+                (int) Math.round(Math.floor(maxCorner.getY() / 16d) * 16),
+                (int) Math.round(Math.floor(maxCorner.getZ() / 16d) * 16)
         );
         for (int x = minOrigin.getX(); x <= maxOrigin.getX(); x += 16)
             for (int y = minOrigin.getY() - 16; y <= maxOrigin.getY(); y += 16)

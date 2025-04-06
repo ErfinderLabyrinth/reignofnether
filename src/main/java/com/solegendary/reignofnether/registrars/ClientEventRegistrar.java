@@ -15,7 +15,6 @@ import com.solegendary.reignofnether.gamemode.GameModeServerEvents;
 import com.solegendary.reignofnether.gamerules.GameruleServerEvents;
 import com.solegendary.reignofnether.guiscreen.TopdownGuiClientEvents;
 import com.solegendary.reignofnether.healthbars.HealthBarClientEvents;
-import com.solegendary.reignofnether.attackwarnings.AttackWarningClientEvents;
 import com.solegendary.reignofnether.hero.HeroServerEvents;
 import com.solegendary.reignofnether.hud.HudClientEvents;
 import com.solegendary.reignofnether.hud.TitleClientEvents;

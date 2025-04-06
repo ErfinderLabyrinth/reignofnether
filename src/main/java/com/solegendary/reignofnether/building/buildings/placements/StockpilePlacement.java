@@ -51,7 +51,7 @@ public class StockpilePlacement extends ProductionPlacement {
                 // not covered by solid blocks
                 boolean hasClearNeighbour = false;
                 for (BlockPos adjBp : List.of(bp.north(), bp.south(), bp.east(), bp.west(), bp.above(), bp.below()))
-                    if (ResourceSources.CLEAR_MATERIALS.contains(getLevel().getBlockState(adjBp).getMaterial()))
+                    if (ResourceSources.isClearMaterial(getLevel().getBlockState(adjBp)))
                         hasClearNeighbour = true;
                 if (!hasClearNeighbour)
                     return false;

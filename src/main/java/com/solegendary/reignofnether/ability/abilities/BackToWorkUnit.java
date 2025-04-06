@@ -1,6 +1,5 @@
 package com.solegendary.reignofnether.ability.abilities;
 
-import org.joml.Vector3d;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.building.buildings.villagers.TownCentre;
 import com.solegendary.reignofnether.hud.AbilityButton;
@@ -10,7 +9,6 @@ import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.units.villagers.MilitiaUnit;
 import com.solegendary.reignofnether.unit.units.villagers.VillagerUnit;
 import com.solegendary.reignofnether.util.LanguageUtil;
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;

@@ -6,12 +6,8 @@ import com.solegendary.reignofnether.building.BuildingBlockData;
 import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.buildings.placements.BridgePlacement;
 import com.solegendary.reignofnether.resources.ResourceCost;
-import com.solegendary.reignofnether.building.BuildingUtils;
-import com.solegendary.reignofnether.util.MiscUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.*;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Rotation;
 
@@ -20,7 +16,6 @@ import java.util.ArrayList;
 import static com.solegendary.reignofnether.building.BuildingUtils.getAbsoluteBlockData;
 
 public abstract class AbstractBridge extends Building {
-
     public final float MELEE_DAMAGE_MULTIPLIER = 0.05f;
 
     public AbstractBridge(ResourceCost cost) {

@@ -1,7 +1,6 @@
 package com.solegendary.reignofnether.votesystem;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.registrars.PacketHandler;
 import com.solegendary.reignofnether.votesystem.networking.ClientVoteHandler;

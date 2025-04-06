@@ -1,6 +1,5 @@
 package com.solegendary.reignofnether.unit.goals;
 
-import org.joml.Vector3d;
 import com.solegendary.reignofnether.hud.HudClientEvents;
 import com.solegendary.reignofnether.unit.UnitServerEvents;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
@@ -16,6 +15,7 @@ import com.solegendary.reignofnether.util.MiscUtil;
 import com.solegendary.reignofnether.util.MyMath;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import org.joml.Vector3d;
 
 import java.util.List;
 

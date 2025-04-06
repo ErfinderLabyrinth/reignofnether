@@ -28,7 +28,7 @@ public abstract class HeroAbility extends Ability {
     public final int maxRank;
 
     public HeroAbility(HeroUnit hero, int maxRank, UnitAction action, int cooldownMax, float range, float radius, boolean canTargetEntities) {
-        super(action, ((Entity) hero).level(), cooldownMax, range, radius, canTargetEntities);
+        super(action, cooldownMax, range, radius, canTargetEntities);
         this.hero = hero;
         this.maxRank = maxRank;
     }

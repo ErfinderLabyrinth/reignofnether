@@ -1,6 +1,5 @@
 package com.solegendary.reignofnether.building.buildings.villagers;
 
-import org.joml.Vector3d;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.*;
 import com.solegendary.reignofnether.api.ReignOfNetherRegistries;

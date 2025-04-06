@@ -1,7 +1,6 @@
 package com.solegendary.reignofnether.unit;
 
 import com.mojang.datafixers.util.Pair;
-import org.joml.Vector3d;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.alliance.AlliancesClient;
 import com.solegendary.reignofnether.building.BuildingClientEvents;
@@ -69,6 +68,7 @@ import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.EntityLeaveLevelEvent;
 import net.minecraftforge.event.entity.EntityMountEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import org.joml.Vector3d;
 import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.Nullable;

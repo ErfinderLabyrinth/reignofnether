@@ -24,7 +24,10 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.AnimationState;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
@@ -226,10 +229,10 @@ public class NecromancerUnit extends Skeleton implements Unit, AttackerUnit, Ran
     public void updateAbilityButtons() {
         if (level().isClientSide()) {
             this.abilityButtons.clear();
-            this.abilityButtons.add(this.abilities.get(0).getButton(Keybindings.keyQ));
-            this.abilityButtons.add(this.abilities.get(1).getButton(Keybindings.keyW));
-            this.abilityButtons.add(this.abilities.get(2).getButton(Keybindings.keyE));
-            this.abilityButtons.add(this.abilities.get(3).getButton(Keybindings.keyR));
+            this.abilityButtons.add(this.abilities.get(0).getButton(Keybindings.keyQ, this));
+            this.abilityButtons.add(this.abilities.get(1).getButton(Keybindings.keyW, this));
+            this.abilityButtons.add(this.abilities.get(2).getButton(Keybindings.keyE, this));
+            this.abilityButtons.add(this.abilities.get(3).getButton(Keybindings.keyR, this));
         }
     }
 

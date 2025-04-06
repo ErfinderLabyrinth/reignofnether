@@ -1,6 +1,6 @@
 package com.solegendary.reignofnether.building.buildings.placements;
 
-import com.mojang.math.Vector3d;
+import org.joml.Vector3d;
 import com.solegendary.reignofnether.ability.EnchantAbility;
 import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingBlock;

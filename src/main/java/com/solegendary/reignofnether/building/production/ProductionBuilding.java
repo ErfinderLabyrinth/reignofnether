@@ -24,7 +24,7 @@ public abstract class ProductionBuilding extends Building {
     }
 
     public BlockPos getDefaultOutdoorSpawnPoint(BlockPos minCorner) {
-        return minCorner.offset((double)(-this.spawnRadiusOffset), (double)0.0F, (double)(-this.spawnRadiusOffset));
+        return minCorner.offset((int) -spawnRadiusOffset, 0, (int) -spawnRadiusOffset);
     }
 
     public BlockPos getIndoorSpawnPoint(ServerLevel level, BlockPos centrePos) {

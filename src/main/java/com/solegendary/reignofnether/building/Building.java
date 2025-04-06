@@ -5,23 +5,6 @@
 
 package com.solegendary.reignofnether.building;
 
-import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.FluidTags;
-import net.minecraftforge.common.Tags;
-import org.joml.Vector3d;
-import com.solegendary.reignofnether.ReignOfNether;
-import com.solegendary.reignofnether.ability.Ability;
-import com.solegendary.reignofnether.attackwarnings.AttackWarningClientboundPacket;
-import com.solegendary.reignofnether.building.buildings.monsters.DarkWatchtower;
-import com.solegendary.reignofnether.building.buildings.neutral.Beacon;
-import com.solegendary.reignofnether.building.buildings.piglins.Bastion;
-import com.solegendary.reignofnether.building.buildings.piglins.FlameSanctuary;
-import com.solegendary.reignofnether.building.buildings.piglins.Fortress;
-import com.solegendary.reignofnether.building.buildings.piglins.Portal;
-import com.solegendary.reignofnether.building.buildings.shared.AbstractBridge;
-import com.solegendary.reignofnether.building.buildings.shared.AbstractStockpile;
-import com.solegendary.reignofnether.building.buildings.villagers.Watchtower;
-import com.solegendary.reignofnether.fogofwar.*;
 import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybinding;
@@ -33,13 +16,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.levelgen.Heightmap;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.world.ForgeChunkManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -111,29 +87,32 @@ public abstract class Building {
 
     public static boolean shouldCullBlock(BlockPos originPos, BuildingBlock b, Level level) {
         BlockState bs = b.getBlockState();
-        boolean isFenceOrAir = b.getBlockState().getBlock() instanceof AirBlock || b.getBlockState().getBlock() instanceof FenceBlock;
-        BlockPos bp = b.getBlockPos().offset(originPos);
-        Material bmWorld = level.getBlockState(bp).getMaterial();
-        Material bmWorldBelow = level.getBlockState(bp.below()).getMaterial();
-        BlockState bsWorld = level.getBlockState(bp);
-        if (bsWorld.getBlock() == Blocks.OBSIDIAN) {
-            return false;
-        } else if (bsWorld.equals(bs)) {
-            return false;
-        } else if ((bsWorld.isAir() || bsWorld.getMaterial().isLiquid()) && !isFenceOrAir) {
-            return false;
-        } else if (BuildingUtils.isPosInsideAnyBuilding(level.isClientSide, bp)) {
-            return true;
-        } else {
-            for(BlockPos bpAdj : List.of(bp.north(), bp.south(), bp.east(), bp.west())) {
-                BlockState bsWorldAdj = level.getBlockState(bpAdj);
-                if (isFenceOrAir && !bsWorldAdj.isAir() && BuildingUtils.isPosInsideAnyBuilding(level.isClientSide, bpAdj)) {
-                    return true;
-                }
-            }
 
-            return bmWorld.isSolidBlocking() || isFenceOrAir && bmWorldBelow.isSolidBlocking();
+        boolean isFenceOrAir = b.getBlockState().getBlock() instanceof AirBlock ||
+                b.getBlockState().getBlock() instanceof FenceBlock;
+        BlockPos bp = b.getBlockPos().offset(originPos);
+
+        // if the block in the world matches this exactly, don't cull it, instead just consider it to be our block too
+        BlockState bsWorld = level.getBlockState(bp);
+
+        if (bsWorld.getBlock() == Blocks.OBSIDIAN)
+            return false;
+        if (bsWorld.equals(bs))
+            return false;
+        if ((bsWorld.isAir() || !bsWorld.getFluidState().isEmpty()) && !isFenceOrAir)
+            return false;
+
+        // cull if overlaps another bridge block that isn't built yet
+        if (BuildingUtils.isPosInsideAnyBuilding(level.isClientSide, bp))
+            return true;
+
+        // cull if fence is adjacent to another solid block (or a bridge block, even if air)
+        for (BlockPos bpAdj : List.of(bp.north(), bp.south(), bp.east(), bp.west())) {
+            BlockState bsWorldAdj = level.getBlockState(bpAdj);
+            if (isFenceOrAir && !bsWorldAdj.isAir() && BuildingUtils.isPosInsideAnyBuilding(level.isClientSide, bpAdj))
+                return true;
         }
+        return level.getBlockState(bp).isSolid() || (isFenceOrAir && level.getBlockState(bp.below()).isSolid());
     }
 
     public abstract Faction getFaction();

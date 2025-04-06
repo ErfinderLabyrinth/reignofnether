@@ -1,11 +1,9 @@
 package com.solegendary.reignofnether.tutorial;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.util.MiscUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.resources.ResourceLocation;

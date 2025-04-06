@@ -1,6 +1,5 @@
 package com.solegendary.reignofnether.building.buildings.placements;
 
-import com.mojang.math.Vector3d;
 import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingBlock;
 import com.solegendary.reignofnether.building.BuildingPlacement;
@@ -15,6 +14,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Rotation;
+import org.joml.Vector3d;
 
 import java.util.*;
 
@@ -41,9 +41,13 @@ public class HealingFountainPlacement extends BuildingPlacement implements Range
                 LivingEntity.class,
                 this.level);
 
-        for (LivingEntity le : nearbyEntities)
-            if (isBuilt && tickAgeAfterBuilt % 100 == 0) // only 1hp/4s
-                le.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 100, 0));
+        for (LivingEntity le : nearbyEntities) {
+            if (isBuilt && tickAgeAfterBuilt % 20 == 0)  {
+                // this actually isn't enough to cause a healing tick, but is just for effects
+                le.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 20, 0));
+                le.heal(Math.min(1, le.getMaxHealth() / 100));
+            }
+        }
 
         // spawn random healing particle
         if (!waterBlocks.isEmpty() && isBuilt) {

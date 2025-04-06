@@ -1,7 +1,5 @@
 package com.solegendary.reignofnether.building.buildings.neutral;
 
-import org.joml.Vector3d;
-import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.*;
 import com.solegendary.reignofnether.building.*;
 import com.solegendary.reignofnether.building.buildings.placements.BeaconPlacement;

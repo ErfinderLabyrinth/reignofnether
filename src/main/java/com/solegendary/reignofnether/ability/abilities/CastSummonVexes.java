@@ -77,7 +77,7 @@ public class CastSummonVexes extends Ability {
     @Override
     public void setToMaxCooldown() {
         if (evokerUnit.hasVigorEnchant())
-            setCooldown((int) (cooldownMax * EnchantVigor.cooldownMultiplier), evokerUnit.level);
+            setCooldown((int) (cooldownMax * EnchantVigor.cooldownMultiplier), evokerUnit.level());
         else
             setToMaxCooldown();
     }
