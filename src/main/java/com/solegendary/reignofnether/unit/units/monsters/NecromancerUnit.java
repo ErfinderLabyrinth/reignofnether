@@ -211,15 +211,10 @@ public class NecromancerUnit extends Skeleton implements Unit, AttackerUnit, Ran
 
     public NecromancerUnit(EntityType<? extends Skeleton> entityType, Level level) {
         super(entityType, level);
-
-        RaiseDead ab1 = new RaiseDead(this);
-        InsomniaCurse ab2 = new InsomniaCurse(this);
-        SoulSiphonPassive ab3 = new SoulSiphonPassive(this);
-        BloodMoon ab4 = new BloodMoon(this);
-        this.abilities.add(ab1);
-        this.abilities.add(ab2);
-        this.abilities.add(ab3);
-        this.abilities.add(ab4);
+        this.abilities.add(new RaiseDead(this));
+        this.abilities.add(new InsomniaCurse(this));
+        this.abilities.add(new SoulSiphonPassive(this));
+        this.abilities.add(new BloodMoon(this));
         updateAbilityButtons();
     }
 

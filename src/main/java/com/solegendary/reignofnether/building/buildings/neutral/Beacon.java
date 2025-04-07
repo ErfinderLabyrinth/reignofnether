@@ -103,17 +103,20 @@ public class Beacon extends ProductionBuilding implements RangeIndicator {
 
         this.explodeChance = 0.2f;
 
-        Ability beaconWealth = new BeaconWealth(this);
-        this.abilities.add(beaconWealth);
-        Ability beaconHaste = new BeaconHaste(this);
-        this.abilities.add(beaconHaste);
-        Ability beaconRegen = new BeaconRegeneration(this);
-        this.abilities.add(beaconRegen);
-        Ability beaconStrength = new BeaconStrength(this);
-        this.abilities.add(beaconStrength);
-        Ability beaconResistance = new BeaconResistance(this);
-        this.abilities.add(beaconResistance);
+        this.abilities.add(new BeaconWealth(this));
+        this.abilities.add(new BeaconHaste(this));
+        this.abilities.add(new BeaconRegeneration(this));
+        this.abilities.add(new BeaconStrength(this));
+        this.abilities.add(new BeaconResistance(this));
 
+        updateButtons();
+
+        for (BuildingBlock bb : blocks)
+            if (bb.getBlockState().getBlock() == Blocks.BEACON)
+                beaconPos = bb.getBlockPos();
+    }
+
+    public void updateButtons() {
         if (level.isClientSide()) {
             this.productionButtons = Arrays.asList(
                     ResearchBeaconLevel1.getStartButton(this, null),
@@ -122,15 +125,13 @@ public class Beacon extends ProductionBuilding implements RangeIndicator {
                     ResearchBeaconLevel4.getStartButton(this, null),
                     ResearchBeaconLevel5.getStartButton(this, null)
             );
-            this.abilityButtons.add(beaconWealth.getButton(Keybindings.keyQ));
-            this.abilityButtons.add(beaconHaste.getButton(Keybindings.keyW));
-            this.abilityButtons.add(beaconRegen.getButton(Keybindings.keyE));
-            this.abilityButtons.add(beaconResistance.getButton(Keybindings.keyR));
-            this.abilityButtons.add(beaconStrength.getButton(Keybindings.keyT));
+            this.abilityButtons.clear();
+            this.abilityButtons.add(abilities.get(0).getButton(Keybindings.keyQ));
+            this.abilityButtons.add(abilities.get(1).getButton(Keybindings.keyW));
+            this.abilityButtons.add(abilities.get(2).getButton(Keybindings.keyE));
+            this.abilityButtons.add(abilities.get(3).getButton(Keybindings.keyR));
+            this.abilityButtons.add(abilities.get(4).getButton(Keybindings.keyT));
         }
-        for (BuildingBlock bb : blocks)
-            if (bb.getBlockState().getBlock() == Blocks.BEACON)
-                beaconPos = bb.getBlockPos();
     }
 
     @Override

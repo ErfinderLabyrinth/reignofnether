@@ -63,10 +63,14 @@ public class Mausoleum extends ProductionBuilding implements NightSource, RangeI
         this.startingBlockTypes.add(Blocks.STONE_BRICKS);
         this.startingBlockTypes.add(Blocks.STONE_BRICK_STAIRS);
 
+        updateButtons();
+        updateBorderBps();
+    }
+
+    public void updateButtons() {
         if (level.isClientSide()) {
             this.productionButtons = List.of(ZombieVillagerProd.getStartButton(this, Keybindings.keyQ));
         }
-        updateBorderBps();
     }
 
     public int getNightRange() {

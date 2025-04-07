@@ -164,13 +164,8 @@ public class PillagerUnit extends Pillager implements Unit, AttackerUnit, Ranged
 
     public PillagerUnit(EntityType<? extends Pillager> entityType, Level level) {
         super(entityType, level);
-
-        MountRavager mountRavagerAbility = new MountRavager(this);
-        this.abilities.add(mountRavagerAbility);
-
-        if (level.isClientSide()) {
-            this.abilityButtons.add(mountRavagerAbility.getButton(Keybindings.keyQ));
-        }
+        this.abilities.add(new MountRavager(this));
+        updateAbilityButtons();
     }
 
     @Override

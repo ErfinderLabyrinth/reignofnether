@@ -6,9 +6,7 @@ package com.solegendary.reignofnether.ability.heroAbilities.monster;
 
 // play a cave sound and announce "A blood moon rises" in global chat
 
-import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.ability.HeroAbility;
-import com.solegendary.reignofnether.cursor.CursorClientEvents;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.keybinds.Keybinding;
@@ -65,6 +63,7 @@ public class BloodMoon extends HeroAbility {
         return List.of(
                 fcs(I18n.get("abilities.reignofnether.blood_moon"), true),
                 fcsIcons(I18n.get("abilities.reignofnether.blood_moon.stats", CD_MAX_SECONDS / 20)),
+                fcs(""),
                 fcs(I18n.get("abilities.reignofnether.blood_moon.tooltip1")),
                 fcs(I18n.get("abilities.reignofnether.blood_moon.tooltip2")),
                 fcs(I18n.get("abilities.reignofnether.blood_moon.tooltip3")),

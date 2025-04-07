@@ -139,14 +139,9 @@ public class BlazeUnit extends Blaze implements Unit, AttackerUnit, RangedAttack
 
     public BlazeUnit(EntityType<? extends Blaze> entityType, Level level) {
         super(entityType, level);
-
-        FirewallShot ab1 = new FirewallShot(this);
-        this.abilities.add(ab1);
-        if (level.isClientSide())
-            this.abilityButtons.add(ab1.getButton(Keybindings.keyQ));
+        this.abilities.add(new FirewallShot(this));
+        updateAbilityButtons();
     }
-
-
 
     @Override
     public boolean removeWhenFarAway(double d) { return false; }

@@ -164,11 +164,8 @@ public class SlimeUnit extends Slime implements Unit, AttackerUnit {
     public SlimeUnit(EntityType<? extends Slime> entityType, Level level) {
         super(entityType, level);
         this.moveControl = new SlimeUnitMoveControl(this);
-
-        ConsumeSlime ab1 = new ConsumeSlime(this);
-        this.abilities.add(ab1);
-        if (level.isClientSide())
-            this.abilityButtons.add(ab1.getButton(Keybindings.keyQ));
+        this.abilities.add(new ConsumeSlime(this));
+        updateAbilityButtons();
     }
 
     // big slimes sometimes bounce off of each other midair

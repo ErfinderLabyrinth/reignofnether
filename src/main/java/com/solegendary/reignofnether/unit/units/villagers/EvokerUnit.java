@@ -172,19 +172,10 @@ public class EvokerUnit extends Evoker implements Unit, AttackerUnit, RangedAtta
 
     public EvokerUnit(EntityType<? extends Evoker> entityType, Level level) {
         super(entityType, level);
-
-        SetFangsLine ab1 = new SetFangsLine(this);
-        SetFangsCircle ab2 = new SetFangsCircle(this);
-        CastSummonVexes ab3 = new CastSummonVexes(this);
-        this.abilities.add(ab1);
-        this.abilities.add(ab2);
-        this.abilities.add(ab3);
-
-        if (level.isClientSide()) {
-            this.abilityButtons.add(ab1.getButton(Keybindings.keyQ));
-            this.abilityButtons.add(ab2.getButton(Keybindings.keyW));
-            this.abilityButtons.add(ab3.getButton(Keybindings.keyE));
-        }
+        this.abilities.add(new SetFangsLine(this));
+        this.abilities.add(new SetFangsCircle(this));
+        this.abilities.add(new CastSummonVexes(this));
+        updateAbilityButtons();
     }
 
     @Override

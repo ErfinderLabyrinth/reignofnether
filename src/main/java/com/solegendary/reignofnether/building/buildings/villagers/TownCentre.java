@@ -59,17 +59,20 @@ public class TownCentre extends ProductionBuilding implements RangeIndicator {
         this.startingBlockTypes.add(Blocks.GRASS_BLOCK);
         this.startingBlockTypes.add(Blocks.POLISHED_ANDESITE_STAIRS);
 
-        Ability callToArms = new CallToArmsBuilding(level);
-        this.abilities.add(callToArms);
-        BackToWorkBuilding backToWork = new BackToWorkBuilding(this.level);
-        this.abilities.add(backToWork);
+        this.abilities.add(new CallToArmsBuilding(level));
+        this.abilities.add(new BackToWorkBuilding(this.level));
 
+        updateButtons();
+    }
+
+    public void updateButtons() {
         if (level.isClientSide()) {
             this.productionButtons = List.of(
-                    VillagerProd.getStartButton(this, Keybindings.keyQ)
+                VillagerProd.getStartButton(this, Keybindings.keyQ)
             );
-            this.abilityButtons.add(callToArms.getButton(Keybindings.keyV));
-            this.abilityButtons.add(backToWork.getButton(Keybindings.build));
+            this.abilityButtons.clear();
+            this.abilityButtons.add(abilities.get(0).getButton(Keybindings.keyV));
+            this.abilityButtons.add(abilities.get(1).getButton(Keybindings.build));
         }
     }
 

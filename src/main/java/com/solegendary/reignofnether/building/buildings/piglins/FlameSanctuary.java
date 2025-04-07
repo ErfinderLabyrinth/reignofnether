@@ -58,11 +58,16 @@ public class FlameSanctuary extends ProductionBuilding {
 
         this.explodeChance = 0.2f;
 
-        if (level.isClientSide())
+        updateButtons();
+    }
+
+    public void updateButtons() {
+        if (level.isClientSide()) {
             this.productionButtons = Arrays.asList(
-                    ResearchBlazeFirewall.getStartButton(this, Keybindings.keyQ),
-                    ResearchFireResistance.getStartButton(this, Keybindings.keyW)
+                ResearchBlazeFirewall.getStartButton(this, Keybindings.keyQ),
+                ResearchFireResistance.getStartButton(this, Keybindings.keyW)
             );
+        }
     }
 
     public Faction getFaction() {return Faction.PIGLINS;}

@@ -143,11 +143,8 @@ public class HoglinUnit extends Hoglin implements Unit, AttackerUnit {
 
     public HoglinUnit(EntityType<? extends Hoglin> entityType, Level level) {
         super(entityType, level);
-
-        Eject ab1 = new Eject(this);
-        this.abilities.add(ab1);
-        if (level.isClientSide())
-            this.abilityButtons.add(ab1.getButton(Keybindings.keyQ));
+        this.abilities.add(new Eject(this));
+        updateAbilityButtons();
     }
 
     @Override

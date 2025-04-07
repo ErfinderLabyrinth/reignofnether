@@ -1,14 +1,14 @@
 package com.solegendary.reignofnether.unit.units.villagers;
 
-import com.solegendary.reignofnether.ability.abilities.*;
+import com.solegendary.reignofnether.ability.Ability;
+import com.solegendary.reignofnether.ability.abilities.PromoteIllager;
+import com.solegendary.reignofnether.ability.abilities.ThrowLingeringHarmingPotion;
+import com.solegendary.reignofnether.ability.abilities.ThrowLingeringRegenPotion;
 import com.solegendary.reignofnether.building.GarrisonableBuilding;
 import com.solegendary.reignofnether.hud.AbilityButton;
-import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
-import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.unit.Checkpoint;
-import com.solegendary.reignofnether.unit.UnitClientEvents;
 import com.solegendary.reignofnether.unit.goals.*;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.util.Faction;
@@ -121,16 +121,9 @@ public class WitchUnit extends Witch implements Unit {
 
     public WitchUnit(EntityType<? extends Witch> entityType, Level level) {
         super(entityType, level);
-
-        ThrowLingeringHarmingPotion ab1 = new ThrowLingeringHarmingPotion(this);
-        ThrowLingeringRegenPotion ab2 = new ThrowLingeringRegenPotion(this);
-        this.abilities.add(ab1);
-        this.abilities.add(ab2);
-
-        if (level.isClientSide()) {
-            this.abilityButtons.add(ab1.getButton(Keybindings.keyQ));
-            this.abilityButtons.add(ab2.getButton(Keybindings.keyW));
-        }
+        this.abilities.add(new ThrowLingeringHarmingPotion(this));
+        this.abilities.add(new ThrowLingeringRegenPotion(this));
+        updateAbilityButtons();
     }
 
     public int getPotionThrowRange() {

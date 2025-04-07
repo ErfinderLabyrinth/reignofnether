@@ -71,10 +71,15 @@ public class CentralPortal extends ProductionBuilding implements NetherConvertin
 
         this.startingBlockTypes.add(Blocks.NETHER_BRICKS);
 
-        if (level.isClientSide())
+        updateButtons();
+    }
+
+    public void updateButtons() {
+        if (level.isClientSide()) {
             this.productionButtons = Arrays.asList(
-                    GruntProd.getStartButton(this, Keybindings.keyQ)
+                GruntProd.getStartButton(this, Keybindings.keyQ)
             );
+        }
     }
 
     @Override

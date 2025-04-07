@@ -154,15 +154,9 @@ public class RavagerUnit extends Ravager implements Unit, AttackerUnit {
 
     public RavagerUnit(EntityType<? extends Ravager> entityType, Level level) {
         super(entityType, level);
-
-        Roar ab1 = new Roar(this);
-        Eject ab2 = new Eject(this);
-        this.abilities.add(ab1);
-        this.abilities.add(ab2);
-        if (level.isClientSide()) {
-            this.abilityButtons.add(ab1.getButton(Keybindings.keyQ));
-            this.abilityButtons.add(ab2.getButton(Keybindings.keyW));
-        }
+        this.abilities.add(new Roar(this));
+        this.abilities.add(new Eject(this));
+        updateAbilityButtons();
     }
 
     // prevents attack commands applying only to passengers

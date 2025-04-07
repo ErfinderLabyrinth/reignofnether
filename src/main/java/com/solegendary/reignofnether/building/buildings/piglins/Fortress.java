@@ -56,12 +56,17 @@ public class Fortress extends ProductionBuilding implements GarrisonableBuilding
         this.startingBlockTypes.add(Blocks.POLISHED_BASALT);
         this.startingBlockTypes.add(Blocks.NETHER_BRICK_STAIRS);
 
-        if (level.isClientSide())
+        updateButtons();
+    }
+
+    public void updateButtons() {
+        if (level.isClientSide()) {
             this.productionButtons = Arrays.asList(
                 ResearchAdvancedPortals.getStartButton(this, Keybindings.keyQ),
                 ResearchBloodlust.getStartButton(this, Keybindings.keyW),
                 ResearchSoulFireballs.getStartButton(this, Keybindings.keyE)
             );
+        }
     }
 
     public Faction getFaction() {return Faction.PIGLINS;}

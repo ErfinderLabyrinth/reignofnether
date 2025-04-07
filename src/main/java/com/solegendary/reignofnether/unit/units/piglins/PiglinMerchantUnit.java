@@ -210,26 +210,11 @@ public class PiglinMerchantUnit extends Piglin implements Unit, AttackerUnit, He
 
     public PiglinMerchantUnit(EntityType<? extends Piglin> entityType, Level level) {
         super(entityType, level);
-
-        ThrowTNT ab1 = new ThrowTNT(this);
-        FancyFeast ab2 = new FancyFeast(this);
-        GreedIsGoodPassive ab3 = new GreedIsGoodPassive(this);
-        LootExplosion ab4 = new LootExplosion(this);
-        this.abilities.add(ab1);
-        this.abilities.add(ab2);
-        this.abilities.add(ab3);
-        this.abilities.add(ab4);
+        this.abilities.add(new ThrowTNT(this));
+        this.abilities.add(new FancyFeast(this));
+        this.abilities.add(new GreedIsGoodPassive(this));
+        this.abilities.add(new LootExplosion(this));
         updateAbilityButtons();
-    }
-
-    public void updateAbilityButtons() {
-        if (level().isClientSide()) {
-            this.abilityButtons.clear();
-            this.abilityButtons.add(this.abilities.get(0).getButton(Keybindings.keyQ));
-            this.abilityButtons.add(this.abilities.get(1).getButton(Keybindings.keyW));
-            this.abilityButtons.add(this.abilities.get(2).getButton(Keybindings.keyE));
-            this.abilityButtons.add(this.abilities.get(3).getButton(Keybindings.keyR));
-        }
     }
 
     @Override

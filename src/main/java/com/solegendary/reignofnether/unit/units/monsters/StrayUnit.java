@@ -145,12 +145,8 @@ public class StrayUnit extends Stray implements Unit, AttackerUnit, RangedAttack
 
     public StrayUnit(EntityType<? extends Stray> entityType, Level level) {
         super(entityType, level);
-
-        MountSpider mountSpiderAbility = new MountSpider(this);
-        this.abilities.add(mountSpiderAbility);
-        if (level.isClientSide()) {
-            this.abilityButtons.add(mountSpiderAbility.getButton(Keybindings.keyQ));
-        }
+        this.abilities.add(new MountSpider(this));
+        updateAbilityButtons();
     }
 
     @Override

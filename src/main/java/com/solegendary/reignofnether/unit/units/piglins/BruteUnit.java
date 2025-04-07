@@ -154,15 +154,9 @@ public class BruteUnit extends PiglinBrute implements Unit, AttackerUnit {
 
     public BruteUnit(EntityType<? extends PiglinBrute> entityType, Level level) {
         super(entityType, level);
-
-        ToggleShield toggleShield = new ToggleShield(this);
-        this.abilities.add(toggleShield);
-        Bloodlust bloodlust = new Bloodlust(this);
-        this.abilities.add(bloodlust);
-        if (level.isClientSide()) {
-            this.abilityButtons.add(toggleShield.getButton(Keybindings.keyQ));
-            this.abilityButtons.add(bloodlust.getButton(Keybindings.keyW));
-        }
+        this.abilities.add(new ToggleShield(this));
+        this.abilities.add(new Bloodlust(this));
+        updateAbilityButtons();
     }
 
     @Override

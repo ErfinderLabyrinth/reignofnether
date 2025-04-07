@@ -180,8 +180,12 @@ public class GruntUnit extends Piglin implements Unit, WorkerUnit, AttackerUnit,
 
     public GruntUnit(EntityType<? extends Piglin> entityType, Level level) {
         super(entityType, level);
+        updateAbilityButtons();
+    }
 
-        if (level.isClientSide()) {
+    public void updateAbilityButtons() {
+        if (level().isClientSide()) {
+            this.abilityButtons.clear();
             this.abilityButtons.addAll(getBuildingButtons());
         }
     }

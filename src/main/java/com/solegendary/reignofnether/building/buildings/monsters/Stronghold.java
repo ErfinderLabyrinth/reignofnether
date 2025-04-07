@@ -59,10 +59,14 @@ public class Stronghold extends ProductionBuilding implements GarrisonableBuildi
         this.startingBlockTypes.add(Blocks.POLISHED_BLACKSTONE_WALL);
         this.startingBlockTypes.add(Blocks.DEEPSLATE);
 
+        updateButtons();
+        updateBorderBps();
+    }
+
+    public void updateButtons() {
         if (level.isClientSide()) {
             this.productionButtons = List.of(WardenProd.getStartButton(this, Keybindings.keyQ));
         }
-        updateBorderBps();
     }
 
     public int getNightRange() {

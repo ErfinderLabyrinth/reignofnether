@@ -141,17 +141,19 @@ public class Portal extends ProductionBuilding implements NetherConvertingBuildi
 
         this.startingBlockTypes.add(Blocks.NETHER_BRICKS);
 
-        Ability connectPortal = new ConnectPortal(this);
-        this.abilities.add(connectPortal);
-        Ability gotoPortal = new GotoPortal(this);
-        this.abilities.add(gotoPortal);
-        Ability disconnectPortal = new DisconnectPortal(this);
-        this.abilities.add(disconnectPortal);
+        this.abilities.add(new ConnectPortal(this));
+        this.abilities.add(new GotoPortal(this));
+        this.abilities.add(new DisconnectPortal(this));
 
+        updateButtons();
+    }
+
+    public void updateButtons() {
         if (level.isClientSide()) {
-            this.abilityButtons.add(connectPortal.getButton(Keybindings.keyQ));
-            this.abilityButtons.add(gotoPortal.getButton(Keybindings.keyW));
-            this.abilityButtons.add(disconnectPortal.getButton(Keybindings.keyE));
+            this.abilityButtons.clear();
+            this.abilityButtons.add(abilities.get(0).getButton(Keybindings.keyQ));
+            this.abilityButtons.add(abilities.get(1).getButton(Keybindings.keyW));
+            this.abilityButtons.add(abilities.get(2).getButton(Keybindings.keyE));
             this.productionButtons = Arrays.asList(ResearchPortalForCivilian.getStartButton(this, Keybindings.keyQ),
                 ResearchPortalForMilitary.getStartButton(this, Keybindings.keyW),
                 ResearchPortalForTransport.getStartButton(this, Keybindings.keyE)

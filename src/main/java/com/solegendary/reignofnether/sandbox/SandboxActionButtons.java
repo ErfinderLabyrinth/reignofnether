@@ -19,6 +19,10 @@ import static com.solegendary.reignofnether.util.MiscUtil.fcs;
 
 public class SandboxActionButtons {
 
+    public static Button setAnchor;
+    public static Button resetToAnchor;
+    public static Button removeAnchor;
+
     private static boolean neutralUnitsSelected() {
         for (LivingEntity entity : UnitClientEvents.getSelectedUnits())
             if (entity instanceof Unit unit && !unit.getOwnerName().isBlank())
@@ -33,61 +37,65 @@ public class SandboxActionButtons {
         return false;
     }
 
-    public static final Button SET_ANCHOR = new Button(
-            "Set Anchor",
-            Button.itemIconSize,
-            new ResourceLocation("minecraft", "textures/block/respawn_anchor_side4.png"),
-            Keybindings.keyQ,
-            () -> CursorClientEvents.getLeftClickSandboxAction() == SandboxAction.SET_ANCHOR,
-            () -> !SandboxClientEvents.isSandboxPlayer(),
-            () -> true,
-            () -> CursorClientEvents.setLeftClickSandboxAction(SandboxAction.SET_ANCHOR),
-            null,
-            List.of(
-                    fcs(I18n.get("hud.actionbuttons.reignofnether.set_anchor"), true),
-                    fcs(I18n.get("hud.actionbuttons.reignofnether.set_anchor.tooltip1"))
-            )
-    );
-
-    public static final Button RESET_TO_ANCHOR = new Button(
-            "Reset to Anchor",
-            Button.itemIconSize,
-            new ResourceLocation("minecraft", "textures/block/respawn_anchor_top_off.png"),
-            Keybindings.keyW,
-            () -> CursorClientEvents.getLeftClickSandboxAction() == SandboxAction.RESET_TO_ANCHOR,
-            () -> !SandboxClientEvents.isSandboxPlayer(),
-            () -> selectedUnitsHaveAnchor(),
-            () -> {
-                if (!UnitClientEvents.getSelectedUnits().isEmpty()) {
-                    LivingEntity entity = UnitClientEvents.getSelectedUnits().get(0);
-                    if (entity instanceof Unit unit) {
-                        SandboxServerboundPacket.resetToAnchor(entity.getId());
-                        Unit.fullResetBehaviours(unit);
+    public static void updateButtons() {
+        setAnchor = new Button(
+                "Set Anchor",
+                Button.itemIconSize,
+                new ResourceLocation("minecraft", "textures/block/respawn_anchor_side4.png"),
+                Keybindings.keyQ,
+                () -> CursorClientEvents.getLeftClickSandboxAction() == SandboxAction.SET_ANCHOR,
+                () -> !SandboxClientEvents.isSandboxPlayer(),
+                () -> true,
+                () -> CursorClientEvents.setLeftClickSandboxAction(SandboxAction.SET_ANCHOR),
+                null,
+                List.of(
+                        fcs(I18n.get("hud.actionbuttons.reignofnether.set_anchor"), true),
+                        fcs(I18n.get("hud.actionbuttons.reignofnether.set_anchor.tooltip1"))
+                )
+        );
+        resetToAnchor = new Button(
+                "Reset to Anchor",
+                Button.itemIconSize,
+                new ResourceLocation("minecraft", "textures/block/respawn_anchor_top_off.png"),
+                Keybindings.keyW,
+                () -> CursorClientEvents.getLeftClickSandboxAction() == SandboxAction.RESET_TO_ANCHOR,
+                () -> !SandboxClientEvents.isSandboxPlayer(),
+                () -> selectedUnitsHaveAnchor(),
+                () -> {
+                    if (!UnitClientEvents.getSelectedUnits().isEmpty()) {
+                        LivingEntity entity = UnitClientEvents.getSelectedUnits().get(0);
+                        if (entity instanceof Unit unit) {
+                            SandboxServerboundPacket.resetToAnchor(entity.getId());
+                            Unit.fullResetBehaviours(unit);
+                        }
                     }
-                }
-            },
-            null,
-            List.of(
-                    fcs(I18n.get("hud.actionbuttons.reignofnether.reset_to_anchor"), true),
-                    fcs(I18n.get("hud.actionbuttons.reignofnether.reset_to_anchor.tooltip1"))
-            )
-    );
+                },
+                null,
+                List.of(
+                        fcs(I18n.get("hud.actionbuttons.reignofnether.reset_to_anchor"), true),
+                        fcs(I18n.get("hud.actionbuttons.reignofnether.reset_to_anchor.tooltip1"))
+                )
+        );
+        removeAnchor = new Button(
+                "Remove Anchor",
+                Button.itemIconSize,
+                new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/barrier.png"),
+                Keybindings.keyE,
+                () -> CursorClientEvents.getLeftClickSandboxAction() == SandboxAction.REMOVE_ANCHOR,
+                () -> !SandboxClientEvents.isSandboxPlayer(),
+                () -> selectedUnitsHaveAnchor(),
+                () -> {
+                    if (!UnitClientEvents.getSelectedUnits().isEmpty())
+                        SandboxServerboundPacket.removeAnchor(UnitClientEvents.getSelectedUnits().get(0).getId());
+                },
+                null,
+                List.of(
+                        fcs(I18n.get("hud.actionbuttons.reignofnether.remove_anchor"), true)
+                )
+        );
+    }
 
-    public static final Button REMOVE_ANCHOR = new Button(
-            "Remove Anchor",
-            Button.itemIconSize,
-            new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/barrier.png"),
-            Keybindings.keyE,
-            () -> CursorClientEvents.getLeftClickSandboxAction() == SandboxAction.REMOVE_ANCHOR,
-            () -> !SandboxClientEvents.isSandboxPlayer(),
-            () -> selectedUnitsHaveAnchor(),
-            () -> {
-                if (!UnitClientEvents.getSelectedUnits().isEmpty())
-                    SandboxServerboundPacket.removeAnchor(UnitClientEvents.getSelectedUnits().get(0).getId());
-            },
-            null,
-            List.of(
-                    fcs(I18n.get("hud.actionbuttons.reignofnether.remove_anchor"), true)
-            )
-    );
+    static {
+        updateButtons();
+    }
 }

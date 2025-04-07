@@ -165,23 +165,10 @@ public class SpiderUnit extends Spider implements Unit, AttackerUnit, Convertabl
 
     public SpiderUnit(EntityType<? extends Spider> entityType, Level level) {
         super(entityType, level);
-
-        SpiderClimbing ab1 = new SpiderClimbing(this);
-        this.abilities.add(ab1);
-        Eject ab2 = new Eject(this);
-        this.abilities.add(ab2);
-        SpinWebs ab3 = new SpinWebs(this);
-        this.abilities.add(ab3);
+        this.abilities.add(new SpiderClimbing(this));
+        this.abilities.add(new Eject(this));
+        this.abilities.add(new SpinWebs(this));
         updateAbilityButtons();
-    }
-
-    public void updateAbilityButtons() {
-        if (level().isClientSide()) {
-            this.abilityButtons.clear();
-            this.abilityButtons.add(this.abilities.get(0).getButton(Keybindings.keyQ));
-            this.abilityButtons.add(this.abilities.get(1).getButton(Keybindings.keyW));
-            this.abilityButtons.add(this.abilities.get(2).getButton(Keybindings.keyE));
-        }
     }
 
     public boolean isWallClimbing() { return wallClimbing; }

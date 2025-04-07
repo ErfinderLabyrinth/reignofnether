@@ -147,13 +147,8 @@ public class SkeletonUnit extends Skeleton implements Unit, AttackerUnit, Ranged
 
     public SkeletonUnit(EntityType<? extends Skeleton> entityType, Level level) {
         super(entityType, level);
-
-        MountSpider mountSpiderAbility = new MountSpider(this);
-        this.abilities.add(mountSpiderAbility);
-
-        if (level.isClientSide()) {
-            this.abilityButtons.add(mountSpiderAbility.getButton(Keybindings.keyQ));
-        }
+        this.abilities.add(new MountSpider(this));
+        updateAbilityButtons();
     }
 
     @Override

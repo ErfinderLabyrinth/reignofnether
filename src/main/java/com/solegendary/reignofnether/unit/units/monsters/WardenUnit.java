@@ -154,12 +154,8 @@ public class WardenUnit extends Warden implements Unit, AttackerUnit {
 
     public WardenUnit(EntityType<? extends Warden> entityType, Level level) {
         super(entityType, level);
-
-        SonicBoom ab1 = new SonicBoom(this);
-        this.abilities.add(ab1);
-
-        if (level.isClientSide())
-            this.abilityButtons.add(ab1.getButton(Keybindings.keyQ));
+        this.abilities.add(new SonicBoom(this));
+        updateAbilityButtons();
     }
 
     @Override

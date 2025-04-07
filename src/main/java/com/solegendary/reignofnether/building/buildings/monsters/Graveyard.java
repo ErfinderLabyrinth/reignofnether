@@ -46,7 +46,11 @@ public class Graveyard extends ProductionBuilding {
 
         this.explodeChance = 0.2f;
 
-        if (level.isClientSide())
+        updateButtons();
+    }
+
+    public void updateButtons() {
+        if (level.isClientSide()) {
             this.productionButtons = Arrays.asList(
                 ZombieProd.getStartButton(this, Keybindings.keyQ),
                 HuskProd.getStartButton(this, Keybindings.keyQ),
@@ -54,6 +58,7 @@ public class Graveyard extends ProductionBuilding {
                 SkeletonProd.getStartButton(this, Keybindings.keyE),
                 StrayProd.getStartButton(this, Keybindings.keyE)
             );
+        }
     }
 
     public Faction getFaction() {return Faction.MONSTERS;}

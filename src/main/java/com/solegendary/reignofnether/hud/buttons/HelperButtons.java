@@ -39,118 +39,121 @@ public class HelperButtons {
 
     public static final int ICON_SIZE = 14;
 
-    public static final Button chatButton = new Button(
-            "Chat",
-            ICON_SIZE,
-            new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/book.png"),
-            (Keybinding) null,
-            () -> false,
-            () -> false,
-            () -> true,
-            () -> {
-                MC.setScreen(new ChatScreen(""));
-            },
-            null,
-            List.of(FormattedCharSequence.forward(I18n.get("hud.helperbuttons.reignofnether.chat"), Style.EMPTY))
-    );
-
     private static int idleWorkerIndex = 0;
+    public static Button idleWorkerButton;
+    public static Button chatButton;
+    public static Button buildingCancelButton;
+    public static Button armyButton;
 
-    public static final Button idleWorkerButton = new Button(
-            "Idle workers (CTRL-click to select all)",
-            ICON_SIZE,
-            new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/villager.png"),
-            Keybindings.keyJ,
-            () -> false,
-            idleWorkerIds::isEmpty,
-            () -> true,
-            () -> {
-                if (MC.level == null)
-                    return;
+    public static void updateButtons() {
+        chatButton = new Button(
+                "Chat",
+                ICON_SIZE,
+                new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/book.png"),
+                (Keybinding) null,
+                () -> false,
+                () -> false,
+                () -> true,
+                () -> {
+                    MC.setScreen(new ChatScreen(""));
+                },
+                null,
+                List.of(FormattedCharSequence.forward(I18n.get("hud.helperbuttons.reignofnether.chat"), Style.EMPTY))
+        );
+        idleWorkerButton = new Button(
+                "Idle workers (CTRL-click to select all)",
+                ICON_SIZE,
+                new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/villager.png"),
+                Keybindings.keyJ,
+                () -> false,
+                idleWorkerIds::isEmpty,
+                () -> true,
+                () -> {
+                    if (MC.level == null)
+                        return;
 
-                if (Keybindings.ctrlMod.isDown()) {
-                    UnitClientEvents.clearSelectedUnits();
-                    for (int id : idleWorkerIds) {
-                        if (idleWorkerIndex < idleWorkerIds.size()) {
-                            Entity entity = MC.level.getEntity(idleWorkerIds.get(idleWorkerIndex));
-                            if (entity instanceof WorkerUnit) {
-                                UnitClientEvents.addSelectedUnit((LivingEntity) entity);
-                            }
-                            idleWorkerIndex += 1;
-                        } else
-                            idleWorkerIndex = 0; // Reset to zero if out of bounds
-                    }
-                } else {
-                    if (idleWorkerIndex >= idleWorkerIds.size())
-                        idleWorkerIndex = 0; // Reset to zero if out of bounds
-
-                    Entity entity = MC.level.getEntity(idleWorkerIds.get(idleWorkerIndex));
-                    if (entity instanceof WorkerUnit) {
-                        OrthoviewClientEvents.centreCameraOnPos(entity.position());
+                    if (Keybindings.ctrlMod.isDown()) {
                         UnitClientEvents.clearSelectedUnits();
-                        UnitClientEvents.addSelectedUnit((LivingEntity) entity);
+                        for (int id : idleWorkerIds) {
+                            if (idleWorkerIndex < idleWorkerIds.size()) {
+                                Entity entity = MC.level.getEntity(idleWorkerIds.get(idleWorkerIndex));
+                                if (entity instanceof WorkerUnit) {
+                                    UnitClientEvents.addSelectedUnit((LivingEntity) entity);
+                                }
+                                idleWorkerIndex += 1;
+                            } else
+                                idleWorkerIndex = 0; // Reset to zero if out of bounds
+                        }
+                    } else {
+                        if (idleWorkerIndex >= idleWorkerIds.size())
+                            idleWorkerIndex = 0; // Reset to zero if out of bounds
+
+                        Entity entity = MC.level.getEntity(idleWorkerIds.get(idleWorkerIndex));
+                        if (entity instanceof WorkerUnit) {
+                            OrthoviewClientEvents.centreCameraOnPos(entity.position());
+                            UnitClientEvents.clearSelectedUnits();
+                            UnitClientEvents.addSelectedUnit((LivingEntity) entity);
+                        }
+                        idleWorkerIndex += 1;
+
+                        // Reset idleWorkerIndex if it exceeds the size after increment
+                        if (idleWorkerIndex >= idleWorkerIds.size())
+                            idleWorkerIndex = 0;
                     }
-                    idleWorkerIndex += 1;
-
-                    // Reset idleWorkerIndex if it exceeds the size after increment
-                    if (idleWorkerIndex >= idleWorkerIds.size())
-                        idleWorkerIndex = 0;
-                }
-            },
-            null,
-            List.of(FormattedCharSequence.forward(I18n.get("hud.helperbuttons.reignofnether.idle_workers"), Style.EMPTY))
-    );
-
-    public static final Button buildingCancelButton = new Button(
-            "Cancel",
-            ICON_SIZE,
-            new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/barrier.png"),
-            Keybindings.cancelBuild,
-            () -> false,
-            () -> {
-                if (hudSelectedBuilding == null)
-                    return false;
-                boolean isSandboxPlayer = MC.player != null && SandboxClientEvents.isSandboxPlayer(MC.player.getName().getString());
-                return BuildingUtils.getTotalCompletedBuildingsOwned(true, hudSelectedBuilding.ownerName) == 0 &&
-                        !isSandboxPlayer;
-            },
-            () -> true,
-            () -> {
-                if (MC.player != null)
-                    BuildingServerboundPacket.cancelBuilding(hudSelectedBuilding.minCorner, MC.player.getName().getString());
-                hudSelectedBuilding = null;
-            },
-            null,
-            List.of(FormattedCharSequence.forward(I18n.get("hud.helperbuttons.reignofnether.cancel"), Style.EMPTY))
-    );
-
-    public static final Button armyButton = new Button(
-            "Select all military units",
-            ICON_SIZE,
-            new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/sword_and_bow.png"),
-            Keybindings.keyK,
-            () -> false,
-            () -> {
-                List<LivingEntity> militaryUnits = UnitClientEvents.getAllUnits().stream()
-                        .filter(u -> !(u instanceof WorkerUnit) &&
-                            GarrisonableBuilding.getGarrison((Unit) u) == null &&
-                            getPlayerToEntityRelationship(u) == Relationship.OWNED).toList();
-                return militaryUnits.isEmpty();
-            },
-            () -> true,
-            () -> {
-                List<LivingEntity> militaryUnits = UnitClientEvents.getAllUnits().stream()
-                        .filter(u -> !(u instanceof WorkerUnit) &&
-                            GarrisonableBuilding.getGarrison((Unit) u) == null &&
-                            getPlayerToEntityRelationship(u) == Relationship.OWNED).toList();
-                UnitClientEvents.clearSelectedUnits();
-                for (LivingEntity militaryUnit : militaryUnits)
-                    UnitClientEvents.addSelectedUnit(militaryUnit);
-                HudClientEvents.setLowestCdHudEntity();
-            },
-            null,
-            List.of(FormattedCharSequence.forward(I18n.get("hud.helperbuttons.reignofnether.select_all_military_units"), Style.EMPTY))
-    );
+                },
+                null,
+                List.of(FormattedCharSequence.forward(I18n.get("hud.helperbuttons.reignofnether.idle_workers"), Style.EMPTY))
+        );
+        buildingCancelButton = new Button(
+                "Cancel",
+                ICON_SIZE,
+                new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/barrier.png"),
+                Keybindings.cancelBuild,
+                () -> false,
+                () -> {
+                    if (hudSelectedBuilding == null)
+                        return false;
+                    boolean isSandboxPlayer = MC.player != null && SandboxClientEvents.isSandboxPlayer(MC.player.getName().getString());
+                    return BuildingUtils.getTotalCompletedBuildingsOwned(true, hudSelectedBuilding.ownerName) == 0 &&
+                            !isSandboxPlayer;
+                },
+                () -> true,
+                () -> {
+                    if (MC.player != null)
+                        BuildingServerboundPacket.cancelBuilding(hudSelectedBuilding.minCorner, MC.player.getName().getString());
+                    hudSelectedBuilding = null;
+                },
+                null,
+                List.of(FormattedCharSequence.forward(I18n.get("hud.helperbuttons.reignofnether.cancel"), Style.EMPTY))
+        );
+        armyButton = new Button(
+                "Select all military units",
+                ICON_SIZE,
+                new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/sword_and_bow.png"),
+                Keybindings.keyK,
+                () -> false,
+                () -> {
+                    List<LivingEntity> militaryUnits = UnitClientEvents.getAllUnits().stream()
+                            .filter(u -> !(u instanceof WorkerUnit) &&
+                                    GarrisonableBuilding.getGarrison((Unit) u) == null &&
+                                    getPlayerToEntityRelationship(u) == Relationship.OWNED).toList();
+                    return militaryUnits.isEmpty();
+                },
+                () -> true,
+                () -> {
+                    List<LivingEntity> militaryUnits = UnitClientEvents.getAllUnits().stream()
+                            .filter(u -> !(u instanceof WorkerUnit) &&
+                                    GarrisonableBuilding.getGarrison((Unit) u) == null &&
+                                    getPlayerToEntityRelationship(u) == Relationship.OWNED).toList();
+                    UnitClientEvents.clearSelectedUnits();
+                    for (LivingEntity militaryUnit : militaryUnits)
+                        UnitClientEvents.addSelectedUnit(militaryUnit);
+                    HudClientEvents.setLowestCdHudEntity();
+                },
+                null,
+                List.of(FormattedCharSequence.forward(I18n.get("hud.helperbuttons.reignofnether.select_all_military_units"), Style.EMPTY))
+        );
+    }
 
     private static List<FormattedCharSequence> getBeaconButtonTooltip(String ownerName) {
         ArrayList<FormattedCharSequence> fcsList = new ArrayList<>();
@@ -208,5 +211,9 @@ public class HelperButtons {
                 null,
                 getBeaconButtonTooltip(ownerName)
         );
+    }
+
+    static {
+        updateButtons();
     }
 }

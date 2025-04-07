@@ -49,11 +49,16 @@ public class Barracks extends ProductionBuilding {
 
         this.explodeChance = 0.2f;
 
-        if (level.isClientSide())
+        updateButtons();
+    }
+
+    public void updateButtons() {
+        if (level.isClientSide()) {
             this.productionButtons = Arrays.asList(
-                    VindicatorProd.getStartButton(this, Keybindings.keyQ),
-                    PillagerProd.getStartButton(this, Keybindings.keyW)
+                VindicatorProd.getStartButton(this, Keybindings.keyQ),
+                PillagerProd.getStartButton(this, Keybindings.keyW)
             );
+        }
     }
 
     public Faction getFaction() {return Faction.VILLAGERS;}

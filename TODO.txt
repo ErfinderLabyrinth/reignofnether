@@ -23,7 +23,7 @@ Controlling non-RoN mobs
 ------------------------
 
 [✔] All vanilla and modded mobs now have basic movement and attack controls
-    - Enabled in Sandbox or by using the cheatcode 'wouldyoukindly'
+    - Enabled while in Sandbox or by using the cheatcode 'wouldyoukindly'
     - Attack-move only works against mobs that the controlled mob is naturally aggressive to
     - Disclaimer: sometimes the mob AI interferes with your commands
         - For example, iron golems constantly try to go back to the nearest village
@@ -31,7 +31,7 @@ Controlling non-RoN mobs
 Bugfixes
 --------
 [✔] Can no longer send resources to a non-RTS ally
-[❌] Fixed unit and building ability tooltips not updating when language is changed
+[🟡] Fixed unit and building ability tooltips not updating when language is changed
 
 Quality of Life
 ---------------
@@ -41,7 +41,7 @@ Quality of Life
 
 Languages
 ---------
-[✔] Added Spanish (es_es)
+[✔] Added Spanish (España) (es_es)
 [✔] Misc language fixes and additions
 
 Balancing

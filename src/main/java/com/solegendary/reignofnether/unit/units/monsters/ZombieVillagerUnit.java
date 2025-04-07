@@ -192,8 +192,12 @@ public class ZombieVillagerUnit extends Vindicator implements Unit, WorkerUnit, 
 
     public ZombieVillagerUnit(EntityType<? extends Vindicator> entityType, Level level) {
         super(entityType, level);
+        updateAbilityButtons();
+    }
 
-        if (level.isClientSide()) {
+    public void updateAbilityButtons() {
+        if (level().isClientSide()) {
+            this.abilityButtons.clear();
             this.abilityButtons.addAll(getBuildingButtons());
         }
     }

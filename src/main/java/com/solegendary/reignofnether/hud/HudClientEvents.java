@@ -50,7 +50,6 @@ import com.solegendary.reignofnether.unit.units.villagers.VillagerUnit;
 import com.solegendary.reignofnether.util.MiscUtil;
 import com.solegendary.reignofnether.util.MyRenderer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.resources.language.I18n;
@@ -801,9 +800,9 @@ public class HudClientEvents {
             ArrayList<Button> actionButtons = new ArrayList<>();
 
             if (hudSelectedEntity instanceof AttackerUnit) {
-                actionButtons.add(SandboxActionButtons.SET_ANCHOR);
-                actionButtons.add(SandboxActionButtons.RESET_TO_ANCHOR);
-                actionButtons.add(SandboxActionButtons.REMOVE_ANCHOR);
+                actionButtons.add(SandboxActionButtons.setAnchor);
+                actionButtons.add(SandboxActionButtons.resetToAnchor);
+                actionButtons.add(SandboxActionButtons.removeAnchor);
             }
             for (Button actionButton : actionButtons) {
                 if (!actionButton.isHidden.get()) {
@@ -825,22 +824,22 @@ public class HudClientEvents {
             ArrayList<Button> actionButtons = new ArrayList<>();
 
             if (hudSelectedEntity instanceof AttackerUnit) {
-                actionButtons.add(ActionButtons.ATTACK);
+                actionButtons.add(ActionButtons.attack);
             }
             if (hudSelectedEntity instanceof WorkerUnit) {
-                actionButtons.add(ActionButtons.BUILD_REPAIR);
-                actionButtons.add(ActionButtons.GATHER);
+                actionButtons.add(ActionButtons.buildRepair);
+                actionButtons.add(ActionButtons.gather);
             }
             if (unit.canGarrison() && GarrisonableBuilding.getGarrison(unit) == null) {
-                actionButtons.add(ActionButtons.GARRISON);
+                actionButtons.add(ActionButtons.garrison);
             } else if (GarrisonableBuilding.getGarrison(unit) != null) {
-                actionButtons.add(ActionButtons.UNGARRISON);
+                actionButtons.add(ActionButtons.ungarrison);
             }
 
             if (!(hudSelectedEntity instanceof WorkerUnit)) {
-                actionButtons.add(ActionButtons.HOLD);
+                actionButtons.add(ActionButtons.hold);
             }
-            actionButtons.add(ActionButtons.STOP);
+            actionButtons.add(ActionButtons.stop);
 
             if (hudSelectedEntity instanceof VillagerUnit vUnit)
                 for (Ability ability : vUnit.getAbilities())
@@ -849,7 +848,7 @@ public class HudClientEvents {
 
             for (Button actionButton : actionButtons) {
                 // GATHER button does not have a static icon
-                if (actionButton == ActionButtons.GATHER && hudSelectedEntity instanceof WorkerUnit workerUnit) {
+                if (actionButton == ActionButtons.gather && hudSelectedEntity instanceof WorkerUnit workerUnit) {
                     switch (workerUnit.getGatherResourceGoal().getTargetResourceName()) {
                         case NONE -> actionButton.iconResource = new ResourceLocation(ReignOfNether.MOD_ID,
                                 "textures/icons/items/no_gather.png"
@@ -992,9 +991,9 @@ public class HudClientEvents {
             ArrayList<Button> actionButtons = new ArrayList<>();
 
             if (NonUnitClientEvents.canAttack(getSelectedUnits().get(0)))
-                actionButtons.add(ActionButtons.ATTACK);
+                actionButtons.add(ActionButtons.attack);
 
-            actionButtons.add(ActionButtons.STOP);
+            actionButtons.add(ActionButtons.stop);
 
             for (Button actionButton : actionButtons) {
                 actionButton.render(evt.getGuiGraphics(), blitX, blitY, mouseX, mouseY);

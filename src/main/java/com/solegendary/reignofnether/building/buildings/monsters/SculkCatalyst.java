@@ -78,11 +78,15 @@ public class SculkCatalyst extends Building implements NightSource, RangeIndicat
 
         this.startingBlockTypes.add(Blocks.POLISHED_BLACKSTONE);
 
-        Ability sacrifice = new Sacrifice(level);
-        this.abilities.add(sacrifice);
+        this.abilities.add(new Sacrifice(level));
 
+        updateButtons();
+    }
+
+    public void updateButtons() {
         if (level.isClientSide()) {
-            this.abilityButtons.add(sacrifice.getButton(Keybindings.keyQ));
+            this.abilityButtons.clear();
+            this.abilityButtons.add(abilities.get(0).getButton(Keybindings.keyQ));
         }
     }
 

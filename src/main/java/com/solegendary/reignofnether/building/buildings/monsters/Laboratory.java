@@ -55,9 +55,11 @@ public class Laboratory extends ProductionBuilding implements RangeIndicator {
         this.startingBlockTypes.add(Blocks.SPRUCE_PLANKS);
         this.startingBlockTypes.add(Blocks.BLACKSTONE);
 
-        Ability callLightning = new CallLightning(this);
-        this.abilities.add(callLightning);
+        this.abilities.add(new CallLightning(this));
+        updateButtons();
+    }
 
+    public void updateButtons() {
         if (level.isClientSide()) {
             this.productionButtons = Arrays.asList(
                 ResearchHusks.getStartButton(this, Keybindings.keyQ),
@@ -71,7 +73,8 @@ public class Laboratory extends ProductionBuilding implements RangeIndicator {
                 ResearchSilverfish.getStartButton(this, Keybindings.keyO),
                 ResearchSculkAmplifiers.getStartButton(this, Keybindings.keyP)
             );
-            this.abilityButtons.add(callLightning.getButton(Keybindings.keyL));
+            this.abilityButtons.clear();
+            this.abilityButtons.add(this.abilities.get(0).getButton(Keybindings.keyL));
         }
     }
 

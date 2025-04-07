@@ -66,15 +66,18 @@ public class Castle extends ProductionBuilding implements GarrisonableBuilding {
         this.startingBlockTypes.add(Blocks.SPRUCE_PLANKS);
         this.startingBlockTypes.add(Blocks.DARK_OAK_PLANKS);
 
-        Ability promoteIllager = new PromoteIllager(this);
-        this.abilities.add(promoteIllager);
+        this.abilities.add(new PromoteIllager(this));
+        updateButtons();
+    }
 
+    public void updateButtons() {
         if (level.isClientSide()) {
             this.productionButtons = Arrays.asList(RavagerProd.getStartButton(this, Keybindings.keyQ),
                 ResearchRavagerCavalry.getStartButton(this, Keybindings.keyW),
                 ResearchCastleFlag.getStartButton(this, Keybindings.keyE)
             );
-            this.abilityButtons.add(promoteIllager.getButton(Keybindings.keyE));
+            this.abilityButtons.clear();
+            this.abilityButtons.add(abilities.get(0).getButton(Keybindings.keyE));
         }
     }
 

@@ -139,12 +139,8 @@ public class CreeperUnit extends Creeper implements Unit, AttackerUnit {
 
     public CreeperUnit(EntityType<? extends Creeper> entityType, Level level) {
         super(entityType, level);
-
-        Explode explodeAbility = new Explode(this);
-        this.abilities.add(explodeAbility);
-
-        if (level.isClientSide())
-            this.abilityButtons.add(explodeAbility.getButton(Keybindings.keyQ));
+        this.abilities.add(new Explode(this));
+        updateAbilityButtons();
     }
 
     @Override

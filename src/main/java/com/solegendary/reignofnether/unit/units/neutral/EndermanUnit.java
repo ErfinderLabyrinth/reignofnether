@@ -132,12 +132,8 @@ public class EndermanUnit extends EnderMan implements Unit, AttackerUnit {
 
     public EndermanUnit(EntityType<? extends EnderMan> entityType, Level level) {
         super(entityType, level);
-
-        Teleport ab1 = new Teleport(this);
-        this.abilities.add(ab1);
-
-        if (level.isClientSide())
-            this.abilityButtons.add(ab1.getButton(Keybindings.keyQ));
+        this.abilities.add(new Teleport(this));
+        updateAbilityButtons();
     }
 
     @Override

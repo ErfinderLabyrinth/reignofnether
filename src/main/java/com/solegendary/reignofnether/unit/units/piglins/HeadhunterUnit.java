@@ -160,15 +160,9 @@ public class HeadhunterUnit extends PiglinBrute implements Unit, AttackerUnit, R
 
     public HeadhunterUnit(EntityType<? extends PiglinBrute> entityType, Level level) {
         super(entityType, level);
-
-        MountHoglin mountHoglinAbility = new MountHoglin(this);
-        this.abilities.add(mountHoglinAbility);
-        Bloodlust bloodlust = new Bloodlust(this);
-        this.abilities.add(bloodlust);
-        if (level.isClientSide()) {
-            this.abilityButtons.add(mountHoglinAbility.getButton(Keybindings.keyQ));
-            this.abilityButtons.add(bloodlust.getButton(Keybindings.keyW));
-        }
+        this.abilities.add(new MountHoglin(this));
+        this.abilities.add(new Bloodlust(this));
+        updateAbilityButtons();
     }
 
     @Override

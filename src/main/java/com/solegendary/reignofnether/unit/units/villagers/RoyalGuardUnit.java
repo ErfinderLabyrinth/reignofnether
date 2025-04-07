@@ -201,26 +201,11 @@ public class RoyalGuardUnit extends Vindicator implements Unit, AttackerUnit, He
 
     public RoyalGuardUnit(EntityType<? extends Vindicator> entityType, Level level) {
         super(entityType, level);
-
-        MaceSlam ab1 = new MaceSlam(this);
-        TauntingCry ab2 = new TauntingCry(this);
-        BattleRagePassive ab3 = new BattleRagePassive(this);
-        Avatar ab4 = new Avatar(this);
-        this.abilities.add(ab1);
-        this.abilities.add(ab2);
-        this.abilities.add(ab3);
-        this.abilities.add(ab4);
+        this.abilities.add(new MaceSlam(this));
+        this.abilities.add(new TauntingCry(this));
+        this.abilities.add(new BattleRagePassive(this));
+        this.abilities.add(new Avatar(this));
         updateAbilityButtons();
-    }
-
-    public void updateAbilityButtons() {
-        if (level().isClientSide()) {
-            this.abilityButtons.clear();
-            this.abilityButtons.add(this.abilities.get(0).getButton(Keybindings.keyQ));
-            this.abilityButtons.add(this.abilities.get(1).getButton(Keybindings.keyW));
-            this.abilityButtons.add(this.abilities.get(2).getButton(Keybindings.keyE));
-            this.abilityButtons.add(this.abilities.get(3).getButton(Keybindings.keyR));
-        }
     }
 
     @Override

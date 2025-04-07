@@ -166,11 +166,8 @@ public class GhastUnit extends Ghast implements Unit, AttackerUnit, RangedAttack
     public GhastUnit(EntityType<? extends Ghast> entityType, Level level) {
         super(entityType, level);
         this.moveControl = new GhastUnitMoveControl(this);
-
-        AttackGround ab1 = new AttackGround(this);
-        this.abilities.add(ab1);
-        if (level.isClientSide())
-            this.abilityButtons.add(ab1.getButton(Keybindings.keyQ));
+        this.abilities.add(new AttackGround(this));
+        updateAbilityButtons();
     }
 
     @Override

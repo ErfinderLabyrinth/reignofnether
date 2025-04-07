@@ -48,11 +48,16 @@ public class SpiderLair extends ProductionBuilding {
 
         this.explodeChance = 0.2f;
 
-        if (level.isClientSide())
+        updateButtons();
+    }
+
+    public void updateButtons() {
+        if (level.isClientSide()) {
             this.productionButtons = Arrays.asList(
                 SpiderProd.getStartButton(this, Keybindings.keyQ),
                 PoisonSpiderProd.getStartButton(this, Keybindings.keyW)
             );
+        }
     }
 
     public Faction getFaction() {return Faction.MONSTERS;}

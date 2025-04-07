@@ -53,10 +53,15 @@ public class BasaltSprings extends ProductionBuilding {
 
         this.explodeChance = 0.2f;
 
-        if (level.isClientSide())
+        updateButtons();
+    }
+
+    public void updateButtons() {
+        if (level.isClientSide()) {
             this.productionButtons = Arrays.asList(
-                    ResearchCubeMagma.getStartButton(this, Keybindings.keyQ)
+                ResearchCubeMagma.getStartButton(this, Keybindings.keyQ)
             );
+        }
     }
 
     public Faction getFaction() {return Faction.PIGLINS;}

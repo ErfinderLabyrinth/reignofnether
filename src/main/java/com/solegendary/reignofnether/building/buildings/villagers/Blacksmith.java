@@ -51,13 +51,16 @@ public class Blacksmith extends ProductionBuilding {
         this.startingBlockTypes.add(Blocks.OAK_PLANKS);
         this.startingBlockTypes.add(Blocks.COBBLESTONE);
 
-        if (level.isClientSide())
+        updateButtons();
+    }
+
+    public void updateButtons() {
+        if (level.isClientSide()) {
             this.productionButtons = Arrays.asList(
                 IronGolemProd.getStartButton(this, Keybindings.keyQ),
-                //ResearchVindicatorAxes.getStartButton(this, Keybindings.keyW),
-                //ResearchPillagerCrossbows.getStartButton(this, Keybindings.keyE),
                 ResearchGolemSmithing.getStartButton(this, Keybindings.keyW)
             );
+        }
     }
 
     public Faction getFaction() {return Faction.VILLAGERS;}

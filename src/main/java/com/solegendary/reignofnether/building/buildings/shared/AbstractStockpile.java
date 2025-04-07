@@ -41,9 +41,13 @@ public abstract class AbstractStockpile extends ProductionBuilding {
 
         this.findMostAbundantNearbyResource();
 
+        updateButtons();
+    }
+
+    public void updateButtons() {
         if (level.isClientSide()) {
             this.productionButtons = Arrays.asList(
-                    ResearchResourceCapacity.getStartButton(this, Keybindings.keyQ)
+                ResearchResourceCapacity.getStartButton(this, Keybindings.keyQ)
             );
         }
     }

@@ -55,11 +55,16 @@ public class Bastion extends ProductionBuilding implements GarrisonableBuilding 
 
         this.explodeChance = 0.2f;
 
-        if (level.isClientSide())
+        updateButtons();
+    }
+
+    public void updateButtons() {
+        if (level.isClientSide()) {
             this.productionButtons = Arrays.asList(
-                    ResearchBruteShields.getStartButton(this, Keybindings.keyQ),
-                    ResearchHeavyTridents.getStartButton(this, Keybindings.keyW)
+                ResearchBruteShields.getStartButton(this, Keybindings.keyQ),
+                ResearchHeavyTridents.getStartButton(this, Keybindings.keyW)
             );
+        }
     }
 
     public Faction getFaction() {return Faction.PIGLINS;}
