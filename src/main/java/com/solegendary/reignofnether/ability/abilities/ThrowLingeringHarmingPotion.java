@@ -55,8 +55,7 @@ public class ThrowLingeringHarmingPotion extends Ability {
                     Style.EMPTY.withBold(true)
                 ),
                 FormattedCharSequence.forward(
-                    I18n.get("abilities.reignofnether.lingering_harming_potion.tooltip1", CD_MAX_SECONDS)
-                        + witchUnit.getPotionThrowRange(),
+                    I18n.get("abilities.reignofnether.lingering_harming_potion.tooltip1", CD_MAX_SECONDS, witchUnit.getPotionThrowRange()),
                     MyRenderer.iconStyle
                 ),
                 FormattedCharSequence.forward(

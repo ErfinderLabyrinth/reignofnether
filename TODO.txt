@@ -32,6 +32,7 @@ Bugfixes
 --------
 [✔] Can no longer send resources to a non-RTS ally
 [🟡] Fixed unit and building ability tooltips not updating when language is changed
+[❌] Witch and Brute ability tooltip errors (only in spanish?)
 
 Quality of Life
 ---------------

@@ -62,7 +62,6 @@ public class BruteProd extends ProductionItem {
                 List.of(
                         FormattedCharSequence.forward(I18n.get("units.piglins.reignofnether.brute"), Style.EMPTY.withBold(true)),
                         FormattedCharSequence.forward("", Style.EMPTY),
-                        FormattedCharSequence.forward("", Style.EMPTY),
                         FormattedCharSequence.forward(I18n.get("units.piglins.reignofnether.brute.tooltip1"), Style.EMPTY)
                 ),
                 null
