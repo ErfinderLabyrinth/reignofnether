@@ -51,7 +51,7 @@ public class ResearchSaveData extends SavedData {
 
     @Override
     public CompoundTag save(CompoundTag tag) {
-        ReignOfNether.LOGGER.info("ResearchSaveData.save");
+        //ReignOfNether.LOGGER.info("ResearchSaveData.save");
 
         ListTag list = new ListTag();
         this.researchItems.forEach(b -> {
@@ -59,7 +59,7 @@ public class ResearchSaveData extends SavedData {
             cTag.putString("ownerName", b.getFirst());
             cTag.putString("researchName", b.getSecond());
             list.add(cTag);
-            ReignOfNether.LOGGER.info("ResearchSaveData.save: " + b.getFirst() + "|" + b.getSecond());
+            //ReignOfNether.LOGGER.info("ResearchSaveData.save: " + b.getFirst() + "|" + b.getSecond());
         });
         tag.put("researchItems", list);
         return tag;

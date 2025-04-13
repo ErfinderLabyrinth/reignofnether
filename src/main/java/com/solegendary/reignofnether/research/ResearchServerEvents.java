@@ -25,7 +25,7 @@ public class ResearchServerEvents {
             researchData.save();
             serverLevel.getDataStorage().save();
 
-            ReignOfNether.LOGGER.info("saved " + researchItems.size() + " researchItems in serverevents");
+            //ReignOfNether.LOGGER.info("saved " + researchItems.size() + " researchItems in serverevents");
         }
     }
 

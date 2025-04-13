@@ -84,7 +84,7 @@ public class TargetResourcesSaveData extends SavedData {
 
     @Override
     public CompoundTag save(CompoundTag tag) {
-        ReignOfNether.LOGGER.info("TargetResourcesSaveData.save");
+        //ReignOfNether.LOGGER.info("TargetResourcesSaveData.save");
 
         ListTag list = new ListTag();
         this.targetData.forEach(td -> {
@@ -104,7 +104,7 @@ public class TargetResourcesSaveData extends SavedData {
             }
             list.add(cTag);
 
-            ReignOfNether.LOGGER.info("TargetResourcesSaveData.save: " + td.unitUUID + "|" + td.gatherTarget);
+            //ReignOfNether.LOGGER.info("TargetResourcesSaveData.save: " + td.unitUUID + "|" + td.gatherTarget);
         });
         tag.put("targetResourcesData", list);
         return tag;

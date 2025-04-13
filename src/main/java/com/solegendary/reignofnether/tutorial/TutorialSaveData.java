@@ -36,7 +36,7 @@ public class TutorialSaveData extends SavedData {
 
     @Override
     public CompoundTag save(CompoundTag tag) {
-        ReignOfNether.LOGGER.info("TutorialSaveData.save: " + stage);
+        //ReignOfNether.LOGGER.info("TutorialSaveData.save: " + stage);
         tag.putString("stage", this.stage.name());
         return tag;
     }

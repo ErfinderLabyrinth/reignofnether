@@ -133,7 +133,7 @@ public class StartPosServerEvents {
         startPosData.startPoses.addAll(startPoses);
         startPosData.save();
         serverLevel.getDataStorage().save();
-        ReignOfNether.LOGGER.info("saved " + startPoses.size() + " start positions in serverevents");
+        //ReignOfNether.LOGGER.info("saved " + startPoses.size() + " start positions in serverevents");
     }
 
     @SubscribeEvent

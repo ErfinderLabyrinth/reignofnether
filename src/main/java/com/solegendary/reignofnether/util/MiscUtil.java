@@ -281,8 +281,8 @@ public class MiscUtil {
         for (Building building : buildings) {
             // Check if the building is attackable, taking into account the relationship
             if (isBuildingAttackable(unitMob, building) && !(building instanceof AbstractBridge)) {
-                BlockPos attackPos = building.getClosestGroundPos(unitMob.getOnPos(), 1);
-                double dist = Math.sqrt(unitMob.getOnPos().distSqr(attackPos));
+                BlockPos attackPos = building.getClosestGroundPos(unitMob.blockPosition(), 1);
+                double dist = Math.sqrt(unitMob.blockPosition().distSqr(attackPos));
                 if (dist < closestDist) {
                     closestDist = dist;
                     closestBuilding = building;
@@ -332,7 +332,7 @@ public class MiscUtil {
 
             for (Entity entity : entities)
                 if (entity.position().distanceTo(new Vec3(pos.x, pos.y, pos.z)) <= range &&
-                        entity.level().getWorldBorder().isWithinBounds(entity.getOnPos()))
+                        entity.level().getWorldBorder().isWithinBounds(entity.blockPosition()))
                     entitiesInRange.add((T) entity);
 
             return entitiesInRange;

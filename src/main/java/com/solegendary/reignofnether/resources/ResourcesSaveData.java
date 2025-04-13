@@ -55,7 +55,7 @@ public class ResourcesSaveData extends SavedData {
 
     @Override
     public CompoundTag save(CompoundTag tag) {
-        ReignOfNether.LOGGER.info("ResourcesSaveData.save");
+        //ReignOfNether.LOGGER.info("ResourcesSaveData.save");
 
         ListTag list = new ListTag();
         this.resources.forEach(r -> {

@@ -134,7 +134,7 @@ public class UnitServerEvents {
         });
         data.save();
         level.getDataStorage().save();
-        ReignOfNether.LOGGER.info("Saved " + getAllUnits().size() + " units");
+        //ReignOfNether.LOGGER.info("Saved " + getAllUnits().size() + " units");
     }
 
     public static void saveGatherTargets(ServerLevel level) {
@@ -156,7 +156,7 @@ public class UnitServerEvents {
         });
         data.save();
         level.getDataStorage().save();
-        ReignOfNether.LOGGER.info("Saved " + numWorkersSaved + " gatherTargets");
+        //ReignOfNether.LOGGER.info("Saved " + numWorkersSaved + " gatherTargets");
     }
 
     @SubscribeEvent
@@ -347,8 +347,7 @@ public class UnitServerEvents {
                         UnitSyncClientboundPacket.sendSyncResourcesPacket(unit);
                         UnitSyncClientboundPacket.sendSyncOwnerNamePacket(unit);
                         UnitSyncClientboundPacket.sendSyncAnchorPosPacket(entity, unit.getAnchor());
-                        ReignOfNether.LOGGER.info(
-                                "loaded unit in serverevents: " + su.ownerName + "|" + su.name + "|" + su.uuid);
+                        ReignOfNether.LOGGER.info("loaded unit in serverevents: " + su.ownerName + "|" + su.name + "|" + su.uuid);
                         return true;
                     }
                     return false;
@@ -360,8 +359,7 @@ public class UnitServerEvents {
                         if (sr.unitUUID.equals(entity.getStringUUID())) {
                             wUnit.getGatherResourceGoal().saveData = sr;
                             wUnit.getGatherResourceGoal().loadState();
-                            ReignOfNether.LOGGER.info(
-                                    "loaded gatherTarget in serverevents: " + sr.gatherTarget);
+                            ReignOfNether.LOGGER.info("loaded gatherTarget in serverevents: " + sr.gatherTarget);
                             return true;
                         }
                         return false;

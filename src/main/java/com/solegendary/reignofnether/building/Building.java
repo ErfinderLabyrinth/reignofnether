@@ -1054,11 +1054,8 @@ public abstract class Building {
 
         for (BlockPos bp : getRenderChunkOrigins(true)) {
             BlockPos roundedOrigin = bp.offset(-bp.getX() % 16, -bp.getY() % 16, -bp.getZ() % 16);
-            if (bp.getX() % 16 != 0 || bp.getY() % 16 != 0 || bp.getZ() % 16 != 0) {
-                ReignOfNether.LOGGER.warn("attempted to create a FrozenChunk at non-origin pos: " + bp);
-            }
 
-            ReignOfNether.LOGGER.info("Froze chunk at: " + roundedOrigin);
+            //ReignOfNether.LOGGER.info("Froze chunk at: " + roundedOrigin);
 
             FrozenChunk newFrozenChunk = null;
             for (FrozenChunk frozenChunk : FogOfWarClientEvents.frozenChunks) {

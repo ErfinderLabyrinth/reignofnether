@@ -57,7 +57,7 @@ public class RTSPlayerSaveData extends SavedData {
 
     @Override
     public CompoundTag save(CompoundTag tag) {
-        ReignOfNether.LOGGER.info("RTSPlayerSaveData.save");
+        //ReignOfNether.LOGGER.info("RTSPlayerSaveData.save");
 
         ListTag list = new ListTag();
         this.rtsPlayers.forEach(p -> {
@@ -69,7 +69,7 @@ public class RTSPlayerSaveData extends SavedData {
             cTag.putString("faction", p.faction.name());
             list.add(cTag);
 
-            ReignOfNether.LOGGER.info("RTSPlayerSaveData.save: " + p.name + "|" + p.id + "|" + p.faction);
+            //ReignOfNether.LOGGER.info("RTSPlayerSaveData.save: " + p.name + "|" + p.id + "|" + p.faction);
         });
         tag.put("rtsplayers", list);
         return tag;

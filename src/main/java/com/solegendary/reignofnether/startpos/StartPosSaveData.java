@@ -53,7 +53,7 @@ public class StartPosSaveData extends SavedData {
 
     @Override
     public CompoundTag save(CompoundTag tag) {
-        ReignOfNether.LOGGER.info("StartPosSaveData.save");
+        //ReignOfNether.LOGGER.info("StartPosSaveData.save");
 
         ListTag list = new ListTag();
         this.startPoses.forEach(sp -> {
@@ -63,7 +63,7 @@ public class StartPosSaveData extends SavedData {
             cTag.putInt("z", sp.pos.getZ());
             cTag.putInt("colorId", sp.colorId);
             list.add(cTag);
-            ReignOfNether.LOGGER.info("StartPosSaveData.save: " + sp.pos.getX() + "," + sp.pos.getY() + "," + sp.pos.getZ() + "|" + sp.colorId);
+            //ReignOfNether.LOGGER.info("StartPosSaveData.save: " + sp.pos.getX() + "," + sp.pos.getY() + "," + sp.pos.getZ() + "|" + sp.colorId);
         });
         tag.put("startPoses", list);
         return tag;

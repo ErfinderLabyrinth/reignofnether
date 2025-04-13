@@ -59,7 +59,7 @@ public class UnitSaveData extends SavedData {
 
     @Override
     public CompoundTag save(CompoundTag tag) {
-        ReignOfNether.LOGGER.info("UnitSaveData.save");
+        //ReignOfNether.LOGGER.info("UnitSaveData.save");
 
         ListTag list = new ListTag();
         this.units.forEach(u -> {
@@ -72,7 +72,7 @@ public class UnitSaveData extends SavedData {
             cTag.putInt("anchorPosZ", u.anchorPos.getZ());
             list.add(cTag);
 
-            ReignOfNether.LOGGER.info("UnitSaveData.save: " + u.ownerName + "|" + u.name + "|" + u.uuid);
+            //ReignOfNether.LOGGER.info("UnitSaveData.save: " + u.ownerName + "|" + u.name + "|" + u.uuid);
         });
         tag.put("units", list);
         return tag;

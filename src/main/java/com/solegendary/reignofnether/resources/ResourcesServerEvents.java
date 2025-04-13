@@ -97,8 +97,7 @@ public class ResourcesServerEvents {
                 r.wood + r.woodToAdd + unitWood + prodWood,
                 r.ore + r.oreToAdd + unitOre + prodOre
             ));
-            ReignOfNether.LOGGER.info(
-                "saved resources in serverevents: " + r.ownerName + "|" + r.food + "|" + r.wood + "|" + r.ore);
+            //ReignOfNether.LOGGER.info("saved resources in serverevents: " + r.ownerName + "|" + r.food + "|" + r.wood + "|" + r.ore);
         });
         data.save();
         serverLevel.getDataStorage().save();
@@ -113,7 +112,7 @@ public class ResourcesServerEvents {
             resourcesList.clear();
             resourcesList.addAll(data.resources);
 
-            ReignOfNether.LOGGER.info("saved " + data.resources.size() + " resources in serverevents");
+            //ReignOfNether.LOGGER.info("saved " + data.resources.size() + " resources in serverevents");
         }
     }
 

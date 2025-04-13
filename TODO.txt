@@ -33,7 +33,10 @@ Bugfixes
 [✔] Can no longer send resources to a non-RTS ally
 [✔] Fixed unit and building ability tooltips not updating when language is changed
 [❌] GUI sometimes still going above size 3 when set to auto
-[❌] Camera moving up constantly on fresh world generation
+[❌] Fixed camera moving up constantly when switching to RTS camera
+    - TODO: check getonPos() doesnt affect anything else (it returns the highest solid block now)
+[❌] Fixed ghast soul fireballs not working
+
 
 Quality of Life
 ---------------
@@ -78,7 +81,7 @@ Piglins
     - Research time reduced by 10s
     - Soulsand duration raised from 8s to 10s
 
-[🟡] Blazes now do 0 damage on hit (only setting enemies on fire)
+[✔] Blazes now do 0 damage on hit (only setting enemies on fire)
 
 [✔] Wither Skeletons
     - Health raised from 90 to 100

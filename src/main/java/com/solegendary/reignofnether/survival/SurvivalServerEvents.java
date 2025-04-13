@@ -68,7 +68,7 @@ public class SurvivalServerEvents {
         survivalData.randomSeed = Wave.randomSeed;
         survivalData.save();
         level.getDataStorage().save();
-        ReignOfNether.LOGGER.info("saved survival data in serverevents");
+        //ReignOfNether.LOGGER.info("saved survival data in serverevents");
     }
 
     @SubscribeEvent

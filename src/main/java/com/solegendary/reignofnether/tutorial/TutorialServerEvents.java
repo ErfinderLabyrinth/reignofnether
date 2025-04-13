@@ -75,7 +75,7 @@ public class TutorialServerEvents {
             tutorialData.stage = stage;
             tutorialData.save();
             serverLevel.getDataStorage().save();
-            ReignOfNether.LOGGER.info("saved tutorialStage in serverevents");
+            //ReignOfNether.LOGGER.info("saved tutorialStage in serverevents");
         }
     }
 

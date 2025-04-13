@@ -279,11 +279,11 @@ public class OrthoviewClientEvents {
             return;
         }
 
-        if (MiscUtil.isGroundBlock(MC.level, MC.player.getOnPos().offset(0, -5, 0))
+        if (MiscUtil.isGroundBlock(MC.level, MC.player.blockPosition().offset(0, -5, 0))
             && MC.player.getOnPos().getY() <= orthoviewPlayerMaxY) {
             panCam(0, 1f, 0);
         }
-        if (!MiscUtil.isGroundBlock(MC.level, MC.player.getOnPos().offset(0, -6, 0))
+        if (!MiscUtil.isGroundBlock(MC.level, MC.player.blockPosition().offset(0, -6, 0))
             && MC.player.getOnPos().getY() >= orthoviewPlayerBaseY) {
             panCam(0, -1f, 0);
         }

@@ -62,7 +62,7 @@ public class NetherZoneSaveData extends SavedData {
 
     @Override
     public CompoundTag save(CompoundTag tag) {
-        ReignOfNether.LOGGER.info("NetherZoneSaveData.save");
+        //ReignOfNether.LOGGER.info("NetherZoneSaveData.save");
 
         ListTag list = new ListTag();
         this.netherZones.forEach(nz -> {

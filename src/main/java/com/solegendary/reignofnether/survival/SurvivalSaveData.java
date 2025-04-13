@@ -42,7 +42,7 @@ public class SurvivalSaveData extends SavedData {
 
     @Override
     public CompoundTag save(CompoundTag tag) {
-        ReignOfNether.LOGGER.info("SurvivalSaveData.save: " + waveNumber);
+        //ReignOfNether.LOGGER.info("SurvivalSaveData.save: " + waveNumber);
         tag.putBoolean("isEnabled", this.isEnabled);
         tag.putInt("waveNumber", this.waveNumber);
         tag.putString("difficulty", this.difficulty.name());

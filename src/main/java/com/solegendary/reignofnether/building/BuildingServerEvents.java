@@ -119,7 +119,7 @@ public class BuildingServerEvents {
                 portalType,
                 b instanceof Portal portal && portal.hasDestination() ? ((Portal) b).destination : new BlockPos(0,0,0)
             ));
-            ReignOfNether.LOGGER.info("saved buildings/nether in serverevents: " + b.originPos);
+            //ReignOfNether.LOGGER.info("saved buildings/nether in serverevents: " + b.originPos);
         });
         buildingData.save();
         level.getDataStorage().save();
@@ -132,7 +132,7 @@ public class BuildingServerEvents {
         netherData.save();
         level.getDataStorage().save();
 
-        ReignOfNether.LOGGER.info("saved " + netherZones.size() + " netherzones in serverevents");
+        //ReignOfNether.LOGGER.info("saved " + netherZones.size() + " netherzones in serverevents");
     }
 
     @SubscribeEvent
@@ -466,7 +466,7 @@ public class BuildingServerEvents {
                 building instanceof Portal p && p.hasDestination() ? p.destination : new BlockPos(0,0,0),
                 true
             );
-        ReignOfNether.LOGGER.info("Synced " + buildings.size() + " buildings with player logged in");
+        //ReignOfNether.LOGGER.info("Synced " + buildings.size() + " buildings with player logged in");
     }
 
     // if blocks are destroyed manually by a player then help it along by causing periodic explosions
