@@ -32,10 +32,11 @@ Bugfixes
 --------
 [✔] Can no longer send resources to a non-RTS ally
 [✔] Fixed unit and building ability tooltips not updating when language is changed
-[❌] GUI sometimes still going above size 3 when set to auto
-[❌] Fixed camera moving up constantly when switching to RTS camera
-    - TODO: check getonPos() doesnt affect anything else (it returns the highest solid block now)
+
+[✔] Fixed camera moving up constantly when switching to RTS camera
 [❌] Fixed ghast soul fireballs not working
+    - TODO: check getonPos() doesnt affect anything else (it returns the highest solid block now)
+    - because mob griefing is now required for fireballs to cause fires?
 
 
 Quality of Life
@@ -44,7 +45,7 @@ Quality of Life
 [✔] Huntable animals now show their food value next to their portrait
 [✔] Updated /rts-help list
 [✔] Added packet spoofing prevention on various player actions
-[❌] Added a lot more serverside logging to track player actions
+
 
 Languages
 ---------
@@ -67,6 +68,7 @@ Witches
     [🟡] Added water potions, unlocked with research costing (250 wood, 250 ore, 140s)
     [🟡] Added healing potions, unlocked with research costing (350 wood, 350 ore, 180s)
     [✔] Extended lingering potions research cost reduced from (250 food, 250 wood, 250 ore) to (0 food, 250 wood, 250 ore)
+
 
 
 Piglins

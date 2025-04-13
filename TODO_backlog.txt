@@ -21,9 +21,13 @@ Bugfixes
 
 [❌] Have too-fast mod be built-in
 
+[❌] GUI sometimes still going above size 3 when set to auto
+
+
 
 Quality of Life Features
 ------------------------
+[❌] Added a lot more serverside logging to track player actions
 
 [❌] Colours for different players (with toggle under map options for ally/enemy)
 
@@ -43,6 +47,8 @@ Quality of Life Features
     - auras
     - hero passives
     - enchantments
+
+
 
 Balancing
 ---------
