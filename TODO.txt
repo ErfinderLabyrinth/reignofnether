@@ -6,6 +6,10 @@
 [❌] Not done, including unmerged PRs
 
 
+
+[❌] leaving sandbox deletes units entirely from list
+[❌]
+
 Features
 --------
 HEROES (in order of priority)
@@ -22,7 +26,7 @@ HEROES (in order of priority)
 Controlling non-RoN mobs
 ------------------------
 
-[✔] All vanilla and modded mobs now have basic movement and attack controls
+- All vanilla and modded mobs now have basic movement and attack controls
     - Enabled while in Sandbox or by using the cheatcode 'wouldyoukindly'
     - Attack-move only works against mobs that the controlled mob is naturally aggressive to
     - Disclaimer: sometimes the mob AI interferes with your commands
@@ -30,61 +34,62 @@ Controlling non-RoN mobs
 
 Bugfixes
 --------
-[✔] Can no longer send resources to a non-RTS ally
-[✔] Fixed unit and building ability tooltips not updating when language is changed
-[✔] Fixed camera moving up constantly when switching to RTS camera
-[✔] Fixed ghast soul fireballs not setting fires or creating soulsand when upgraded
+- Can no longer send resources to a non-RTS ally
+- Fixed unit and building ability tooltips not updating when language is changed
+- Fixed camera moving up constantly when switching to RTS camera
+- Fixed ghast soul fireballs not setting fires or creating soulsand when upgraded
 
 
 Quality of Life
 ---------------
-[✔] Workers can now gather modded log blocks such as those from Biomes O'Plenty
-[✔] Huntable animals now show their food value next to their portrait
-[✔] Updated /rts-help list
-[✔] Added packet spoofing prevention on various player actions
-[✔] All units and buildings are now converted to neutral instead of being destroyed when exiting sandbox mode
-[✔] Double-clicking a villager now selects all nearby villagers of the same profession only
+- Workers can now gather modded log blocks such as those from Biomes O'Plenty
+- Huntable animals now show their food value next to their portrait
+- Updated /rts-help list
+- Added packet spoofing prevention on various player actions
+- All units and buildings are now converted to neutral instead of being destroyed when exiting sandbox mode
+- Double-clicking a villager now selects all nearby villagers of the same profession only
 
 
 Languages
 ---------
-[✔] Added Spanish (España) (es_es)
-[✔] Misc language fixes and additions
+- Added Spanish (España) (es_es)
+- Misc language fixes and additions for:
+    - Ukrainian (uk_UA)
+    - Chinese (Simplified) (zh_CN)
+    - Chinese (Traditional) (zh_TW)
 
 Balancing
 ---------
 
-Neutral
--------
-[✔] The Killer Rabbit now has increased knockback resistance and attack jump height
+- The Killer Rabbit now has increased knockback resistance and attack jump height
 
 
 Villagers
 ---------
 Witches
-    [✔] Can now autocast any potion, but only one at a time
-    [✔] All potion abilities now have a shared cooldown
-    [✔] Added water potions, unlocked with research costing (250 wood, 250 ore, 140s)
-    [✔] Added healing potions, unlocked with research costing (350 wood, 350 ore, 180s)
-    [✔] Extended lingering potions research cost reduced from (250 food, 250 wood, 250 ore) to (0 food, 250 wood, 250 ore)
+    - Can now autocast any potion, but only one at a time
+    - All potion abilities now have a shared cooldown
+    - Added water potions, unlocked with research costing (250 wood, 250 ore, 140s)
+    - Added healing potions, unlocked with research costing (350 wood, 350 ore, 180s)
+    - Extended lingering potions research cost reduced from (250 food, 250 wood, 250 ore) to (0 food, 250 wood, 250 ore)
 
 
 
 Piglins
 -------
-[✔] Bloodlust
+- Bloodlust
     - Health cost raised from 10 to 12
     - Attack speed boost raised from 50% to 60%
     - Affected units now regenerate their lost health over 30 seconds
 
-[✔] Soul Fireballs
+- Soul Fireballs
     - Cost reduced from (350 wood, 350 ore) to (300 wood, 300 ore)
     - Research time reduced by 10s
     - Soulsand duration raised from 8s to 10s
 
-[✔] Blazes now do 0 damage on hit (only setting enemies on fire)
+- Blazes now do 0 damage on hit (only setting enemies on fire)
 
-[✔] Wither Skeletons
+- Wither Skeletons
     - Health raised from 90 to 100
     - Max wither stacks raised from 5 to 6
 
@@ -92,11 +97,11 @@ Piglins
 Monsters
 --------
 
-[✔] Sculk Amplifiers
+- Sculk Amplifiers
     - Sonic boom damage is now reduced by 33% (from 75 to 50 damage) when split
     - Can no longer be used on unfinished catalysts
 
-[✔] Slimes
+- Slimes
     - Cost reduced from (40 food, 40 wood, 40 ore) to (35 food, 35 wood, 35 ore)
 
-[✔] Spin web duration raised from 5s to 6s
+- Spin web duration raised from 5s to 6s

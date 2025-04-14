@@ -835,7 +835,8 @@ public class PlayerServerEvents {
                 if (hardReset || (entity instanceof Unit unit && !Unit.hasAnchor(unit) && !isSandbox))
                     entity.kill();
 
-            UnitServerEvents.getAllUnits().removeIf(u -> (hardReset || (u instanceof Unit unit && !Unit.hasAnchor(unit))));
+            if (!isSandbox)
+                UnitServerEvents.getAllUnits().removeIf(u -> (hardReset || (u instanceof Unit unit && !Unit.hasAnchor(unit))));
 
             for (LivingEntity entity : UnitServerEvents.getAllUnits())
                 if (entity instanceof Unit unit)
@@ -847,7 +848,8 @@ public class PlayerServerEvents {
                 if ((building.shouldDestroyOnReset || hardReset) && !isSandbox)
                     building.destroy((ServerLevel) building.getLevel());
             }
-            BuildingServerEvents.getBuildings().removeIf(b -> b.shouldDestroyOnReset || hardReset);
+            if (!isSandbox)
+                BuildingServerEvents.getBuildings().removeIf(b -> b.shouldDestroyOnReset || hardReset);
             for (Building building : BuildingServerEvents.getBuildings())
                 building.ownerName = "";
             ResearchServerEvents.removeAllResearch();

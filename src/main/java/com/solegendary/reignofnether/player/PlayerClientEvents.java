@@ -258,12 +258,14 @@ public class PlayerClientEvents {
     }
 
     public static void resetRTS(boolean hardReset) {
+        boolean isSandbox = SandboxClientEvents.isSandboxPlayer();
         isRTSPlayer = false;
 
         HudClientEvents.controlGroups.clear();
         UnitClientEvents.getSelectedUnits().clear();
         UnitClientEvents.getPreselectedUnits().clear();
-        UnitClientEvents.getAllUnits().removeIf(u -> (hardReset || (u instanceof Unit unit && !Unit.hasAnchor(unit))));
+        if (!isSandbox)
+            UnitClientEvents.getAllUnits().removeIf(u -> (hardReset || (u instanceof Unit unit && !Unit.hasAnchor(unit))));
         for (LivingEntity entity : UnitClientEvents.getAllUnits())
             if (entity instanceof Unit unit)
                 unit.setOwnerName("");
@@ -271,7 +273,8 @@ public class PlayerClientEvents {
         ResearchClient.removeAllResearch();
         ResearchClient.removeAllCheats();
         BuildingClientEvents.getSelectedBuildings().clear();
-        BuildingClientEvents.getBuildings().removeIf(b -> b.shouldDestroyOnReset || hardReset);
+        if (!isSandbox)
+            BuildingClientEvents.getBuildings().removeIf(b -> b.shouldDestroyOnReset || hardReset);
         for (Building building : BuildingClientEvents.getBuildings())
             building.ownerName = "";
         ResourcesClientEvents.resourcesList.clear();
