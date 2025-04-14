@@ -1,5 +1,5 @@
 
-1.19.2-1.1.5
+1.19.2-1.1.5a
 
 [✔] Done and tested
 [🟡] Partially done and/or needs testing
@@ -54,9 +54,9 @@ Languages
 ---------
 - Added Spanish (España) (es_es)
 - Misc language fixes and additions for:
-    - Ukrainian (uk_UA)
-    - Chinese (Simplified) (zh_CN)
-    - Chinese (Traditional) (zh_TW)
+    - Ukrainian (uk_ua)
+    - Chinese (Simplified) (zh_cn)
+    - Chinese (Traditional) (zh_tw)
 
 Balancing
 ---------
