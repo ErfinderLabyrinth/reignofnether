@@ -1,6 +1,5 @@
 package com.solegendary.reignofnether.config;
 
-import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.registrars.PacketHandler;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import net.minecraft.server.level.ServerPlayer;

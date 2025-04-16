@@ -5,7 +5,6 @@ import com.solegendary.reignofnether.ability.heroAbilities.monster.BloodMoon;
 import com.solegendary.reignofnether.ability.heroAbilities.monster.InsomniaCurse;
 import com.solegendary.reignofnether.ability.heroAbilities.monster.RaiseDead;
 import com.solegendary.reignofnether.ability.heroAbilities.monster.SoulSiphonPassive;
-import com.solegendary.reignofnether.ability.heroAbilities.villager.MaceSlam;
 import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientboundPacket;
 import com.solegendary.reignofnether.hud.AbilityButton;

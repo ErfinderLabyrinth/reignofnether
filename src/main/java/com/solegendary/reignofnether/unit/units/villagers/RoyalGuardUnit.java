@@ -2,7 +2,6 @@ package com.solegendary.reignofnether.unit.units.villagers;
 
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.PromoteIllager;
-import com.solegendary.reignofnether.ability.abilities.SpinWebs;
 import com.solegendary.reignofnether.ability.heroAbilities.villager.Avatar;
 import com.solegendary.reignofnether.ability.heroAbilities.villager.BattleRagePassive;
 import com.solegendary.reignofnether.ability.heroAbilities.villager.MaceSlam;

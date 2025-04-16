@@ -11,9 +11,7 @@ import org.joml.Vector3d;
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.minecraft.util.Mth.cos;
-import static net.minecraft.util.Mth.sin;
-import static net.minecraft.util.Mth.abs;
+import static net.minecraft.util.Mth.*;
 
 public class MyMath {
 

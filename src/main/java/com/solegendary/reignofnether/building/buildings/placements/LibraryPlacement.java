@@ -1,6 +1,5 @@
 package com.solegendary.reignofnether.building.buildings.placements;
 
-import org.joml.Vector3d;
 import com.solegendary.reignofnether.ability.EnchantAbility;
 import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingBlock;
@@ -9,6 +8,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Rotation;
+import org.joml.Vector3d;
 
 import java.util.ArrayList;
 import java.util.List;

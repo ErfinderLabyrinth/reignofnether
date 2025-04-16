@@ -21,8 +21,6 @@ import net.minecraft.world.level.Level;
 
 import java.util.List;
 
-import static com.solegendary.reignofnether.unit.UnitClientEvents.sendUnitCommand;
-
 public class SpinWebs extends Ability {
 
     public static final int CD_MAX_SECONDS = 30;

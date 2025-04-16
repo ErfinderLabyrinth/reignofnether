@@ -19,8 +19,6 @@ import net.minecraft.world.level.Level;
 
 import java.util.List;
 
-import static com.solegendary.reignofnether.unit.UnitClientEvents.sendUnitCommand;
-
 public class ConsumeSlime extends Ability {
 
     private static final int CD_MAX = 0;

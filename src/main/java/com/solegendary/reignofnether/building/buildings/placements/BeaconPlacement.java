@@ -1,6 +1,5 @@
 package com.solegendary.reignofnether.building.buildings.placements;
 
-import org.joml.Vector3d;
 import com.solegendary.reignofnether.alliance.AlliancesServerEvents;
 import com.solegendary.reignofnether.building.*;
 import com.solegendary.reignofnether.building.buildings.neutral.Beacon;
@@ -30,6 +29,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.joml.Vector3d;
 
 import java.util.ArrayList;
 import java.util.HashSet;
