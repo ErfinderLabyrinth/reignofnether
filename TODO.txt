@@ -25,9 +25,10 @@ HEROES (in order of priority)
 
 Bugfixes
 --------
-[❌] Fixed unit highlights not being visible behind blocks
-[❌] Fixed /gamerule slantedBuilding not working when using the typed command
-[❌] Fixed wave survival sometimes spawning the incorrect enemy faction
+[✔] Fixed unit highlights not being visible behind transparent leaves
+[✔] Fixed transparent leaves options not working when zoomed in too close
+[✔] Fixed /gamerule slantedBuilding not working when using the typed command
+[🟡] Fixed the first wave survival wave sometimes being the incorrect faction
 
 
 Quality of Life

@@ -1,7 +1,6 @@
 package com.solegendary.reignofnether.unit;
 
 import com.mojang.datafixers.util.Pair;
-import org.joml.Vector3d;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.alliance.AlliancesClient;
 import com.solegendary.reignofnether.building.*;
@@ -20,13 +19,18 @@ import com.solegendary.reignofnether.research.ResearchClient;
 import com.solegendary.reignofnether.research.researchItems.ResearchHoglinCavalry;
 import com.solegendary.reignofnether.research.researchItems.ResearchRavagerCavalry;
 import com.solegendary.reignofnether.research.researchItems.ResearchSpiderJockeys;
-import com.solegendary.reignofnether.resources.*;
+import com.solegendary.reignofnether.resources.ResourceCosts;
+import com.solegendary.reignofnether.resources.ResourceName;
+import com.solegendary.reignofnether.resources.ResourceSources;
+import com.solegendary.reignofnether.resources.Resources;
 import com.solegendary.reignofnether.sandbox.SandboxClientEvents;
 import com.solegendary.reignofnether.tutorial.TutorialClientEvents;
 import com.solegendary.reignofnether.unit.goals.MeleeAttackBuildingGoal;
 import com.solegendary.reignofnether.unit.interfaces.*;
 import com.solegendary.reignofnether.unit.packets.UnitActionServerboundPacket;
-import com.solegendary.reignofnether.unit.units.monsters.*;
+import com.solegendary.reignofnether.unit.units.monsters.CreeperUnit;
+import com.solegendary.reignofnether.unit.units.monsters.WardenUnit;
+import com.solegendary.reignofnether.unit.units.monsters.ZoglinUnit;
 import com.solegendary.reignofnether.unit.units.piglins.BruteUnit;
 import com.solegendary.reignofnether.unit.units.piglins.GhastUnit;
 import com.solegendary.reignofnether.unit.units.piglins.HeadhunterUnit;
@@ -60,6 +64,7 @@ import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.EntityLeaveLevelEvent;
 import net.minecraftforge.event.entity.EntityMountEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import org.joml.Vector3d;
 import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.Nullable;
@@ -69,7 +74,7 @@ import static com.solegendary.reignofnether.building.BuildingClientEvents.getPla
 import static com.solegendary.reignofnether.cursor.CursorClientEvents.getPreselectedBlockPos;
 import static com.solegendary.reignofnether.hud.HudClientEvents.hudSelectedEntity;
 import static com.solegendary.reignofnether.unit.Checkpoint.CHECKPOINT_TICKS_FADE;
-import static net.minecraftforge.client.event.RenderLevelStageEvent.Stage.*;
+import static net.minecraftforge.client.event.RenderLevelStageEvent.Stage.AFTER_CUTOUT_MIPPED_BLOCKS_BLOCKS;
 
 public class UnitClientEvents {
 
@@ -460,7 +465,7 @@ public class UnitClientEvents {
                 synchronized (unitWindowVecs) {
                     unitWindowVecs.clear();
                     windowPositions.forEach(bp -> {
-                        float dist = OrthoviewClientEvents.getZoom() * 2;
+                        float dist = Math.max(120, OrthoviewClientEvents.getZoom() * 2);
                         if (bp.distSqr(MC.player.getOnPos()) < (dist * dist))
                             unitWindowVecs.add(MyMath.prepIsPointInsideRect3d(Minecraft.getInstance(),
                                     new Vector3d(bp.getX() - WINDOW_RADIUS, bp.getY(), bp.getZ() - WINDOW_RADIUS), // tl
@@ -698,16 +703,14 @@ public class UnitClientEvents {
         CursorClientEvents.setLeftClickAction(null);
     }
 
+    public static final RenderLevelStageEvent.Stage RENDER_STAGE = AFTER_CUTOUT_MIPPED_BLOCKS_BLOCKS;
+
     @SubscribeEvent
     public static void onRenderLevel(RenderLevelStageEvent evt) {
         if (MC.level == null)
             return;
 
-        // if orthoview uses creative mode: RenderLevelStageEvent.Stage.AFTER_WEATHER
-        // if orthoview uses spectator mode: RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS
-
-        if ((OrthoviewClientEvents.isEnabled() && evt.getStage() == RenderLevelStageEvent.Stage.AFTER_WEATHER) ||
-            (!OrthoviewClientEvents.isEnabled() && evt.getStage() == RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS))
+        if (evt.getStage() == RENDER_STAGE)
         {
             ArrayList<LivingEntity> selectedUnits = getSelectedUnits();
             ArrayList<LivingEntity> preselectedUnits = getPreselectedUnits();
@@ -762,7 +765,7 @@ public class UnitClientEvents {
         }
 
         // AFTER_CUTOUT_BLOCKS lets us see checkpoints through leaves
-        if (OrthoviewClientEvents.isEnabled() && evt.getStage() == AFTER_CUTOUT_BLOCKS) {
+        if (OrthoviewClientEvents.isEnabled() && evt.getStage() == RENDER_STAGE) {
             // draw unit checkpoints
             for (LivingEntity entity : getSelectedUnits()) {
                 if (entity instanceof Unit unit) {
@@ -1072,41 +1075,40 @@ public class UnitClientEvents {
     }
 
     /*
-    public static RenderLevelStageEvent.Stage stage = AFTER_CUTOUT_BLOCKS;
-
     @SubscribeEvent
     public static void onButtonPress2(ScreenEvent.KeyPressed.Pre evt) {
-        if (evt.getKeyCode() == GLFW.GLFW_KEY_L) {
-            if (AFTER_CUTOUT_BLOCKS.equals(stage)) {
+        if (evt.getKeyCode() == GLFW.GLFW_KEY_P) {
+            if (AFTER_SKY.equals(stage)) {
+                stage = AFTER_SOLID_BLOCKS;
+            } else if (AFTER_SOLID_BLOCKS.equals(stage)) {
+                stage = AFTER_CUTOUT_MIPPED_BLOCKS_BLOCKS;
+            } else if (AFTER_CUTOUT_MIPPED_BLOCKS_BLOCKS.equals(stage)) {
+                stage = AFTER_CUTOUT_BLOCKS;
+            } else if (AFTER_CUTOUT_BLOCKS.equals(stage)) {
+                stage = AFTER_ENTITIES;
+            } else if (AFTER_ENTITIES.equals(stage)) {
+                stage = AFTER_BLOCK_ENTITIES;
+            } else if (AFTER_BLOCK_ENTITIES.equals(stage)) {
                 stage = AFTER_TRANSLUCENT_BLOCKS;
             } else if (AFTER_TRANSLUCENT_BLOCKS.equals(stage)) {
+                stage = AFTER_TRIPWIRE_BLOCKS;
+            } else if (AFTER_TRIPWIRE_BLOCKS.equals(stage)) {
+                stage = AFTER_PARTICLES;
+            } else if (AFTER_PARTICLES.equals(stage)) {
                 stage = AFTER_WEATHER;
             } else if (AFTER_WEATHER.equals(stage)) {
+                stage = AFTER_LEVEL;
+            } else if (AFTER_LEVEL.equals(stage)) {
                 stage = AFTER_SKY;
-            } else if (AFTER_SKY.equals(stage)) {
-                stage = AFTER;
-            } else if (AFTER_CUTOUT_BLOCKS.equals(stage)) {
-                stage = AFTER_TRANSLUCENT_BLOCKS;
-            } else if (AFTER_CUTOUT_BLOCKS.equals(stage)) {
-                stage = AFTER_TRANSLUCENT_BLOCKS;
-            } else if (AFTER_CUTOUT_BLOCKS.equals(stage)) {
-                stage = AFTER_TRANSLUCENT_BLOCKS;
             }
         }
     }
-     */
 
-    /*
     @SubscribeEvent
     public static void onRenderOverLay(RenderGuiOverlayEvent.Pre evt) {
-        if (hudSelectedEntity instanceof NecromancerUnit necromancerUnit) {
-
-            MiscUtil.drawDebugStrings(evt.getPoseStack(), MC.font, new String[] {
-                    necromancerUnit.activeAnimState != null ? necromancerUnit.activeAnimState.toString() : "",
-                    "animateScale: " + necromancerUnit.animateScale,
-                    "animateReducing: " + necromancerUnit.animateScaleReducing,
-            });
-        }
+        MiscUtil.drawDebugStrings(evt.getGuiGraphics(), MC.font, new String[] {
+            "stage: " + stage.toString(),
+        });
     }
      */
 

@@ -75,6 +75,12 @@ public class GameruleServerEvents {
                 double beaconWinMinutes = ((Integer) args.get("value").getResult()).doubleValue();
                 GameruleClientboundPacket.setBeaconWinMinutes((long) beaconWinMinutes);
             }
+        } else if (nodes.get(1).getNode().getName().equals("slantedBuilding")) {
+            Map<String, ParsedArgument<CommandSourceStack, ?>> args = evt.getParseResults().getContext().getArguments();
+            if (args.containsKey("value")) {
+                boolean value = (boolean) args.get("value").getResult();
+                GameruleClientboundPacket.setSlantedBuilding(value);
+            }
         }
     }
 

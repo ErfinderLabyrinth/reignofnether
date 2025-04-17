@@ -226,13 +226,13 @@ public class SurvivalServerEvents {
         ArrayList<WavePortal> portalsCopy = new ArrayList<>(portals);
         for (WavePortal portal : portalsCopy)
             portal.portal.destroy(serverLevel);
-        nextWave = Wave.getWave(1);
         difficulty = WaveDifficulty.EASY;
         isEnabled = false;
         portals.clear();
         enemies.clear();
         Wave.randomSeed = System.currentTimeMillis();
         Wave.reseedWaves();
+        nextWave = Wave.getWave(1);
         SurvivalClientboundPacket.setWaveRandomSeed(Wave.randomSeed);
         if (serverLevel != null)
             saveData(serverLevel);
@@ -318,8 +318,10 @@ public class SurvivalServerEvents {
     public static void startNextWave(ServerLevel level) {
         saveData(level);
         currentWave = nextWave;
+        System.out.println("starting wave: " + nextWave.faction.name());
         nextWave.start(level);
         nextWave = Wave.getWave(nextWave.number + 1);
+        System.out.println("next wave: " + nextWave.faction.name());
         SurvivalClientboundPacket.setWaveNumber(nextWave.number);
     }
 
