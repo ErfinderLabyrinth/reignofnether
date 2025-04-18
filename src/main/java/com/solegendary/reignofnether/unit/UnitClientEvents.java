@@ -1,6 +1,5 @@
 package com.solegendary.reignofnether.unit;
 
-import com.mojang.datafixers.util.Pair;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.alliance.AlliancesClient;
 import com.solegendary.reignofnether.building.*;
@@ -319,24 +318,11 @@ public class UnitClientEvents {
             ResourceName resName = ResourceSources.getBlockResourceName(getPreselectedBlockPos(), MC.level);
             boolean isGathering = hudSelectedEntity instanceof WorkerUnit && resName != ResourceName.NONE;
 
-            if (selectedUnits.size() == 1 || isGathering)
-                sendUnitCommand(UnitAction.MOVE);
-            else { // if we do not have a gathering villager as the fist
+            sendUnitCommand(UnitAction.MOVE);
 
-                List<Pair<Integer, BlockPos>> formationPairs = UnitFormations.getMoveFormation(
-                    MC.level, selectedUnits, getPreselectedBlockPos()
-                );
-
-                for (Pair<Integer, BlockPos> pair : formationPairs) {
-                    int entityId = pair.getFirst();
-                    BlockPos targetPos = pair.getSecond();
-                    Entity entity = MC.level.getEntity(entityId);
-                    sendUnitCommandManual(UnitAction.MOVE, -1, new int[]{entityId}, targetPos);
-                }
-                for (LivingEntity le : selectedUnits)
-                    if (le instanceof Unit unit && unit.getMoveGoal() != null)
-                        unit.getMoveGoal().lastSelectedMoveTarget = getPreselectedBlockPos();
-            }
+            for (LivingEntity le : selectedUnits)
+                if (!isGathering && le instanceof Unit unit && unit.getMoveGoal() != null)
+                    unit.getMoveGoal().lastSelectedMoveTarget = getPreselectedBlockPos();
         }
     }
 

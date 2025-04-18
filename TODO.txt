@@ -26,7 +26,7 @@ HEROES (in order of priority)
 Bugfixes
 --------
 
-[❌] Rework resolveMoveAction to only send one packet instead of multiple per right click
+[🟡] Rework resolveMoveAction to only send one packet instead of multiple per right click
     - Calculate the formation equally on both client and server side
 
     "Fixed sometimes being kicked for sending too many packets when moving a large group of units"

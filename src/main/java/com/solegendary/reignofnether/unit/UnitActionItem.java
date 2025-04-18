@@ -108,6 +108,8 @@ public class UnitActionItem {
             }
         }
 
+        ArrayList<Unit> formationUnits = new ArrayList<>();
+
         actionableUnitsLoop:
         for (Unit unit : actionableUnits) {
 
@@ -214,8 +216,10 @@ public class UnitActionItem {
                             flyingUsePortalGoal.setBuildingTarget(preselectedBlockPos);
                         if (unit.getUsePortalGoal() instanceof UsePortalGoal usePortalGoal)
                             usePortalGoal.setBuildingTarget(preselectedBlockPos);
-                    } else {
+                    } else if (actionableUnits.size() == 1) {
                         unit.setMoveTarget(preselectedBlockPos);
+                    } else {
+                        formationUnits.add(unit);
                     }
                 }
                 case ATTACK_MOVE -> {
@@ -360,6 +364,20 @@ public class UnitActionItem {
                 }
             }
         }
+
+        // if we have multiple units performing the same MOVE action, calculate a spread of blockPoses for them to go to
+        if (!formationUnits.isEmpty()) {
+            List<Pair<LivingEntity, BlockPos>> formationPairs = UnitFormations.getMoveFormation(
+                level, new ArrayList<>(formationUnits.stream().map(u -> ((LivingEntity) u)).toList()), preselectedBlockPos
+            );
+            for (Pair<LivingEntity, BlockPos> pair : formationPairs) {
+                LivingEntity le = pair.getFirst();
+                BlockPos targetPos = pair.getSecond();
+                if (le instanceof Unit unit)
+                    unit.setMoveTarget(targetPos);
+            }
+        }
+
         if (level.isClientSide() && usedAbility != null && usedAbility.oneClickOneUse) {
             HudClientEvents.setLowestCdHudEntity();
         }

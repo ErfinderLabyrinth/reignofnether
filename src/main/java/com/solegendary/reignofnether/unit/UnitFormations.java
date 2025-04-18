@@ -16,11 +16,11 @@ public class UnitFormations {
     // given a list of entities that were issued a move command to moveBp, find the best pairings of entities and
     // positions that allows each entity the best chance to reach said position without bumping into each other
 
-    public static List<Pair<Integer, BlockPos>> getMoveFormation(Level level, List<LivingEntity> units, BlockPos moveBp) {
+    public static List<Pair<LivingEntity, BlockPos>> getMoveFormation(Level level, ArrayList<LivingEntity> units, BlockPos moveBp) {
 
         // 1. create a list of final BPs the units should move into, closest approximation of a square
         //    with moveBp at the approximate centre by spiralling outward
-        List<BlockPos> bps = new ArrayList<>(List.of(moveBp));
+        ArrayList<BlockPos> bps = new ArrayList<>(List.of(moveBp));
         BlockPos lastBp = bps.get(0);
 
         if (units.size() == 3) {
@@ -64,10 +64,10 @@ public class UnitFormations {
         bps.sort(Comparator.comparing(Vec3i::getZ));
 
         // entityId/BlockPos pairs
-        List<Pair<Integer, BlockPos>> formation = new ArrayList<>();
+        List<Pair<LivingEntity, BlockPos>> formation = new ArrayList<>();
 
         for (int i = 0; i < units.size(); i++) {
-            formation.add(new Pair<>(units.get(i).getId(), bps.get(i)));
+            formation.add(new Pair<>(units.get(i), bps.get(i)));
         }
         return formation;
     }
