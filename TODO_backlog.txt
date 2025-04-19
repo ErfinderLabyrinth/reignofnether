@@ -10,6 +10,11 @@ Features
 
 [❌] Config to allow changing resource block values, including modded blocks
 
+[❌] AoE2-style markets
+
+[❌] Workers can repair iron golems
+    - Also contributes to mason exp and masons can repair faster
+
 
 Bugfixes
 --------

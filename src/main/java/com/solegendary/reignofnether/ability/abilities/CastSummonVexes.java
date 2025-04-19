@@ -24,7 +24,7 @@ import java.util.List;
 
 public class CastSummonVexes extends Ability {
 
-    public static final int CD_MAX_SECONDS = 80;
+    public static final int CD_MAX_SECONDS = 60;
     public static final int VEX_DURATION_SECONDS = 30;
 
     private final EvokerUnit evokerUnit;
@@ -40,6 +40,8 @@ public class CastSummonVexes extends Ability {
             false
         );
         this.evokerUnit = evokerUnit;
+        this.autocastEnableAction = UnitAction.CAST_SUMMON_VEXES_AUTOCAST_ENABLE;
+        this.autocastDisableAction = UnitAction.CAST_SUMMON_VEXES_AUTOCAST_DISABLE;
     }
 
     @Override
@@ -50,18 +52,20 @@ public class CastSummonVexes extends Ability {
             hotkey,
             () -> {
                 if (this.evokerUnit.getCastSummonVexesGoal() != null)
-                    return this.evokerUnit.getCastSummonVexesGoal().isCasting();
+                    return this.evokerUnit.getCastSummonVexesGoal().isCasting() || getAutocast();
                 return false;
             },
             () -> !ResearchClient.hasResearch(ResearchEvokerVexes.itemName),
             () -> true,
             () -> UnitClientEvents.sendUnitCommand(UnitAction.CAST_SUMMON_VEXES),
-            null,
+            this::toggleAutocast,
             List.of(
                 FormattedCharSequence.forward(I18n.get("abilities.reignofnether.summon_vexes"), Style.EMPTY.withBold(true)),
                 FormattedCharSequence.forward(I18n.get("abilities.reignofnether.summon_vexes.tooltip1", CD_MAX_SECONDS), MyRenderer.iconStyle),
                 FormattedCharSequence.forward(I18n.get("abilities.reignofnether.summon_vexes.tooltip2", EvokerUnit.SUMMON_VEXES_AMOUNT), Style.EMPTY),
-                FormattedCharSequence.forward(I18n.get("abilities.reignofnether.summon_vexes.tooltip3", VEX_DURATION_SECONDS), Style.EMPTY)
+                FormattedCharSequence.forward(I18n.get("abilities.reignofnether.summon_vexes.tooltip3", VEX_DURATION_SECONDS), Style.EMPTY),
+                FormattedCharSequence.forward("", Style.EMPTY),
+                FormattedCharSequence.forward(I18n.get("abilities.reignofnether.autocast"), Style.EMPTY)
             ),
             this
         );

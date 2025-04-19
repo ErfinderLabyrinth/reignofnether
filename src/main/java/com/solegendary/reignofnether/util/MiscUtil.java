@@ -237,7 +237,9 @@ public class MiscUtil {
 
     // does not cover explicit attack commands
     private static boolean isIdleOrMoveAttackable(Mob unitMob, LivingEntity targetEntity, boolean neutralAggro) {
-        Relationship rs = UnitServerEvents.getUnitToEntityRelationship((Unit) unitMob, targetEntity);
+        Relationship rs = Relationship.NEUTRAL;
+        if (unitMob instanceof Unit)
+            rs = UnitServerEvents.getUnitToEntityRelationship((Unit) unitMob, targetEntity);
 
         if (targetEntity instanceof Player player && (player.isCreative() || player.isSpectator()))
             return false;

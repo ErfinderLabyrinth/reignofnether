@@ -293,9 +293,9 @@ public class SlimeUnit extends Slime implements Unit, AttackerUnit {
         else if (size == 3)
             return 80;
         else if (size == 2)
-            return 40;
+            return 45;
         else
-            return 20;
+            return 15;
     }
 
     @Override

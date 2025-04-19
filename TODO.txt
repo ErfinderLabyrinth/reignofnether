@@ -25,50 +25,43 @@ HEROES (in order of priority)
 
 Bugfixes
 --------
-[✔] Fixed the cursor sometimes selecting air blocks next to resources when ordering workers to gather
-
-[🟡] During a match, your resources are always shown at the top left regardless of if you have anything selected
-
-[🟡] Wardens can no longer garrison as they are too large to fit through doorways
-[🟡] Fixed neutral units not gaining bonus attack range when inside a neutral garrison building
-[✔] Buildings no longer remove blocks from other nearby buildings when using /gamerule slantedBuilding
-
-[🟡] Fixed sometimes being kicked for sending too many packets when moving a large group of units
-
-[❌] Fixed a food duplication exploit when two workers kill the same animal at the same time
-
-[✔] Fixed ghast fireballs sometimes not doing damage to buildings
+- Fixed the cursor sometimes selecting air blocks next to resources when ordering workers to gather
+- During a match, your resources are always shown at the top left regardless of if you have anything selected
+- Wardens can no longer garrison as they are too large to fit through doorways
+- Fixed neutral units not gaining bonus attack range when inside a neutral garrison building
+- Buildings no longer remove blocks from other nearby buildings when using /gamerule slantedBuilding
+- Fixed sometimes being kicked for sending too many packets when moving a large group of units
+- Fixed a food duplication exploit when two workers kill the same animal at the same time
+- Fixed ghast fireballs sometimes not doing damage to buildings
     - They were actually doing half of their intended damage for quite a few patches now
-
-[🟡] Fixed the first wave survival wave sometimes being the incorrect faction
-[🟡] Fixed crash related to saving unit anchors
-[🟡] Toggled abilities are now synced if unit states are mixed
+- Fixed the first wave survival wave sometimes being the incorrect faction
+- Fixed crash related to saving unit anchors
+- Toggled abilities are now synced if unit states are mixed
     - Eg. if you select a brute with a raised shield and one a lowered shield, clicking the ability only toggles one of them so they become synced
-
-[✔] Neutral units no longer aggro against neutral buildings
-[✔] Fixed unit highlights not being visible behind transparent leaves
-[✔] Fixed transparent leaves options not working when zoomed in too close
-[✔] Fixed /gamerule slantedBuilding not working when using the typed command
-[✔] Fixed start being able to choose more than one start block location
-[✔] Fixed capitols being placed a block too high on negative Y level maps
-[✔] Fixed beacon auras sometimes not working
-[✔] Fixed crash related to building iron golems
-[✔] You can no longer view an opponent's resources during a match unless you are a spectator
-
-
+- Neutral units no longer aggro against neutral buildings
+- Fixed unit highlights not being visible behind transparent leaves
+- Fixed transparent leaves options not working when zoomed in too close
+- Fixed /gamerule slantedBuilding not working when using the typed command
+- Fixed start being able to choose more than one start block location
+- Fixed capitols being placed a block too high on negative Y level maps
+- Fixed beacon auras sometimes not working
+- Fixed crash related to building iron golems
+- You can no longer view an opponent's resources during a match unless you are a spectator
+- Evokers now stop their casting animation if their abilities are on cooldown
 
 Quality of Life
 ---------------
-[🟡] Line of sight is now shared with allies
+- Line of sight is now shared with allies
 
+[❌] /gamerule neutralAggro now also controls whether neutral and modded units are aggressive against player units
 
 Balancing
 ---------
-
-[✔] Bonus damage from ravager artillery arrows reduced by 1
-
-[✔] Slimes and magma cubes have more HP at almost every size:
+- Bonus damage from ravager artillery arrows reduced by 1
+- Slimes and magma cubes have more HP at all sizes above 1:
     - old: (15, 40, 75, 110, 145, 180)
-    - new: (20, 40, 80, 120, 160, 200)
-
-[✔]
+    - new: (15, 45, 80, 120, 160, 200)
+- Evoker Vexes
+    - Can now be autocast
+    - Channel time reduced from 4 to 3 seconds
+    - Cooldown reduced from 70 to 60s

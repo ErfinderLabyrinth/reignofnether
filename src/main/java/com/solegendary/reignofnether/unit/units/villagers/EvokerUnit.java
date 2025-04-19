@@ -1,13 +1,17 @@
 package com.solegendary.reignofnether.unit.units.villagers;
 
 import com.solegendary.reignofnether.ability.Ability;
+import com.solegendary.reignofnether.ability.AbilityClientboundPacket;
 import com.solegendary.reignofnether.ability.abilities.*;
 import com.solegendary.reignofnether.building.GarrisonableBuilding;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientboundPacket;
 import com.solegendary.reignofnether.hud.AbilityButton;
+import com.solegendary.reignofnether.research.ResearchServerEvents;
+import com.solegendary.reignofnether.research.researchItems.ResearchEvokerVexes;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.unit.Checkpoint;
+import com.solegendary.reignofnether.unit.UnitAction;
 import com.solegendary.reignofnether.unit.UnitAnimationAction;
 import com.solegendary.reignofnether.unit.goals.*;
 import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
@@ -143,6 +147,7 @@ public class EvokerUnit extends Evoker implements Unit, AttackerUnit, RangedAtta
     public static final int SUMMON_VEXES_AMOUNT = 3;
     public static final int VEX_TARGET_RANGE = 20;
     public static final int VEX_TARGET_RANGE_GARRISON = 30;
+    public static final int SUMMON_VEXES_CHANNEL_SECONDS = 3;
 
     final static public float attackDamage = FANGS_DAMAGE * 2;
     final static public float attacksPerSecond = 1f / (SetFangsLine.CD_MAX_SECONDS + FANGS_CHANNEL_SECONDS);
@@ -204,6 +209,15 @@ public class EvokerUnit extends Evoker implements Unit, AttackerUnit, RangedAtta
         this.castFangsGoal.tick();
         this.castSummonVexesGoal.tick();
         PromoteIllager.checkAndApplyBuff(this);
+
+        for (Ability ability : getAbilities()) {
+            if (ability instanceof CastSummonVexes castSummonVexes) {
+                if (castSummonVexes.getAutocast() && !isCastingSpell() && castSummonVexes.isOffCooldown() && !level().isClientSide() && isIdle() &&
+                    tickCount % 4 == 0 && ResearchServerEvents.playerHasResearch(getOwnerName(), ResearchEvokerVexes.itemName)) {
+                    this.castSummonVexesGoal.startCasting();
+                }
+            }
+        }
     }
 
     public void initialiseGoals() {
@@ -219,7 +233,7 @@ public class EvokerUnit extends Evoker implements Unit, AttackerUnit, RangedAtta
         );
         this.castSummonVexesGoal = new GenericUntargetedSpellGoal(
             this,
-            4 * ResourceCost.TICKS_PER_SECOND,
+            SUMMON_VEXES_CHANNEL_SECONDS * ResourceCost.TICKS_PER_SECOND,
             this::summonVexes,
             UnitAnimationAction.NON_KEYFRAME_START,
             UnitAnimationAction.NON_KEYFRAME_STOP
@@ -243,10 +257,14 @@ public class EvokerUnit extends Evoker implements Unit, AttackerUnit, RangedAtta
     // controls whether the evoker's arms are up or not
     @Override
     public boolean isCastingSpell() {
-        if (this.getCastFangsGoal() != null && this.getCastFangsGoal().isCasting())
-            return true;
-        if (this.getCastSummonVexesGoal() != null && this.getCastSummonVexesGoal().isCasting())
-            return true;
+        for (Ability ability : getAbilities())
+            if (ability instanceof SetFangsCircle || ability instanceof SetFangsLine) {
+                if (ability.isOffCooldown() && this.getCastFangsGoal() != null && this.getCastFangsGoal().isCasting())
+                    return true;
+            } else if (ability instanceof CastSummonVexes) {
+                if (ability.isOffCooldown() && this.getCastSummonVexesGoal() != null && this.getCastSummonVexesGoal().isCasting())
+                    return true;
+            }
         return false;
     }
 
@@ -349,6 +367,12 @@ public class EvokerUnit extends Evoker implements Unit, AttackerUnit, RangedAtta
                 ((ServerLevel) this.level()).addFreshEntityWithPassengers(vex);
             }
         }
+        for (Ability ability : getAbilities())
+            if (ability instanceof CastSummonVexes castSummonVexes)
+                AbilityClientboundPacket.sendSetCooldownPacket(getId(), UnitAction.CAST_SUMMON_VEXES, CastSummonVexes.CD_MAX_SECONDS);
+
+        if (getCastFangsGoal() != null)
+            getCastFangsGoal().stopCasting();
     }
 
     // TODO: when a target is autoacquired serverside this is not updated clientside

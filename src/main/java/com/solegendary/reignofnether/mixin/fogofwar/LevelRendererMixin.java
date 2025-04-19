@@ -154,7 +154,7 @@ public abstract class LevelRendererMixin {
                         chunksToReDirty.addAll(newChunksToReDirty);
 
                         UnitClientEvents.windowPositions.forEach(bp -> {
-                            if (chunkCentreBp.distSqr(bp) < 225) {
+                            if (chunkCentreBp.distSqr(bp) < 625) {
                                 chunkInfo.chunk.setDirty(true);
                                 chunksToReDirty.add(new Pair<>(chunkInfo.chunk.getOrigin(), 10));
                             }

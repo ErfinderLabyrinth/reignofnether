@@ -526,6 +526,9 @@ public class UnitServerEvents {
         }
     }
 
+    // prevent onDropItem firing twice if the same animal is killed by two workers on the same tick
+    private static int lastHuntedAnimalId = -1;
+
     // animal hunting
     @SubscribeEvent
     public static void onDropItem(LivingDropsEvent evt) {
@@ -534,13 +537,18 @@ public class UnitServerEvents {
             .getEntity() instanceof Mob mob && mob.canPickUpLoot() && !Unit.atMaxResources(unit)) {
 
             evt.setCanceled(true);
-            for (ItemStack itemStack : ResourceSources.getFoodItemsFromAnimal((Animal) evt.getEntity())) {
-                ResourceSource res = ResourceSources.getFromItem(itemStack.getItem());
-                if (res != null)
-                    unit.getItems().add(itemStack);
-            }
-            if (Unit.atThresholdResources(unit)) {
-                unit.getReturnResourcesGoal().returnToClosestBuilding();
+
+            if (lastHuntedAnimalId != evt.getEntity().getId()) {
+                for (ItemStack itemStack : ResourceSources.getFoodItemsFromAnimal((Animal) evt.getEntity())) {
+                    ResourceSource res = ResourceSources.getFromItem(itemStack.getItem());
+                    if (res != null)
+                        unit.getItems().add(itemStack);
+                }
+                if (Unit.atThresholdResources(unit)) {
+                    unit.getReturnResourcesGoal().returnToClosestBuilding();
+                }
+            } else {
+                lastHuntedAnimalId = evt.getEntity().getId();
             }
         }
     }

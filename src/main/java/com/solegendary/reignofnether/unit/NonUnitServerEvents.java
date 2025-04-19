@@ -1,18 +1,24 @@
 package com.solegendary.reignofnether.unit;
 
 import com.mojang.datafixers.util.Pair;
+import com.solegendary.reignofnether.registrars.GameRuleRegistrar;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
 import com.solegendary.reignofnether.sandbox.SandboxServer;
+import com.solegendary.reignofnether.util.MiscUtil;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.ai.goal.WrappedGoal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.pathfinder.Path;
+import net.minecraft.world.phys.AABB;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class NonUnitServerEvents {
 
@@ -52,6 +58,28 @@ public class NonUnitServerEvents {
         }
         synchronized (moveSuppressedNonUnits) {
             moveSuppressedNonUnits.removeIf(mob -> (mob.isDeadOrDying() || mob.isRemoved() || (mob.getNavigation().isDone() && mob.getTarget() == null)));
+        }
+
+        if (evt.level.getServer() != null && evt.level.getServer().getGameRules().getRule(GameRuleRegistrar.NEUTRAL_AGGRO).get()) {
+            Set<PathfinderMob> pfMobs = new HashSet<>();
+            for (LivingEntity unit : UnitServerEvents.getAllUnits()) {
+                if (unit.tickCount % 20 != 0)
+                    continue;
+                AABB aabb = new AABB(unit.blockPosition().offset(-10, -10, -10), unit.blockPosition().offset(10, 10, 10));
+                pfMobs.addAll(evt.level.getNearbyEntities(PathfinderMob.class, TargetingConditions.forCombat(), unit, aabb));
+            }
+            for (PathfinderMob pfMob : pfMobs) {
+                boolean hasAttackGoal = false;
+                for (WrappedGoal wrappedGoal : pfMob.targetSelector.getAvailableGoals())
+                    if (wrappedGoal.getGoal() instanceof NearestAttackableTargetGoal)
+                        hasAttackGoal = true;
+
+                if (pfMob.getTarget() == null && hasAttackGoal && !attackSuppressedNonUnits.contains(pfMob)) {
+                    LivingEntity target = MiscUtil.findClosestAttackableEntity(pfMob, 10, (ServerLevel) evt.level);
+                    if (target != null)
+                        pfMob.setTarget(target);
+                }
+            }
         }
     }
 }

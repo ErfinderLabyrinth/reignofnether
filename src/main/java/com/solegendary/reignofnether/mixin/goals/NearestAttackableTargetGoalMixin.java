@@ -1,6 +1,7 @@
 package com.solegendary.reignofnether.mixin.goals;
 
 import com.solegendary.reignofnether.unit.NonUnitServerEvents;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
@@ -17,14 +18,15 @@ public abstract class NearestAttackableTargetGoalMixin extends TargetGoal {
     public NearestAttackableTargetGoalMixin(Mob pMob, boolean pMustSee) { super(pMob, pMustSee); }
 
     @Inject(
-            method = "findTarget",
+            method = "setTarget",
             at = @At("HEAD"),
             cancellable = true
     )
-    public void findTarget(CallbackInfo ci) {
+    public void setTarget(LivingEntity pTarget, CallbackInfo ci) {
         synchronized (NonUnitServerEvents.attackSuppressedNonUnits) {
-            if (mob instanceof PathfinderMob pfMob && NonUnitServerEvents.attackSuppressedNonUnits.contains(pfMob))
+            if (pTarget != null && mob instanceof PathfinderMob pfMob && NonUnitServerEvents.attackSuppressedNonUnits.contains(pfMob)) {
                 ci.cancel();
+            }
         }
     }
 }
