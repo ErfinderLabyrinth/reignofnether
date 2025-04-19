@@ -52,8 +52,8 @@ Bugfixes
 Quality of Life
 ---------------
 - Line of sight is now shared with allies
-
-[❌] /gamerule neutralAggro now also controls whether neutral and modded units are aggressive against player units
+- You can now send resources to non-allies again
+- /gamerule neutralAggro now also controls whether neutral and modded units are aggressive against player units
 
 Balancing
 ---------

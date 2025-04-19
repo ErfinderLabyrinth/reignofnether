@@ -25,7 +25,7 @@
         "fire.FireBlockMixin",
         "fire.MagmaBlockMixin",
         "fire.WalkNodeEvaluatorMixin",
-        "goals.NearestAttackableTargetGoalMixin",
+        "goals.MobMixin",
         "goals.RandomStrollGoalMixin"
     ],
     "minVersion": "0.8",

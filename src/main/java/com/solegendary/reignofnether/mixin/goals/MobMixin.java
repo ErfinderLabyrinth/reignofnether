@@ -1,21 +1,22 @@
 package com.solegendary.reignofnether.mixin.goals;
 
 import com.solegendary.reignofnether.unit.NonUnitServerEvents;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.PathfinderMob;
-import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
-import net.minecraft.world.entity.ai.goal.target.TargetGoal;
+import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(NearestAttackableTargetGoal.class)
-public abstract class NearestAttackableTargetGoalMixin extends TargetGoal {
+@Mixin(Mob.class)
+public abstract class MobMixin extends LivingEntity {
 
-    public boolean canUse() { return false; }
-    public NearestAttackableTargetGoalMixin(Mob pMob, boolean pMustSee) { super(pMob, pMustSee); }
+    protected MobMixin(EntityType<? extends LivingEntity> pEntityType, Level pLevel) {
+        super(pEntityType, pLevel);
+    }
 
     @Inject(
             method = "setTarget",
@@ -24,8 +25,9 @@ public abstract class NearestAttackableTargetGoalMixin extends TargetGoal {
     )
     public void setTarget(LivingEntity pTarget, CallbackInfo ci) {
         synchronized (NonUnitServerEvents.attackSuppressedNonUnits) {
-            if (pTarget != null && mob instanceof PathfinderMob pfMob && NonUnitServerEvents.attackSuppressedNonUnits.contains(pfMob)) {
+            if (pTarget != null && NonUnitServerEvents.attackSuppressedNonUnits.stream().map(Entity::getId).toList().contains(getId())) {
                 ci.cancel();
+                System.out.println("cancelled!");
             }
         }
     }
