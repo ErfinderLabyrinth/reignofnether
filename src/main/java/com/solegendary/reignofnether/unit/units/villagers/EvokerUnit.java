@@ -1,13 +1,15 @@
 package com.solegendary.reignofnether.unit.units.villagers;
 
+import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.AbilityClientboundPacket;
 import com.solegendary.reignofnether.ability.abilities.*;
 import com.solegendary.reignofnether.building.GarrisonableBuilding;
+import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientboundPacket;
 import com.solegendary.reignofnether.hud.AbilityButton;
+import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
-import com.solegendary.reignofnether.research.researchItems.ResearchEvokerVexes;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.unit.Checkpoint;
@@ -51,6 +53,12 @@ import java.util.List;
 import java.util.Optional;
 
 public class EvokerUnit extends Evoker implements Unit, AttackerUnit, RangedAttackerUnit {
+    public static final Abilities ABILITIES = new Abilities();
+    static {
+        ABILITIES.add(new SetFangsLine());
+        ABILITIES.add(new SetFangsCircle());
+        ABILITIES.add(new CastSummonVexes(), Keybindings.keyQ);
+    }
     // region
     private BlockPos anchorPos = new BlockPos(0,0,0);
     public void setAnchor(BlockPos bp) { anchorPos = bp; }
@@ -170,25 +178,14 @@ public class EvokerUnit extends Evoker implements Unit, AttackerUnit, RangedAtta
     private UnitBowAttackGoal<? extends LivingEntity> attackGoal;
     private MeleeAttackBuildingGoal attackBuildingGoal;
 
-    private final List<AbilityButton> abilityButtons = new ArrayList<>();
-    private final List<Ability> abilities = new ArrayList<>();
+    private List<AbilityButton> abilityButtons = new ArrayList<>();
+    private List<Ability> abilities = new ArrayList<>();
     private final List<ItemStack> items = new ArrayList<>();
 
     public EvokerUnit(EntityType<? extends Evoker> entityType, Level level) {
         super(entityType, level);
 
-        SetFangsLine ab1 = new SetFangsLine(this);
-        SetFangsCircle ab2 = new SetFangsCircle(this);
-        CastSummonVexes ab3 = new CastSummonVexes(this);
-        this.abilities.add(ab1);
-        this.abilities.add(ab2);
-        this.abilities.add(ab3);
-
-        if (level.isClientSide()) {
-            this.abilityButtons.add(ab1.getButton(Keybindings.keyQ, this));
-            this.abilityButtons.add(ab2.getButton(Keybindings.keyW, this));
-            this.abilityButtons.add(ab3.getButton(Keybindings.keyE, this));
-        }
+        updateAbilityButtons();
     }
 
     @Override
@@ -222,7 +219,7 @@ public class EvokerUnit extends Evoker implements Unit, AttackerUnit, RangedAtta
         for (Ability ability : getAbilities()) {
             if (ability instanceof CastSummonVexes castSummonVexes) {
                 if (castSummonVexes.getAutocast() && !isCastingSpell() && castSummonVexes.isOffCooldown() && !level().isClientSide() && isIdle() &&
-                    tickCount % 4 == 0 && ResearchServerEvents.playerHasResearch(getOwnerName(), ResearchEvokerVexes.itemName)) {
+                    tickCount % 4 == 0 && ResearchServerEvents.playerHasResearch(getOwnerName(), ProductionItems.RESEARCH_EVOKER_VEXES)) {
                     this.castSummonVexesGoal.startCasting();
                 }
             }
@@ -428,5 +425,11 @@ public class EvokerUnit extends Evoker implements Unit, AttackerUnit, RangedAtta
     @Nullable
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor pLevel, DifficultyInstance pDifficulty, MobSpawnType pReason, @Nullable SpawnGroupData pSpawnData, @Nullable CompoundTag pDataTag) {
         return pSpawnData;
+    }
+
+    @Override
+    public void updateAbilityButtons() {
+        abilities = ABILITIES.get();
+        abilityButtons = ABILITIES.getButtons(this);
     }
 }

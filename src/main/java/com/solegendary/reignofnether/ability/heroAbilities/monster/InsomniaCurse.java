@@ -38,13 +38,13 @@ public class InsomniaCurse extends HeroAbility {
     private static final float PHANTOM_DAMAGE_BONUS_PER_SOUL = 0.5f;
     private static final int PHANTOM_MAX_ATTACKS = 3;
 
-    public InsomniaCurse(HeroUnit hero) {
-        super(hero, 3, UnitAction.INSOMNIA_CURSE, 20 * ResourceCost.TICKS_PER_SECOND, RANGE, 0, true);
+    public InsomniaCurse() {
+        super(3, UnitAction.INSOMNIA_CURSE, 20 * ResourceCost.TICKS_PER_SECOND, RANGE, 0, true);
     }
 
     @Override
-    public boolean rankUp() {
-        if (super.rankUp()) {
+    public boolean rankUp(HeroUnit hero) {
+        if (super.rankUp(hero)) {
             if (rank == 1) {
                 maxCharges = 3;
                 cooldownMax = 20 * ResourceCost.TICKS_PER_SECOND;
@@ -61,7 +61,7 @@ public class InsomniaCurse extends HeroAbility {
     }
 
     @Override
-    public AbilityButton getButton(Keybinding hotkey) {
+    public AbilityButton getButton(Keybinding hotkey, HeroUnit hero) {
         return new AbilityButton("Curse of Insomnia",
             new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/phantom.png"),
             hotkey,
@@ -70,20 +70,21 @@ public class InsomniaCurse extends HeroAbility {
             () -> true,
             () -> CursorClientEvents.setLeftClickAction(UnitAction.INSOMNIA_CURSE),
             null,
-            getTooltipLines(),
+            getTooltipLines(hero),
             this
         );
     }
 
     @Override
-    public Button getRankUpButton() {
+    public Button getRankUpButton(HeroUnit hero) {
         return super.getRankUpButtonProtected(
-            "Curse of Insomnia",
-            new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/phantom.png")
+                "Curse of Insomnia",
+                new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/phantom.png"),
+                hero
         );
     }
 
-    public List<FormattedCharSequence> getTooltipLines() {
+    public List<FormattedCharSequence> getTooltipLines(HeroUnit hero) {
         return List.of(
                 fcs(I18n.get("abilities.reignofnether.insomnia_curse") + " " + rankString(), true),
                 fcsIcons(I18n.get("abilities.reignofnether.insomnia_curse.stats", PHANTOM_DAMAGE, cooldownMax / 20, RANGE)),
@@ -94,10 +95,10 @@ public class InsomniaCurse extends HeroAbility {
         );
     }
 
-    public List<FormattedCharSequence> getRankUpTooltipLines() {
+    public List<FormattedCharSequence> getRankUpTooltipLines(HeroUnit hero) {
         return List.of(
             fcs(I18n.get("abilities.reignofnether.insomnia_curse"), true),
-            fcs(I18n.get("abilities.reignofnether.level_req", getLevelRequirement()), getLevelReqStyle()),
+            fcs(I18n.get("abilities.reignofnether.level_req", getLevelRequirement()), getLevelReqStyle(hero)),
             fcs(""),
             fcs(I18n.get("abilities.reignofnether.insomnia_curse.tooltip1")),
             fcs(I18n.get("abilities.reignofnether.insomnia_curse.tooltip2", PHANTOM_DAMAGE, PHANTOM_DAMAGE_BONUS_PER_SOUL)),

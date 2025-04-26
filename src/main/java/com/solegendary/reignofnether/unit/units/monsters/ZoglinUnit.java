@@ -1,8 +1,10 @@
 package com.solegendary.reignofnether.unit.units.monsters;
 
+import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.Eject;
 import com.solegendary.reignofnether.hud.AbilityButton;
+import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.time.NightUtils;
@@ -38,6 +40,11 @@ import java.util.Iterator;
 import java.util.List;
 
 public class ZoglinUnit extends Zoglin implements Unit, AttackerUnit {
+    public static final Abilities ABILITIES = new Abilities();
+    static {
+        ABILITIES.add(new Eject(), Keybindings.keyQ);
+    }
+
     // region
     private BlockPos anchorPos = new BlockPos(0,0,0);
     public void setAnchor(BlockPos bp) { anchorPos = bp; }
@@ -124,17 +131,14 @@ public class ZoglinUnit extends Zoglin implements Unit, AttackerUnit {
     final static public float movementSpeed = 0.30f;
     public int maxResources = 100;
 
-    private final List<AbilityButton> abilityButtons = new ArrayList<>();
-    private final List<Ability> abilities = new ArrayList<>();
+    private List<AbilityButton> abilityButtons = new ArrayList<>();
+    private List<Ability> abilities = new ArrayList<>();
     private final List<ItemStack> items = new ArrayList<>();
 
     public ZoglinUnit(EntityType<? extends Zoglin> entityType, Level level) {
         super(entityType, level);
 
-        Eject ab1 = new Eject();
-        this.abilities.add(ab1);
-        if (level.isClientSide())
-            this.abilityButtons.add(ab1.getButton(Keybindings.keyQ, this));
+        updateAbilityButtons();
     }
 
     @Override
@@ -228,5 +232,11 @@ public class ZoglinUnit extends Zoglin implements Unit, AttackerUnit {
 
     @Override
     public void setupEquipmentAndUpgradesServer() {
+    }
+
+    @Override
+    public void updateAbilityButtons() {
+        abilities = ABILITIES.get();
+        abilityButtons = ABILITIES.getButtons(this);
     }
 }

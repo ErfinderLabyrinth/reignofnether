@@ -160,15 +160,14 @@ public class HeadhunterUnit extends PiglinBrute implements Unit, AttackerUnit, R
     public int getFogRevealDuration() { return fogRevealDuration; }
     public void setFogRevealDuration(int duration) { fogRevealDuration = duration; }
 
-    private final List<AbilityButton> abilityButtons;
-    private final List<Ability> abilities;
+    private List<AbilityButton> abilityButtons;
+    private List<Ability> abilities;
     private final List<ItemStack> items = new ArrayList<>();
 
     public HeadhunterUnit(EntityType<? extends PiglinBrute> entityType, Level level) {
         super(entityType, level);
 
-        this.abilities = ABILITIES.get();
-        this.abilityButtons = ABILITIES.getButtons(this);
+        updateAbilityButtons();
     }
 
     @Override
@@ -277,5 +276,11 @@ public class HeadhunterUnit extends PiglinBrute implements Unit, AttackerUnit, R
     public boolean fireImmune() {
         BuildingPlacement building = BuildingUtils.findBuilding(level().isClientSide(), getOnPos());
         return super.fireImmune() || (building != null &&(building.getBuilding() instanceof FlameSanctuary || building.getBuilding() instanceof BasaltSprings));
+    }
+
+    @Override
+    public void updateAbilityButtons() {
+        abilities = ABILITIES.get();
+        abilityButtons = ABILITIES.getButtons(this);
     }
 }

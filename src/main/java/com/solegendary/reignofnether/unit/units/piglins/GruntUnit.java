@@ -1,5 +1,6 @@
 package com.solegendary.reignofnether.unit.units.piglins;
 
+import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.api.ReignOfNetherRegistries;
 import com.solegendary.reignofnether.building.Building;
@@ -46,6 +47,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GruntUnit extends Piglin implements Unit, WorkerUnit, AttackerUnit, ArmSwingingUnit {
+    public static final Abilities ABILITIES = new Abilities();
 
     // region
     private BlockPos anchorPos = new BlockPos(0,0,0);
@@ -141,8 +143,8 @@ public class GruntUnit extends Piglin implements Unit, WorkerUnit, AttackerUnit,
     final static public float movementSpeed = 0.25f;
     public int maxResources = 100;
 
-    private final List<AbilityButton> abilityButtons = new ArrayList<>();
-    private final List<Ability> abilities = new ArrayList<>();
+    private List<AbilityButton> abilityButtons = new ArrayList<>();
+    private List<Ability> abilities = new ArrayList<>();
     private final List<ItemStack> items = new ArrayList<>();
 
     private boolean isSwingingArmOnce = false;
@@ -183,10 +185,7 @@ public class GruntUnit extends Piglin implements Unit, WorkerUnit, AttackerUnit,
     public GruntUnit(EntityType<? extends Piglin> entityType, Level level) {
         super(entityType, level);
 
-        //TODO Remove need for I18n
-        if (FMLEnvironment.dist == Dist.CLIENT) {
-            this.abilityButtons.addAll(getBuildingButtons());
-        }
+        updateAbilityButtons();
     }
 
     @Override
@@ -270,5 +269,15 @@ public class GruntUnit extends Piglin implements Unit, WorkerUnit, AttackerUnit,
     public boolean fireImmune() {
         BuildingPlacement building = BuildingUtils.findBuilding(level().isClientSide(), getOnPos());
         return super.fireImmune() || (building != null &&(building.getBuilding() instanceof FlameSanctuary || building.getBuilding() instanceof BasaltSprings));
+    }
+
+    @Override
+    public void updateAbilityButtons() {
+        this.abilities = ABILITIES.get();
+        this.abilityButtons = ABILITIES.getButtons(this);
+        //TODO Remove need for I18n
+        if (FMLEnvironment.dist == Dist.CLIENT) {
+            this.abilityButtons.addAll(getBuildingButtons());
+        }
     }
 }

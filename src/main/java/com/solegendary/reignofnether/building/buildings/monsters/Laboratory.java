@@ -95,7 +95,7 @@ public class Laboratory extends ProductionBuilding {
 
     @Override
     public BuildingPlacement createBuildingPlacement(Level level, BlockPos pos, Rotation rotation, String ownerName) {
-        return new RangeIndicatorProductionPlacement(this, level, pos, rotation, ownerName, getCulledBlocks(getAbsoluteBlockData(getRelativeBlockData(level), level, pos, rotation), level), false, CallLightning.RANGE, true, true);
+        return new RangeIndicatorProductionPlacement(this, level, pos, rotation, ownerName, getAbsoluteBlockData(getRelativeBlockData(level), level, pos, rotation), false, CallLightning.RANGE, true, true);
     }
 
     public AbilityButton getBuildButton(Keybinding hotkey) {

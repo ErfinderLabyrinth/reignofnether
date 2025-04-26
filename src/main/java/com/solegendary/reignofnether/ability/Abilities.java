@@ -1,6 +1,5 @@
 package com.solegendary.reignofnether.ability;
 
-import com.ibm.icu.impl.Pair;
 import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybinding;
@@ -8,6 +7,7 @@ import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.loading.FMLEnvironment;
+import oshi.util.tuples.Pair;
 
 import java.util.*;
 
@@ -28,11 +28,11 @@ public class Abilities {
     }
 
     public void add(Ability ability) {
-        abilities.add(Pair.of(ability, null));
+        abilities.add(new Pair<>(ability, null));
     }
 
     public void add(Ability ability, Keybinding keybind) {
-        abilities.add(Pair.of(ability, keybind));
+        abilities.add(new Pair<>(ability, keybind));
     }
 
     public List<AbilityButton> getButtons(BuildingPlacement placement) {
@@ -41,7 +41,7 @@ public class Abilities {
         if (FMLEnvironment.dist == Dist.CLIENT) {
             for (int i = 0; i < abilities.size(); i++) {
                 Pair<Ability, Keybinding> ability = abilities.get(i);
-                buttons.add(ability.first.getButton(ability.second != null ? ability.second : ABILITY_KEYBINDS.get(i) , placement));
+                buttons.add(ability.getA().getButton(ability.getB() != null ? ability.getB() : ABILITY_KEYBINDS.get(i) , placement));
             }
         }
         return buttons;
@@ -53,13 +53,13 @@ public class Abilities {
         if (FMLEnvironment.dist == Dist.CLIENT) {
             for (int i = 0; i < abilities.size(); i++) {
                 Pair<Ability, Keybinding> ability = abilities.get(i);
-                buttons.add(ability.first.getButton(ability.second != null ? ability.second : ABILITY_KEYBINDS.get(i) , unit));
+                buttons.add(ability.getA().getButton(ability.getB() != null ? ability.getB() : ABILITY_KEYBINDS.get(i) , unit));
             }
         }
         return buttons;
     }
 
     public List<Ability> get() {
-        return new ArrayList<>(Arrays.asList(abilities.stream().map(pair -> pair.first).toArray(size -> new Ability[size])));
+        return new ArrayList<>(Arrays.asList(abilities.stream().map(Pair::getA).toArray(Ability[]::new)));
     }
 }

@@ -9,6 +9,7 @@ import com.solegendary.reignofnether.ability.abilities.SpinWebs;
 import com.solegendary.reignofnether.blocks.BlockServerEvents;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.hud.HudClientEvents;
+import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
@@ -165,8 +166,8 @@ public class SpiderUnit extends Spider implements Unit, AttackerUnit, Convertabl
         return null;
     }
 
-    private final List<AbilityButton> abilityButtons;
-    protected final List<Ability> abilities;
+    private List<AbilityButton> abilityButtons;
+    protected List<Ability> abilities;
     private final List<ItemStack> items = new ArrayList<>();
 
     public SpiderUnit(EntityType<? extends Spider> entityType, Level level) {
@@ -318,9 +319,15 @@ public class SpiderUnit extends Spider implements Unit, AttackerUnit, Convertabl
             }
         }
         if (!isVehicle()) {
-            spinWebs.setToMaxCooldown();
+            spinWebs.setToMaxCooldown(this);
             if (!level().isClientSide())
                 AbilityClientboundPacket.sendSetCooldownPacket(getId(), spinWebs.action, spinWebs.cooldownMax);
         }
+    }
+
+    @Override
+    public void updateAbilityButtons() {
+        abilities = ABILITIES.get();
+        abilityButtons = ABILITIES.getButtons(this);
     }
 }

@@ -64,6 +64,6 @@ public class WitherCloud extends Ability {
     public void use(Level level, Unit unitUsing, BlockPos targetBp) {
         WitherSkeletonUnit witherSkeletonUnit = (WitherSkeletonUnit) unitUsing;
         witherSkeletonUnit.deathCloudTicks = DURATION_SECONDS * ResourceCost.TICKS_PER_SECOND;
-        this.setToMaxCooldown();
+        this.setToMaxCooldown(unitUsing);
     }
 }

@@ -1,5 +1,6 @@
 package com.solegendary.reignofnether.building.buildings.monsters;
 
+import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.Sacrifice;
 import com.solegendary.reignofnether.api.ReignOfNetherRegistries;
 import com.solegendary.reignofnether.building.Building;
@@ -63,7 +64,7 @@ public class SculkCatalyst extends Building {
 
     @Override
     public BuildingPlacement createBuildingPlacement(Level level, BlockPos pos, Rotation rotation, String ownerName) {
-        return new SculkCatalystPlacement(this, level, pos, rotation, ownerName, getCulledBlocks(getAbsoluteBlockData(getRelativeBlockData(level), level, pos, rotation), level), false);
+        return new SculkCatalystPlacement(this, level, pos, rotation, ownerName, getAbsoluteBlockData(getRelativeBlockData(level), level, pos, rotation), false);
     }
 
     public AbilityButton getBuildButton(Keybinding hotkey) {

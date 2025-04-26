@@ -1,8 +1,8 @@
 package com.solegendary.reignofnether.unit.units.monsters;
 
 import com.solegendary.reignofnether.ReignOfNether;
-import com.solegendary.reignofnether.building.ProductionBuilding;
-import com.solegendary.reignofnether.building.ProductionItem;
+import com.solegendary.reignofnether.building.buildings.placements.ProductionPlacement;
+import com.solegendary.reignofnether.building.production.ProductionItem;
 import com.solegendary.reignofnether.cursor.CursorClientEvents;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.registrars.EntityRegistrar;

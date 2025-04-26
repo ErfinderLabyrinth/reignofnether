@@ -79,7 +79,7 @@ public abstract class EnchantAbility extends Ability {
 
             doEnchant(te);
             ResourcesServerEvents.addSubtractResources(new Resources(buildingUsing.ownerName, -cost.food, -cost.wood, -cost.ore));
-            setToMaxCooldown();
+            setToMaxCooldown(buildingUsing);
             playSound(level, te);
 
         } else if (level.isClientSide()) {
@@ -95,7 +95,7 @@ public abstract class EnchantAbility extends Ability {
             } else if (!canAfford(buildingUsing)) {
                 HudClientEvents.showTemporaryMessage(I18n.get("ability.reignofnether.enchant.error5"));
             } else {
-                setToMaxCooldown();
+                setToMaxCooldown(buildingUsing);
                 playSound(level, te);
             }
         }

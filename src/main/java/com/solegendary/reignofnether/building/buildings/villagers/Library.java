@@ -1,5 +1,6 @@
 package com.solegendary.reignofnether.building.buildings.villagers;
 
+import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.research.researchItems.*;
 import org.joml.Vector3d;
 import com.solegendary.reignofnether.ability.EnchantAbility;
@@ -77,7 +78,7 @@ public class Library extends ProductionBuilding {
 
     @Override
     public BuildingPlacement createBuildingPlacement(Level level, BlockPos pos, Rotation rotation, String ownerName) {
-        return new LibraryPlacement(this, level, pos, rotation, ownerName, getCulledBlocks(getAbsoluteBlockData(getRelativeBlockData(level), level, pos, rotation), level), false);
+        return new LibraryPlacement(this, level, pos, rotation, ownerName, getAbsoluteBlockData(getRelativeBlockData(level), level, pos, rotation), false);
     }
 
     public AbilityButton getBuildButton(Keybinding hotkey) {

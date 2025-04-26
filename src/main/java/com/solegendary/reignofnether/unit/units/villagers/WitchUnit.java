@@ -123,15 +123,14 @@ public class WitchUnit extends Witch implements Unit {
     final static public int LINGERING_POTION_DURATION = 5 * ResourceCost.TICKS_PER_SECOND;
     final static public int LINGERING_POTION_DURATION_EXTENDED = 10 * ResourceCost.TICKS_PER_SECOND;
 
-    private final List<AbilityButton> abilityButtons;
-    private final List<Ability> abilities;
+    private List<AbilityButton> abilityButtons;
+    private List<Ability> abilities;
     private final List<ItemStack> items = new ArrayList<>();
 
     public WitchUnit(EntityType<? extends Witch> entityType, Level level) {
         super(entityType, level);
 
-        this.abilities = ABILITIES.get();
-        this.abilityButtons = ABILITIES.getButtons(this);
+        updateAbilityButtons();
     }
 
     public int getPotionThrowRange() {
@@ -220,5 +219,11 @@ public class WitchUnit extends Witch implements Unit {
                 this.getEntityData().set(Witch.DATA_USING_ITEM, false);
             }
         }
+    }
+
+    @Override
+    public void updateAbilityButtons() {
+        abilities = ABILITIES.get();
+        abilityButtons = ABILITIES.getButtons(this);
     }
 }

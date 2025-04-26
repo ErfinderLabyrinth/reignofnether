@@ -61,7 +61,7 @@ public class Mausoleum extends ProductionBuilding {
 
     @Override
     public BuildingPlacement createBuildingPlacement(Level level, BlockPos pos, Rotation rotation, String ownerName) {
-        return new DarknessProductionBuilding(this, level, pos, rotation, ownerName, getCulledBlocks(getAbsoluteBlockData(getRelativeBlockData(level), level, pos, rotation), level), true, nightRange,false, true);
+        return new DarknessProductionBuilding(this, level, pos, rotation, ownerName, getAbsoluteBlockData(getRelativeBlockData(level), level, pos, rotation), true, nightRange,false, true);
     }
 
     public AbilityButton getBuildButton(Keybinding hotkey) {

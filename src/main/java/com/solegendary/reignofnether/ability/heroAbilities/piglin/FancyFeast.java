@@ -41,8 +41,8 @@ public class FancyFeast extends HeroAbility {
     private static final float HEALTH_PER_BEEF = 20;
 
 
-    public FancyFeast(HeroUnit hero) {
-        super(hero, 3, UnitAction.FANCY_FEAST, CD_MAX_SECONDS, RANGE, 0, false);
+    public FancyFeast() {
+        super(3, UnitAction.FANCY_FEAST, CD_MAX_SECONDS, RANGE, 0, false);
     }
 
     private ResourceLocation getIcon(int plusRank) {
@@ -64,7 +64,7 @@ public class FancyFeast extends HeroAbility {
     }
 
     @Override
-    public AbilityButton getButton(Keybinding hotkey) {
+    public AbilityButton getButton(Keybinding hotkey, HeroUnit hero) {
         return new AbilityButton("Fancy Feast",
                 getIcon(0),
                 hotkey,
@@ -73,20 +73,21 @@ public class FancyFeast extends HeroAbility {
                 () -> true,
                 () -> CursorClientEvents.setLeftClickAction(UnitAction.FANCY_FEAST),
                 null,
-                getTooltipLines(),
+                getTooltipLines(hero),
                 this
         );
     }
 
     @Override
-    public Button getRankUpButton() {
+    public Button getRankUpButton(HeroUnit hero) {
         return super.getRankUpButtonProtected(
                 "Fancy Feast",
-                getIcon(1)
+                getIcon(1),
+                hero
         );
     }
 
-    public List<FormattedCharSequence> getTooltipLines() {
+    public List<FormattedCharSequence> getTooltipLines(HeroUnit hero) {
         return List.of(
                 fcs(I18n.get("abilities.reignofnether.fancy_feast") + " " + rankString(), true),
                 fcsIcons(I18n.get("abilities.reignofnether.fancy_feast.stats", getHealAmount(), CD_MAX_SECONDS / 20)),
@@ -96,10 +97,10 @@ public class FancyFeast extends HeroAbility {
         );
     }
 
-    public List<FormattedCharSequence> getRankUpTooltipLines() {
+    public List<FormattedCharSequence> getRankUpTooltipLines(HeroUnit hero) {
         return List.of(
                 fcs(I18n.get("abilities.reignofnether.fancy_feast"), true),
-                fcs(I18n.get("abilities.reignofnether.level_req", getLevelRequirement()), getLevelReqStyle()),
+                fcs(I18n.get("abilities.reignofnether.level_req", getLevelRequirement()), getLevelReqStyle(hero)),
                 fcs(""),
                 fcs(I18n.get("abilities.reignofnether.fancy_feast.tooltip1")),
                 fcs(I18n.get("abilities.reignofnether.fancy_feast.tooltip2", BASE_ITEMS, BONUS_ITEMS_PER_RESOURCES)),

@@ -1,9 +1,11 @@
 package com.solegendary.reignofnether.unit.units.monsters;
 
+import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.MountSpider;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientboundPacket;
 import com.solegendary.reignofnether.hud.AbilityButton;
+import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.time.NightUtils;
@@ -40,6 +42,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SkeletonUnit extends Skeleton implements Unit, AttackerUnit, RangedAttackerUnit, ConvertableUnit {
+    public static final Abilities ABILITIES = new Abilities();
+    static {
+        ABILITIES.add(new MountSpider(), Keybindings.keyQ);
+    }
+
     // region
     private BlockPos anchorPos = new BlockPos(0,0,0);
     public void setAnchor(BlockPos bp) { anchorPos = bp; }
@@ -139,19 +146,14 @@ public class SkeletonUnit extends Skeleton implements Unit, AttackerUnit, Ranged
     private UnitBowAttackGoal<? extends LivingEntity> attackGoal;
     private MeleeAttackBuildingGoal attackBuildingGoal;
 
-    private final List<AbilityButton> abilityButtons = new ArrayList<>();
-    private final List<Ability> abilities = new ArrayList<>();
+    private List<AbilityButton> abilityButtons = new ArrayList<>();
+    private List<Ability> abilities = new ArrayList<>();
     private final List<ItemStack> items = new ArrayList<>();
 
     public SkeletonUnit(EntityType<? extends Skeleton> entityType, Level level) {
         super(entityType, level);
 
-        MountSpider mountSpiderAbility = new MountSpider();
-        this.abilities.add(mountSpiderAbility);
-
-        if (level.isClientSide()) {
-            this.abilityButtons.add(mountSpiderAbility.getButton(Keybindings.keyQ, this));
-        }
+        updateAbilityButtons();
     }
 
     @Override
@@ -241,5 +243,11 @@ public class SkeletonUnit extends Skeleton implements Unit, AttackerUnit, Ranged
 
         if (!level().isClientSide() && pTarget instanceof Unit unit)
             FogOfWarClientboundPacket.revealRangedUnit(unit.getOwnerName(), this.getId());
+    }
+
+    @Override
+    public void updateAbilityButtons() {
+        abilities = ABILITIES.get();
+        abilityButtons = ABILITIES.getButtons(this);
     }
 }

@@ -140,7 +140,7 @@ public class PromoteIllager extends Ability {
             if (!level.isClientSide()) {
                 MiscUtil.shootFirework(level, promotedIllager.getEyePosition());
             }
-            this.setToMaxCooldown();
+            this.setToMaxCooldown(buildingUsing);
         } else {
             if (level.isClientSide()) {
                 HudClientEvents.showTemporaryMessage(I18n.get("abilities.reignofnether.promote_illager.error4"));

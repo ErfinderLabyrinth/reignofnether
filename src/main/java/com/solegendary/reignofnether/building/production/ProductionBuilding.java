@@ -20,7 +20,7 @@ public abstract class ProductionBuilding extends Building {
     }
 
     public BuildingPlacement createBuildingPlacement(Level level, BlockPos pos, Rotation rotation, String ownerName) {
-        return new ProductionPlacement(this, level, pos, rotation, ownerName, getCulledBlocks(BuildingUtils.getAbsoluteBlockData(this.getRelativeBlockData(level), level, pos, rotation), level), this.isCapitol);
+        return new ProductionPlacement(this, level, pos, rotation, ownerName, BuildingUtils.getAbsoluteBlockData(this.getRelativeBlockData(level), level, pos, rotation), this.isCapitol);
     }
 
     public BlockPos getDefaultOutdoorSpawnPoint(BlockPos minCorner) {

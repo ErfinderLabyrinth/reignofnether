@@ -54,6 +54,6 @@ public class Eject extends Ability {
 
         for (Ability ability : unitUsing.getAbilities())
             if (ability instanceof SpinWebs spinWebs)
-                spinWebs.setCooldown(spinWebs.getCooldown() / 4f, level);
+                spinWebs.setCooldown(spinWebs.getCooldown() / 4f, unitUsing);
     }
 }

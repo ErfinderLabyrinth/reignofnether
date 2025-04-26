@@ -93,6 +93,6 @@ public class CallLightning extends Ability {
                 }
             }
         }
-        this.setToMaxCooldown();
+        this.setToMaxCooldown(buildingUsing);
     }
 }

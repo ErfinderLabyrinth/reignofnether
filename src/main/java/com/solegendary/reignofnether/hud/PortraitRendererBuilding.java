@@ -4,6 +4,8 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import com.solegendary.reignofnether.api.ReignOfNetherRegistries;
+import com.solegendary.reignofnether.building.buildings.placements.SculkCatalystPlacement;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.item.ItemDisplayContext;
 import org.joml.Quaternionf;

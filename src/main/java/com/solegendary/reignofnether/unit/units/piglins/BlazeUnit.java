@@ -1,9 +1,11 @@
 package com.solegendary.reignofnether.unit.units.piglins;
 
+import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.FirewallShot;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientboundPacket;
 import com.solegendary.reignofnether.hud.AbilityButton;
+import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.unit.Checkpoint;
@@ -36,6 +38,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BlazeUnit extends Blaze implements Unit, AttackerUnit, RangedAttackerUnit {
+    public static final Abilities ABILITIES = new Abilities();
+    static {
+        ABILITIES.add(new FirewallShot(), Keybindings.keyQ);
+    }
     // region
     private BlockPos anchorPos = new BlockPos(0,0,0);
     public void setAnchor(BlockPos bp) { anchorPos = bp; }
@@ -129,17 +135,14 @@ public class BlazeUnit extends Blaze implements Unit, AttackerUnit, RangedAttack
     public int getFogRevealDuration() { return fogRevealDuration; }
     public void setFogRevealDuration(int duration) { fogRevealDuration = duration; }
 
-    private final List<AbilityButton> abilityButtons = new ArrayList<>();
-    private final List<Ability> abilities = new ArrayList<>();
+    private List<AbilityButton> abilityButtons = new ArrayList<>();
+    private List<Ability> abilities = new ArrayList<>();
     private final List<ItemStack> items = new ArrayList<>();
 
     public BlazeUnit(EntityType<? extends Blaze> entityType, Level level) {
         super(entityType, level);
 
-        FirewallShot ab1 = new FirewallShot(this);
-        this.abilities.add(ab1);
-        if (level.isClientSide())
-            this.abilityButtons.add(ab1.getButton(Keybindings.keyQ, this));
+        updateAbilityButtons();
     }
 
     @Override
@@ -240,5 +243,11 @@ public class BlazeUnit extends Blaze implements Unit, AttackerUnit, RangedAttack
     @Override
     public void setupEquipmentAndUpgradesServer() {
         this.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
+    }
+
+    @Override
+    public void updateAbilityButtons() {
+        abilities = ABILITIES.get();
+        abilityButtons = ABILITIES.getButtons(this);
     }
 }

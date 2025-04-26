@@ -30,14 +30,14 @@ public class SoulSiphonPassive extends HeroAbility {
     public int soulsPerCast = 4;
     public int soulsMax = 20;
 
-    public SoulSiphonPassive(HeroUnit hero) {
-        super(hero, 3, UnitAction.NONE, 0, 0, 0, false);
+    public SoulSiphonPassive() {
+        super(3, UnitAction.NONE, 0, 0, 0, false);
         this.autocastEnableAction = UnitAction.ENABLE_SOUL_SIPHON_PASSIVE;
         this.autocastDisableAction = UnitAction.DISBLE_SOUL_SIPHON_PASSIVE;
     }
 
-    public boolean rankUp() {
-        if (super.rankUp()) {
+    public boolean rankUp(HeroUnit hero) {
+        if (super.rankUp(hero)) {
             if (rank == 1) {
                 soulsPerCast = 4;
                 soulsMax = 20;
@@ -54,7 +54,7 @@ public class SoulSiphonPassive extends HeroAbility {
     }
 
     @Override
-    public AbilityButton getButton(Keybinding hotkey) {
+    public AbilityButton getButton(Keybinding hotkey, HeroUnit hero) {
         return new AbilityButton("Soul Siphon",
             new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/blocks/portal.png"),
             hotkey,
@@ -63,20 +63,21 @@ public class SoulSiphonPassive extends HeroAbility {
             () -> true,
             this::toggleAutocast,
             null,
-            getTooltipLines(),
+            getTooltipLines(hero),
             this
         );
     }
 
     @Override
-    public Button getRankUpButton() {
+    public Button getRankUpButton(HeroUnit hero) {
         return super.getRankUpButtonProtected(
-            "Soul Siphon",
-            new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/blocks/portal.png")
+                "Soul Siphon",
+                new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/blocks/portal.png"),
+                hero
         );
     }
 
-    public List<FormattedCharSequence> getTooltipLines() {
+    public List<FormattedCharSequence> getTooltipLines(HeroUnit hero) {
         return List.of(
                 fcs(I18n.get("abilities.reignofnether.soul_siphon") + " " + rankString(), true),
                 fcs(""),
@@ -88,10 +89,10 @@ public class SoulSiphonPassive extends HeroAbility {
         );
     }
 
-    public List<FormattedCharSequence> getRankUpTooltipLines() {
+    public List<FormattedCharSequence> getRankUpTooltipLines(HeroUnit hero) {
         return List.of(
                 fcs(I18n.get("abilities.reignofnether.soul_siphon"), true),
-                fcs(I18n.get("abilities.reignofnether.level_req", getLevelRequirement()), getLevelReqStyle()),
+                fcs(I18n.get("abilities.reignofnether.level_req", getLevelRequirement()), getLevelReqStyle(hero)),
                 fcs(""),
                 fcs(I18n.get("abilities.reignofnether.soul_siphon.tooltip1")),
                 fcs(I18n.get("abilities.reignofnether.soul_siphon.tooltip2")),

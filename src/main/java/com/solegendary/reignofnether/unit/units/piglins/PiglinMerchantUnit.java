@@ -1,6 +1,11 @@
 package com.solegendary.reignofnether.unit.units.piglins;
 
+import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.ability.Ability;
+import com.solegendary.reignofnether.ability.heroAbilities.monster.BloodMoon;
+import com.solegendary.reignofnether.ability.heroAbilities.monster.InsomniaCurse;
+import com.solegendary.reignofnether.ability.heroAbilities.monster.RaiseDead;
+import com.solegendary.reignofnether.ability.heroAbilities.monster.SoulSiphonPassive;
 import com.solegendary.reignofnether.ability.heroAbilities.piglin.FancyFeast;
 import com.solegendary.reignofnether.ability.heroAbilities.piglin.GreedIsGoodPassive;
 import com.solegendary.reignofnether.ability.heroAbilities.piglin.LootExplosion;
@@ -41,6 +46,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PiglinMerchantUnit extends Piglin implements Unit, AttackerUnit, HeroUnit, KeyframeAnimated {
+    public static final Abilities ABILITIES = new Abilities();
+    static {
+        ABILITIES.add(new ThrowTNT());
+        ABILITIES.add(new FancyFeast());
+        ABILITIES.add(new GreedIsGoodPassive());
+        ABILITIES.add(new LootExplosion());
+    }
+
     // region
     private BlockPos anchorPos = new BlockPos(0,0,0);
     public void setAnchor(BlockPos bp) { anchorPos = bp; }
@@ -150,8 +163,8 @@ public class PiglinMerchantUnit extends Piglin implements Unit, AttackerUnit, He
     final static public float movementSpeed = 0.28f;
     public int maxResources = 100;
 
-    private final List<AbilityButton> abilityButtons = new ArrayList<>();
-    private final List<Ability> abilities = new ArrayList<>();
+    private List<AbilityButton> abilityButtons = new ArrayList<>();
+    private List<Ability> abilities = new ArrayList<>();
     private final List<ItemStack> items = new ArrayList<>();
 
     public final AnimationState idleAnimState = new AnimationState();
@@ -204,10 +217,7 @@ public class PiglinMerchantUnit extends Piglin implements Unit, AttackerUnit, He
 
     public PiglinMerchantUnit(EntityType<? extends Piglin> entityType, Level level) {
         super(entityType, level);
-        this.abilities.add(new ThrowTNT(this));
-        this.abilities.add(new FancyFeast(this));
-        this.abilities.add(new GreedIsGoodPassive(this));
-        this.abilities.add(new LootExplosion(this));
+
         updateAbilityButtons();
     }
 
@@ -310,5 +320,11 @@ public class PiglinMerchantUnit extends Piglin implements Unit, AttackerUnit, He
 
     public void lootExplosion() {
 
+    }
+
+    @Override
+    public void updateAbilityButtons() {
+        abilities = ABILITIES.get();
+        abilityButtons = ABILITIES.getButtons(this);
     }
 }

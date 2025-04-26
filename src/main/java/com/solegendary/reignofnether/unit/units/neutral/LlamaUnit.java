@@ -1,5 +1,6 @@
 package com.solegendary.reignofnether.unit.units.neutral;
 
+import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.resources.ResourceCost;
@@ -33,6 +34,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LlamaUnit extends Llama implements Unit, AttackerUnit, RangedAttackerUnit {
+    public static final Abilities ABILITIES = new Abilities();
+
     // region
     private BlockPos anchorPos = new BlockPos(0,0,0);
     public void setAnchor(BlockPos bp) { anchorPos = bp; }
@@ -122,12 +125,14 @@ public class LlamaUnit extends Llama implements Unit, AttackerUnit, RangedAttack
     public int getFogRevealDuration() { return fogRevealDuration; }
     public void setFogRevealDuration(int duration) { fogRevealDuration = duration; }
 
-    private final List<AbilityButton> abilityButtons = new ArrayList<>();
-    private final List<Ability> abilities = new ArrayList<>();
+    private List<AbilityButton> abilityButtons = new ArrayList<>();
+    private List<Ability> abilities = new ArrayList<>();
     private final List<ItemStack> items = new ArrayList<>();
 
     public LlamaUnit(EntityType<? extends Llama> entityType, Level level) {
         super(entityType, level);
+
+        updateAbilityButtons();
     }
 
     @Override
@@ -185,5 +190,11 @@ public class LlamaUnit extends Llama implements Unit, AttackerUnit, RangedAttack
     @Override
     public void performUnitRangedAttack(LivingEntity pTarget, float velocity) {
         this.performRangedAttack(pTarget, 0);
+    }
+
+    @Override
+    public void updateAbilityButtons() {
+        abilities = ABILITIES.get();
+        abilityButtons = ABILITIES.getButtons(this);
     }
 }

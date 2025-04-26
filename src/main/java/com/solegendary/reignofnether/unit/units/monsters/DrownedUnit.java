@@ -134,8 +134,8 @@ public class DrownedUnit extends Drowned implements Unit, AttackerUnit {
     private AbstractMeleeAttackUnitGoal attackGoal;
     private MeleeAttackBuildingGoal attackBuildingGoal;
 
-    private final List<AbilityButton> abilityButtons = new ArrayList<>();
-    private final List<Ability> abilities = new ArrayList<>();
+    private List<AbilityButton> abilityButtons = new ArrayList<>();
+    private List<Ability> abilities = new ArrayList<>();
     private final List<ItemStack> items = new ArrayList<>();
 
     public DrownedUnit(EntityType<? extends Drowned> entityType, Level level) {

@@ -1,5 +1,6 @@
 package com.solegendary.reignofnether.building.buildings.villagers;
 
+import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.BackToWorkBuilding;
 import com.solegendary.reignofnether.ability.abilities.CallToArmsBuilding;
 import com.solegendary.reignofnether.api.ReignOfNetherRegistries;
@@ -65,7 +66,7 @@ public class TownCentre extends ProductionBuilding {
 
     @Override
     public BuildingPlacement createBuildingPlacement(Level level, BlockPos pos, Rotation rotation, String ownerName) {
-        return new RangeIndicatorProductionPlacement(this, level, pos, rotation, ownerName, getCulledBlocks(getAbsoluteBlockData(getRelativeBlockData(level), level, pos, rotation), level), true, MILITIA_RANGE, true, false);
+        return new RangeIndicatorProductionPlacement(this, level, pos, rotation, ownerName, getAbsoluteBlockData(getRelativeBlockData(level), level, pos, rotation), true, MILITIA_RANGE, true, false);
     }
 
     public AbilityButton getBuildButton(Keybinding hotkey) {

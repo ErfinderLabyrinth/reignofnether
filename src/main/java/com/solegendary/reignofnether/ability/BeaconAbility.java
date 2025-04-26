@@ -28,7 +28,7 @@ public abstract class BeaconAbility extends Ability {
 
     private void setToMaxCooldownAllAbiltities(BeaconPlacement beacon) {
         for (Ability ability : beacon.getAbilities())
-            ability.setToMaxCooldown();
+            ability.setToMaxCooldown(beacon);
     }
 
     @Override

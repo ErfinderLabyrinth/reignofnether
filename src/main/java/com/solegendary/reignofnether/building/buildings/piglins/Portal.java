@@ -1,6 +1,7 @@
 package com.solegendary.reignofnether.building.buildings.piglins;
 
 import com.solegendary.reignofnether.ReignOfNether;
+import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.ConnectPortal;
 import com.solegendary.reignofnether.ability.abilities.DisconnectPortal;
 import com.solegendary.reignofnether.ability.abilities.GotoPortal;
@@ -94,7 +95,7 @@ public class Portal extends ProductionBuilding {
 
     @Override
     public PortalPlacement createBuildingPlacement(Level level, BlockPos pos, Rotation rotation, String ownerName) {
-        return new PortalPlacement(this, level, pos, rotation, ownerName, getCulledBlocks(getAbsoluteBlockData(getRelativeBlockData(level), level, pos, rotation), level), false);
+        return new PortalPlacement(this, level, pos, rotation, ownerName, getAbsoluteBlockData(getRelativeBlockData(level), level, pos, rotation), false);
     }
 
     public AbilityButton getBuildButton(Keybinding hotkey) {

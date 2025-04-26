@@ -1,5 +1,6 @@
 package com.solegendary.reignofnether.unit.units.villagers;
 
+import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.EnchantMaiming;
 import com.solegendary.reignofnether.ability.abilities.EnchantSharpness;
@@ -44,6 +45,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class VindicatorUnit extends Vindicator implements Unit, AttackerUnit {
+    public static final Abilities ABILITIES = new Abilities();
+
     // region
     private BlockPos anchorPos = new BlockPos(0,0,0);
     public void setAnchor(BlockPos bp) { anchorPos = bp; }
@@ -133,12 +136,14 @@ public class VindicatorUnit extends Vindicator implements Unit, AttackerUnit {
     private AbstractMeleeAttackUnitGoal attackGoal;
     private MeleeAttackBuildingGoal attackBuildingGoal;
 
-    private final List<AbilityButton> abilityButtons = new ArrayList<>();
-    private final List<Ability> abilities = new ArrayList<>();
+    private List<AbilityButton> abilityButtons = new ArrayList<>();
+    private List<Ability> abilities = new ArrayList<>();
     private final List<ItemStack> items = new ArrayList<>();
 
     public VindicatorUnit(EntityType<? extends Vindicator> entityType, Level level) {
         super(entityType, level);
+
+        updateAbilityButtons();
     }
 
     @Override
@@ -275,5 +280,11 @@ public class VindicatorUnit extends Vindicator implements Unit, AttackerUnit {
     @Nullable
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor pLevel, DifficultyInstance pDifficulty, MobSpawnType pReason, @Nullable SpawnGroupData pSpawnData, @Nullable CompoundTag pDataTag) {
         return pSpawnData;
+    }
+
+    @Override
+    public void updateAbilityButtons() {
+        abilities = ABILITIES.get();
+        abilityButtons = ABILITIES.getButtons(this);
     }
 }

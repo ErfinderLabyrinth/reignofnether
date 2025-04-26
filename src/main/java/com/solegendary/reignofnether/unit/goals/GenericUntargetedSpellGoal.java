@@ -3,6 +3,7 @@ package com.solegendary.reignofnether.unit.goals;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.AbilityClientboundPacket;
 import com.solegendary.reignofnether.unit.UnitAnimationAction;
+import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.packets.UnitAnimationClientboundPacket;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -61,8 +62,8 @@ public class GenericUntargetedSpellGoal extends Goal {
                 if (this.ability != null && !this.mob.level().isClientSide()) {
                     if (!this.mob.level().isClientSide())
                         AbilityClientboundPacket.sendSetCooldownPacket(this.mob.getId(), this.ability.action, this.ability.cooldownMax);
-                    else
-                        this.ability.setToMaxCooldown();
+                    else if (mob instanceof Unit unit) // Can it be a non-unit entity?
+                        this.ability.setToMaxCooldown(unit);
                 }
                 this.ticksCasting = 0;
                 this.isCasting = false;

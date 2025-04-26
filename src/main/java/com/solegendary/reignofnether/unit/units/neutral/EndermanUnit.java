@@ -4,6 +4,7 @@ import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.Teleport;
 import com.solegendary.reignofnether.hud.AbilityButton;
+import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.unit.Checkpoint;
@@ -129,15 +130,14 @@ public class EndermanUnit extends EnderMan implements Unit, AttackerUnit {
     private AbstractMeleeAttackUnitGoal attackGoal;
     private MeleeAttackBuildingGoal attackBuildingGoal;
 
-    private final List<AbilityButton> abilityButtons;
-    private final List<Ability> abilities;
+    private List<AbilityButton> abilityButtons;
+    private List<Ability> abilities;
     private final List<ItemStack> items = new ArrayList<>();
 
     public EndermanUnit(EntityType<? extends EnderMan> entityType, Level level) {
         super(entityType, level);
 
-        this.abilities = ABILITIES.get();
-        this.abilityButtons = ABILITIES.getButtons(this);
+        updateAbilityButtons();
     }
 
     @Override
@@ -222,5 +222,11 @@ public class EndermanUnit extends EnderMan implements Unit, AttackerUnit {
             this.level().playSound(null, this.xo, this.yo, this.zo, SoundEvents.ENDERMAN_TELEPORT, this.getSoundSource(), 1.0F, 1.0F);
             this.playSound(SoundEvents.ENDERMAN_TELEPORT, 3.0F, 1.0F);
         }
+    }
+
+    @Override
+    public void updateAbilityButtons() {
+        abilities = ABILITIES.get();
+        abilityButtons = ABILITIES.getButtons(this);
     }
 }

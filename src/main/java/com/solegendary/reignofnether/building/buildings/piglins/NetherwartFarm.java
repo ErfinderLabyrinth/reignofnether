@@ -1,5 +1,6 @@
 package com.solegendary.reignofnether.building.buildings.piglins;
 
+import com.solegendary.reignofnether.api.ReignOfNetherRegistries;
 import com.solegendary.reignofnether.building.BuildingBlock;
 import com.solegendary.reignofnether.building.BuildingBlockData;
 import com.solegendary.reignofnether.building.BuildingClientEvents;

@@ -1,5 +1,6 @@
 package com.solegendary.reignofnether.unit.units.villagers;
 
+import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.PromoteIllager;
 import com.solegendary.reignofnether.ability.heroAbilities.villager.Avatar;
@@ -7,6 +8,7 @@ import com.solegendary.reignofnether.ability.heroAbilities.villager.BattleRagePa
 import com.solegendary.reignofnether.ability.heroAbilities.villager.MaceSlam;
 import com.solegendary.reignofnether.ability.heroAbilities.villager.TauntingCry;
 import com.solegendary.reignofnether.hud.AbilityButton;
+import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.unit.Checkpoint;
@@ -41,6 +43,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RoyalGuardUnit extends Vindicator implements Unit, AttackerUnit, HeroUnit, KeyframeAnimated {
+    public static final Abilities ABILITIES = new Abilities();
+    static {
+        ABILITIES.add(new MaceSlam());
+        ABILITIES.add(new TauntingCry());
+        ABILITIES.add(new BattleRagePassive());
+        ABILITIES.add(new Avatar());
+    }
+
     // region
     private BlockPos anchorPos = new BlockPos(0,0,0);
     public void setAnchor(BlockPos bp) { anchorPos = bp; }
@@ -145,8 +155,8 @@ public class RoyalGuardUnit extends Vindicator implements Unit, AttackerUnit, He
     private AbstractMeleeAttackUnitGoal attackGoal;
     private MeleeAttackBuildingGoal attackBuildingGoal;
 
-    private final List<AbilityButton> abilityButtons = new ArrayList<>();
-    private final List<Ability> abilities = new ArrayList<>();
+    private List<AbilityButton> abilityButtons = new ArrayList<>();
+    private List<Ability> abilities = new ArrayList<>();
     private final List<ItemStack> items = new ArrayList<>();
 
     public final AnimationState idleAnimState = new AnimationState();
@@ -199,10 +209,7 @@ public class RoyalGuardUnit extends Vindicator implements Unit, AttackerUnit, He
 
     public RoyalGuardUnit(EntityType<? extends Vindicator> entityType, Level level) {
         super(entityType, level);
-        this.abilities.add(new MaceSlam(this));
-        this.abilities.add(new TauntingCry(this));
-        this.abilities.add(new BattleRagePassive(this));
-        this.abilities.add(new Avatar(this));
+
         updateAbilityButtons();
     }
 
@@ -289,5 +296,11 @@ public class RoyalGuardUnit extends Vindicator implements Unit, AttackerUnit, He
 
     public void avatar() {
 
+    }
+
+    @Override
+    public void updateAbilityButtons() {
+        abilities = ABILITIES.get();
+        abilityButtons = ABILITIES.getButtons(this);
     }
 }

@@ -5,6 +5,7 @@ import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.AttackGround;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientboundPacket;
 import com.solegendary.reignofnether.hud.AbilityButton;
+import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.unit.Checkpoint;
@@ -147,8 +148,8 @@ public class GhastUnit extends Ghast implements Unit, AttackerUnit, RangedAttack
     public int getFogRevealDuration() { return fogRevealDuration; }
     public void setFogRevealDuration(int duration) { fogRevealDuration = duration; }
 
-    private final List<AbilityButton> abilityButtons;
-    private final List<Ability> abilities;
+    private List<AbilityButton> abilityButtons;
+    private List<Ability> abilities;
     private final List<ItemStack> items = new ArrayList<>();
 
     public static final int EXPLOSION_POWER = 2;
@@ -169,8 +170,7 @@ public class GhastUnit extends Ghast implements Unit, AttackerUnit, RangedAttack
         super(entityType, level);
         this.moveControl = new GhastUnitMoveControl(this);
 
-        this.abilities = ABILITIES.get();
-        this.abilityButtons = ABILITIES.getButtons(this);
+        updateAbilityButtons();
     }
 
     @Override
@@ -330,5 +330,11 @@ public class GhastUnit extends Ghast implements Unit, AttackerUnit, RangedAttack
     @Override
     public void setupEquipmentAndUpgradesServer() {
         this.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
+    }
+
+    @Override
+    public void updateAbilityButtons() {
+        abilities = ABILITIES.get();
+        abilityButtons = ABILITIES.getButtons(this);
     }
 }

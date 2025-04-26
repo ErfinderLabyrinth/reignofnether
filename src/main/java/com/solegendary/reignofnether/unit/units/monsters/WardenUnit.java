@@ -7,6 +7,7 @@ import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.buildings.placements.SculkCatalystPlacement;
 import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.hud.AbilityButton;
+import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.research.ResearchClient;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
 import com.solegendary.reignofnether.research.researchItems.ResearchSculkAmplifiers;
@@ -146,8 +147,8 @@ public class WardenUnit extends Warden implements Unit, AttackerUnit {
 
     public SonicBoomGoal getSonicBoomGoal() { return sonicBoomGoal; }
 
-    private final List<AbilityButton> abilityButtons;
-    private final List<Ability> abilities;
+    private List<AbilityButton> abilityButtons;
+    private List<Ability> abilities;
     private final List<ItemStack> items = new ArrayList<>();
 
     public static final float SONIC_BOOM_DAMAGE = 75f;
@@ -157,8 +158,7 @@ public class WardenUnit extends Warden implements Unit, AttackerUnit {
     public WardenUnit(EntityType<? extends Warden> entityType, Level level) {
         super(entityType, level);
 
-        this.abilities = ABILITIES.get();
-        this.abilityButtons = ABILITIES.getButtons(this);
+        updateAbilityButtons();
     }
 
     @Override
@@ -300,5 +300,11 @@ public class WardenUnit extends Warden implements Unit, AttackerUnit {
 
     public void stopSonicBoomAnimation() {
         this.sonicBoomAnimationState.stop();
+    }
+
+    @Override
+    public void updateAbilityButtons() {
+        abilities = ABILITIES.get();
+        abilityButtons = ABILITIES.getButtons(this);
     }
 }

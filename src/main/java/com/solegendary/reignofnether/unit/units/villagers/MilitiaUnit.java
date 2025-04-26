@@ -43,6 +43,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -155,15 +157,14 @@ public class MilitiaUnit extends Vindicator implements Unit, AttackerUnit, Villa
     final static public float movementSpeed = 0.28f;
     public int maxResources = 100;
 
-    private final List<AbilityButton> abilityButtons;
-    private final List<Ability> abilities;
+    private List<AbilityButton> abilityButtons;
+    private List<Ability> abilities;
     private final List<ItemStack> items = new ArrayList<>();
 
     public MilitiaUnit(EntityType<? extends Vindicator> entityType, Level level) {
         super(entityType, level);
 
-        this.abilities = ABILITIES.get();
-        this.abilityButtons = ABILITIES.getButtons(this);
+        updateAbilityButtons();
     }
 
     @Override
@@ -299,6 +300,12 @@ public class MilitiaUnit extends Vindicator implements Unit, AttackerUnit, Villa
     public void setVillagerData(VillagerData p_35437_) {
         VillagerData villagerdata = this.getVillagerData();
         this.entityData.set(VILLAGER_DATA, p_35437_);
+    }
+
+    @Override
+    public void updateAbilityButtons() {
+        abilities = ABILITIES.get();
+        abilityButtons = ABILITIES.getButtons(this);
     }
 
     static {

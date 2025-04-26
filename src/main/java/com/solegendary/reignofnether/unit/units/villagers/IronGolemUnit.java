@@ -1,5 +1,6 @@
 package com.solegendary.reignofnether.unit.units.villagers;
 
+import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.resources.ResourceCost;
@@ -29,6 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class IronGolemUnit extends IronGolem implements Unit, AttackerUnit {
+    public static final Abilities ABILITIES = new Abilities();
+
     // region
     private BlockPos anchorPos = new BlockPos(0,0,0);
     public void setAnchor(BlockPos bp) { anchorPos = bp; }
@@ -119,12 +122,14 @@ public class IronGolemUnit extends IronGolem implements Unit, AttackerUnit {
     private AbstractMeleeAttackUnitGoal attackGoal;
     private MeleeAttackBuildingGoal attackBuildingGoal;
 
-    private final List<AbilityButton> abilityButtons = new ArrayList<>();
-    private final List<Ability> abilities = new ArrayList<>();
+    private List<AbilityButton> abilityButtons = new ArrayList<>();
+    private List<Ability> abilities = new ArrayList<>();
     private final List<ItemStack> items = new ArrayList<>();
 
     public IronGolemUnit(EntityType<? extends IronGolem> entityType, Level level) {
         super(entityType, level);
+
+        updateAbilityButtons();
     }
 
     @Override
@@ -176,5 +181,11 @@ public class IronGolemUnit extends IronGolem implements Unit, AttackerUnit {
         this.targetSelector.addGoal(2, targetGoal);
         this.goalSelector.addGoal(3, moveGoal);
         this.goalSelector.addGoal(4, new RandomLookAroundUnitGoal(this));
+    }
+
+    @Override
+    public void updateAbilityButtons() {
+        abilities = ABILITIES.get();
+        abilityButtons = ABILITIES.getButtons(this);
     }
 }

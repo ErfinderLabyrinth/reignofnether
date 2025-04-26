@@ -103,7 +103,7 @@ public class WaveEnemy {
         if (unit instanceof SpiderUnit spiderUnit &&
             ResearchServerEvents.playerHasResearch(spiderUnit.getOwnerName(), ProductionItems.RESEARCH_SPIDER_WEBS) &&
             spiderUnit.getWebAbility() != null) {
-            spiderUnit.getWebAbility().setAutocast(true);
+            spiderUnit.getWebAbility().setAutocast(true, spiderUnit);
         }
         attackMoveNearestBuilding();
     }

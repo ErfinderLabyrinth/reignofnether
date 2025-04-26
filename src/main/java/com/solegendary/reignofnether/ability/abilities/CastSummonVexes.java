@@ -27,9 +27,7 @@ public class CastSummonVexes extends Ability {
     public static final int CD_MAX_SECONDS = 60;
     public static final int VEX_DURATION_SECONDS = 30;
 
-    private final EvokerUnit evokerUnit;
-
-    public CastSummonVexes(EvokerUnit evokerUnit) {
+    public CastSummonVexes() {
         super(
                 UnitAction.CAST_SUMMON_VEXES,
                 CD_MAX_SECONDS * ResourceCost.TICKS_PER_SECOND,
@@ -38,20 +36,20 @@ public class CastSummonVexes extends Ability {
                 true,
                 false
         );
-        this.evokerUnit = evokerUnit;
         this.autocastEnableAction = UnitAction.CAST_SUMMON_VEXES_AUTOCAST_ENABLE;
         this.autocastDisableAction = UnitAction.CAST_SUMMON_VEXES_AUTOCAST_DISABLE;
     }
 
     @Override
     public AbilityButton getButton(Keybinding hotkey, Unit unit) {
+        EvokerUnit evokerUnit = (EvokerUnit) unit;
         return new AbilityButton(
                 "Summon Vexes",
                 new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/vex.png"),
                 hotkey,
                 () -> {
-                    if (this.evokerUnit.getCastSummonVexesGoal() != null)
-                        return this.evokerUnit.getCastSummonVexesGoal().isCasting()|| getAutocast();
+                    if (evokerUnit.getCastSummonVexesGoal() != null)
+                        return evokerUnit.getCastSummonVexesGoal().isCasting()|| getAutocast();
                     return false;
                 },
                 () -> !ResearchClient.hasResearch(ProductionItems.RESEARCH_EVOKER_VEXES),
@@ -71,19 +69,21 @@ public class CastSummonVexes extends Ability {
     }
 
     @Override
-    public void setCooldown(float cooldown) {
+    public void setCooldown(float cooldown, Unit unit) {
+        EvokerUnit evokerUnit = (EvokerUnit) unit;
         if (evokerUnit.hasVigorEnchant())
             cooldown *= EnchantVigor.cooldownMultiplier;
-        super.setCooldown(cooldown);
+        super.setCooldown(cooldown, unit);
     }
 
 
     @Override
-    public void setToMaxCooldown() {
+    public void setToMaxCooldown(Unit unit) {
+        EvokerUnit evokerUnit = (EvokerUnit) unit;
         if (evokerUnit.hasVigorEnchant())
-            setCooldown((int) (cooldownMax * EnchantVigor.cooldownMultiplier));
+            setCooldown((int) (cooldownMax * EnchantVigor.cooldownMultiplier), unit);
         else
-            setCooldown(cooldownMax);
+            setCooldown(cooldownMax, unit);
     }
 
     @Override

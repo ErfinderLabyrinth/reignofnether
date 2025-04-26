@@ -1,5 +1,6 @@
 package com.solegendary.reignofnether.unit.units.piglins;
 
+import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.Eject;
 import com.solegendary.reignofnether.building.BuildingPlacement;
@@ -7,6 +8,7 @@ import com.solegendary.reignofnether.building.BuildingUtils;
 import com.solegendary.reignofnether.building.buildings.piglins.BasaltSprings;
 import com.solegendary.reignofnether.building.buildings.piglins.FlameSanctuary;
 import com.solegendary.reignofnether.hud.AbilityButton;
+import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.unit.Checkpoint;
@@ -46,6 +48,11 @@ import java.util.Iterator;
 import java.util.List;
 
 public class HoglinUnit extends Hoglin implements Unit, AttackerUnit {
+    public static final Abilities ABILITIES = new Abilities();
+    static {
+        ABILITIES.add(new Eject(), Keybindings.keyQ);
+    }
+
     // region
     private BlockPos anchorPos = new BlockPos(0,0,0);
     public void setAnchor(BlockPos bp) { anchorPos = bp; }
@@ -134,17 +141,14 @@ public class HoglinUnit extends Hoglin implements Unit, AttackerUnit {
 
     final static public float BUILDING_DAMAGE_MULTIPLIER = 1.5f;
 
-    private final List<AbilityButton> abilityButtons = new ArrayList<>();
-    private final List<Ability> abilities = new ArrayList<>();
+    private List<AbilityButton> abilityButtons = new ArrayList<>();
+    private List<Ability> abilities = new ArrayList<>();
     private final List<ItemStack> items = new ArrayList<>();
 
     public HoglinUnit(EntityType<? extends Hoglin> entityType, Level level) {
         super(entityType, level);
 
-        Eject ab1 = new Eject();
-        this.abilities.add(ab1);
-        if (level.isClientSide())
-            this.abilityButtons.add(ab1.getButton(Keybindings.keyQ, this));
+        updateAbilityButtons();
     }
 
     @Override
@@ -244,5 +248,11 @@ public class HoglinUnit extends Hoglin implements Unit, AttackerUnit {
     public boolean fireImmune() {
         BuildingPlacement building = BuildingUtils.findBuilding(level().isClientSide(), getOnPos());
         return super.fireImmune() || (building != null &&(building.getBuilding() instanceof FlameSanctuary || building.getBuilding() instanceof BasaltSprings));
+    }
+
+    @Override
+    public void updateAbilityButtons() {
+        abilities = ABILITIES.get();
+        abilityButtons = ABILITIES.getButtons(this);
     }
 }

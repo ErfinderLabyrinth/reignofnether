@@ -32,12 +32,12 @@ public class RaiseDead extends HeroAbility {
     public static final int CHANNEL_TICKS = 40;
     private static final int CD_MAX_SECONDS = 5 * ResourceCost.TICKS_PER_SECOND;
 
-    public RaiseDead(HeroUnit hero) {
-        super(hero, 3, UnitAction.RAISE_DEAD, CD_MAX_SECONDS, 0, 0, false);
+    public RaiseDead() {
+        super(3, UnitAction.RAISE_DEAD, CD_MAX_SECONDS, 0, 0, false);
     }
 
     @Override
-    public AbilityButton getButton(Keybinding hotkey) {
+    public AbilityButton getButton(Keybinding hotkey, HeroUnit hero) {
         return new AbilityButton("Raise Dead",
                 new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/zombie.png"),
                 hotkey,
@@ -46,23 +46,24 @@ public class RaiseDead extends HeroAbility {
                 () -> true,
                 () -> sendUnitCommand(UnitAction.RAISE_DEAD),
                 null,
-                getTooltipLines(),
+                getTooltipLines(hero),
                 this
         );
     }
 
     @Override
-    public Button getRankUpButton() {
+    public Button getRankUpButton(HeroUnit hero) {
         return super.getRankUpButtonProtected(
-            "Raise Dead",
-            new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/zombie.png")
+                "Raise Dead",
+                new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/zombie.png"),
+                hero
         );
     }
 
     private static final float BONUS_HEALTH_PER_SOUL = 2;
     private static final float BONUS_DAMAGE_PER_SOUL = 0.3f;
 
-    public List<FormattedCharSequence> getTooltipLines() {
+    public List<FormattedCharSequence> getTooltipLines(HeroUnit hero) {
         return List.of(
                 fcs(I18n.get("abilities.reignofnether.raise_dead") + " " + rankString(), true),
                 fcsIcons(I18n.get("abilities.reignofnether.raise_dead.stats", CD_MAX_SECONDS / 20)),
@@ -73,10 +74,10 @@ public class RaiseDead extends HeroAbility {
         );
     }
 
-    public List<FormattedCharSequence> getRankUpTooltipLines() {
+    public List<FormattedCharSequence> getRankUpTooltipLines(HeroUnit hero) {
         return List.of(
                 fcs(I18n.get("abilities.reignofnether.raise_dead"), true),
-                fcs(I18n.get("abilities.reignofnether.level_req", getLevelRequirement()), getLevelReqStyle()),
+                fcs(I18n.get("abilities.reignofnether.level_req", getLevelRequirement()), getLevelReqStyle(hero)),
                 fcs(""),
                 fcs(I18n.get("abilities.reignofnether.raise_dead.tooltip1")),
                 fcs(I18n.get("abilities.reignofnether.raise_dead.tooltip2", BONUS_HEALTH_PER_SOUL, BONUS_DAMAGE_PER_SOUL)),

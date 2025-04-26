@@ -1,5 +1,6 @@
 package com.solegendary.reignofnether.building.buildings.neutral;
 
+import com.solegendary.reignofnether.building.buildings.placements.HealingFountainPlacement;
 import org.joml.Vector3d;
 import com.solegendary.reignofnether.building.*;
 import com.solegendary.reignofnether.hud.AbilityButton;
@@ -56,7 +57,7 @@ public class HealingFountain extends Building {
 
     @Override
     public BuildingPlacement createBuildingPlacement(Level level, BlockPos pos, Rotation rotation, String ownerName) {
-        return new HealingFountainPlacement(this, level, pos, rotation, ownerName, getCulledBlocks(getAbsoluteBlockData(getRelativeBlockData(level), level, pos, rotation), level), false);
+        return new HealingFountainPlacement(this, level, pos, rotation, ownerName, getAbsoluteBlockData(getRelativeBlockData(level), level, pos, rotation), false);
     }
 
     public AbilityButton getBuildButton(Keybinding hotkey) {

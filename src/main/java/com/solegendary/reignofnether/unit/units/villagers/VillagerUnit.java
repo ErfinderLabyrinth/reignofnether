@@ -260,8 +260,8 @@ public class VillagerUnit extends Vindicator implements Unit, WorkerUnit, Attack
             makeVeteran();
     }
 
-    private final List<AbilityButton> abilityButtons;
-    private final List<Ability> abilities;
+    private List<AbilityButton> abilityButtons;
+    private List<Ability> abilities;
     private final List<ItemStack> items = new ArrayList<>();
 
     private boolean isSwingingArmOnce = false;
@@ -303,12 +303,7 @@ public class VillagerUnit extends Vindicator implements Unit, WorkerUnit, Attack
     public VillagerUnit(EntityType<? extends Vindicator> entityType, Level level) {
         super(entityType, level);
 
-        this.abilities = ABILITIES.get();
-        this.abilityButtons = ABILITIES.getButtons(this);
-        //TODO Remove need for I18n
-        if (FMLEnvironment.dist == Dist.CLIENT) {
-            this.abilityButtons.addAll(getBuildingButtons());
-        }
+        updateAbilityButtons();
     }
 
     @Override
@@ -482,6 +477,16 @@ public class VillagerUnit extends Vindicator implements Unit, WorkerUnit, Attack
         this.hunterExp = pCompound.getInt("hunterExp");
         if (!level().isClientSide() && pCompound.getBoolean("isVeteran"))
             makeVeteran();
+    }
+
+    @Override
+    public void updateAbilityButtons() {
+        this.abilities = ABILITIES.get();
+        this.abilityButtons = ABILITIES.getButtons(this);
+        //TODO Remove need for I18n
+        if (FMLEnvironment.dist == Dist.CLIENT) {
+            this.abilityButtons.addAll(getBuildingButtons());
+        }
     }
 
     static {

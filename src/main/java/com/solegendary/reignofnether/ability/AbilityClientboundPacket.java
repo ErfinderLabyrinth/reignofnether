@@ -26,7 +26,7 @@ public class AbilityClientboundPacket {
             if (entity.getId() == unitId && entity instanceof Unit unit)
                 for (Ability ability : unit.getAbilities())
                     if (ability.action == unitAction) {
-                        ability.setCooldown(cooldown, entity.level());
+                        ability.setCooldown(cooldown, unit);
                         return;
                     }
     }
@@ -71,7 +71,7 @@ public class AbilityClientboundPacket {
                         if (entity.getId() == this.unitId && entity instanceof Unit unit)
                             for (Ability ability : unit.getAbilities())
                                 if (ability.action == this.unitAction) {
-                                    ability.setCooldown(this.cooldown, entity.level());
+                                    ability.setCooldown(this.cooldown, unit);
                                     return;
                                 }
                 });

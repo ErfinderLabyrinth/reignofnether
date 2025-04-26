@@ -25,7 +25,7 @@ public class Ability {
     public UnitAction autocastDisableAction = null;
 
     private boolean autocast = false;
-    public void setAutocast(boolean value) { autocast = value; }
+    public void setAutocast(boolean value, Unit unit) { autocast = value; }
     public boolean getAutocast() { return autocast; }
 
     public Ability(UnitAction action, int cooldownMax, float range, float radius, boolean canTargetEntities) {
@@ -73,12 +73,16 @@ public class Ability {
 
     public boolean isOffCooldown() { return this.cooldown <= 0; }
 
-    public void setToMaxCooldown() {
+    public void setToMaxCooldown(Unit unit) {
         this.cooldown = cooldownMax;
     }
 
-    public void setCooldown(float cooldown, Level level) {
-        if (level.isClientSide() && cooldown > 0) {
+    public void setToMaxCooldown(BuildingPlacement building) {
+        this.cooldown = cooldownMax;
+    }
+
+    public void setCooldown(float cooldown, Unit unit) {
+        if (unit.level().isClientSide() && cooldown > 0) {
             HudClientEvents.setLowestCdHudEntity();
         }
         this.cooldown = Math.min(cooldown, cooldownMax);

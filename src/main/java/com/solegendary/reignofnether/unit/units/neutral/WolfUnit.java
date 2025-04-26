@@ -1,5 +1,6 @@
 package com.solegendary.reignofnether.unit.units.neutral;
 
+import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.resources.ResourceCost;
@@ -35,6 +36,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WolfUnit extends Wolf implements Unit, AttackerUnit {
+    public static final Abilities ABILITIES = new Abilities();
+
     // region
     private BlockPos anchorPos = new BlockPos(0,0,0);
     public void setAnchor(BlockPos bp) { anchorPos = bp; }
@@ -121,12 +124,14 @@ public class WolfUnit extends Wolf implements Unit, AttackerUnit {
     final static public float movementSpeed = 0.31f;
     public int maxResources = 100;
 
-    private final List<AbilityButton> abilityButtons = new ArrayList<>();
-    private final List<Ability> abilities = new ArrayList<>();
+    private List<AbilityButton> abilityButtons = new ArrayList<>();
+    private List<Ability> abilities = new ArrayList<>();
     private final List<ItemStack> items = new ArrayList<>();
 
     public WolfUnit(EntityType<? extends Wolf> entityType, Level level) {
         super(entityType, level);
+
+        updateAbilityButtons();
     }
 
     @Override
@@ -194,5 +199,11 @@ public class WolfUnit extends Wolf implements Unit, AttackerUnit {
     @Nullable
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor pLevel, DifficultyInstance pDifficulty, MobSpawnType pReason, @Nullable SpawnGroupData pSpawnData, @Nullable CompoundTag pDataTag) {
         return pSpawnData;
+    }
+
+    @Override
+    public void updateAbilityButtons() {
+        abilities = ABILITIES.get();
+        abilityButtons = ABILITIES.getButtons(this);
     }
 }

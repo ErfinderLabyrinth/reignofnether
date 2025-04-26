@@ -888,7 +888,7 @@ public class HudClientEvents {
                 List<AbilityButton> abilityButtons = List.of();
                 for (LivingEntity livingEntity : selUnits) {
                     if (livingEntity == hudSelectedEntity) {
-                        abilityButtons = ((Unit) livingEntity).getAbilityButtons();
+                        abilityButtons = unit.getAbilityButtons(); // unit == hudSelectedEntity
                         break;
                     }
                 }
@@ -904,8 +904,8 @@ public class HudClientEvents {
                 for (AbilityButton abilityButton : unitAbilities) {
 
                     if (abilityButton.ability instanceof HeroAbility heroAbility &&
-                        heroAbility.hero.isRankUpMenuOpen()) {
-                        Button rankUpButton = heroAbility.getRankUpButton();
+                            ((HeroUnit)unit).isRankUpMenuOpen()) {
+                        Button rankUpButton = heroAbility.getRankUpButton((HeroUnit)unit);
                         if (!rankUpButton.isHidden.get()) {
                             i += 1;
                             rankUpButton.render(evt.getGuiGraphics(), blitX, blitY, mouseX, mouseY);

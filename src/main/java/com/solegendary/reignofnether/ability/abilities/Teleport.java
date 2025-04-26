@@ -57,6 +57,6 @@ public class Teleport extends Ability {
         BlockPos limitedBp = MyMath.getXZRangeLimitedBlockPos(((LivingEntity) unitUsing).getOnPos(), targetBp, range);
         ((EndermanUnit) unitUsing).teleport(limitedBp);
 
-        this.setToMaxCooldown();
+        this.setToMaxCooldown(unitUsing);
     }
 }

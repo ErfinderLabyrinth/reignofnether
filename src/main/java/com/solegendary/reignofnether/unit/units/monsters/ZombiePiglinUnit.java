@@ -1,5 +1,6 @@
 package com.solegendary.reignofnether.unit.units.monsters;
 
+import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.resources.ResourceCost;
@@ -32,6 +33,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ZombiePiglinUnit extends ZombifiedPiglin implements Unit, AttackerUnit {
+    public static final Abilities ABILITIES = new Abilities();
+
     // region
     private BlockPos anchorPos = new BlockPos(0,0,0);
     public void setAnchor(BlockPos bp) { anchorPos = bp; }
@@ -121,12 +124,14 @@ public class ZombiePiglinUnit extends ZombifiedPiglin implements Unit, AttackerU
     private AbstractMeleeAttackUnitGoal attackGoal;
     private MeleeAttackBuildingGoal attackBuildingGoal;
 
-    private final List<AbilityButton> abilityButtons = new ArrayList<>();
-    private final List<Ability> abilities = new ArrayList<>();
+    private List<AbilityButton> abilityButtons = new ArrayList<>();
+    private List<Ability> abilities = new ArrayList<>();
     private final List<ItemStack> items = new ArrayList<>();
 
     public ZombiePiglinUnit(EntityType<? extends ZombifiedPiglin> entityType, Level level) {
         super(entityType, level);
+
+        updateAbilityButtons();
     }
 
     @Override
@@ -192,5 +197,11 @@ public class ZombiePiglinUnit extends ZombifiedPiglin implements Unit, AttackerU
     public void setupEquipmentAndUpgradesServer() {
         this.setItemSlot(EquipmentSlot.MAINHAND, ItemStack.EMPTY);
         this.setItemSlot(EquipmentSlot.OFFHAND, ItemStack.EMPTY);
+    }
+
+    @Override
+    public void updateAbilityButtons() {
+        abilities = ABILITIES.get();
+        abilityButtons = ABILITIES.getButtons(this);
     }
 }

@@ -1,11 +1,13 @@
 package com.solegendary.reignofnether.unit.units.villagers;
 
+import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.Eject;
 import com.solegendary.reignofnether.ability.abilities.Roar;
 import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.BuildingUtils;
 import com.solegendary.reignofnether.hud.AbilityButton;
+import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.unit.Checkpoint;
@@ -48,6 +50,12 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 public class RavagerUnit extends Ravager implements Unit, AttackerUnit {
+    public static final Abilities ABILITIES = new Abilities();
+    static {
+        ABILITIES.add(new Roar(), Keybindings.keyQ);
+        ABILITIES.add(new Eject(), Keybindings.keyW);
+    }
+
     // region
     private BlockPos anchorPos = new BlockPos(0,0,0);
     public void setAnchor(BlockPos bp) { anchorPos = bp; }
@@ -137,8 +145,8 @@ public class RavagerUnit extends Ravager implements Unit, AttackerUnit {
     private AbstractMeleeAttackUnitGoal attackGoal;
     private MeleeAttackBuildingGoal attackBuildingGoal;
 
-    private final List<AbilityButton> abilityButtons = new ArrayList<>();
-    private final List<Ability> abilities = new ArrayList<>();
+    private List<AbilityButton> abilityButtons = new ArrayList<>();
+    private List<Ability> abilities = new ArrayList<>();
     private final List<ItemStack> items = new ArrayList<>();
 
     public final static float ROAR_DAMAGE = 8.0f;
@@ -151,14 +159,7 @@ public class RavagerUnit extends Ravager implements Unit, AttackerUnit {
     public RavagerUnit(EntityType<? extends Ravager> entityType, Level level) {
         super(entityType, level);
 
-        Roar ab1 = new Roar();
-        Eject ab2 = new Eject();
-        this.abilities.add(ab1);
-        this.abilities.add(ab2);
-        if (level.isClientSide()) {
-            this.abilityButtons.add(ab1.getButton(Keybindings.keyQ, this));
-            this.abilityButtons.add(ab2.getButton(Keybindings.keyW, this));
-        }
+        updateAbilityButtons();
     }
 
     // prevents attack commands applying only to passengers
@@ -289,5 +290,11 @@ public class RavagerUnit extends Ravager implements Unit, AttackerUnit {
                 this.playSound(SoundEvents.GENERIC_EXPLODE, 1.0F, 1.0F);
             }
         }
+    }
+
+    @Override
+    public void updateAbilityButtons() {
+        abilities = ABILITIES.get();
+        abilityButtons = ABILITIES.getButtons(this);
     }
 }

@@ -171,12 +171,14 @@ public class BeaconPlacement extends ProductionPlacement implements RangeIndicat
 
                 if ((isOwnedOrFriendlyUnit || isFriendlyPlayer) &&
                         (isFriendlyPlayer || auraEffect != MobEffects.LUCK) &&
-                        (!(le instanceof WorkerUnit) || auraEffect != MobEffects.DIG_SPEED) &&
                         getBeaconBlockEntity() != null) {
-                    if (auraEffect != MobEffects.REGENERATION)
-                        le.addEffect(new MobEffectInstance(auraEffect, 25, 0));
-                    else if (tickAgeAfterBuilt % 80 == 0) // only 1hp/4s
+                    if (auraEffect != MobEffects.REGENERATION) {
+                        if (le instanceof WorkerUnit || auraEffect != MobEffects.DIG_SPEED) {
+                            le.addEffect(new MobEffectInstance(auraEffect, 25, 0));
+                        }
+                    } else if (tickAgeAfterBuilt % 80 == 0) { // only 1hp/4s
                         le.addEffect(new MobEffectInstance(auraEffect, 60, 0));
+                    }
                 }
             }
 

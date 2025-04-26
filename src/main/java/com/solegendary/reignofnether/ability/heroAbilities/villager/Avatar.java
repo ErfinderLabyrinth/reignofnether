@@ -35,12 +35,12 @@ public class Avatar extends HeroAbility {
     private static final float BONUS_HEALTH = 100;
     private static final float BONUS_DAMAGE = 5;
 
-    public Avatar(HeroUnit hero) {
-        super(hero, 1, UnitAction.AVATAR, CD_MAX_SECONDS, 0, 0, false);
+    public Avatar() {
+        super(1, UnitAction.AVATAR, CD_MAX_SECONDS, 0, 0, false);
     }
 
     @Override
-    public AbilityButton getButton(Keybinding hotkey) {
+    public AbilityButton getButton(Keybinding hotkey, HeroUnit hero) {
         return new AbilityButton("Avatar",
                 new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/vindicator.png"),
                 hotkey,
@@ -49,20 +49,21 @@ public class Avatar extends HeroAbility {
                 () -> true,
                 () -> sendUnitCommand(UnitAction.AVATAR),
                 null,
-                getTooltipLines(),
+                getTooltipLines(hero),
                 this
         );
     }
 
     @Override
-    public Button getRankUpButton() {
+    public Button getRankUpButton(HeroUnit hero) {
         return super.getRankUpButtonProtected(
                 "Avatar",
-                new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/vindicator.png")
+                new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/vindicator.png"),
+                hero
         );
     }
 
-    public List<FormattedCharSequence> getTooltipLines() {
+    public List<FormattedCharSequence> getTooltipLines(HeroUnit hero) {
         return List.of(
                 fcs(I18n.get("abilities.reignofnether.avatar"), true),
                 fcsIcons(I18n.get("abilities.reignofnether.avatar.stats", CD_MAX_SECONDS / 20)),
@@ -73,10 +74,10 @@ public class Avatar extends HeroAbility {
         );
     }
 
-    public List<FormattedCharSequence> getRankUpTooltipLines() {
+    public List<FormattedCharSequence> getRankUpTooltipLines(HeroUnit hero) {
         return List.of(
                 fcs(I18n.get("abilities.reignofnether.avatar"), true),
-                fcs(I18n.get("abilities.reignofnether.level_req", getLevelRequirement()), getLevelReqStyle()),
+                fcs(I18n.get("abilities.reignofnether.level_req", getLevelRequirement()), getLevelReqStyle(hero)),
                 fcs(""),
                 fcs(I18n.get("abilities.reignofnether.avatar.tooltip1")),
                 fcs(I18n.get("abilities.reignofnether.avatar.tooltip2", BONUS_HEALTH, BONUS_DAMAGE)),

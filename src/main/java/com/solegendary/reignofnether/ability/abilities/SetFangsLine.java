@@ -23,20 +23,18 @@ public class SetFangsLine extends Ability {
 
     public static final int CD_MAX_SECONDS = 7;
 
-    private final EvokerUnit evokerUnit;
-
-    public SetFangsLine(EvokerUnit evokerUnit) {
+    public SetFangsLine() {
         super(UnitAction.SET_FANGS_LINE,
             CD_MAX_SECONDS * ResourceCost.TICKS_PER_SECOND,
             EvokerUnit.FANGS_RANGE_LINE,
             0,
             true
         );
-        this.evokerUnit = evokerUnit;
     }
 
     @Override
     public AbilityButton getButton(Keybinding hotkey, Unit unit) {
+        EvokerUnit evokerUnit = (EvokerUnit) unit;
         return new AbilityButton("Evoker Fangs (Line)",
             new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/shears.png"),
             hotkey,
@@ -66,24 +64,26 @@ public class SetFangsLine extends Ability {
         );
     }
 
-    public void setCooldownSingle(float cooldown, Level level) {
-        super.setCooldown(cooldown, level);
+    public void setCooldownSingle(float cooldown, Unit unit) {
+        super.setCooldown(cooldown, unit);
     }
 
     @Override
-    public void setCooldown(float cooldown, Level level) {
+    public void setCooldown(float cooldown, Unit unit) {
+        EvokerUnit evokerUnit = (EvokerUnit) unit;
         if (evokerUnit.hasVigorEnchant())
             cooldown *= EnchantVigor.cooldownMultiplier;
 
-        super.setCooldown(cooldown, level);
-        for (Ability ability : this.evokerUnit.getAbilities())
+        super.setCooldown(cooldown, unit);
+        for (Ability ability : evokerUnit.getAbilities())
             if (ability instanceof SetFangsCircle ab) {
-                ab.setCooldownSingle(cooldown, level);
+                ab.setCooldownSingle(cooldown, unit);
             }
     }
 
     @Override
     public void use(Level level, Unit unitUsing, BlockPos targetBp) {
+        EvokerUnit evokerUnit = (EvokerUnit) unitUsing;
         evokerUnit.isUsingLineFangs = true;
     }
 

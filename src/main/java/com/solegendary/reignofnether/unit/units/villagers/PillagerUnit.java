@@ -1,10 +1,12 @@
 package com.solegendary.reignofnether.unit.units.villagers;
 
+import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.MountRavager;
 import com.solegendary.reignofnether.ability.abilities.PromoteIllager;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientboundPacket;
 import com.solegendary.reignofnether.hud.AbilityButton;
+import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.unit.Checkpoint;
@@ -47,6 +49,11 @@ import java.util.Optional;
 // despite being a RangedAttackerUnit we don't implement performRangedAttack as we override the Pillager crossbow attack instead
 // we just implement this for fog reveal methods
 public class PillagerUnit extends Pillager implements Unit, AttackerUnit, RangedAttackerUnit {
+    public static final Abilities ABILITIES = new Abilities();
+    static {
+        ABILITIES.add(new MountRavager(), Keybindings.keyQ);
+    }
+
     // region
     private BlockPos anchorPos = new BlockPos(0,0,0);
     public void setAnchor(BlockPos bp) { anchorPos = bp; }
@@ -156,19 +163,14 @@ public class PillagerUnit extends Pillager implements Unit, AttackerUnit, Ranged
     private UnitCrossbowAttackGoal<? extends LivingEntity> attackGoal;
     private RangedAttackBuildingGoal<?> attackBuildingGoal;
 
-    private final List<AbilityButton> abilityButtons = new ArrayList<>();
-    private final List<Ability> abilities = new ArrayList<>();
+    private List<AbilityButton> abilityButtons = new ArrayList<>();
+    private List<Ability> abilities = new ArrayList<>();
     private final List<ItemStack> items = new ArrayList<>();
 
     public PillagerUnit(EntityType<? extends Pillager> entityType, Level level) {
         super(entityType, level);
 
-        MountRavager mountRavagerAbility = new MountRavager();
-        this.abilities.add(mountRavagerAbility);
-
-        if (level.isClientSide()) {
-            this.abilityButtons.add(mountRavagerAbility.getButton(Keybindings.keyQ, this));
-        }
+        updateAbilityButtons();
     }
 
     @Override
@@ -310,5 +312,11 @@ public class PillagerUnit extends Pillager implements Unit, AttackerUnit, Ranged
     @Nullable
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor pLevel, DifficultyInstance pDifficulty, MobSpawnType pReason, @Nullable SpawnGroupData pSpawnData, @Nullable CompoundTag pDataTag) {
         return pSpawnData;
+    }
+
+    @Override
+    public void updateAbilityButtons() {
+        abilities = ABILITIES.get();
+        abilityButtons = ABILITIES.getButtons(this);
     }
 }

@@ -5,6 +5,7 @@ import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.ConsumeSlime;
 import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.hud.AbilityButton;
+import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
@@ -22,6 +23,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
@@ -155,8 +157,8 @@ public class SlimeUnit extends Slime implements Unit, AttackerUnit {
     private MeleeAttackSlimeUnitGoal attackGoal;
     private MeleeAttackBuildingGoal attackBuildingGoal;
 
-    private final List<AbilityButton> abilityButtons;
-    private final List<Ability> abilities;
+    private List<AbilityButton> abilityButtons;
+    private List<Ability> abilities;
     private final List<ItemStack> items = new ArrayList<>();
 
     public SlimeUnit consumeTarget = null;
@@ -165,8 +167,7 @@ public class SlimeUnit extends Slime implements Unit, AttackerUnit {
         super(entityType, level);
         this.moveControl = new SlimeUnitMoveControl(this);
 
-        this.abilities = ABILITIES.get();
-        this.abilityButtons = ABILITIES.getButtons(this);
+        updateAbilityButtons();
     }
 
     // big slimes sometimes bounce off of each other midair
@@ -255,7 +256,7 @@ public class SlimeUnit extends Slime implements Unit, AttackerUnit {
         consumeTarget = null;
         for (Ability ability : abilities)
             if (ability instanceof ConsumeSlime consume)
-                consume.setAutocast(false);
+                consume.setAutocast(false, this);
     }
 
     @Override
@@ -499,5 +500,11 @@ public class SlimeUnit extends Slime implements Unit, AttackerUnit {
             setSize(newSize, false);
 
         return result;
+    }
+
+    @Override
+    public void updateAbilityButtons() {
+        abilities = ABILITIES.get();
+        abilityButtons = ABILITIES.getButtons(this);
     }
 }
