@@ -340,5 +340,5 @@ public interface Unit {
                 idleWorker;
     }
 
-    default void updateAbilityButtons() {}
+    void updateAbilityButtons();
 }

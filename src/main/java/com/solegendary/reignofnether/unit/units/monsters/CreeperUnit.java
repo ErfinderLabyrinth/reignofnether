@@ -1,5 +1,6 @@
 package com.solegendary.reignofnether.unit.units.monsters;
 
+import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.Explode;
 import com.solegendary.reignofnether.hud.AbilityButton;
@@ -36,6 +37,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CreeperUnit extends Creeper implements Unit, AttackerUnit {
+    public static final Abilities ABILITIES = new Abilities();
+    static {
+        ABILITIES.add(new Explode());
+    }
     // region
     private BlockPos anchorPos = new BlockPos(0,0,0);
     public void setAnchor(BlockPos bp) { anchorPos = bp; }
@@ -129,8 +134,8 @@ public class CreeperUnit extends Creeper implements Unit, AttackerUnit {
 
     private MeleeAttackBuildingGoal attackBuildingGoal;
 
-    private final List<AbilityButton> abilityButtons = new ArrayList<>();
-    private final List<Ability> abilities = new ArrayList<>();
+    private List<AbilityButton> abilityButtons = new ArrayList<>();
+    private List<Ability> abilities = new ArrayList<>();
     private final List<ItemStack> items = new ArrayList<>();
 
     private boolean forceSwelling = false;
@@ -222,5 +227,11 @@ public class CreeperUnit extends Creeper implements Unit, AttackerUnit {
 
     public void startToExplode() {
         forceSwelling = true;
+    }
+
+    @Override
+    public void updateAbilityButtons() {
+        abilities = ABILITIES.get();
+        abilityButtons = ABILITIES.getButtons(this);
     }
 }

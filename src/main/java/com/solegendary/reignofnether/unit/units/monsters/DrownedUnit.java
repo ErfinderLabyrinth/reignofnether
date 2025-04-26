@@ -1,7 +1,11 @@
 package com.solegendary.reignofnether.unit.units.monsters;
 
+import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.ability.Ability;
+import com.solegendary.reignofnether.ability.abilities.Bloodlust;
+import com.solegendary.reignofnether.ability.abilities.ToggleShield;
 import com.solegendary.reignofnether.hud.AbilityButton;
+import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.time.NightUtils;
@@ -36,6 +40,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DrownedUnit extends Drowned implements Unit, AttackerUnit {
+    public static final Abilities ABILITIES = new Abilities();
+    static {
+        ABILITIES.add(new ToggleShield(), Keybindings.keyQ);
+        ABILITIES.add(new Bloodlust(), Keybindings.keyW);
+    }
     // region
     private BlockPos anchorPos = new BlockPos(0,0,0);
     public void setAnchor(BlockPos bp) { anchorPos = bp; }
@@ -218,5 +227,11 @@ public class DrownedUnit extends Drowned implements Unit, AttackerUnit {
         } else {
             return false;
         }
+    }
+
+    @Override
+    public void updateAbilityButtons() {
+        abilities = ABILITIES.get();
+        abilityButtons = ABILITIES.getButtons(this);
     }
 }
