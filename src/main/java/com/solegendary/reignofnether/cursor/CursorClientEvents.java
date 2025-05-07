@@ -270,6 +270,8 @@ public class CursorClientEvents {
         }
     }
 
+    public static ArrayList<LivingEntity> militaryUnitsOnScreen = new ArrayList<>();
+
     public static boolean isBoxSelecting() {
         return cursorLeftClickDownPos.x >= 0 &&
                 cursorLeftClickDownPos.y >= 0 &&

@@ -1053,7 +1053,8 @@ public class BuildingClientEvents {
 
             // if a player is looking directly at a frozenchunk on login, they may load in the real blocks before
             // they are frozen so move them to their capitol (or any of their buildings if they don't have one)
-            if (MC.player != null && forPlayerLoggingIn && ownerName.equals(MC.player.getName().getString())) {
+            /*
+            if (MC.player != null && forPlayerLoggingIn && ownerName.equals(MC.player.getName().getString()) && FogOfWarClientEvents.isEnabled()) {
                 if (!FogOfWarClientEvents.movedToCapitol) {
                     OrthoviewClientEvents.centreCameraOnPos(newBuilding.originPos);
                     if (newBuilding.isCapitol) {
@@ -1061,6 +1062,7 @@ public class BuildingClientEvents {
                     }
                 }
             }
+             */
         }
         // sync the goal so we can display the correct animations
         Entity entity = hudSelectedEntity;

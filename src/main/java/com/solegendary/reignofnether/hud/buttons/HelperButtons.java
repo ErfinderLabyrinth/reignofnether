@@ -152,7 +152,10 @@ public class HelperButtons {
                     HudClientEvents.setLowestCdHudEntity();
                 },
                 null,
-                List.of(FormattedCharSequence.forward(I18n.get("hud.helperbuttons.reignofnether.select_all_military_units"), Style.EMPTY))
+                List.of(
+                        fcs(I18n.get("hud.helperbuttons.reignofnether.select_all_military_units"), Style.EMPTY),
+                        fcs(I18n.get("hud.helperbuttons.reignofnether.select_all_military_units_shift"), Style.EMPTY)
+                )
         );
     }
 

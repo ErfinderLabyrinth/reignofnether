@@ -37,16 +37,20 @@ public class GreedIsGoodPassive extends HeroAbility {
 
     public boolean rankUp(HeroUnit hero) {
         if (super.rankUp(hero)) {
-            if (rank == 1) {
-                maxResourcesPerCast = 100;
-            } else if (rank == 2) {
-                maxResourcesPerCast = 200;
-            } else if (rank == 3) {
-                maxResourcesPerCast = 300;
-            }
+            updateStatsForRank();
             return true;
         }
         return false;
+    }
+
+    public void updateStatsForRank() {
+        if (rank == 1) {
+            maxResourcesPerCast = 100;
+        } else if (rank == 2) {
+            maxResourcesPerCast = 200;
+        } else if (rank == 3) {
+            maxResourcesPerCast = 300;
+        }
     }
 
     @Override

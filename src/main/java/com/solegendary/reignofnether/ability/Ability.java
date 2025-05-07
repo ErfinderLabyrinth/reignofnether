@@ -23,6 +23,8 @@ public class Ability {
     public boolean oneClickOneUse; // if true, a group of units/buildings will use their abilities one by one
     public UnitAction autocastEnableAction = null;
     public UnitAction autocastDisableAction = null;
+    public int maxCharges = 1;
+    public int charges = 1;
 
     private boolean autocast = false;
     public void setAutocast(boolean value, Unit unit) { autocast = value; }
@@ -46,6 +48,10 @@ public class Ability {
         this.oneClickOneUse = oneClickOneUse;
     }
 
+    public boolean usesCharges() {
+        return maxCharges > 1;
+    }
+
     protected void toggleAutocast(/*boolean serverSide*/) {
         //TODO
         //if (!level.isClientSide())  // Why? currently its only called by button
@@ -59,11 +65,19 @@ public class Ability {
     }
 
     public void tickCooldown(Level level) {
-        if (this.cooldown > 0) {
+        if (this.cooldown > 0 || charges < maxCharges) {
             if (level.isClientSide())
                 this.cooldown -= (TPSClientEvents.getCappedTPS() / 20D);
             else
                 this.cooldown -= 1;
+
+            if (this.cooldown <= 0 && usesCharges() && charges < maxCharges) {
+                charges += 1;
+                if (charges < maxCharges)
+                    cooldown = cooldownMax;
+                if (charges > maxCharges)
+                    charges = maxCharges;
+            }
         }
     }
 
@@ -72,22 +86,32 @@ public class Ability {
     public float getCooldown(Unit unit) { return unit.getCooldown(getClass()); }
     public float getCooldown(BuildingPlacement placement) { return placement.getCooldown(getClass()); }
 
-    public boolean isOffCooldown(Unit unit) { return getCooldown(unit) <= 0; }
-    public boolean isOffCooldown(BuildingPlacement placement) { return getCooldown(placement) <= 0; }
+    public boolean isOffCooldown(Unit unit) { return getCooldown(unit) <= 0 || (usesCharges() && charges > 0); }
+    public boolean isOffCooldown(BuildingPlacement placement) { return getCooldown(placement) <= 0 || (usesCharges() && charges > 0); }
 
     public void setToMaxCooldown(Unit unit) {
         unit.setCooldown(getClass(), cooldownMax);
+        if (usesCharges() && charges > 0)
+            charges -= 1;
     }
 
     public void setToMaxCooldown(BuildingPlacement building) {
         building.setCooldown(getClass(), cooldownMax);
+        if (usesCharges() && charges > 0)
+            charges -= 1;
     }
 
     public void setCooldown(float cooldown, Unit unit) {
+        this.setCooldown(cooldown, true, unit);
+    }
+
+    public void setCooldown(float cooldown, boolean useCharge, Unit unit) {
         if (unit.level().isClientSide() && cooldown > 0) {
             HudClientEvents.setLowestCdHudEntity();
         }
         unit.setCooldown(this.getClass(), Math.min(cooldown, cooldownMax));
+        if (useCharge && usesCharges() && charges > 0)
+            charges -= 1;
     }
 
     public void use(Level level, Unit unitUsing, LivingEntity targetEntity) { }
@@ -105,7 +129,7 @@ public class Ability {
         return null;
     }
 
-    public boolean canBypassCooldown() { return false; }
+    public boolean canBypassCooldown() { return usesCharges() && charges > 0; }
 
     public boolean shouldResetBehaviours() { return true; }
 }

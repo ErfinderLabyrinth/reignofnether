@@ -30,6 +30,7 @@
     ],
     "minVersion": "0.8",
     "client": [
+        "ArmorStandMixin",
         "CameraMixin",
         "ClientLevelMixin",
         "ClientPacketMixin",

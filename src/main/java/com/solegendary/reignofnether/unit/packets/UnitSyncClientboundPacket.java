@@ -42,7 +42,7 @@ public class UnitSyncClientboundPacket {
     public static void sendSyncOwnerNamePacket(Unit unit) {
         PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(),
                 new UnitSyncClientboundPacket(UnitSyncAction.SYNC_OWNERNAME,
-                        ((LivingEntity) unit).getId(),0,0,0,0,0,0,0,0, "")
+                        ((LivingEntity) unit).getId(),0,0,0,0,0,0,0,0, unit.getOwnerName())
         );
     }
 

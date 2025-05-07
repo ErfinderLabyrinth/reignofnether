@@ -1,16 +1,44 @@
 package com.solegendary.reignofnether.building;
 
+import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.ability.Abilities;
-import com.solegendary.reignofnether.hud.AbilityButton;
-import com.solegendary.reignofnether.keybinds.Keybinding;
+import com.solegendary.reignofnether.ability.Ability;
+import com.solegendary.reignofnether.attackwarnings.AttackWarningClientboundPacket;
+import com.solegendary.reignofnether.building.buildings.monsters.DarkWatchtower;
+import com.solegendary.reignofnether.building.buildings.neutral.Beacon;
+import com.solegendary.reignofnether.building.buildings.piglins.Bastion;
+import com.solegendary.reignofnether.building.buildings.piglins.FlameSanctuary;
+import com.solegendary.reignofnether.building.buildings.piglins.Fortress;
+import com.solegendary.reignofnether.building.buildings.piglins.Portal;
+import com.solegendary.reignofnether.building.buildings.shared.AbstractBridge;
+import com.solegendary.reignofnether.building.buildings.shared.AbstractStockpile;
+import com.solegendary.reignofnether.building.buildings.villagers.Watchtower;
+import com.solegendary.reignofnether.fogofwar.*;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.util.Faction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.animal.Chicken;
+import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.world.ForgeChunkManager;
+import org.joml.Vector3d;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +75,13 @@ public abstract class Building {
     public boolean capturable = false;
     public boolean invulnerable = false;
     public boolean shouldDestroyOnReset = true;
+
+    private ArmorStand targetStand = null;
+    public ArmorStand getTargetStand() {
+        if (targetStand == null)
+            createArmourStandTarget();
+        return targetStand;
+    }
 
     public ResourceCost cost;
     public boolean selfBuilding = false;

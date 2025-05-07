@@ -32,19 +32,23 @@ public class BattleRagePassive extends HeroAbility {
 
     public boolean rankUp(HeroUnit hero) {
         if (super.rankUp(hero)) {
-            if (rank == 1) {
-                maxHpRegen = 1.2f;
-                maxBonusDamage = 4;
-            } else if (rank == 2) {
-                maxHpRegen = 1.8f;
-                maxBonusDamage = 6;
-            } else if (rank == 3) {
-                maxHpRegen = 2.4f;
-                maxBonusDamage = 8;
-            }
+            updateStatsForRank();
             return true;
         }
         return false;
+    }
+
+    public void updateStatsForRank() {
+        if (rank == 1) {
+            maxHpRegen = 1.2f;
+            maxBonusDamage = 4;
+        } else if (rank == 2) {
+            maxHpRegen = 1.8f;
+            maxBonusDamage = 6;
+        } else if (rank == 3) {
+            maxHpRegen = 2.4f;
+            maxBonusDamage = 8;
+        }
     }
 
     public double getHpRegen(HeroUnit hero) {

@@ -168,6 +168,12 @@ public class TitleScreenMixin extends Screen {
         }
     }
 
+    private static final int titleX = -31;
+    private static final int titleY = 12;
+    private static final int titleWidth = 330;
+    private static final int titleHeight = 110;
+    private static final int editionY = 88;
+
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     private void render(GuiGraphics guiGraphics, int pMouseX, int pMouseY,
                         float pPartialTick, CallbackInfo ci) {
@@ -195,11 +201,14 @@ public class TitleScreenMixin extends Screen {
             // Render Minecraft logo
             RenderSystem.setShaderTexture(0, MINECRAFT_LOGO);
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, alpha);
-            guiGraphics.blit(MINECRAFT_LOGO, logoX - 54, 30, 0, 0, 380, 36, 380, 36);
+            guiGraphics.blit(MINECRAFT_LOGO, logoX + titleX, titleY, 0, 0,
+                    titleWidth, titleHeight,
+                    titleWidth, titleHeight
+            );
 
             // Render Edition logo
             RenderSystem.setShaderTexture(0, MINECRAFT_EDITION);
-            guiGraphics.blit(MINECRAFT_EDITION, logoX + 44, 67, 0.0F, 0.0F, 186, 14, 186, 16);
+            guiGraphics.blit(MINECRAFT_EDITION, logoX + 44,  editionY, 0.0F, 0.0F, 186, 14, 186, 16);
 
             // Render main menu elements and splash text
             ForgeHooksClient.renderMainMenu((TitleScreen) Minecraft.getInstance().screen,
@@ -207,7 +216,7 @@ public class TitleScreenMixin extends Screen {
 
             if (TitleClientEvents.splash != null) {
                 pPoseStack.pushPose();
-                pPoseStack.translate(this.width / 2 + 90, 70.0, 0.0);
+                pPoseStack.translate(this.width / 2 + 90, 82.0, 0.0);
                 pPoseStack.mulPose(Axis.ZP.rotationDegrees(-20.0F));
                 float scale = 1.8F - Mth.abs(Mth.sin((float) (Util.getMillis() % 1000L) / 1000.0F * 6.2831855F) * 0.1F);
                 scale = scale * 100.0F / (float) (this.font.width(TitleClientEvents.splash) + 32);
@@ -249,4 +258,29 @@ public class TitleScreenMixin extends Screen {
             RenderSystem.disableBlend();
         }
     }
+
+    /*
+    @Shadow private Component getMultiplayerDisabledReason() { return null; }
+    @Shadow private void realmsButtonClicked() { }
+
+    private final int menuOffsetY = 20;
+
+    @Inject(method = "createNormalMenuOptions", at = @At("HEAD"), cancellable = true)
+    private void createNormalMenuOptions(int pY, int pRowHeight, CallbackInfo ci) {
+        ci.cancel();
+        this.addRenderableWidget(Button.builder(Component.translatable("menu.singleplayer"), (p_280833_) -> {
+            this.minecraft.setScreen(new SelectWorldScreen(this));
+        }).bounds(this.width / 2 - 100, pY + menuOffsetY, 200, 20).build());
+        Component component = this.getMultiplayerDisabledReason();
+        boolean flag = component == null;
+        Tooltip tooltip = component != null ? Tooltip.create(component) : null;
+        ((Button)this.addRenderableWidget(Button.builder(Component.translatable("menu.multiplayer"), (p_210872_) -> {
+            Screen screen = this.minecraft.options.skipMultiplayerWarning ? new JoinMultiplayerScreen(this) : new SafetyScreen(this);
+            this.minecraft.setScreen((Screen)screen);
+        }).bounds(this.width / 2 - 100, pY + menuOffsetY + pRowHeight * 1, 200, 20).tooltip(tooltip).build())).active = flag;
+        ((Button)this.addRenderableWidget(Button.builder(Component.translatable("menu.online"), (p_210872_) -> {
+            this.realmsButtonClicked();
+        }).bounds(this.width / 2 + 2, pY + menuOffsetY + pRowHeight * 2, 98, 20).tooltip(tooltip).build())).active = flag;
+    }
+     */
 }

@@ -13,10 +13,12 @@ import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.unit.Checkpoint;
 import com.solegendary.reignofnether.unit.TargetResourcesSave;
+import com.solegendary.reignofnether.unit.UnitAnimationAction;
 import com.solegendary.reignofnether.unit.goals.*;
 import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.ConvertableUnit;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
+import com.solegendary.reignofnether.unit.packets.UnitAnimationClientboundPacket;
 import com.solegendary.reignofnether.unit.packets.UnitConvertClientboundPacket;
 import com.solegendary.reignofnether.util.Faction;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
@@ -166,12 +168,34 @@ public class MilitiaUnit extends Vindicator implements Unit, AttackerUnit, Villa
 
     public MilitiaUnit(EntityType<? extends Vindicator> entityType, Level level) {
         super(entityType, level);
-
         updateAbilityButtons();
     }
 
     @Override
     public boolean removeWhenFarAway(double d) { return false; }
+
+    // all for animation syncing...
+    @Override
+    public void setUnitAttackTarget(@Nullable LivingEntity target) {
+        AttackerUnit.super.setUnitAttackTarget(target);
+        if (!this.level().isClientSide()) {
+            if (target != null)
+                UnitAnimationClientboundPacket.sendEntityPacket(UnitAnimationAction.NON_KEYFRAME_START, this, target);
+            else
+                UnitAnimationClientboundPacket.sendBasicPacket(UnitAnimationAction.NON_KEYFRAME_STOP, this);
+        }
+    }
+    @Override
+    public void setAttackBuildingTarget(BlockPos preselectedBlockPos) {
+        AttackerUnit.super.setAttackBuildingTarget(preselectedBlockPos);
+        if (!this.level().isClientSide())
+            UnitAnimationClientboundPacket.sendBlockPosPacket(UnitAnimationAction.NON_KEYFRAME_START, this, preselectedBlockPos);
+    }
+    @Override
+    public void resetBehaviours() {
+        if (!this.level().isClientSide())
+            UnitAnimationClientboundPacket.sendBasicPacket(UnitAnimationAction.NON_KEYFRAME_STOP, this);
+    }
 
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes()

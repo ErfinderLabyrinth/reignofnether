@@ -40,6 +40,8 @@ public class GenericTargetedSpellGoal extends MoveToTargetBlockGoal {
         this.channelTicks = channelTicks;
         this.range = range;
         this.animationStart = animationStart;
+        if (this.animationStart != null)
+            this.hasKeyframeAnimations = true;
         this.onEntityCast = onEntityCast;
         this.onGroundCast = onGroundCast;
         this.onBuildingCast = onBuildingCast;

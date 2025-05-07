@@ -31,6 +31,7 @@ import com.solegendary.reignofnether.startpos.StartPosServerEvents;
 import com.solegendary.reignofnether.survival.SurvivalClientEvents;
 import com.solegendary.reignofnether.survival.SurvivalServerEvents;
 import com.solegendary.reignofnether.time.TimeClientEvents;
+import com.solegendary.reignofnether.time.TimeServerEvents;
 import com.solegendary.reignofnether.tps.TPSClientEvents;
 import com.solegendary.reignofnether.tps.TPSServerEvents;
 import com.solegendary.reignofnether.tutorial.TutorialClientEvents;
@@ -96,5 +97,6 @@ public class ClientEventRegistrar {
         vanillaEventBus.register(AlliancesServerEvents.class);
         vanillaEventBus.register(HeroServerEvents.class);
         vanillaEventBus.register(NonUnitServerEvents.class);
+        vanillaEventBus.register(TimeServerEvents.class);
     }
 }

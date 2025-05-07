@@ -6,6 +6,7 @@ import com.solegendary.reignofnether.building.GarrisonableBuilding;
 import com.solegendary.reignofnether.unit.Relationship;
 import com.solegendary.reignofnether.unit.UnitServerEvents;
 import com.solegendary.reignofnether.unit.goals.*;
+import com.solegendary.reignofnether.unit.units.monsters.PhantomSummon;
 import com.solegendary.reignofnether.unit.units.villagers.RavagerUnit;
 import com.solegendary.reignofnether.util.MiscUtil;
 import com.solegendary.reignofnether.util.MyMath;
@@ -18,6 +19,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.monster.Vex;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -159,7 +161,10 @@ public interface AttackerUnit {
 
                 boolean isMeleeAttackedByFlyingOrGarrisoned = false;
                 if (lastDSEntity instanceof Unit unitDS &&
-                    (unitDS.getMoveGoal() instanceof FlyingMoveToTargetGoal || GarrisonableBuilding.getGarrison(unitDS) != null) &&
+                    (unitDS.getMoveGoal() instanceof FlyingMoveToTargetGoal ||
+                        GarrisonableBuilding.getGarrison(unitDS) != null ||
+                        unitDS instanceof PhantomSummon ||
+                        unitDS instanceof Vex) &&
                     attackerUnit.getAttackGoal() instanceof AbstractMeleeAttackUnitGoal) {
                     isMeleeAttackedByFlyingOrGarrisoned = true;
                 }

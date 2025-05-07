@@ -153,6 +153,9 @@ public class HudClientEvents {
 
     // eg. entity.reignofnether.zombie_unit -> zombie
     public static String getSimpleEntityName(Entity entity) {
+        if (entity instanceof PhantomSummon)
+            return "Phantom";
+
         if (entity instanceof Unit) {
             if (entity.hasCustomName()) {
                 return entity.getType()

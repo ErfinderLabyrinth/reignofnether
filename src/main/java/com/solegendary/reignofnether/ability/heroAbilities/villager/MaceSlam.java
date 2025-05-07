@@ -39,19 +39,23 @@ public class MaceSlam extends HeroAbility {
     @Override
     public boolean rankUp(HeroUnit hero) {
         if (super.rankUp(hero)) {
-            if (rank == 1) {
-                damage = 15;
-                stunDuration = 2 * ResourceCost.TICKS_PER_SECOND;
-            } else if (rank == 2) {
-                damage = 20;
-                stunDuration = 3 * ResourceCost.TICKS_PER_SECOND;
-            } else if (rank == 3) {
-                damage = 25;
-                stunDuration = 4 * ResourceCost.TICKS_PER_SECOND;
-            }
+            updateStatsForRank();
             return true;
         }
         return false;
+    }
+
+    public void updateStatsForRank() {
+        if (rank == 1) {
+            damage = 15;
+            stunDuration = 2 * ResourceCost.TICKS_PER_SECOND;
+        } else if (rank == 2) {
+            damage = 20;
+            stunDuration = 3 * ResourceCost.TICKS_PER_SECOND;
+        } else if (rank == 3) {
+            damage = 25;
+            stunDuration = 4 * ResourceCost.TICKS_PER_SECOND;
+        }
     }
 
     @Override

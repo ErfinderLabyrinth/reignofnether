@@ -18,6 +18,7 @@ import com.solegendary.reignofnether.unit.goals.AbstractMeleeAttackUnitGoal;
 import com.solegendary.reignofnether.unit.goals.FlyingMoveToTargetGoal;
 import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
+import com.solegendary.reignofnether.unit.units.monsters.PhantomSummon;
 import com.solegendary.reignofnether.unit.units.piglins.GhastUnit;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -33,7 +34,9 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.animal.AbstractFish;
 import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.monster.Vex;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
@@ -256,12 +259,14 @@ public class MiscUtil {
             return false;
         }
         boolean isPassiveNonUnit = !(targetEntity instanceof Unit) &&
-                (targetEntity instanceof Animal || targetEntity instanceof Villager);
+                (targetEntity instanceof Animal || targetEntity instanceof AbstractFish || targetEntity instanceof Villager);
 
         // Checks if neutral units can be attacked based on neutralAggro flag and other conditions
         boolean canAttackNeutral =
                 rs == Relationship.NEUTRAL && neutralAggro &&
                         !(targetEntity instanceof Vex) &&
+                        !(targetEntity instanceof ArmorStand) &&
+                        !(targetEntity instanceof PhantomSummon) &&
                         !isPassiveNonUnit;
 
         return (rs == Relationship.HOSTILE || canAttackNeutral) &&

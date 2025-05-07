@@ -13,6 +13,7 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 
 import java.util.List;
 
@@ -43,10 +44,14 @@ public abstract class HeroAbility extends Ability {
         if (rank < maxRank && hero.getSkillPoints() > 0 && hero.getHeroLevel() >= getLevelRequirement()) {
             rank += 1;
             hero.setSkillPoints(hero.getSkillPoints() - 1);
+            if (((LivingEntity) hero).level().isClientSide)
+                ((Unit) hero).updateAbilityButtons();
             return true;
         }
         return false;
     }
+
+    public void updateStatsForRank() { }
 
     protected String rankString() {
         return rank > 0 ? I18n.get("abilities.reignofnether.rank", rank) : I18n.get("abilities.reignofnether.unlearnt");

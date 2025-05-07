@@ -39,16 +39,20 @@ public class TauntingCry extends HeroAbility {
     @Override
     public boolean rankUp(HeroUnit hero) {
         if (super.rankUp(hero)) {
-            if (rank == 1) {
-                duration = 4 * ResourceCost.TICKS_PER_SECOND;
-            } else if (rank == 2) {
-                duration = 6 * ResourceCost.TICKS_PER_SECOND;
-            } else if (rank == 3) {
-                duration= 8 * ResourceCost.TICKS_PER_SECOND;
-            }
+            updateStatsForRank();
             return true;
         }
         return false;
+    }
+
+    public void updateStatsForRank() {
+        if (rank == 1) {
+            duration = 4 * ResourceCost.TICKS_PER_SECOND;
+        } else if (rank == 2) {
+            duration = 6 * ResourceCost.TICKS_PER_SECOND;
+        } else if (rank == 3) {
+            duration= 8 * ResourceCost.TICKS_PER_SECOND;
+        }
     }
 
     @Override

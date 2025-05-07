@@ -14,6 +14,7 @@ import com.solegendary.reignofnether.research.ResearchServerEvents;
 import com.solegendary.reignofnether.resources.ResourcesServerEvents;
 import com.solegendary.reignofnether.startpos.StartPosServerEvents;
 import com.solegendary.reignofnether.survival.SurvivalServerEvents;
+import com.solegendary.reignofnether.time.TimeServerEvents;
 import com.solegendary.reignofnether.tps.TPSServerEvents;
 import com.solegendary.reignofnether.unit.NonUnitServerEvents;
 import com.solegendary.reignofnether.unit.UnitServerEvents;
@@ -53,5 +54,6 @@ public class ServerEventRegistrar {
         vanillaEventBus.register(AlliancesServerEvents.class);
         vanillaEventBus.register(HeroServerEvents.class);
         vanillaEventBus.register(NonUnitServerEvents.class);
+        vanillaEventBus.register(TimeServerEvents.class);
     }
 }

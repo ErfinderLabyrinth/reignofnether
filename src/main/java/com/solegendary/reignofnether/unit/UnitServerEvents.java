@@ -2,6 +2,9 @@ package com.solegendary.reignofnether.unit;
 
 import com.mojang.datafixers.util.Pair;
 import com.solegendary.reignofnether.ReignOfNether;
+import com.solegendary.reignofnether.ability.AbilityClientboundPacket;
+import com.solegendary.reignofnether.ability.HeroAbility;
+import com.solegendary.reignofnether.ability.heroAbilities.monster.SoulSiphonPassive;
 import com.solegendary.reignofnether.alliance.AlliancesServerEvents;
 import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.BuildingServerEvents;
@@ -11,6 +14,7 @@ import com.solegendary.reignofnether.building.buildings.monsters.SculkCatalyst;
 import com.solegendary.reignofnether.building.buildings.placements.ProductionPlacement;
 import com.solegendary.reignofnether.building.buildings.placements.SculkCatalystPlacement;
 import com.solegendary.reignofnether.building.buildings.villagers.IronGolemBuilding;
+import com.solegendary.reignofnether.hero.HeroClientboundPacket;
 import com.solegendary.reignofnether.building.production.ActiveProduction;
 import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.player.PlayerServerEvents;
@@ -18,15 +22,13 @@ import com.solegendary.reignofnether.registrars.EntityRegistrar;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
 import com.solegendary.reignofnether.resources.*;
 import com.solegendary.reignofnether.sandbox.SandboxServer;
-import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
-import com.solegendary.reignofnether.unit.interfaces.ConvertableUnit;
-import com.solegendary.reignofnether.unit.interfaces.Unit;
-import com.solegendary.reignofnether.unit.interfaces.WorkerUnit;
+import com.solegendary.reignofnether.unit.interfaces.*;
 import com.solegendary.reignofnether.unit.packets.UnitConvertClientboundPacket;
 import com.solegendary.reignofnether.unit.packets.UnitIdleWorkerClientBoundPacket;
 import com.solegendary.reignofnether.unit.packets.UnitSyncClientboundPacket;
 import com.solegendary.reignofnether.unit.packets.UnitSyncWorkerClientBoundPacket;
 import com.solegendary.reignofnether.unit.units.monsters.CreeperUnit;
+import com.solegendary.reignofnether.unit.units.monsters.NecromancerUnit;
 import com.solegendary.reignofnether.unit.units.monsters.SlimeUnit;
 import com.solegendary.reignofnether.unit.units.piglins.*;
 import com.solegendary.reignofnether.unit.units.villagers.*;
@@ -101,6 +103,7 @@ public class UnitServerEvents {
     }
 
     public static final ArrayList<UnitSave> savedUnits = new ArrayList<>();
+    public static final ArrayList<HeroUnitSave> savedHeroUnits = new ArrayList<>();
     public static final ArrayList<TargetResourcesSave> savedTargetResources = new ArrayList<>();
 
     private static final int SAVE_TICKS_MAX = 1200;
@@ -114,6 +117,7 @@ public class UnitServerEvents {
             ServerLevel level = evt.getServer().getLevel(Level.OVERWORLD);
             if (level != null) {
                 saveUnits(level);
+                saveHeroUnits(level);
                 saveTicks = 0;
             }
         }
@@ -124,6 +128,7 @@ public class UnitServerEvents {
         ServerLevel level = evt.getServer().getLevel(Level.OVERWORLD);
         if (level != null) {
             saveUnits(level);
+            saveHeroUnits(level);
             saveGatherTargets(level);
         }
     }
@@ -135,6 +140,30 @@ public class UnitServerEvents {
             if (e instanceof Unit unit) {
                 // Save unit data as usual
                 data.units.add(new UnitSave(e.getName().getString(), unit.getOwnerName(), e.getStringUUID(), unit.getAnchor()));
+            }
+        });
+        data.save();
+        level.getDataStorage().save();
+        //ReignOfNether.LOGGER.info("Saved " + getAllUnits().size() + " units");
+    }
+
+    public static void saveHeroUnits(ServerLevel level) {
+        HeroUnitSaveData data = HeroUnitSaveData.getInstance(level);
+        data.heroUnits.clear();
+        getAllUnits().forEach(e -> {
+            if (e instanceof HeroUnit hero) {
+                int charges = 0;
+                List<HeroAbility> abls = hero.getHeroAbilities();
+                data.heroUnits.add(new HeroUnitSave(
+                    e.getStringUUID(),
+                    hero.getExperience(),
+                    hero.getSkillPoints(),
+                    hero.getChargesForSaveData(),
+                    abls.size() > 0 ? abls.get(0).rank : 0,
+                    abls.size() > 1 ? abls.get(1).rank : 0,
+                    abls.size() > 2 ? abls.get(2).rank : 0,
+                    abls.size() > 3 ? abls.get(3).rank : 0
+                ));
             }
         });
         data.save();
@@ -168,15 +197,18 @@ public class UnitServerEvents {
     public static void onServerStarted(ServerStartedEvent evt) {
         ServerLevel level = evt.getServer().getLevel(Level.OVERWORLD);
 
-        synchronized (savedUnits) {
-            if (level != null) {
+        if (level != null) {
+            synchronized (savedUnits) {
                 UnitSaveData data = UnitSaveData.getInstance(level);
                 savedUnits.addAll(data.units); // actually assign the data in TickEvent as entities don't exist here yet
                 ReignOfNether.LOGGER.info("Loaded " + data.units.size() + " units in serverevents");
             }
-        }
-        synchronized (savedTargetResources) {
-            if (level != null) {
+            synchronized (savedHeroUnits) {
+                HeroUnitSaveData data = HeroUnitSaveData.getInstance(level);
+                savedHeroUnits.addAll(data.heroUnits);
+                ReignOfNether.LOGGER.info("Loaded " + data.heroUnits.size() + " hero units in serverevents");
+            }
+            synchronized (savedTargetResources) {
                 TargetResourcesSaveData data = TargetResourcesSaveData.getInstance(level);
                 savedTargetResources.addAll(data.targetData); // actually assign the data in TickEvent as entities don't exist here yet
                 ReignOfNether.LOGGER.info("Loaded " + data.targetData.size() + " gatherTargets in serverevents");
@@ -359,6 +391,42 @@ public class UnitServerEvents {
                     return false;
                 });
             }
+            synchronized (savedHeroUnits) {
+                savedHeroUnits.removeIf(shu -> {
+                    if (shu.uuid.equals(entity.getStringUUID()) && unit instanceof HeroUnit hero) {
+                        hero.setExperience(shu.experience);
+                        hero.setSkillPoints(shu.skillPoints);
+                        hero.setChargesFromSaveData(shu.charges);
+
+                        HeroClientboundPacket.setExperience(entity.getId(), hero.getExperience());
+                        HeroClientboundPacket.setSkillPoints(entity.getId(), hero.getSkillPoints());
+                        HeroClientboundPacket.setCharges(entity.getId(), hero.getChargesForSaveData());
+
+                        List<HeroAbility> abls = hero.getHeroAbilities();
+                        if (abls.size() > 0) {
+                            abls.get(0).rank = shu.ability1Rank;
+                            HeroClientboundPacket.setAbilityRank(entity.getId(), shu.ability1Rank, 0);
+                        }
+                        if (abls.size() > 1) {
+                            abls.get(1).rank = shu.ability2Rank;
+                            HeroClientboundPacket.setAbilityRank(entity.getId(), shu.ability2Rank, 1);
+                        }
+                        if (abls.size() > 2) {
+                            abls.get(2).rank = shu.ability3Rank;
+                            HeroClientboundPacket.setAbilityRank(entity.getId(), shu.ability3Rank, 2);
+                        }
+                        if (abls.size() > 3) {
+                            abls.get(3).rank = shu.ability4Rank;
+                            HeroClientboundPacket.setAbilityRank(entity.getId(), shu.ability4Rank, 3);
+                        }
+                        for (HeroAbility abl : abls)
+                            abl.updateStatsForRank();
+                        ReignOfNether.LOGGER.info("loaded hero unit in serverevents: " + shu.uuid + "|" + shu.experience + "|" + shu.skillPoints);
+                        return true;
+                    }
+                    return false;
+                });
+            }
             if (unit instanceof WorkerUnit wUnit) {
                 synchronized (savedTargetResources) {
                     savedTargetResources.removeIf(sr -> {
@@ -420,7 +488,6 @@ public class UnitServerEvents {
 
     @SubscribeEvent
     public static void onLivingDeath(LivingDeathEvent evt) {
-
         // Convert nearby blocks arond a death into something that is sculk convertible
         // supposed to add to sculk_spreadable.json tag under the data/minecraft/tags/blocks but doesn't work for
         // some reason
@@ -528,6 +595,23 @@ public class UnitServerEvents {
                 if (resources.getTotalValue() > 0) {
                     ResourcesClientboundPacket.showFloatingText(resources, evt.getEntity().getOnPos());
                     ResourcesServerEvents.addSubtractResources(resources);
+                }
+            }
+        }
+
+        if (!(evt.getEntity() instanceof NecromancerUnit) && !evt.getEntity().level().isClientSide()) {
+            Vec3 pos = evt.getEntity().position();
+            List<NecromancerUnit> necromancers = MiscUtil.getEntitiesWithinRange(
+                    new Vector3d(pos.x, pos.y, pos.z),
+                    SoulSiphonPassive.RANGE,
+                    NecromancerUnit.class,
+                    evt.getEntity().level()).stream().toList();
+
+            for (NecromancerUnit necromancerUnit : necromancers) {
+                SoulSiphonPassive soulSiphon = necromancerUnit.getSoulSiphon();
+                if (soulSiphon != null) {
+                    soulSiphon.checkAndGainSouls(evt.getEntity(), necromancers.size());
+                    AbilityClientboundPacket.doAbility(necromancerUnit.getId(), UnitAction.SOUL_SIPHON_UPDATE, soulSiphon.souls);
                 }
             }
         }

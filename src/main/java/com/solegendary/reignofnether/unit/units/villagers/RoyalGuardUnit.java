@@ -89,6 +89,8 @@ public class RoyalGuardUnit extends Vindicator implements Unit, AttackerUnit, He
     private MoveToTargetBlockGoal moveGoal;
     private SelectedTargetGoal<? extends LivingEntity> targetGoal;
     private ReturnResourcesGoal returnResourcesGoal;
+    private AbstractMeleeAttackUnitGoal attackGoal;
+    private MeleeAttackBuildingGoal attackBuildingGoal;
 
     public BlockPos getAttackMoveTarget() { return attackMoveTarget; }
     public LivingEntity getFollowTarget() { return followTarget; }
@@ -121,8 +123,8 @@ public class RoyalGuardUnit extends Vindicator implements Unit, AttackerUnit, He
     public boolean getAggressiveWhenIdle() {return aggressiveWhenIdle && !isVehicle();}
     public float getAttackRange() {return attackRange;}
     public float getMovementSpeed() {return movementSpeed;}
-    public float getUnitAttackDamage() {return attackDamage;}
-    public float getUnitMaxHealth() {return maxHealth;}
+    public float getUnitAttackDamage() {return attackDamage + (attackBonusPerLevel * getHeroLevel());}
+    public float getUnitMaxHealth() {return maxHealth + (maxHealthBonusPerLevel * getHeroLevel());}
     public float getUnitArmorValue() {return armorValue;}
     @Nullable
     public ResourceCost getCost() {return ResourceCosts.VINDICATOR;}
@@ -133,7 +135,7 @@ public class RoyalGuardUnit extends Vindicator implements Unit, AttackerUnit, He
 
     // endregion
 
-    private int skillPoints = 10;
+    private int skillPoints = 1;
     private int experience = 0;
     private boolean rankUpMenuOpen = false;
     @Override public int getSkillPoints() { return skillPoints; }
@@ -141,22 +143,28 @@ public class RoyalGuardUnit extends Vindicator implements Unit, AttackerUnit, He
     @Override public boolean isRankUpMenuOpen() { return rankUpMenuOpen; }
     @Override public void showRankUpMenu(boolean show) { rankUpMenuOpen = show; }
     @Override public int getExperience() { return experience; }
-    @Override public void setExperience(int amount) { experience = amount; }
+    @Override public void setExperience(int amount) {
+        experience = amount;
+        setStatsForLevel();
+    }
 
     final static public float attackDamage = 6.0f;
+    final static public float attackBonusPerLevel = 0.6f;
     final static public float attacksPerSecond = 0.5f;
-    final static public float maxHealth = 65.0f;
+    final static public float maxHealth = 125.0f;
+    final static public float maxHealthBonusPerLevel = 15.0f;
     final static public float armorValue = 0.0f;
     final static public float movementSpeed = 0.28f;
     final static public float attackRange = 2; // only used by ranged units or melee building attackers
     final static public float aggroRange = 10;
     final static public boolean willRetaliate = true; // will attack when hurt by an enemy
     final static public boolean aggressiveWhenIdle = true;
-
     public int maxResources = 100;
 
-    private AbstractMeleeAttackUnitGoal attackGoal;
-    private MeleeAttackBuildingGoal attackBuildingGoal;
+    @Override public float getHealthBonusPerLevel() { return maxHealthBonusPerLevel; };
+    @Override public float getAttackBonusPerLevel() { return maxHealth; };
+    @Override public float getBaseHealth() { return maxHealth; };
+    @Override public float getBaseAttack() { return attackDamage; };
 
     private List<AbilityButton> abilityButtons = new ArrayList<>();
     private List<Ability> abilities = new ArrayList<>();
@@ -214,6 +222,7 @@ public class RoyalGuardUnit extends Vindicator implements Unit, AttackerUnit, He
         super(entityType, level);
 
         updateAbilityButtons();
+        setStatsForLevel();
     }
 
     @Override

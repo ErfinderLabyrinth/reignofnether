@@ -30,13 +30,14 @@ import static com.solegendary.reignofnether.util.MiscUtil.fcsIcons;
 
 public class BloodMoon extends HeroAbility {
 
+    public static final int SPAWN_INTERVAL_TICKS = 120; // how often to spawn a unit
     public static final int CHANNEL_TICKS = 40;
-    private static final int CD_MAX_SECONDS = 360 * ResourceCost.TICKS_PER_SECOND;
-    private static final int DURATION_SECONDS = 60;
-    private static final int BONUS_SECONDS_PER_SOUL = 3;
+    private static final int CD_MAX = 360 * ResourceCost.TICKS_PER_SECOND;
+    public static final int DURATION = 60 * ResourceCost.TICKS_PER_SECOND;
+    public static final int BONUS_DURATION_PER_SOUL_RANK = 10 * ResourceCost.TICKS_PER_SECOND;
 
     public BloodMoon() {
-        super(1, UnitAction.BLOOD_MOON, CD_MAX_SECONDS, 0, 0, false);
+        super(1, UnitAction.BLOOD_MOON, CD_MAX, 0, 0, false);
     }
 
     @Override
@@ -67,12 +68,12 @@ public class BloodMoon extends HeroAbility {
     public List<FormattedCharSequence> getTooltipLines(HeroUnit hero) {
         return List.of(
                 fcs(I18n.get("abilities.reignofnether.blood_moon"), true),
-                fcsIcons(I18n.get("abilities.reignofnether.blood_moon.stats", CD_MAX_SECONDS / 20)),
+                fcsIcons(I18n.get("abilities.reignofnether.blood_moon.stats", CD_MAX / 20)),
                 fcs(""),
                 fcs(I18n.get("abilities.reignofnether.blood_moon.tooltip1")),
                 fcs(I18n.get("abilities.reignofnether.blood_moon.tooltip2")),
                 fcs(I18n.get("abilities.reignofnether.blood_moon.tooltip3")),
-                fcs(I18n.get("abilities.reignofnether.blood_moon.tooltip4", DURATION_SECONDS, BONUS_SECONDS_PER_SOUL))
+                fcs(I18n.get("abilities.reignofnether.blood_moon.tooltip4", DURATION / 20, BONUS_DURATION_PER_SOUL_RANK / 20))
         );
     }
 

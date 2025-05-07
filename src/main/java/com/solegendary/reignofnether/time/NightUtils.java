@@ -13,6 +13,10 @@ import java.util.List;
 public class NightUtils {
 
     public static boolean isInRangeOfNightSource(Vec3 pos, boolean clientSide) {
+        if ((clientSide && TimeClientEvents.isBloodMoonActive()) ||
+            (!clientSide && TimeServerEvents.isBloodMoonActive())) {
+            return true;
+        }
         List<BuildingPlacement> buildings = clientSide ? BuildingClientEvents.getBuildings() : BuildingServerEvents.getBuildings();
 
         Vec2 pos2d = new Vec2((float) pos.x, (float) pos.z);

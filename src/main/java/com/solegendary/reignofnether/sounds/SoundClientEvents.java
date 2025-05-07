@@ -18,6 +18,8 @@ public class SoundClientEvents {
     // mute the next sound played at each pos in ClientLevelMixin, then remove it from the list
     public static ArrayList<BlockPos> mutedBps = new ArrayList<>();
 
+    public static FadeableMusicInstance customSong = null;
+
     public static void playSoundAtPos(SoundAction soundAction, BlockPos bp) {
         playSoundAtPos(soundAction, bp, 1.0f);
     }

@@ -1,12 +1,5 @@
 package com.solegendary.reignofnether.ability.heroAbilities.monster;
 
-//The necromancer begins to collect the souls of nearby units that die
-//Whenever another spell is cast, all souls up to a maximum are consumed to empower that spell
-//Higher levels increase the maximum number of souls held
-//can be toggled on and off
-
-// starts at 4/20 souls, raises to 7/30, 10/40 at higher ranks
-
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.ability.HeroAbility;
 import com.solegendary.reignofnether.hud.AbilityButton;
@@ -26,36 +19,42 @@ import static com.solegendary.reignofnether.util.MiscUtil.fcs;
 
 public class SoulSiphonPassive extends HeroAbility {
 
-    public int souls = 0;
-    public int soulsPerCast = 4;
-    public int soulsMax = 20;
+    public static int RANGE = 16;
+    public float souls = 0;
+    public float soulsPerCast = 0;
+    public float soulsMax = 0;
 
     public SoulSiphonPassive() {
         super(3, UnitAction.NONE, 0, 0, 0, false);
         this.autocastEnableAction = UnitAction.ENABLE_SOUL_SIPHON_PASSIVE;
         this.autocastDisableAction = UnitAction.DISBLE_SOUL_SIPHON_PASSIVE;
+        this.setAutocast(true);
     }
 
     public boolean rankUp(HeroUnit hero) {
         if (super.rankUp(hero)) {
-            if (rank == 1) {
-                soulsPerCast = 4;
-                soulsMax = 20;
-            } else if (rank == 2) {
-                soulsPerCast = 7;
-                soulsMax = 30;
-            } else if (rank == 3) {
-                soulsPerCast = 10;
-                soulsMax = 40;
-            }
+            updateStatsForRank();
             return true;
         }
         return false;
     }
 
+    public void updateStatsForRank() {
+        if (rank == 1) {
+            soulsPerCast = 4;
+            soulsMax = 20;
+        } else if (rank == 2) {
+            soulsPerCast = 7;
+            soulsMax = 30;
+        } else if (rank == 3) {
+            soulsPerCast = 10;
+            soulsMax = 40;
+        }
+    }
+
     @Override
     public AbilityButton getButton(Keybinding hotkey, HeroUnit hero) {
-        return new AbilityButton("Soul Siphon",
+        AbilityButton button = new AbilityButton("Soul Siphon",
             new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/blocks/portal.png"),
             hotkey,
             this::getAutocast,
@@ -67,14 +66,21 @@ public class SoulSiphonPassive extends HeroAbility {
             this,
             hero
         );
+        button.extraLabel = String.valueOf((int) souls);
+        if (((int) souls) <= 0)
+            button.extraLabelColour = 0xFF0000;
+        else if (((int) souls) >= ((int) soulsMax))
+            button.extraLabelColour = 0x00FF00;
+        else if (((int) souls) <= ((int) soulsPerCast))
+            button.extraLabelColour = 0xFFFF00;
+        return button;
     }
 
     @Override
     public Button getRankUpButton(HeroUnit hero) {
         return super.getRankUpButtonProtected(
-                "Soul Siphon",
-                new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/blocks/portal.png"),
-                hero
+            "Soul Siphon",
+            new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/blocks/portal.png")
         );
     }
 
@@ -108,23 +114,25 @@ public class SoulSiphonPassive extends HeroAbility {
     }
 
     // returns amount of souls consumed
-    public int consumeSouls() {
-        if (getAutocast() && souls > 0) {
-            int soulsConsumed = Math.min(soulsPerCast, souls);
-            souls -= soulsConsumed;
-            return soulsConsumed;
+    public boolean consumeSouls() {
+        if (getAutocast() && souls >= soulsPerCast) {
+            souls -= soulsPerCast;
+            return true;
         }
-        return 0;
+        return false;
     }
 
-    public void checkAndGainSouls(LivingEntity entityKilled) {
-        if (getAutocast() && souls > 0) {
-            if (entityKilled instanceof Unit unit)
+    private int lastEntityKilledId = -1; // LivingDeathEvent sometimes fires twice
+
+    public void checkAndGainSouls(LivingEntity entityKilled, int splitAmount) {
+        if (soulsMax > 0 && entityKilled.getId() != lastEntityKilledId) {
+            if (entityKilled instanceof Unit unit && !unit.getOwnerName().equals(((Unit) hero).getOwnerName()))
                 souls += unit.getCost().population;
-            else
-                souls += 1;
+            lastEntityKilledId = entityKilled.getId();
         }
         if (souls > soulsMax)
             souls = soulsMax;
+        if (((LivingEntity) hero).level().isClientSide())
+            ((Unit) hero).updateAbilityButtons();
     }
 }

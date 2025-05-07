@@ -29,6 +29,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -211,5 +212,15 @@ public class ClientLevelMixin {
     private void onAddDestroyBlockEffect(BlockPos pPos, BlockState pState, CallbackInfo ci) {
         if (!FogOfWarClientEvents.isInBrightChunk(pPos))
             ci.cancel();
+    }
+
+    @Inject(
+            method = "getSkyColor",
+            at = @At("HEAD"),
+            cancellable = true
+    )
+    public void getSkyColor(Vec3 pPos, float pPartialTick, CallbackInfoReturnable<Vec3> cir) {
+        if (TimeClientEvents.isBloodMoonActive())
+            cir.setReturnValue(new Vec3(0.25f, 0f, 0f));
     }
 }

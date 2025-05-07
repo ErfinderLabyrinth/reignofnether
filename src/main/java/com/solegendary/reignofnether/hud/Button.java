@@ -155,6 +155,20 @@ public class Button {
                     HealthBarClientEvents.RenderMode.GUI_ICON);
     }
 
+    protected void renderHotkey(GuiGraphics guiGraphics, int x, int y) {
+        // hotkey letter
+        if (this.hotkey != null) {
+            String hotkeyStr = hotkey.buttonLabel;
+            hotkeyStr = hotkeyStr.substring(0,Math.min(3, hotkeyStr.length()));
+            guiGraphics.pose().translate(0,0,1);
+            guiGraphics.drawCenteredString(MC.font,
+                    hotkeyStr,
+                    x + iconSize + 8 - (hotkeyStr.length() * 4),
+                    y + iconSize - 1,
+                    0xFFFFFF);
+        }
+    }
+
     public void render(GuiGraphics guiGraphics, int x, int y, int mouseX, int mouseY) {
         this.x = x;
         this.y = y;
@@ -186,17 +200,8 @@ public class Button {
                     DEFAULT_ICON_SIZE
             );
         }
-        // hotkey letter
-        if (this.hotkey != null) {
-            String hotkeyStr = hotkey.buttonLabel;
-            hotkeyStr = hotkeyStr.substring(0,Math.min(3, hotkeyStr.length()));
-            guiGraphics.pose().translate(0,0,1);
-            guiGraphics.drawCenteredString(MC.font,
-                    hotkeyStr,
-                    x + iconSize + 8 - (hotkeyStr.length() * 4),
-                    y + iconSize - 1,
-                    0xFFFFFF);
-        }
+
+        renderHotkey(guiGraphics, x, y);
 
         // user is holding click or hotkey down over the button and render frame if so
         if (isEnabled.get() &&

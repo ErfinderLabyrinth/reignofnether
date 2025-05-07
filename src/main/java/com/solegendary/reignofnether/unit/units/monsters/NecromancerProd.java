@@ -47,7 +47,7 @@ public class NecromancerProd extends ProductionItem {
                 null,
                 () -> SandboxClientEvents.spawnUnitName.equals(itemName),
                 () -> false,
-                () -> false,
+                () -> true,
                 () -> {
                     CursorClientEvents.setLeftClickSandboxAction(SandboxAction.SPAWN_UNIT);
                     SandboxClientEvents.spawnUnitName = itemName;

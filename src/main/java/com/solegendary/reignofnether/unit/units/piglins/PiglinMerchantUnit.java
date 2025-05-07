@@ -2,10 +2,6 @@ package com.solegendary.reignofnether.unit.units.piglins;
 
 import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.ability.Ability;
-import com.solegendary.reignofnether.ability.heroAbilities.monster.BloodMoon;
-import com.solegendary.reignofnether.ability.heroAbilities.monster.InsomniaCurse;
-import com.solegendary.reignofnether.ability.heroAbilities.monster.RaiseDead;
-import com.solegendary.reignofnether.ability.heroAbilities.monster.SoulSiphonPassive;
 import com.solegendary.reignofnether.ability.heroAbilities.piglin.FancyFeast;
 import com.solegendary.reignofnether.ability.heroAbilities.piglin.GreedIsGoodPassive;
 import com.solegendary.reignofnether.ability.heroAbilities.piglin.LootExplosion;
@@ -124,7 +120,8 @@ public class PiglinMerchantUnit extends Piglin implements Unit, AttackerUnit, He
 
     // combat stats
     public float getMovementSpeed() {return movementSpeed;}
-    public float getUnitMaxHealth() {return maxHealth;}
+    public float getUnitAttackDamage() {return attackDamage + (attackBonusPerLevel * getHeroLevel());}
+    public float getUnitMaxHealth() {return maxHealth + (maxHealthBonusPerLevel * getHeroLevel());}
     public float getUnitArmorValue() {return armorValue;}
     @Nullable
     public ResourceCost getCost() {return ResourceCosts.PIGLIN_MERCHANT;}
@@ -134,7 +131,6 @@ public class PiglinMerchantUnit extends Piglin implements Unit, AttackerUnit, He
     public float getAggroRange() {return aggroRange;}
     public boolean getAggressiveWhenIdle() {return aggressiveWhenIdle && !isVehicle();}
     public float getAttackRange() {return attackRange;}
-    public float getUnitAttackDamage() {return attackDamage;}
     public BlockPos getAttackMoveTarget() { return attackMoveTarget; }
     public boolean canAttackBuildings() {return getAttackBuildingGoal() != null;}
     public Goal getAttackGoal() { return attackGoal; }
@@ -144,27 +140,36 @@ public class PiglinMerchantUnit extends Piglin implements Unit, AttackerUnit, He
 
     // endregion
 
-    private int skillPoints = 10;
-    private int experience = 10000;
+    private int skillPoints = 1;
+    private int experience = 0;
     private boolean rankUpMenuOpen = false;
     @Override public int getSkillPoints() { return skillPoints; }
     @Override public void setSkillPoints(int points) { skillPoints = points; }
     @Override public boolean isRankUpMenuOpen() { return rankUpMenuOpen; }
     @Override public void showRankUpMenu(boolean show) { rankUpMenuOpen = show; }
     @Override public int getExperience() { return experience; }
-    @Override public void setExperience(int amount) { experience = amount; }
+    @Override public void setExperience(int amount) {
+        experience = amount;
+        setStatsForLevel();
+    }
 
     final static public float attackDamage = 6.0f;
-    final static public float attacksPerSecond = 0.45f;
+    final static public float attackBonusPerLevel = 0.5f;
+    final static public float attacksPerSecond = 0.35f;
+    final static public float maxHealth = 150.0f;
+    final static public float maxHealthBonusPerLevel = 10.0f;
+    final static public float armorValue = 0.0f;
+    final static public float movementSpeed = 0.28f;
     final static public float attackRange = 2; // only used by ranged units or melee building attackers
     final static public float aggroRange = 10;
     final static public boolean willRetaliate = true; // will attack when hurt by an enemy
     final static public boolean aggressiveWhenIdle = true;
-
-    final static public float maxHealth = 100.0f;
-    final static public float armorValue = 0.0f;
-    final static public float movementSpeed = 0.28f;
     public int maxResources = 100;
+
+    @Override public float getHealthBonusPerLevel() { return maxHealthBonusPerLevel; };
+    @Override public float getAttackBonusPerLevel() { return maxHealth; };
+    @Override public float getBaseHealth() { return maxHealth; };
+    @Override public float getBaseAttack() { return attackDamage; };
 
     private List<AbilityButton> abilityButtons = new ArrayList<>();
     private List<Ability> abilities = new ArrayList<>();
@@ -222,6 +227,7 @@ public class PiglinMerchantUnit extends Piglin implements Unit, AttackerUnit, He
         super(entityType, level);
 
         updateAbilityButtons();
+        setStatsForLevel();
     }
 
     @Override

@@ -4,14 +4,17 @@ import com.mojang.datafixers.util.Pair;
 import com.solegendary.reignofnether.registrars.GameRuleRegistrar;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
 import com.solegendary.reignofnether.sandbox.SandboxServer;
+import com.solegendary.reignofnether.unit.units.monsters.PhantomSummon;
 import com.solegendary.reignofnether.util.MiscUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
+import net.minecraft.world.entity.monster.Vex;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.phys.AABB;
@@ -69,6 +72,9 @@ public class NonUnitServerEvents {
                 pfMobs.addAll(evt.level.getNearbyEntities(PathfinderMob.class, TargetingConditions.forCombat(), unit, aabb));
             }
             for (PathfinderMob pfMob : pfMobs) {
+                if (!(shouldMobBeAggressive(pfMob)))
+                    continue;
+
                 boolean hasAttackGoal = false;
                 for (WrappedGoal wrappedGoal : pfMob.targetSelector.getAvailableGoals())
                     if (wrappedGoal.getGoal() instanceof NearestAttackableTargetGoal)
@@ -81,5 +87,10 @@ public class NonUnitServerEvents {
                 }
             }
         }
+    }
+
+    private static boolean shouldMobBeAggressive(Mob mob) {
+        return !(mob instanceof Vex) &&
+                !(mob instanceof PhantomSummon);
     }
 }

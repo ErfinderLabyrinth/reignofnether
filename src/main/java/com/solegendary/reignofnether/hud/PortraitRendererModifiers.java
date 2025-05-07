@@ -65,6 +65,8 @@ public class PortraitRendererModifiers {
             yOffset = 20;
         } else if (entity instanceof Vex) {
             yOffset = 5;
+        }  else if (entity instanceof Phantom) {
+            yOffset = 20;
         } else if (entity instanceof Hoglin || entity instanceof Zoglin) {
             yOffset = -18;
             scale = -18;

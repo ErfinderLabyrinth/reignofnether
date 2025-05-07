@@ -26,6 +26,7 @@ import com.solegendary.reignofnether.unit.units.piglins.GhastUnit;
 import com.solegendary.reignofnether.unit.units.villagers.PillagerUnit;
 import com.solegendary.reignofnether.util.MiscUtil;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.Entity;
@@ -52,6 +53,8 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 public class BuildingServerEvents {
 
@@ -440,24 +443,34 @@ public class BuildingServerEvents {
         return false;
     }
 
+    private static void syncBuildings() {
+        for (BuildingPlacement building : buildings) {
+            BuildingClientboundPacket.placeBuilding(building.originPos,
+                    building.getBuilding(),
+                    building.rotation,
+                    building.ownerName,
+                    building.blockPlaceQueue.size(),
+                    building instanceof BridgePlacement bridge && bridge.isDiagonalBridge,
+                    building.getUpgradeLevel(),
+                    building.isBuilt,
+                    building instanceof PortalPlacement p ? p.portalType : PortalPlacement.PortalType.BASIC,
+                    building instanceof PortalPlacement p && p.hasDestination() ? p.destination : new BlockPos(0, 0, 0),
+                    true
+            );
+        }
+    }
+
     @SubscribeEvent
     public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent evt) {
         if (!PlayerServerEvents.rtsSyncingEnabled) {
             return;
         }
-        for (BuildingPlacement building : buildings)
-            BuildingClientboundPacket.placeBuilding(building.originPos,
-                building.getBuilding(),
-                building.rotation,
-                building.ownerName,
-                building.blockPlaceQueue.size(),
-                building instanceof BridgePlacement bridge && bridge.isDiagonalBridge,
-                building.getUpgradeLevel(),
-                building.isBuilt,
-                building instanceof PortalPlacement p ? p.portalType : PortalPlacement.PortalType.BASIC,
-                building instanceof PortalPlacement p && p.hasDestination() ? p.destination : new BlockPos(0,0,0),
-                true
-            );
+        MinecraftServer server = evt.getEntity().level().getServer();
+        if (server == null || !server.isDedicatedServer()) {
+            CompletableFuture.delayedExecutor(1000, TimeUnit.MILLISECONDS).execute(BuildingServerEvents::syncBuildings);
+        } else {
+            syncBuildings();
+        }
         //ReignOfNether.LOGGER.info("Synced " + buildings.size() + " buildings with player logged in");
     }
 

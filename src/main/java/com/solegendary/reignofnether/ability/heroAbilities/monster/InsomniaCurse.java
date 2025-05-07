@@ -2,6 +2,7 @@ package com.solegendary.reignofnether.ability.heroAbilities.monster;
 
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.ability.HeroAbility;
+import com.solegendary.reignofnether.building.BuildingUtils;
 import com.solegendary.reignofnether.cursor.CursorClientEvents;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.hud.Button;
@@ -31,33 +32,37 @@ public class InsomniaCurse extends HeroAbility {
     // [X] Should be able to curse buildings too
     // [X] Can have set number of charges
 
-    public int charges = 3;
-    public int maxCharges = 3;
     public static final int RANGE = 12;
-    private static final float PHANTOM_DAMAGE = 5;
-    private static final float PHANTOM_DAMAGE_BONUS_PER_SOUL = 0.5f;
-    private static final int PHANTOM_MAX_ATTACKS = 3;
+    public static final float PHANTOM_DAMAGE = 6;
+    public static final float PHANTOM_DAMAGE_BONUS_PER_SOUL_RANK = 2f;
+    public static final int PHANTOM_MAX_ATTACKS = 5;
 
     public InsomniaCurse() {
         super(3, UnitAction.INSOMNIA_CURSE, 20 * ResourceCost.TICKS_PER_SECOND, RANGE, 0, true);
+        maxCharges = 3;
+        charges = maxCharges;
     }
 
     @Override
     public boolean rankUp(HeroUnit hero) {
         if (super.rankUp(hero)) {
-            if (rank == 1) {
-                maxCharges = 3;
-                cooldownMax = 20 * ResourceCost.TICKS_PER_SECOND;
-            } else if (rank == 2) {
-                maxCharges = 4;
-                cooldownMax = 17 * ResourceCost.TICKS_PER_SECOND;
-            } else if (rank == 3) {
-                maxCharges = 5;
-                cooldownMax= 14 * ResourceCost.TICKS_PER_SECOND;
-            }
+            updateStatsForRank();
             return true;
         }
         return false;
+    }
+
+    public void updateStatsForRank() {
+        if (rank == 1) {
+            maxCharges = 3;
+            cooldownMax = 20 * ResourceCost.TICKS_PER_SECOND;
+        } else if (rank == 2) {
+            maxCharges = 4;
+            cooldownMax = 17 * ResourceCost.TICKS_PER_SECOND;
+        } else if (rank == 3) {
+            maxCharges = 5;
+            cooldownMax= 14 * ResourceCost.TICKS_PER_SECOND;
+        }
     }
 
     @Override
@@ -91,8 +96,10 @@ public class InsomniaCurse extends HeroAbility {
                 fcsIcons(I18n.get("abilities.reignofnether.insomnia_curse.stats", PHANTOM_DAMAGE, cooldownMax / 20, RANGE)),
                 fcs(""),
                 fcs(I18n.get("abilities.reignofnether.insomnia_curse.tooltip1")),
-                fcs(I18n.get("abilities.reignofnether.insomnia_curse.tooltip2", PHANTOM_DAMAGE, PHANTOM_DAMAGE_BONUS_PER_SOUL)),
-                fcs(I18n.get("abilities.reignofnether.insomnia_curse.tooltip3", PHANTOM_MAX_ATTACKS))
+                fcs(I18n.get("abilities.reignofnether.insomnia_curse.tooltip2", PHANTOM_DAMAGE, PHANTOM_DAMAGE_BONUS_PER_SOUL_RANK)),
+                fcs(I18n.get("abilities.reignofnether.insomnia_curse.tooltip3", PHANTOM_MAX_ATTACKS)),
+                fcs(""),
+                fcs(I18n.get("abilities.reignofnether.charges", maxCharges))
         );
     }
 
@@ -102,7 +109,7 @@ public class InsomniaCurse extends HeroAbility {
             fcs(I18n.get("abilities.reignofnether.level_req", getLevelRequirement()), getLevelReqStyle(hero)),
             fcs(""),
             fcs(I18n.get("abilities.reignofnether.insomnia_curse.tooltip1")),
-            fcs(I18n.get("abilities.reignofnether.insomnia_curse.tooltip2", PHANTOM_DAMAGE, PHANTOM_DAMAGE_BONUS_PER_SOUL)),
+            fcs(I18n.get("abilities.reignofnether.insomnia_curse.tooltip2", PHANTOM_DAMAGE, PHANTOM_DAMAGE_BONUS_PER_SOUL_RANK)),
             fcs(I18n.get("abilities.reignofnether.insomnia_curse.tooltip3", PHANTOM_MAX_ATTACKS)),
             fcs(""),
             fcs(I18n.get("abilities.reignofnether.insomnia_curse.rank1"), rank == 0),
@@ -113,13 +120,17 @@ public class InsomniaCurse extends HeroAbility {
 
     @Override
     public void use(Level level, Unit unitUsing, LivingEntity targetEntity) {
+        if (targetEntity == unitUsing)
+            return;
         ((NecromancerUnit) unitUsing).getCastPhantomGoal().setAbility(this);
         ((NecromancerUnit) unitUsing).getCastPhantomGoal().setTarget(targetEntity);
     }
 
     @Override
     public void use(Level level, Unit unitUsing, BlockPos targetBp) {
-        ((NecromancerUnit) unitUsing).getCastPhantomGoal().setAbility(this);
-        ((NecromancerUnit) unitUsing).getCastPhantomGoal().setTarget(targetBp);
+        if (BuildingUtils.isPosInsideAnyBuilding(level.isClientSide(), targetBp)) {
+            ((NecromancerUnit) unitUsing).getCastPhantomGoal().setAbility(this);
+            ((NecromancerUnit) unitUsing).getCastPhantomGoal().setTarget(targetBp);
+        }
     }
 }

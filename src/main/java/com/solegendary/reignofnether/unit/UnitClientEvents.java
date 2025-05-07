@@ -39,6 +39,7 @@ import com.solegendary.reignofnether.unit.goals.MeleeAttackBuildingGoal;
 import com.solegendary.reignofnether.unit.interfaces.*;
 import com.solegendary.reignofnether.unit.packets.UnitActionServerboundPacket;
 import com.solegendary.reignofnether.unit.units.monsters.CreeperUnit;
+import com.solegendary.reignofnether.unit.units.monsters.PhantomSummon;
 import com.solegendary.reignofnether.unit.units.monsters.WardenUnit;
 import com.solegendary.reignofnether.unit.units.monsters.ZoglinUnit;
 import com.solegendary.reignofnether.unit.units.piglins.BruteUnit;
@@ -84,7 +85,7 @@ import static com.solegendary.reignofnether.building.BuildingClientEvents.getPla
 import static com.solegendary.reignofnether.cursor.CursorClientEvents.getPreselectedBlockPos;
 import static com.solegendary.reignofnether.hud.HudClientEvents.hudSelectedEntity;
 import static com.solegendary.reignofnether.unit.Checkpoint.CHECKPOINT_TICKS_FADE;
-import static net.minecraftforge.client.event.RenderLevelStageEvent.Stage.AFTER_CUTOUT_MIPPED_BLOCKS_BLOCKS;
+import static net.minecraftforge.client.event.RenderLevelStageEvent.Stage.AFTER_ENTITIES;
 
 
 public class UnitClientEvents {
@@ -346,7 +347,7 @@ public class UnitClientEvents {
     }
 
     public static void syncOwnerName(int entityId, String ownerName) {
-        for(LivingEntity entity : allUnits)
+        for (LivingEntity entity : allUnits)
             if (entity.getId() == entityId && MC.level != null)
                 if (entity instanceof Unit unit)
                     unit.setOwnerName(ownerName);
@@ -526,7 +527,7 @@ public class UnitClientEvents {
 
             addUnitPoofs(evt.getLevel(), entity);
         }
-        if (entity instanceof LivingEntity le && ResourceSources.isHuntableAnimal(le))
+        if (entity instanceof LivingEntity le && (ResourceSources.isHuntableAnimal(le) || le instanceof PhantomSummon))
             addUnitPoofs(evt.getLevel(), entity);
     }
 
@@ -701,14 +702,14 @@ public class UnitClientEvents {
         CursorClientEvents.setLeftClickAction(null);
     }
 
-    public static final RenderLevelStageEvent.Stage RENDER_STAGE = AFTER_CUTOUT_MIPPED_BLOCKS_BLOCKS;
+    public static RenderLevelStageEvent.Stage stage = AFTER_ENTITIES;
 
     @SubscribeEvent
     public static void onRenderLevel(RenderLevelStageEvent evt) {
         if (MC.level == null)
             return;
 
-        if (evt.getStage() == RENDER_STAGE)
+        if (evt.getStage() == stage)
         {
             ArrayList<LivingEntity> selectedUnits = getSelectedUnits();
             ArrayList<LivingEntity> preselectedUnits = getPreselectedUnits();
@@ -763,7 +764,7 @@ public class UnitClientEvents {
         }
 
         // AFTER_CUTOUT_BLOCKS lets us see checkpoints through leaves
-        if (OrthoviewClientEvents.isEnabled() && evt.getStage() == RENDER_STAGE) {
+        if (OrthoviewClientEvents.isEnabled() && evt.getStage() == stage) {
             // draw unit checkpoints
             for (LivingEntity entity : getSelectedUnits()) {
                 if (entity instanceof Unit unit) {
@@ -984,16 +985,16 @@ public class UnitClientEvents {
                     entity.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.AIR));
                     aUnit.setUnitAttackTarget(null);
                 }
-            } else if (entity instanceof VindicatorUnit vUnit && entity.getId() == entityId) {
+            } else if ((entity instanceof VindicatorUnit || entity instanceof MilitiaUnit) && entity.getId() == entityId) {
                 if (startAnimation && MC.level != null) {
                     if (targetId > 0) {
-                        vUnit.setUnitAttackTarget((LivingEntity) MC.level.getEntity(targetId)); // set itself as a target just for animation purposes, doesn't tick clientside anyway
+                        ((AttackerUnit) entity).setUnitAttackTarget((LivingEntity) MC.level.getEntity(targetId)); // set itself as a target just for animation purposes, doesn't tick clientside anyway
                     } else {
-                        vUnit.setAttackBuildingTarget(buildingBp);
+                        ((AttackerUnit) entity).setAttackBuildingTarget(buildingBp);
                     }
                 } else {
-                    vUnit.setUnitAttackTarget(null);
-                    ((MeleeAttackBuildingGoal) vUnit.getAttackBuildingGoal()).stopAttacking();
+                    ((AttackerUnit) entity).setUnitAttackTarget(null);
+                    ((MeleeAttackBuildingGoal) ((AttackerUnit) entity).getAttackBuildingGoal()).stopAttacking();
                 }
             }
         }

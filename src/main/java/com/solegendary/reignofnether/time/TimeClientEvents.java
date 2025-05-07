@@ -1,14 +1,20 @@
 package com.solegendary.reignofnether.time;
 
 import com.mojang.datafixers.util.Pair;
+import com.solegendary.reignofnether.ReignOfNether;
+import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingClientEvents;
 import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.NightSource;
 import com.solegendary.reignofnether.building.RangeIndicator;
+import com.solegendary.reignofnether.guiscreen.TopdownGui;
 import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.minimap.MinimapClientEvents;
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
 import com.solegendary.reignofnether.player.PlayerClientEvents;
+import com.solegendary.reignofnether.registrars.SoundRegistrar;
+import com.solegendary.reignofnether.sounds.FadeableMusicInstance;
+import com.solegendary.reignofnether.sounds.SoundClientEvents;
 import com.solegendary.reignofnether.survival.SurvivalClientEvents;
 import com.solegendary.reignofnether.tutorial.TutorialClientEvents;
 import com.solegendary.reignofnether.tutorial.TutorialStage;
@@ -19,6 +25,7 @@ import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Style;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -30,8 +37,10 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.solegendary.reignofnether.time.TimeUtils.*;
+import static com.solegendary.reignofnether.util.MiscUtil.fcs;
 
 public class TimeClientEvents {
 
@@ -48,17 +57,58 @@ public class TimeClientEvents {
     public static NightCircleMode nightCircleMode = NightCircleMode.NO_OVERLAPS;
 
     private static final Button CLOCK_BUTTON = new Button("Clock",
-        10,
-        null,
-        null,
-        null,
-        () -> false,
-        () -> !OrthoviewClientEvents.isEnabled(),
-        () -> true,
-        null,
-        null,
-        null
+            10,
+            null,
+            null,
+            null,
+            () -> false,
+            () -> !OrthoviewClientEvents.isEnabled(),
+            () -> true,
+            null,
+            null,
+            null
     );
+    private static int bloodMoonTicksLeft = 0;
+    private static String bloodMoonOwner = "";
+
+    public static boolean isBloodMoonActive() {
+        return bloodMoonTicksLeft > 0;
+    }
+
+    private static Button getBloodMoonButton() {
+        return new Button("Clock",
+                14,
+                new ResourceLocation(ReignOfNether.MOD_ID, "textures/hud/blood_moon.png"),
+                null,
+                null,
+                () -> false,
+                () -> !OrthoviewClientEvents.isEnabled() || !isBloodMoonActive(),
+                () -> true,
+                null,
+                null,
+                List.of(
+                        fcs(I18n.get("abilities.reignofnether.blood_moon.clock_warning1"), Style.EMPTY.withColor(0xFF0000)),
+                        fcs(I18n.get("abilities.reignofnether.blood_moon.clock_warning2", getTimeStrFromTicks(bloodMoonTicksLeft))),
+                        fcs(I18n.get("abilities.reignofnether.blood_moon.clock_warning3", bloodMoonOwner.isBlank() ? "Nobody!" : bloodMoonOwner))
+                )
+        );
+    }
+
+    public static void setBloodMoonTicks(int tickDuration, String ownerName) {
+        bloodMoonTicksLeft = tickDuration;
+        bloodMoonOwner = ownerName;
+        if (tickDuration > 0) {
+            MC.getMusicManager().stopPlaying();
+            if (SoundClientEvents.customSong == null) {
+                FadeableMusicInstance bloodMoonSong = new FadeableMusicInstance(SoundRegistrar.BLOOD_MOON.get());
+                SoundClientEvents.customSong = bloodMoonSong;
+                MC.getSoundManager().play(bloodMoonSong);
+            }
+        } else if (SoundClientEvents.customSong != null) {
+            SoundClientEvents.customSong.startFadeOut();
+            SoundClientEvents.customSong = null;
+        }
+    }
 
     // render directly above the minimap
     @SubscribeEvent
@@ -68,17 +118,19 @@ public class TimeClientEvents {
             return;
         }
 
-        xPos = MC.getWindow().getGuiScaledWidth() - MinimapClientEvents.getMapGuiRadius() - (
-            MinimapClientEvents.CORNER_OFFSET * 2
-        ) + 2;
-        yPos = MC.getWindow().getGuiScaledHeight() - (MinimapClientEvents.getMapGuiRadius() * 2) - (
-            MinimapClientEvents.CORNER_OFFSET * 2
-        ) - 6;
+        if (!isBloodMoonActive()) {
+            xPos = MC.getWindow().getGuiScaledWidth() - MinimapClientEvents.getMapGuiRadius() - (
+                    MinimapClientEvents.CORNER_OFFSET * 2
+            ) + 2;
+            yPos = MC.getWindow().getGuiScaledHeight() - (MinimapClientEvents.getMapGuiRadius() * 2) - (
+                    MinimapClientEvents.CORNER_OFFSET * 2
+            ) - 6;
 
-        ItemRenderer itemrenderer = MC.getItemRenderer();
+            ItemRenderer itemrenderer = MC.getItemRenderer();
 
-        evt.getGuiGraphics().renderItem(new ItemStack(Items.CLOCK), xPos, yPos);
-        evt.getGuiGraphics().renderItemDecorations(MC.font, new ItemStack(Items.CLOCK), xPos, yPos);
+            evt.getGuiGraphics().renderItem(new ItemStack(Items.CLOCK), xPos, yPos);
+            evt.getGuiGraphics().renderItemDecorations(MC.font, new ItemStack(Items.CLOCK), xPos, yPos);
+        }
     }
 
     @SubscribeEvent
@@ -95,7 +147,13 @@ public class TimeClientEvents {
             MinimapClientEvents.CORNER_OFFSET * 2
         ) - 6;
 
-        if (!CLOCK_BUTTON.isHidden.get())
+        Button bloodMoonButton = getBloodMoonButton();
+        if (!bloodMoonButton.isHidden.get() && evt.getScreen() instanceof TopdownGui) {
+            bloodMoonButton.render(evt.getGuiGraphics(), xPos - 3, yPos - 3, evt.getMouseX(), evt.getMouseY());
+            if (bloodMoonButton.isMouseOver(evt.getMouseX(), evt.getMouseY()))
+                bloodMoonButton.renderTooltip(evt.getGuiGraphics(), evt.getMouseX(), evt.getMouseY());
+        }
+        else if (!CLOCK_BUTTON.isHidden.get() && evt.getScreen() instanceof TopdownGui)
             CLOCK_BUTTON.render(evt.getGuiGraphics(), xPos - 3, yPos - 3, evt.getMouseX(), evt.getMouseY());
     }
 
@@ -115,8 +173,11 @@ public class TimeClientEvents {
 
         final int GUI_LENGTH = 16;
 
-        if (evt.getMouseX() > xPos && evt.getMouseX() <= xPos + GUI_LENGTH && evt.getMouseY() > yPos
-            && evt.getMouseY() <= yPos + GUI_LENGTH) {
+        if (!isBloodMoonActive() &&
+            evt.getMouseX() > xPos &&
+            evt.getMouseX() <= xPos + GUI_LENGTH &&
+            evt.getMouseY() > yPos &&
+            evt.getMouseY() <= yPos + GUI_LENGTH) {
 
             // 'day' is when undead start burning, ~500
             // 'night' is when undead stop burning, ~12500
