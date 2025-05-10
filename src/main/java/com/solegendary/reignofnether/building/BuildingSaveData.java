@@ -58,6 +58,7 @@ public class BuildingSaveData extends SavedData {
                 }else {
                     building = getOldBuilding(btag.getString("buildingName"));
                 }
+
                 String ownerName = btag.getString("ownerName");
                 Rotation rotation = Rotation.valueOf(btag.getString("rotation"));
                 BlockPos rallyPoint = new BlockPos(btag.getInt("rallyX"), btag.getInt("rallyY"), btag.getInt("rallyZ"));
@@ -122,6 +123,7 @@ public class BuildingSaveData extends SavedData {
         this.setDirty();
     }
 
+    // backwards compatibility for old saves
     private static Building getOldBuilding(String name) {
         Building building = null;
         switch(name) {

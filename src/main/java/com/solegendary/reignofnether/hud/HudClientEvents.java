@@ -349,7 +349,7 @@ public class HudClientEvents {
 
                     buildingButtons.add(new Button(ReignOfNetherRegistries.BUILDING.getKey(building.getBuilding()).toString(),
                         iconSize,
-                        building.icon,
+                        building.getBuilding().icon,
                         building,
                         () -> hudSelectedPlacement.getBuilding() == building.getBuilding(),
                         () -> false,

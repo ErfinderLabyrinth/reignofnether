@@ -102,18 +102,18 @@ public class PortalPlacement extends ProductionPlacement implements NetherConver
         String newStructureName = "";
         switch (portalType) {
             case CIVILIAN -> {
-                this.portraitBlock = Blocks.CYAN_GLAZED_TERRACOTTA;
-                this.icon = new ResourceLocation("minecraft", "textures/block/cyan_glazed_terracotta.png");
+                this.getBuilding().portraitBlock = Blocks.CYAN_GLAZED_TERRACOTTA;
+                this.getBuilding().icon = new ResourceLocation("minecraft", "textures/block/cyan_glazed_terracotta.png");
                 newStructureName = Portal.structureNameCivilian;
-                this.canAcceptResources = true;
-                popSupply = CIVILIIAN_PORTAL_POPULATION_SUPPLY;
+                this.getBuilding().canAcceptResources = true;
+                this.getBuilding().cost.population = CIVILIIAN_PORTAL_POPULATION_SUPPLY;
                 if (this.getLevel().isClientSide()) {
                     this.productionButtons = List.of(ProductionItems.RESEARCH_RESOURCE_CAPACITY.getStartButton(this, Keybindings.keyQ));
                 }
             }
             case MILITARY -> {
-                this.portraitBlock = Blocks.RED_GLAZED_TERRACOTTA;
-                this.icon = new ResourceLocation("minecraft", "textures/block/red_glazed_terracotta.png");
+                this.getBuilding().portraitBlock = Blocks.RED_GLAZED_TERRACOTTA;
+                this.getBuilding().icon = new ResourceLocation("minecraft", "textures/block/red_glazed_terracotta.png");
                 newStructureName = Portal.structureNameMilitary;
                 if (this.getLevel().isClientSide()) {
                     this.productionButtons = Arrays.asList(ProductionItems.BRUTE.getStartButton(this, Keybindings.keyQ),
@@ -127,8 +127,8 @@ public class PortalPlacement extends ProductionPlacement implements NetherConver
                 }
             }
             case TRANSPORT -> {
-                this.portraitBlock = Blocks.BLUE_GLAZED_TERRACOTTA;
-                this.icon = new ResourceLocation("minecraft", "textures/block/blue_glazed_terracotta.png");
+                this.getBuilding().portraitBlock = Blocks.BLUE_GLAZED_TERRACOTTA;
+                this.getBuilding().icon = new ResourceLocation("minecraft", "textures/block/blue_glazed_terracotta.png");
                 newStructureName = Portal.structureNameTransport;
             }
         }
