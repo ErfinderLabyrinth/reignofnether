@@ -1,8 +1,8 @@
 package com.solegendary.reignofnether.unit.units.piglins;
 
 import com.solegendary.reignofnether.blocks.BlockServerEvents;
+import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
-import com.solegendary.reignofnether.research.researchItems.ResearchSoulFireballs;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
@@ -63,7 +63,7 @@ public class GhastUnitFireball extends LargeFireball {
         for (BlockPos bp : fireBps) {
             level().setBlockAndUpdate(bp, Blocks.FIRE.defaultBlockState());
 
-            if (getOwner() instanceof GhastUnit ghastUnit && ResearchServerEvents.playerHasResearch(ghastUnit.getOwnerName(), ResearchSoulFireballs.itemName)) {
+            if (getOwner() instanceof GhastUnit ghastUnit && ResearchServerEvents.playerHasResearch(ghastUnit.getOwnerName(), ProductionItems.RESEARCH_SOUL_FIREBALLS)) {
                 for (BlockPos bpAdj : List.of(bp, bp.north(), bp.south(), bp.east(), bp.west())) {
                     BlockState bsBelow = level().getBlockState(bpAdj.below());
                     if (!bsBelow.isAir())

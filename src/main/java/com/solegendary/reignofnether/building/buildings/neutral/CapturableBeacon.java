@@ -1,26 +1,20 @@
 package com.solegendary.reignofnether.building.buildings.neutral;
 
-import com.solegendary.reignofnether.building.BuildingBlock;
-import com.solegendary.reignofnether.building.BuildingBlockData;
+import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingClientEvents;
+import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.tutorial.TutorialClientEvents;
+import com.solegendary.reignofnether.util.Faction;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.Rotation;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import static com.solegendary.reignofnether.building.BuildingUtils.getAbsoluteBlockData;
 
 public class CapturableBeacon extends Beacon {
 
@@ -28,20 +22,15 @@ public class CapturableBeacon extends Beacon {
     public final static String structureName = "beacon_t5";
     public final static ResourceCost cost = ResourceCost.Building(0,0,0,0);
 
-    public CapturableBeacon(Level level, BlockPos originPos, Rotation rotation, String ownerName) {
-        super(level, originPos, rotation, ownerName);
-
-        this.blocks = getAbsoluteBlockData(getRelativeBlockData(level), level, originPos, rotation);
+    public CapturableBeacon() {
+        super();
+        ((Building)this).structureName = structureName;
+        ((Building)this).cost = cost;
 
         this.name = buildingName;
-        this.ownerName = ownerName;
         this.portraitBlock = Blocks.BEACON;
         this.icon = new ResourceLocation("minecraft", "textures/item/nether_star.png");
 
-        this.foodCost = cost.food;
-        this.woodCost = cost.wood;
-        this.oreCost = cost.ore;
-        this.popSupply = cost.population;
         this.buildTimeModifier = 1.0f;
 
         this.capturable = true;
@@ -54,19 +43,20 @@ public class CapturableBeacon extends Beacon {
         this.explodeChance = 0.2f;
     }
 
-    public static ArrayList<BuildingBlock> getRelativeBlockData(LevelAccessor level) {
-        return BuildingBlockData.getBuildingBlocks(structureName, level);
+    @Override
+    public Faction getFaction() {
+        return Faction.NONE;
     }
 
-    public static AbilityButton getBuildButton(Keybinding hotkey) {
+    public AbilityButton getBuildButton(Keybinding hotkey) {
         return new AbilityButton(
                 buildingName,
                 new ResourceLocation("minecraft", "textures/item/nether_star.png"),
                 hotkey,
-                () -> BuildingClientEvents.getBuildingToPlace() == CapturableBeacon.class,
+                () -> BuildingClientEvents.getBuildingToPlace() == this,
                 TutorialClientEvents::isEnabled,
-                () -> BuildingClientEvents.getBuildings().stream().filter(b -> b instanceof CapturableBeacon).toList().isEmpty(),
-                () -> BuildingClientEvents.setBuildingToPlace(CapturableBeacon.class),
+                () -> BuildingClientEvents.getBuildings().stream().filter(b -> b.getBuilding() instanceof CapturableBeacon).toList().isEmpty(),
+                () -> BuildingClientEvents.setBuildingToPlace(this),
                 null,
                 List.of(
                         FormattedCharSequence.forward(I18n.get("buildings.neutral.reignofnether.upgraded_beacon"), Style.EMPTY.withBold(true)),
@@ -77,7 +67,8 @@ public class CapturableBeacon extends Beacon {
                         FormattedCharSequence.forward("", Style.EMPTY),
                         FormattedCharSequence.forward(I18n.get("buildings.neutral.reignofnether.beacon.tooltip3"), Style.EMPTY)
                 ),
-                null
+                null,
+                (BuildingPlacement) null
         );
     }
 }

@@ -2,87 +2,42 @@ package com.solegendary.reignofnether.building.buildings.shared;
 
 import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingBlock;
-import com.solegendary.reignofnether.building.BuildingUtils;
-import com.solegendary.reignofnether.util.MiscUtil;
+import com.solegendary.reignofnether.building.BuildingBlockData;
+import com.solegendary.reignofnether.building.BuildingPlacement;
+import com.solegendary.reignofnether.building.buildings.placements.BridgePlacement;
+import com.solegendary.reignofnether.resources.ResourceCost;
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.*;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Rotation;
 
 import java.util.ArrayList;
-import java.util.List;
+
+import static com.solegendary.reignofnether.building.BuildingUtils.getAbsoluteBlockData;
 
 public abstract class AbstractBridge extends Building {
-
     public final float MELEE_DAMAGE_MULTIPLIER = 0.05f;
 
-    public AbstractBridge(Level level, BlockPos originPos, Rotation rotation, String ownerName, boolean isDiagonalBridge, ArrayList<BuildingBlock> culledBlocks) {
-        super(level, originPos, rotation, ownerName, culledBlocks,false);
-        this.isDiagonalBridge = isDiagonalBridge;
+    public AbstractBridge(ResourceCost cost) {
+        super("", cost, false);
     }
 
     @Override
     public float getMeleeDamageMult() { return MELEE_DAMAGE_MULTIPLIER; }
 
-    public static boolean shouldCullBlock(BlockPos originPos, BuildingBlock b, Level level) {
-        BlockState bs = b.getBlockState();
-
-        boolean isFenceOrAir = b.getBlockState().getBlock() instanceof AirBlock ||
-                b.getBlockState().getBlock() instanceof FenceBlock;
-        BlockPos bp = b.getBlockPos().offset(originPos);
-
-        // if the block in the world matches this exactly, don't cull it, instead just consider it to be our block too
-        BlockState bsWorld = level.getBlockState(bp);
-
-        if (bsWorld.getBlock() == Blocks.OBSIDIAN)
-            return false;
-        if (bsWorld.equals(bs))
-            return false;
-        if ((bsWorld.isAir() || !bsWorld.getFluidState().isEmpty()) && !isFenceOrAir)
-            return false;
-
-        // cull if overlaps another bridge block that isn't built yet
-        if (BuildingUtils.isPosInsideAnyBuilding(level.isClientSide, bp))
-            return true;
-
-        // cull if fence is adjacent to another solid block (or a bridge block, even if air)
-        for (BlockPos bpAdj : List.of(bp.north(), bp.south(), bp.east(), bp.west())) {
-            BlockState bsWorldAdj = level.getBlockState(bpAdj);
-            if (isFenceOrAir && !bsWorldAdj.isAir() && BuildingUtils.isPosInsideAnyBuilding(level.isClientSide, bpAdj))
-                return true;
-        }
-        return MiscUtil.isSolidBlocking(level, bp) || (isFenceOrAir && MiscUtil.isSolidBlocking(level, bp.below()));
-    }
-
-    protected static ArrayList<BuildingBlock> getCulledBlocks(ArrayList<BuildingBlock> blocks, Level level) {
-        blocks.removeIf(b -> shouldCullBlock(new BlockPos(0,0,0), b, level));
-        return blocks;
-    }
-
-    private void replaceWithLiquidBelow(BlockPos bp, BlockState bs) {
-        if (!(bs.getBlock() instanceof FenceBlock)) {
-            for (BlockPos bpAdj : List.of(bp.below(), bp.north(), bp.south(), bp.east(), bp.west())) {
-                BlockState bsAdj = level.getBlockState(bpAdj);
-                if (!bsAdj.getFluidState().isEmpty())
-                    level.setBlockAndUpdate(bp, bsAdj);
-            }
-        }
+    public ArrayList<BuildingBlock> getRelativeBlockData(LevelAccessor level, boolean diagonal) {
+        return BuildingBlockData.getBuildingBlocks(diagonal ? getDiagonalStructureName() : getOrthogonalStructureName(), level);
     }
 
     @Override
-    public void onBlockBreak(ServerLevel level, BlockPos pos, boolean breakBlocks) {
-        BlockState bs = level.getBlockState(pos);
-        super.onBlockBreak(level, pos, breakBlocks);
-        replaceWithLiquidBelow(pos, bs);
+    public BuildingPlacement createBuildingPlacement(Level level, BlockPos pos, Rotation rotation, String ownerName) {
+        return createBuildingPlacement(level, pos, rotation, ownerName, false);
     }
 
-    @Override
-    public void destroy(ServerLevel serverLevel) {
-        super.destroy(serverLevel);
-        for (BuildingBlock bb : blocks) // need to check first here since we already destroyed the level blocks
-            if (!(bb.getBlockState().getBlock() instanceof FenceBlock) &&
-                !(bb.getBlockState().getBlock() instanceof AirBlock))
-                replaceWithLiquidBelow(bb.getBlockPos(), bb.getBlockState());
+    public BuildingPlacement createBuildingPlacement(Level level, BlockPos pos, Rotation rotation, String ownerName, boolean diagonal) {
+        return new BridgePlacement(this, level, pos, rotation, "", getCulledBlocks(getAbsoluteBlockData(getRelativeBlockData(level, diagonal), level, pos, rotation), level), isCapitol, diagonal);
     }
+
+    public abstract String getDiagonalStructureName();
+    public abstract String getOrthogonalStructureName();
 }

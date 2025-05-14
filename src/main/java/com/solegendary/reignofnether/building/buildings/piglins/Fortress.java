@@ -1,13 +1,16 @@
 package com.solegendary.reignofnether.building.buildings.piglins;
 
-import com.solegendary.reignofnether.building.*;
+import com.solegendary.reignofnether.api.ReignOfNetherRegistries;
+import com.solegendary.reignofnether.building.BuildingClientEvents;
+import com.solegendary.reignofnether.building.BuildingPlacement;
+import com.solegendary.reignofnether.building.Buildings;
+import com.solegendary.reignofnether.building.buildings.placements.FortressPlacement;
+import com.solegendary.reignofnether.building.production.ProductionBuilding;
+import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.research.ResearchClient;
-import com.solegendary.reignofnether.research.researchItems.ResearchAdvancedPortals;
-import com.solegendary.reignofnether.research.researchItems.ResearchBloodlust;
-import com.solegendary.reignofnether.research.researchItems.ResearchSoulFireballs;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.util.Faction;
@@ -15,38 +18,27 @@ import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Rotation;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static com.solegendary.reignofnether.building.BuildingUtils.getAbsoluteBlockData;
 
-public class Fortress extends ProductionBuilding implements GarrisonableBuilding {
+public class Fortress extends ProductionBuilding {
 
     public final static String buildingName = "Fortress";
     public final static String structureName = "fortress";
     public final static ResourceCost cost = ResourceCosts.FORTRESS;
 
-    private final static int MAX_OCCUPANTS = 7;
-
-    public Fortress(Level level, BlockPos originPos, Rotation rotation, String ownerName) {
-        super(level, originPos, rotation, ownerName, getAbsoluteBlockData(getRelativeBlockData(level), level, originPos, rotation), false);
+    public Fortress() {
+        super(structureName, cost, false);
         this.name = buildingName;
-        this.ownerName = ownerName;
         this.portraitBlock = Blocks.CHISELED_NETHER_BRICKS;
         this.icon = new ResourceLocation("minecraft", "textures/block/chiseled_nether_bricks.png");
 
-        this.foodCost = cost.food;
-        this.woodCost = cost.wood;
-        this.oreCost = cost.ore;
-        this.popSupply = cost.population;
         this.buildTimeModifier = 0.5f;
 
         this.canSetRallyPoint = false;
@@ -56,91 +48,43 @@ public class Fortress extends ProductionBuilding implements GarrisonableBuilding
         this.startingBlockTypes.add(Blocks.POLISHED_BASALT);
         this.startingBlockTypes.add(Blocks.NETHER_BRICK_STAIRS);
 
-        updateButtons();
-    }
-
-    public void updateButtons() {
-        if (level.isClientSide()) {
-            this.productionButtons = Arrays.asList(
-                ResearchAdvancedPortals.getStartButton(this, Keybindings.keyQ),
-                ResearchBloodlust.getStartButton(this, Keybindings.keyW),
-                ResearchSoulFireballs.getStartButton(this, Keybindings.keyE)
-            );
-        }
+        this.productions.add(ProductionItems.RESEARCH_ADVANCED_PORTALS, Keybindings.keyQ);
+        this.productions.add(ProductionItems.RESEARCH_BLOODLUST, Keybindings.keyW);
+        this.productions.add(ProductionItems.RESEARCH_SOUL_FIREBALLS, Keybindings.keyE);
     }
 
     public Faction getFaction() {return Faction.PIGLINS;}
 
-    // don't use this for abilities as it may not be balanced
-    public int getAttackRange() { return 30; }
-    // bonus for units attacking garrisoned units
-    public int getExternalAttackRangeBonus() { return 15; }
-
-    public static ArrayList<BuildingBlock> getRelativeBlockData(LevelAccessor level) {
-        return BuildingBlockData.getBuildingBlocks(structureName, level);
+    @Override
+    public BuildingPlacement createBuildingPlacement(Level level, BlockPos pos, Rotation rotation, String ownerName) {
+        return new FortressPlacement(this, level, pos, rotation, ownerName, getAbsoluteBlockData(getRelativeBlockData(level), level, pos, rotation), false);
     }
 
-    public boolean canDestroyBlock(BlockPos relativeBp) {
-        return relativeBp.getY() != 16 &&
-                relativeBp.getY() != 17;
-    }
-
-    public static AbilityButton getBuildButton(Keybinding hotkey) {
+    public AbilityButton getBuildButton(Keybinding hotkey) {
+        ResourceLocation key = ReignOfNetherRegistries.BUILDING.getKey(this);
+        String name = I18n.get("buildings." + getFaction().name().toLowerCase() + "." + key.getNamespace() + "." + key.getPath());
         return new AbilityButton(
-            Fortress.buildingName,
+            name,
             new ResourceLocation("minecraft", "textures/block/chiseled_nether_bricks.png"),
             hotkey,
-            () -> BuildingClientEvents.getBuildingToPlace() == Fortress.class,
+            () -> BuildingClientEvents.getBuildingToPlace() == Buildings.FORTRESS,
             () -> false,
-            () -> (BuildingClientEvents.hasFinishedBuilding(FlameSanctuary.buildingName) &&
-                    BuildingClientEvents.hasFinishedBuilding(WitherShrine.buildingName)) ||
+            () -> (BuildingClientEvents.hasFinishedBuilding(Buildings.FLAME_SANCTUARY) &&
+                    BuildingClientEvents.hasFinishedBuilding(Buildings.WITHER_SHRINE)) ||
                     ResearchClient.hasCheat("modifythephasevariance"),
-            () -> BuildingClientEvents.setBuildingToPlace(Fortress.class),
+            () -> BuildingClientEvents.setBuildingToPlace(Buildings.FORTRESS),
             null,
             List.of(
                     FormattedCharSequence.forward(I18n.get("buildings.piglins.reignofnether.fortress"), Style.EMPTY.withBold(true)),
                     ResourceCosts.getFormattedCost(cost),
                     FormattedCharSequence.forward("", Style.EMPTY),
                     FormattedCharSequence.forward(I18n.get("buildings.piglins.reignofnether.fortress.tooltip1"), Style.EMPTY),
-                    FormattedCharSequence.forward(I18n.get("buildings.piglins.reignofnether.fortress.tooltip2", MAX_OCCUPANTS), Style.EMPTY),
+                    FormattedCharSequence.forward(I18n.get("buildings.piglins.reignofnether.fortress.tooltip2", FortressPlacement.MAX_OCCUPANTS), Style.EMPTY),
                     FormattedCharSequence.forward("", Style.EMPTY),
                     FormattedCharSequence.forward(I18n.get("buildings.piglins.reignofnether.fortress.tooltip3"), Style.EMPTY)
             ),
-            null
+            null,
+                (BuildingPlacement) null
         );
     }
-
-    @Override
-    public BlockPos getIndoorSpawnPoint(ServerLevel level) {
-        return this.originPos.offset(getExitPosition());
-    }
-
-    @Override
-    public BlockPos getEntryPosition() {
-        if (this.rotation == Rotation.NONE) {
-            return new BlockPos(5,17,5);
-        } else if (this.rotation == Rotation.CLOCKWISE_90) {
-            return new BlockPos(-5,17,5);
-        } else if (this.rotation == Rotation.CLOCKWISE_180) {
-            return new BlockPos(-5,17,-5);
-        } else {
-            return new BlockPos(5,17,-5);
-        }
-    }
-
-    @Override
-    public BlockPos getExitPosition() {
-        if (this.rotation == Rotation.NONE) {
-            return new BlockPos(5,1,5);
-        } else if (this.rotation == Rotation.CLOCKWISE_90) {
-            return new BlockPos(-5,1,5);
-        } else if (this.rotation == Rotation.CLOCKWISE_180) {
-            return new BlockPos(-5,1,-5);
-        } else {
-            return new BlockPos(5,1,-5);
-        }
-    }
-
-    @Override
-    public boolean isFull() { return GarrisonableBuilding.getNumOccupants(this) >= MAX_OCCUPANTS; }
 }

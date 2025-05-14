@@ -1,8 +1,8 @@
 package com.solegendary.reignofnether.unit.units.neutral;
 
 import com.solegendary.reignofnether.ReignOfNether;
-import com.solegendary.reignofnether.building.ProductionBuilding;
-import com.solegendary.reignofnether.building.ProductionItem;
+import com.solegendary.reignofnether.building.buildings.placements.ProductionPlacement;
+import com.solegendary.reignofnether.building.production.ProductionItem;
 import com.solegendary.reignofnether.cursor.CursorClientEvents;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.registrars.EntityRegistrar;
@@ -10,6 +10,7 @@ import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.sandbox.SandboxAction;
 import com.solegendary.reignofnether.sandbox.SandboxClientEvents;
+import com.solegendary.reignofnether.unit.interfaces.Unit;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
@@ -24,24 +25,20 @@ public class LlamaProd extends ProductionItem {
     public final static String itemName = "Llama";
     public final static ResourceCost cost = ResourceCosts.LLAMA;
 
-    public LlamaProd(ProductionBuilding building) {
-        super(building, cost.ticks);
-        this.onComplete = (Level level) -> {
+    public LlamaProd() {
+        super(cost);
+        this.onComplete = (Level level, ProductionPlacement placement) -> {
             if (!level.isClientSide()) {
-                building.produceUnit((ServerLevel) level, EntityRegistrar.LLAMA_UNIT.get(), building.ownerName, true);
+                placement.produceUnit((ServerLevel) level, EntityRegistrar.LLAMA_UNIT.get(), placement.ownerName, true);
             }
         };
-        this.foodCost = cost.food;
-        this.woodCost = cost.wood;
-        this.oreCost = cost.ore;
-        this.popCost = cost.population;
     }
 
     public String getItemName() {
         return LlamaProd.itemName;
     }
 
-    public static AbilityButton getPlaceButton() {
+    public AbilityButton getPlaceButton() {
         return new AbilityButton(
             itemName,
             new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/llama.png"),
@@ -57,7 +54,8 @@ public class LlamaProd extends ProductionItem {
             List.of(
                     FormattedCharSequence.forward(I18n.get("units.neutral.reignofnether.llama"), Style.EMPTY.withBold(true))
             ),
-            null
+            null,
+            (Unit) null
         );
     }
 }

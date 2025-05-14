@@ -3,9 +3,10 @@ package com.solegendary.reignofnether.research.researchItems;
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.building.BuildingClientboundPacket;
 import com.solegendary.reignofnether.building.BuildingServerboundPacket;
-import com.solegendary.reignofnether.building.ProductionBuilding;
-import com.solegendary.reignofnether.building.ProductionItem;
-import com.solegendary.reignofnether.building.buildings.piglins.Portal;
+import com.solegendary.reignofnether.building.buildings.placements.PortalPlacement;
+import com.solegendary.reignofnether.building.buildings.placements.ProductionPlacement;
+import com.solegendary.reignofnether.building.production.ProductionItem;
+import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.research.ResearchClient;
@@ -24,26 +25,23 @@ public class ResearchPortalForTransport extends ProductionItem {
     public final static String itemName = "Transport Portal";
     public final static ResourceCost cost = ResourceCosts.RESEARCH_TRANSPORT_PORTAL;
 
-    public ResearchPortalForTransport(ProductionBuilding building) {
-        super(building, cost.ticks);
-        this.onComplete = (Level level) -> {
-            if (this.building instanceof Portal portal) {
+    public ResearchPortalForTransport() {
+        super(cost);
+        this.onComplete = (Level level, ProductionPlacement placement) -> {
+            if (placement instanceof PortalPlacement portal) {
                 if (!level.isClientSide()) {
-                    portal.changeStructure(Portal.PortalType.TRANSPORT);
-                    BuildingClientboundPacket.changePortal(this.building.originPos, Portal.PortalType.TRANSPORT.name());
+                    portal.changeStructure(PortalPlacement.PortalType.TRANSPORT);
+                    BuildingClientboundPacket.changePortal(placement.originPos, PortalPlacement.PortalType.TRANSPORT);
                 }
             }
         };
-        this.foodCost = cost.food;
-        this.woodCost = cost.wood;
-        this.oreCost = cost.ore;
     }
 
     public String getItemName() {
         return ResearchPortalForTransport.itemName;
     }
 
-    public static Button getStartButton(ProductionBuilding prodBuilding, Keybinding hotkey) {
+    public Button getStartButton(ProductionPlacement prodBuilding, Keybinding hotkey) {
         return new Button(ResearchPortalForTransport.itemName,
             14,
             new ResourceLocation("minecraft", "textures/block/blue_glazed_terracotta.png"),
@@ -51,12 +49,12 @@ public class ResearchPortalForTransport extends ProductionItem {
             hotkey,
             () -> false,
             () -> prodBuilding.productionQueue.size() > 0 || (
-                prodBuilding instanceof Portal portal && portal.getUpgradeLevel() > 0
+                prodBuilding instanceof PortalPlacement portal && portal.getUpgradeLevel() > 0
             ),
-            () -> ResearchClient.hasResearch(ResearchAdvancedPortals.itemName),
+            () -> ResearchClient.hasResearch(ProductionItems.RESEARCH_ADVANCED_PORTALS),
             () -> {
                 if (prodBuilding.productionQueue.isEmpty())
-                    BuildingServerboundPacket.startProduction(prodBuilding.originPos, itemName);
+                    BuildingServerboundPacket.startProduction(prodBuilding.originPos, ProductionItems.RESEARCH_PORTAL_FOR_TRANSPORT);
             },
             null,
             List.of(FormattedCharSequence.forward(
@@ -80,7 +78,7 @@ public class ResearchPortalForTransport extends ProductionItem {
         );
     }
 
-    public Button getCancelButton(ProductionBuilding prodBuilding, boolean first) {
+    public Button getCancelButton(ProductionPlacement prodBuilding, boolean first) {
         return new Button(ResearchPortalForTransport.itemName,
             14,
             new ResourceLocation("minecraft", "textures/block/blue_glazed_terracotta.png"),
@@ -89,7 +87,7 @@ public class ResearchPortalForTransport extends ProductionItem {
             () -> false,
             () -> false,
             () -> true,
-            () -> BuildingServerboundPacket.cancelProduction(prodBuilding.minCorner, itemName, first),
+            () -> BuildingServerboundPacket.cancelProduction(prodBuilding.minCorner, ProductionItems.RESEARCH_PORTAL_FOR_TRANSPORT, first),
             null,
             null
         );

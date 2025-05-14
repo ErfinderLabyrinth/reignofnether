@@ -1,8 +1,9 @@
 package com.solegendary.reignofnether.player;
 
-import com.solegendary.reignofnether.building.Building;
+import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.BuildingServerEvents;
 import com.solegendary.reignofnether.building.buildings.neutral.Beacon;
+import com.solegendary.reignofnether.building.buildings.placements.BeaconPlacement;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientboundPacket;
 import com.solegendary.reignofnether.fogofwar.FogOfWarServerEvents;
 import com.solegendary.reignofnether.util.Faction;
@@ -90,8 +91,8 @@ public class RTSPlayer {
             this.ticksWithoutCapitol = 0;
         }
 
-        for (Building building : BuildingServerEvents.getBuildings()) {
-            if (building instanceof Beacon beacon && beacon.isBuilt && building.ownerName.equals(this.name)) {
+        for (BuildingPlacement building : BuildingServerEvents.getBuildings()) {
+            if (building instanceof BeaconPlacement beacon && beacon.isBuilt && building.ownerName.equals(this.name)) {
                 if (beacon.getUpgradeLevel() == Beacon.MAX_UPGRADE_LEVEL) {
                     beaconOwnerTicks += 1;
                     if (beaconOwnerTicks == Beacon.getTicksToWin(beacon.getLevel()) / 4 ||

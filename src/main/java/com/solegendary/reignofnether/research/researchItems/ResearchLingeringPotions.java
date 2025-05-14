@@ -2,8 +2,9 @@ package com.solegendary.reignofnether.research.researchItems;
 
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.building.BuildingServerboundPacket;
-import com.solegendary.reignofnether.building.ProductionBuilding;
-import com.solegendary.reignofnether.building.ProductionItem;
+import com.solegendary.reignofnether.building.buildings.placements.ProductionPlacement;
+import com.solegendary.reignofnether.building.production.ProductionItem;
+import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.research.ResearchClient;
@@ -23,35 +24,32 @@ public class ResearchLingeringPotions extends ProductionItem {
     public final static String itemName = "Lingering Potions";
     public final static ResourceCost cost = ResourceCosts.RESEARCH_LINGERING_POTIONS;
 
-    public ResearchLingeringPotions(ProductionBuilding building) {
-        super(building, ResourceCosts.RESEARCH_LINGERING_POTIONS.ticks);
-        this.onComplete = (Level level) -> {
+    public ResearchLingeringPotions() {
+        super(cost);
+        this.onComplete = (Level level, ProductionPlacement placement) -> {
             if (level.isClientSide()) {
-                ResearchClient.addResearch(this.building.ownerName, ResearchLingeringPotions.itemName);
+                ResearchClient.addResearch(placement.ownerName, ProductionItems.RESEARCH_LINGERING_POTIONS);
             } else {
-                ResearchServerEvents.addResearch(this.building.ownerName, ResearchLingeringPotions.itemName);
+                ResearchServerEvents.addResearch(placement.ownerName, ProductionItems.RESEARCH_LINGERING_POTIONS);
             }
         };
-        this.foodCost = cost.food;
-        this.woodCost = cost.wood;
-        this.oreCost = cost.ore;
     }
 
     public String getItemName() {
         return ResearchLingeringPotions.itemName;
     }
 
-    public static Button getStartButton(ProductionBuilding prodBuilding, Keybinding hotkey) {
+    public Button getStartButton(ProductionPlacement prodBuilding, Keybinding hotkey) {
         return new Button(ResearchLingeringPotions.itemName,
             14,
             new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/lingering_potion_regeneration.png"),
             new ResourceLocation(ReignOfNether.MOD_ID, "textures/hud/icon_frame_bronze.png"),
             hotkey,
             () -> false,
-            () -> ProductionItem.itemIsBeingProduced(ResearchLingeringPotions.itemName, prodBuilding.ownerName)
-                || ResearchClient.hasResearch(ResearchLingeringPotions.itemName),
+            () -> ProductionItems.RESEARCH_LINGERING_POTIONS.itemIsBeingProduced(prodBuilding.ownerName)
+                || ResearchClient.hasResearch(ProductionItems.RESEARCH_LINGERING_POTIONS),
             () -> true,
-            () -> BuildingServerboundPacket.startProduction(prodBuilding.originPos, itemName),
+            () -> BuildingServerboundPacket.startProduction(prodBuilding.originPos, ProductionItems.RESEARCH_LINGERING_POTIONS),
             null,
             List.of(FormattedCharSequence.forward(I18n.get("research.reignofnether.lingering_potions"),
                     Style.EMPTY.withBold(true)
@@ -66,7 +64,7 @@ public class ResearchLingeringPotions extends ProductionItem {
         );
     }
 
-    public Button getCancelButton(ProductionBuilding prodBuilding, boolean first) {
+    public Button getCancelButton(ProductionPlacement prodBuilding, boolean first) {
         return new Button(ResearchLingeringPotions.itemName,
             14,
             new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/lingering_potion_regeneration.png"),
@@ -75,7 +73,7 @@ public class ResearchLingeringPotions extends ProductionItem {
             () -> false,
             () -> false,
             () -> true,
-            () -> BuildingServerboundPacket.cancelProduction(prodBuilding.minCorner, itemName, first),
+            () -> BuildingServerboundPacket.cancelProduction(prodBuilding.minCorner, ProductionItems.RESEARCH_LINGERING_POTIONS, first),
             null,
             null
         );

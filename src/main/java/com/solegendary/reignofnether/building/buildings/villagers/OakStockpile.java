@@ -1,10 +1,10 @@
 package com.solegendary.reignofnether.building.buildings.villagers;
 
 import com.solegendary.reignofnether.ReignOfNether;
-import com.solegendary.reignofnether.building.BuildingBlock;
-import com.solegendary.reignofnether.building.BuildingBlockData;
+import com.solegendary.reignofnether.api.ReignOfNetherRegistries;
 import com.solegendary.reignofnether.building.BuildingClientEvents;
-import com.solegendary.reignofnether.building.buildings.monsters.Mausoleum;
+import com.solegendary.reignofnether.building.BuildingPlacement;
+import com.solegendary.reignofnether.building.Buildings;
 import com.solegendary.reignofnether.building.buildings.shared.AbstractStockpile;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybinding;
@@ -16,19 +16,12 @@ import com.solegendary.reignofnether.tutorial.TutorialClientEvents;
 import com.solegendary.reignofnether.tutorial.TutorialStage;
 import com.solegendary.reignofnether.util.Faction;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.Rotation;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import static com.solegendary.reignofnether.building.BuildingUtils.getAbsoluteBlockData;
 
 public class OakStockpile extends AbstractStockpile {
 
@@ -37,29 +30,27 @@ public class OakStockpile extends AbstractStockpile {
     public final static ResourceCost cost = ResourceCosts.STOCKPILE;
     public ResourceName mostAbundantNearbyResource = ResourceName.NONE;
 
-    public OakStockpile(Level level, BlockPos originPos, Rotation rotation, String ownerName) {
-        super(buildingName, level, originPos, rotation, ownerName, getAbsoluteBlockData(getRelativeBlockData(level), level, originPos, rotation), false);
+    public OakStockpile() {
+        super(structureName);
 
         this.startingBlockTypes.add(Blocks.OAK_LOG);
     }
 
-    public static ArrayList<BuildingBlock> getRelativeBlockData(LevelAccessor level) {
-        return BuildingBlockData.getBuildingBlocks(structureName, level);
-    }
-
     public Faction getFaction() {return Faction.VILLAGERS;}
 
-    public static AbilityButton getBuildButton(Keybinding hotkey) {
+    public AbilityButton getBuildButton(Keybinding hotkey) {
+        ResourceLocation key = ReignOfNetherRegistries.BUILDING.getKey(this);
+        String name = I18n.get("buildings." + getFaction().name().toLowerCase() + "." + key.getNamespace() + "." + key.getPath());
         return new AbilityButton(
-                OakStockpile.buildingName,
+                name,
                 new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/blocks/chest.png"),
                 hotkey,
-                () -> BuildingClientEvents.getBuildingToPlace() == OakStockpile.class,
+                () -> BuildingClientEvents.getBuildingToPlace() == Buildings.OAK_STOCKPILE,
                 () -> !TutorialClientEvents.isAtOrPastStage(TutorialStage.EXPLAIN_BUILDINGS),
-                () -> BuildingClientEvents.hasFinishedBuilding(TownCentre.buildingName) ||
-                        BuildingClientEvents.hasFinishedBuilding(Mausoleum.buildingName) ||
+                () -> BuildingClientEvents.hasFinishedBuilding(Buildings.TOWN_CENTRE) ||
+                        BuildingClientEvents.hasFinishedBuilding(Buildings.MAUSOLEUM) ||
                         ResearchClient.hasCheat("modifythephasevariance"),
-                () -> BuildingClientEvents.setBuildingToPlace(OakStockpile.class),
+                () -> BuildingClientEvents.setBuildingToPlace(Buildings.OAK_STOCKPILE),
                 null,
                 List.of(
                         FormattedCharSequence.forward(I18n.get("buildings.villagers.reignofnether.oak_stockpile"), Style.EMPTY.withBold(true)),
@@ -67,7 +58,8 @@ public class OakStockpile extends AbstractStockpile {
                         FormattedCharSequence.forward("", Style.EMPTY),
                         FormattedCharSequence.forward(I18n.get("buildings.villagers.reignofnether.oak_stockpile.tooltip1"), Style.EMPTY)
                 ),
-                null
+                null,
+                (BuildingPlacement) null
         );
     }
 }

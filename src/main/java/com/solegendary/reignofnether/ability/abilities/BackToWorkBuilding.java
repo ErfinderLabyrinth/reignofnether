@@ -1,8 +1,7 @@
 package com.solegendary.reignofnether.ability.abilities;
 
-import org.joml.Vector3d;
 import com.solegendary.reignofnether.ability.Ability;
-import com.solegendary.reignofnether.building.Building;
+import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.buildings.villagers.TownCentre;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybinding;
@@ -10,13 +9,14 @@ import com.solegendary.reignofnether.unit.UnitAction;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.units.villagers.MilitiaUnit;
 import com.solegendary.reignofnether.unit.units.villagers.VillagerUnit;
+import com.solegendary.reignofnether.util.LanguageUtil;
 import com.solegendary.reignofnether.util.MiscUtil;
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.level.Level;
+import org.joml.Vector3d;
 
 import java.util.List;
 
@@ -26,10 +26,9 @@ public class BackToWorkBuilding extends Ability {
 
     private static final int RANGE = TownCentre.MILITIA_RANGE + 5;
 
-    public BackToWorkBuilding(Level level) {
+    public BackToWorkBuilding() {
         super(
                 UnitAction.BACK_TO_WORK_BUILDING,
-                level,
                 0,
                 RANGE,
                 0,
@@ -39,7 +38,7 @@ public class BackToWorkBuilding extends Ability {
     }
 
     @Override
-    public AbilityButton getButton(Keybinding hotkey) {
+    public AbilityButton getButton(Keybinding hotkey, BuildingPlacement placement) {
         return new AbilityButton(
                 "Back to Work (Building)",
                 new ResourceLocation("minecraft", "textures/item/iron_pickaxe.png"),
@@ -50,17 +49,18 @@ public class BackToWorkBuilding extends Ability {
                 () -> sendUnitCommand(UnitAction.BACK_TO_WORK_BUILDING),
                 null,
                 List.of(
-                        FormattedCharSequence.forward(I18n.get("abilities.reignofnether.back_to_work_building"), Style.EMPTY.withBold(true)),
+                        FormattedCharSequence.forward(LanguageUtil.getTranslation("abilities.reignofnether.back_to_work_building"), Style.EMPTY.withBold(true)),
                         FormattedCharSequence.forward("", Style.EMPTY),
-                        FormattedCharSequence.forward(I18n.get("abilities.reignofnether.back_to_work_building.tooltip1"), Style.EMPTY),
-                        FormattedCharSequence.forward(I18n.get("abilities.reignofnether.back_to_work_building.tooltip2"), Style.EMPTY)
+                        FormattedCharSequence.forward(LanguageUtil.getTranslation("abilities.reignofnether.back_to_work_building.tooltip1"), Style.EMPTY),
+                        FormattedCharSequence.forward(LanguageUtil.getTranslation("abilities.reignofnether.back_to_work_building.tooltip2"), Style.EMPTY)
                 ),
-                this
+                this,
+                placement
         );
     }
 
     @Override
-    public void use(Level level, Building buildingUsing, BlockPos targetBp) {
+    public void use(Level level, BuildingPlacement buildingUsing, BlockPos targetBp) {
         if (!level.isClientSide()) {
 
             List<VillagerUnit> nearbyVillagers = MiscUtil.getEntitiesWithinRange(

@@ -1,6 +1,6 @@
 package com.solegendary.reignofnether.unit;
 
-import com.solegendary.reignofnether.building.Building;
+import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.BuildingUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
@@ -13,7 +13,7 @@ public class Checkpoint {
 
     public final BlockPos bp;
     public final Entity entity;
-    public final Building building;
+    public final BuildingPlacement placement;
     public final boolean isGreen;
     private boolean isFading = false;
     public int ticksLeft = CHECKPOINT_TICKS_FADE;
@@ -22,14 +22,14 @@ public class Checkpoint {
         this.bp = bp;
         this.entity = null;
         this.isGreen = isGreen;
-        this.building = BuildingUtils.findBuilding(true, bp);
+        this.placement = BuildingUtils.findBuilding(true, bp);
     }
 
     public Checkpoint(Entity entity, boolean isGreen) {
         this.bp = null;
         this.entity = entity;
         this.isGreen = isGreen;
-        this.building = null;
+        this.placement = null;
     }
 
     public void startFading() {

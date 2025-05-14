@@ -1,16 +1,17 @@
 package com.solegendary.reignofnether.building.buildings.piglins;
 
 import com.solegendary.reignofnether.ReignOfNether;
-import com.solegendary.reignofnether.building.BuildingBlock;
-import com.solegendary.reignofnether.building.BuildingBlockData;
+import com.solegendary.reignofnether.api.ReignOfNetherRegistries;
 import com.solegendary.reignofnether.building.BuildingClientEvents;
-import com.solegendary.reignofnether.building.ProductionBuilding;
+import com.solegendary.reignofnether.building.BuildingPlacement;
+import com.solegendary.reignofnether.building.Buildings;
+import com.solegendary.reignofnether.building.buildings.placements.FlameSanctuaryPlacement;
+import com.solegendary.reignofnether.building.production.ProductionBuilding;
+import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.research.ResearchClient;
-import com.solegendary.reignofnether.research.researchItems.ResearchBlazeFirewall;
-import com.solegendary.reignofnether.research.researchItems.ResearchFireResistance;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.util.Faction;
@@ -19,17 +20,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Rotation;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.SpawnerBlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static com.solegendary.reignofnether.building.BuildingUtils.getAbsoluteBlockData;
@@ -40,52 +34,41 @@ public class FlameSanctuary extends ProductionBuilding {
     public final static String structureName = "flame_sanctuary";
     public final static ResourceCost cost = ResourceCosts.FLAME_SANCTUARY;
 
-    public FlameSanctuary(Level level, BlockPos originPos, Rotation rotation, String ownerName) {
-        super(level, originPos, rotation, ownerName, getAbsoluteBlockData(getRelativeBlockData(level), level, originPos, rotation), false);
+    public FlameSanctuary() {
+        super(structureName, cost, false);
         this.name = buildingName;
-        this.ownerName = ownerName;
         this.portraitBlock = Blocks.MAGMA_BLOCK;
         this.icon = new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/blocks/magma.png");
 
         this.canSetRallyPoint = false;
 
-        this.foodCost = cost.food;
-        this.woodCost = cost.wood;
-        this.oreCost = cost.ore;
-        this.popSupply = cost.population;
-
         this.startingBlockTypes.add(Blocks.RED_NETHER_BRICK_STAIRS);
 
         this.explodeChance = 0.2f;
 
-        updateButtons();
-    }
-
-    public void updateButtons() {
-        if (level.isClientSide()) {
-            this.productionButtons = Arrays.asList(
-                ResearchBlazeFirewall.getStartButton(this, Keybindings.keyQ),
-                ResearchFireResistance.getStartButton(this, Keybindings.keyW)
-            );
-        }
+        this.productions.add(ProductionItems.RESEARCH_BLAZE_FIREWALL, Keybindings.keyQ);
+        this.productions.add(ProductionItems.RESEARCH_FIRE_RESISTANCE, Keybindings.keyW);
     }
 
     public Faction getFaction() {return Faction.PIGLINS;}
 
-    public static ArrayList<BuildingBlock> getRelativeBlockData(LevelAccessor level) {
-        return BuildingBlockData.getBuildingBlocks(structureName, level);
+    @Override
+    public BuildingPlacement createBuildingPlacement(Level level, BlockPos pos, Rotation rotation, String ownerName) {
+        return new FlameSanctuaryPlacement(this, level, pos, rotation, ownerName, getAbsoluteBlockData(getRelativeBlockData(level), level, pos, rotation), false);
     }
 
-    public static AbilityButton getBuildButton(Keybinding hotkey) {
+    public AbilityButton getBuildButton(Keybinding hotkey) {
+        ResourceLocation key = ReignOfNetherRegistries.BUILDING.getKey(this);
+        String name = I18n.get("buildings." + getFaction().name().toLowerCase() + "." + key.getNamespace() + "." + key.getPath());
         return new AbilityButton(
-            FlameSanctuary.buildingName,
+            name,
             new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/blocks/magma.png"),
             hotkey,
-            () -> BuildingClientEvents.getBuildingToPlace() == FlameSanctuary.class,
+            () -> BuildingClientEvents.getBuildingToPlace() == Buildings.FLAME_SANCTUARY,
             () -> false,
-            () -> BuildingClientEvents.hasFinishedBuilding(HoglinStables.buildingName) ||
+            () -> BuildingClientEvents.hasFinishedBuilding(Buildings.HOGLIN_STABLES) ||
                     ResearchClient.hasCheat("modifythephasevariance"),
-            () -> BuildingClientEvents.setBuildingToPlace(FlameSanctuary.class),
+            () -> BuildingClientEvents.setBuildingToPlace(Buildings.FLAME_SANCTUARY),
             null,
             List.of(
                 FormattedCharSequence.forward(I18n.get("buildings.piglins.reignofnether.flame_sanctuary"), Style.EMPTY.withBold(true)),
@@ -96,18 +79,8 @@ public class FlameSanctuary extends ProductionBuilding {
                 FormattedCharSequence.forward("", Style.EMPTY),
                 FormattedCharSequence.forward(I18n.get("buildings.piglins.reignofnether.flame_sanctuary.tooltip3"), Style.EMPTY)
             ),
-            null
+            null,
+            (BuildingPlacement) null
         );
-    }
-
-    @Override
-    public void onBlockBuilt(BlockPos bp, BlockState bs) {
-        if (!this.getLevel().isClientSide()) {
-            if (bs.hasBlockEntity()) {
-                BlockEntity be = this.getLevel().getBlockEntity(bp);
-                if (be instanceof SpawnerBlockEntity sbe)
-                    sbe.getSpawner().setEntityId(EntityType.BLAZE, getLevel(), getLevel().random, bp);
-            }
-        }
     }
 }

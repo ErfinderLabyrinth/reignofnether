@@ -1,10 +1,15 @@
 package com.solegendary.reignofnether.building;
 
 import com.solegendary.reignofnether.ReignOfNether;
-import com.solegendary.reignofnether.building.buildings.piglins.Portal;
+import com.solegendary.reignofnether.api.ReignOfNetherRegistries;
+import com.solegendary.reignofnether.building.buildings.placements.PortalPlacement;
+import com.solegendary.reignofnether.building.buildings.placements.ProductionPlacement;
+import com.solegendary.reignofnether.building.production.ActiveProduction;
+import com.solegendary.reignofnether.building.production.ProductionItem;
 import com.solegendary.reignofnether.registrars.PacketHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
@@ -17,11 +22,12 @@ import java.util.function.Supplier;
 import static com.solegendary.reignofnether.building.BuildingUtils.findBuilding;
 
 public class BuildingClientboundPacket {
+    public static final ResourceLocation EMPTY = new ResourceLocation("", "");
 
     // pos is used to identify the building object serverside
     public BuildingAction action;
     public BlockPos buildingPos;
-    public String itemName;
+    public ResourceLocation itemKey;
     public Rotation rotation;
     public String ownerName;
     public int blocksPlaced; // for syncing out-of-view clientside buildings
@@ -29,25 +35,25 @@ public class BuildingClientboundPacket {
     public boolean isDiagonalBridge;
     public int upgradeLevel;
     public boolean isBuilt;
-    public Portal.PortalType portalType;
+    public PortalPlacement.PortalType portalType;
     public BlockPos portalDestination;
     public boolean forPlayerLoggingIn; // is this placement for someone logging in currently joined?
 
     public static void placeBuilding(
         BlockPos buildingPos,
-        String itemName,
+        Building building,
         Rotation rotation,
         String ownerName,
         int numQueuedBlocks,
         boolean isDiagonalBridge,
         int upgradeLevel,
         boolean isBuilt,
-        Portal.PortalType portalType,
+        PortalPlacement.PortalType portalType,
         BlockPos portalDestination,
         boolean forPlayerLoggingIn
     ) {
         PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(), new BuildingClientboundPacket(BuildingAction.PLACE,
-            itemName,
+            ReignOfNetherRegistries.BUILDING.getKey(building),
             buildingPos,
             rotation,
             ownerName,
@@ -65,7 +71,7 @@ public class BuildingClientboundPacket {
     public static void syncBuilding(BlockPos buildingPos, int blocksPlaced, String ownerName) {
         PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(),
             new BuildingClientboundPacket(BuildingAction.SYNC_BLOCKS_AND_OWNER,
-                "",
+                EMPTY,
                 buildingPos,
                 Rotation.NONE,
                 ownerName,
@@ -74,17 +80,17 @@ public class BuildingClientboundPacket {
                 false,
                 0,
                 false,
-                Portal.PortalType.BASIC,
+                PortalPlacement.PortalType.BASIC,
                 new BlockPos(0,0,0),
                 false
             )
         );
     }
 
-    public static void startProduction(BlockPos buildingPos, String itemName) {
+    public static void startProduction(BlockPos buildingPos, ProductionItem item) {
         PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(),
             new BuildingClientboundPacket(BuildingAction.START_PRODUCTION,
-                itemName,
+                ReignOfNetherRegistries.PRODUCTION_ITEM.getKey(item),
                 buildingPos,
                 Rotation.NONE,
                 "",
@@ -93,19 +99,19 @@ public class BuildingClientboundPacket {
                 false,
                 0,
                 false,
-                Portal.PortalType.BASIC,
+                PortalPlacement.PortalType.BASIC,
                 new BlockPos(0,0,0),
                 false
             )
         );
     }
 
-    public static void cancelProduction(BlockPos buildingPos, String itemName, boolean frontItem) {
+    public static void cancelProduction(BlockPos buildingPos, ProductionItem item, boolean frontItem) {
         PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(),
             new BuildingClientboundPacket(frontItem
                                           ? BuildingAction.CANCEL_PRODUCTION
                                           : BuildingAction.CANCEL_BACK_PRODUCTION,
-                itemName,
+                ReignOfNetherRegistries.PRODUCTION_ITEM.getKey(item),
                 buildingPos,
                 Rotation.NONE,
                 "",
@@ -114,17 +120,17 @@ public class BuildingClientboundPacket {
                 false,
                 0,
                 false,
-                Portal.PortalType.BASIC,
+                PortalPlacement.PortalType.BASIC,
                 new BlockPos(0,0,0),
                 false
             )
         );
     }
 
-    public static void changePortal(BlockPos buildingPos, String portalType) {
+    public static void changePortal(BlockPos buildingPos, PortalPlacement.PortalType type) {
         PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(),
             new BuildingClientboundPacket(BuildingAction.CHANGE_PORTAL,
-                portalType,
+                EMPTY,
                 buildingPos,
                 Rotation.NONE,
                 "",
@@ -133,7 +139,7 @@ public class BuildingClientboundPacket {
                 false,
                 0,
                 false,
-                Portal.PortalType.BASIC,
+                type,
                 new BlockPos(0,0,0),
                 false
             )
@@ -143,7 +149,7 @@ public class BuildingClientboundPacket {
     public static void clearQueue(BlockPos buildingPos) {
         PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(),
                 new BuildingClientboundPacket(BuildingAction.CLEAR_PRODUCTION,
-                        "",
+                        EMPTY,
                         buildingPos,
                         Rotation.NONE,
                         "",
@@ -152,7 +158,7 @@ public class BuildingClientboundPacket {
                         false,
                         0,
                         false,
-                        Portal.PortalType.BASIC,
+                        PortalPlacement.PortalType.BASIC,
                         new BlockPos(0,0,0),
                         false
                 )
@@ -162,7 +168,7 @@ public class BuildingClientboundPacket {
     public static void completeProduction(BlockPos buildingPos) {
         PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(),
                 new BuildingClientboundPacket(BuildingAction.COMPLETE_PRODUCTION,
-                        "",
+                        EMPTY,
                         buildingPos,
                         Rotation.NONE,
                         "",
@@ -171,7 +177,7 @@ public class BuildingClientboundPacket {
                         false,
                         0,
                         false,
-                        Portal.PortalType.BASIC,
+                        PortalPlacement.PortalType.BASIC,
                         new BlockPos(0,0,0),
                         false
                 )
@@ -180,7 +186,7 @@ public class BuildingClientboundPacket {
 
     public BuildingClientboundPacket(
         BuildingAction action,
-        String itemName,
+        ResourceLocation itemKey,
         BlockPos buildingPos,
         Rotation rotation,
         String ownerName,
@@ -189,12 +195,12 @@ public class BuildingClientboundPacket {
         boolean isDiagonalBridge,
         int upgradeLevel,
         boolean isBuilt,
-        Portal.PortalType portalType,
+        PortalPlacement.PortalType portalType,
         BlockPos portalDestination,
         boolean forPlayerLoggingIn
     ) {
         this.action = action;
-        this.itemName = itemName;
+        this.itemKey = itemKey;
         this.buildingPos = buildingPos;
         this.rotation = rotation;
         this.ownerName = ownerName;
@@ -210,7 +216,7 @@ public class BuildingClientboundPacket {
 
     public BuildingClientboundPacket(FriendlyByteBuf buffer) {
         this.action = buffer.readEnum(BuildingAction.class);
-        this.itemName = buffer.readUtf();
+        this.itemKey = buffer.readResourceLocation();
         this.buildingPos = buffer.readBlockPos();
         this.rotation = buffer.readEnum(Rotation.class);
         this.ownerName = buffer.readUtf();
@@ -219,14 +225,14 @@ public class BuildingClientboundPacket {
         this.isDiagonalBridge = buffer.readBoolean();
         this.isBuilt = buffer.readBoolean();
         this.upgradeLevel = buffer.readInt();
-        this.portalType = buffer.readEnum(Portal.PortalType.class);
+        this.portalType = buffer.readEnum(PortalPlacement.PortalType.class);
         this.portalDestination = buffer.readBlockPos();
         this.forPlayerLoggingIn = buffer.readBoolean();
     }
 
     public void encode(FriendlyByteBuf buffer) {
         buffer.writeEnum(this.action);
-        buffer.writeUtf(this.itemName);
+        buffer.writeResourceLocation(this.itemKey);
         buffer.writeBlockPos(this.buildingPos);
         buffer.writeEnum(this.rotation);
         buffer.writeUtf(this.ownerName);
@@ -246,7 +252,7 @@ public class BuildingClientboundPacket {
 
         ctx.get().enqueueWork(() -> {
             DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-                Building building = null;
+                BuildingPlacement building = null;
                 if (this.action != BuildingAction.PLACE) {
                     building = findBuilding(true, this.buildingPos);
                     if (building == null) {
@@ -260,7 +266,8 @@ public class BuildingClientboundPacket {
                     }
                 }
                 switch (action) {
-                    case PLACE -> BuildingClientEvents.placeBuilding(this.itemName,
+                    case PLACE -> BuildingClientEvents.placeBuilding(
+                        ReignOfNetherRegistries.BUILDING.get(this.itemKey),
                         this.buildingPos,
                         this.rotation,
                         this.ownerName,
@@ -274,52 +281,49 @@ public class BuildingClientboundPacket {
                     );
                     case SYNC_BLOCKS_AND_OWNER -> BuildingClientEvents.syncBuilding(building, this.blocksPlaced, this.ownerName);
                     case START_PRODUCTION -> {
-                        ProductionBuilding.startProductionItem(
-                            (ProductionBuilding) building,
-                            this.itemName,
+                        ((ProductionPlacement) building).startProductionItem(
+                            ReignOfNetherRegistries.PRODUCTION_ITEM.get(itemKey),
                             this.buildingPos
                         );
                     }
                     case CANCEL_PRODUCTION -> {
-                        ProductionBuilding.cancelProductionItem(
-                            (ProductionBuilding) building,
-                            this.itemName,
+                        ((ProductionPlacement) building).cancelProductionItem(
+                                ReignOfNetherRegistries.PRODUCTION_ITEM.get(itemKey),
                             this.buildingPos,
                             true
                         );
                     }
                     case CANCEL_BACK_PRODUCTION -> {
-                        ProductionBuilding.cancelProductionItem(
-                            (ProductionBuilding) building,
-                            this.itemName,
+                        ((ProductionPlacement) building).cancelProductionItem(
+                                ReignOfNetherRegistries.PRODUCTION_ITEM.get(itemKey),
                             this.buildingPos,
                             false
                         );
                     }
                     case CHANGE_PORTAL -> {
-                        if (building instanceof Portal portal) {
-                            portal.changeStructure(Portal.PortalType.valueOf(itemName));
+                        if (building instanceof PortalPlacement portal) {
+                            portal.changeStructure(portalType);
                         }
                     }
                     case CLEAR_PRODUCTION -> {
-                        if (building instanceof ProductionBuilding pBuilding) {
+                        if (building instanceof ProductionPlacement pBuilding) {
                             if (!pBuilding.productionQueue.isEmpty()) {
-                                ProductionItem pItem = pBuilding.productionQueue.get(0);
+                                ActiveProduction pItem = pBuilding.productionQueue.get(0);
                                 if (!pItem.completed) {
                                     pItem.completed = true;
-                                    pItem.onComplete.accept(pBuilding.level);
+                                    pItem.item.onComplete.accept(pBuilding.level, pBuilding);
                                 }
                                 pBuilding.productionQueue.clear();
                             }
                         }
                     }
                     case COMPLETE_PRODUCTION -> {
-                        if (building instanceof ProductionBuilding pBuilding) {
+                        if (building instanceof ProductionPlacement pBuilding) {
                             if (!pBuilding.productionQueue.isEmpty()) {
-                                ProductionItem pItem = pBuilding.productionQueue.get(0);
+                                ActiveProduction pItem = pBuilding.productionQueue.get(0);
                                 if (!pItem.completed) {
                                     pItem.completed = true;
-                                    pItem.onComplete.accept(pBuilding.level);
+                                    pItem.item.onComplete.accept(pBuilding.level, pBuilding);
                                 }
                                 pBuilding.productionQueue.remove(pItem);
                             }

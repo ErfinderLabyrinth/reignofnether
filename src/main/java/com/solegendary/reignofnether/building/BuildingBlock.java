@@ -1,6 +1,6 @@
 package com.solegendary.reignofnether.building;
 
-import com.solegendary.reignofnether.building.buildings.monsters.SculkCatalyst;
+import com.solegendary.reignofnether.building.buildings.placements.SculkCatalystPlacement;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
@@ -17,7 +17,7 @@ public class BuildingBlock {
     private BlockPos blockPos;
     private BlockState blockState; // ideal blockstate when placed, not actual world state
 
-    private List<Predicate<BlockState>> materialsThatIgnoreState = List.of((s)-> SculkCatalyst.isSculk(s.getBlock()), (s)->s.is(Tags.Blocks.GLASS),(s)->s.is(BlockTags.LEAVES));
+    private List<Predicate<BlockState>> materialsThatIgnoreState = List.of((s)-> SculkCatalystPlacement.isSculk(s.getBlock()), (s)->s.is(Tags.Blocks.GLASS),(s)->s.is(BlockTags.LEAVES));
 
     private boolean isIgnored(BlockState state){
         for(Predicate<BlockState> predicate : materialsThatIgnoreState){

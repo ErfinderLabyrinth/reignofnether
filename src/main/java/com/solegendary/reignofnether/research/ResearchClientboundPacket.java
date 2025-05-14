@@ -3,6 +3,7 @@ package com.solegendary.reignofnether.research;
 import com.solegendary.reignofnether.registrars.PacketHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent;
@@ -77,7 +78,7 @@ public class ResearchClientboundPacket {
                                     ResearchClient.removeCheat(this.itemName);
                             } else {
                                 if (add)
-                                    ResearchClient.addResearch(this.playerName, this.itemName);
+                                    ResearchClient.addResearch(this.playerName, ResourceLocation.tryParse(this.itemName));
                             }
                         }
                         success.set(true);

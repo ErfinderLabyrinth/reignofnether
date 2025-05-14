@@ -1,10 +1,9 @@
 package com.solegendary.reignofnether.survival.spawners;
 
+import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.player.PlayerServerEvents;
 import com.solegendary.reignofnether.registrars.EntityRegistrar;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
-import com.solegendary.reignofnether.research.researchItems.ResearchCubeMagma;
-import com.solegendary.reignofnether.research.researchItems.ResearchSpiderWebs;
 import com.solegendary.reignofnether.survival.Wave;
 import com.solegendary.reignofnether.unit.UnitServerEvents;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
@@ -97,10 +96,10 @@ public class MonsterWaveSpawner {
     }
 
     public static void checkAndApplyUpgrades(int tier) {
-        if (tier >= 4 && !ResearchServerEvents.playerHasResearch(ENEMY_OWNER_NAME, ResearchSpiderWebs.itemName))
-            ResearchServerEvents.addResearch(ENEMY_OWNER_NAME, ResearchSpiderWebs.itemName);
-        if (tier >= 6 && !ResearchServerEvents.playerHasResearch(ENEMY_OWNER_NAME, ResearchCubeMagma.itemName))
-            ResearchServerEvents.addResearch(ENEMY_OWNER_NAME, ResearchCubeMagma.itemName);
+        if (tier >= 4 && !ResearchServerEvents.playerHasResearch(ENEMY_OWNER_NAME, ProductionItems.RESEARCH_SPIDER_WEBS))
+            ResearchServerEvents.addResearch(ENEMY_OWNER_NAME, ProductionItems.RESEARCH_SPIDER_WEBS);
+        if (tier >= 6 && !ResearchServerEvents.playerHasResearch(ENEMY_OWNER_NAME, ProductionItems.RESEARCH_CUBE_MAGMA))
+            ResearchServerEvents.addResearch(ENEMY_OWNER_NAME, ProductionItems.RESEARCH_CUBE_MAGMA);
     }
 
     public static void checkAndApplyArmour(LivingEntity entity, int tier) {

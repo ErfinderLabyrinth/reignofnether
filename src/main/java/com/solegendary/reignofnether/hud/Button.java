@@ -2,7 +2,7 @@ package com.solegendary.reignofnether.hud;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.solegendary.reignofnether.ReignOfNether;
-import com.solegendary.reignofnether.building.Building;
+import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.healthbars.HealthBarClientEvents;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
@@ -44,7 +44,7 @@ public class Button {
 
     public Keybinding hotkey = null; // for action/ability buttons
     public LivingEntity entity = null; // for selected unit buttons
-    public Building building = null; // for selected building buttons
+    public BuildingPlacement building = null; // for selected building buttons
 
     /** https://stackoverflow.com/questions/29945627/java-8-lambda-void-argument
      * Supplier       ()    -> x
@@ -125,7 +125,7 @@ public class Button {
     }
 
     // constructor for building selection buttons
-    public Button(String name, int iconSize, ResourceLocation iconRl, Building building, Supplier<Boolean> isSelected,
+    public Button(String name, int iconSize, ResourceLocation iconRl, BuildingPlacement building, Supplier<Boolean> isSelected,
                   Supplier<Boolean> isHidden, Supplier<Boolean> isEnabled, @Nullable Runnable onLeftClick,
                   @Nullable Runnable onRightClick, @Nullable List<FormattedCharSequence> tooltipLines) {
         this.name = name;

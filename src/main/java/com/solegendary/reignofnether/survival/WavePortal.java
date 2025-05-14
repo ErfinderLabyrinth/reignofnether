@@ -1,7 +1,6 @@
 package com.solegendary.reignofnether.survival;
 
-import com.solegendary.reignofnether.building.buildings.piglins.Portal;
-import com.solegendary.reignofnether.player.PlayerServerEvents;
+import com.solegendary.reignofnether.building.buildings.placements.PortalPlacement;
 import com.solegendary.reignofnether.registrars.EntityRegistrar;
 import com.solegendary.reignofnether.survival.spawners.PiglinWaveSpawner;
 import com.solegendary.reignofnether.unit.UnitServerEvents;
@@ -29,22 +28,20 @@ public class WavePortal {
     private static final int SPAWN_TICKS_MAX = 600;
     private static int spawnTicks = 0;
 
-    public final Portal portal;
+    public final PortalPlacement portal;
     public final Wave wave;
     private int initialSpawnPop;
-    private int numPlayers;
 
     private BlockPos lastOnPos;
 
-    public WavePortal(Portal portal, Wave wave) {
+    public WavePortal(PortalPlacement portal, Wave wave) {
         this.portal = portal;
         this.portal.selfBuilding = true;
         this.wave = wave;
-        this.numPlayers = PlayerServerEvents.rtsPlayers.size();
-        this.initialSpawnPop = ((wave.population / wave.getNumPortals()) / 2) * numPlayers;
+        this.initialSpawnPop = (wave.population / wave.getNumPortals()) / 2;
     }
 
-    public Portal getPortal() {
+    public PortalPlacement getPortal() {
         return portal;
     }
 
@@ -63,7 +60,7 @@ public class WavePortal {
                 spawnTicks = 0;
                 doSpawn();
             } else {
-                spawnTicks += ticksToAdd * numPlayers;
+                spawnTicks += ticksToAdd;
             }
         }
     }

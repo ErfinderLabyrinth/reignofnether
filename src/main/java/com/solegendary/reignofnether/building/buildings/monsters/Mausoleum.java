@@ -1,60 +1,48 @@
 package com.solegendary.reignofnether.building.buildings.monsters;
 
-import com.solegendary.reignofnether.building.*;
+import com.solegendary.reignofnether.api.ReignOfNetherRegistries;
+import com.solegendary.reignofnether.building.BuildingClientEvents;
+import com.solegendary.reignofnether.building.BuildingPlacement;
+import com.solegendary.reignofnether.building.Buildings;
+import com.solegendary.reignofnether.building.buildings.placements.DarknessProductionBuilding;
+import com.solegendary.reignofnether.building.production.ProductionBuilding;
+import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.resources.ResourceCost;
-import com.solegendary.reignofnether.time.TimeClientEvents;
-import com.solegendary.reignofnether.unit.units.monsters.ZombieVillagerProd;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.util.Faction;
-import com.solegendary.reignofnether.util.MiscUtil;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Rotation;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import static com.solegendary.reignofnether.building.BuildingUtils.getAbsoluteBlockData;
 
-public class Mausoleum extends ProductionBuilding implements NightSource, RangeIndicator {
+public class Mausoleum extends ProductionBuilding {
 
     public final static String buildingName = "Mausoleum";
     public final static String structureName = "mausoleum";
     public final static ResourceCost cost = ResourceCosts.MAUSOLEUM;
-    public final static int nightRange = 70;
+    public final static int nightRange = 80;
 
     private final Set<BlockPos> nightBorderBps = new HashSet<>();
 
-    public Mausoleum(Level level, BlockPos originPos, Rotation rotation, String ownerName) {
-        super(
-            level,
-            originPos,
-            rotation,
-            ownerName,
-            getAbsoluteBlockData(getRelativeBlockData(level), level, originPos, rotation),
-            true
-        );
+    public Mausoleum() {
+        super(structureName, cost, true);
         this.name = buildingName;
-        this.ownerName = ownerName;
-        this.blocks = getAbsoluteBlockData(getRelativeBlockData(level), level, originPos, rotation);
         this.portraitBlock = Blocks.DEEPSLATE_TILES;
         this.icon = new ResourceLocation("minecraft", "textures/block/deepslate_tiles.png");
 
-        this.foodCost = cost.food;
-        this.woodCost = cost.wood;
-        this.oreCost = cost.ore;
-        this.popSupply = cost.population;
         this.buildTimeModifier = 0.274f; // 100s total build time with 1 villager
         this.canAcceptResources = true;
 
@@ -63,62 +51,28 @@ public class Mausoleum extends ProductionBuilding implements NightSource, RangeI
         this.startingBlockTypes.add(Blocks.STONE_BRICKS);
         this.startingBlockTypes.add(Blocks.STONE_BRICK_STAIRS);
 
-        updateButtons();
-        updateBorderBps();
-    }
-
-    public void updateButtons() {
-        if (level.isClientSide()) {
-            this.productionButtons = List.of(ZombieVillagerProd.getStartButton(this, Keybindings.keyQ));
-        }
-    }
-
-    public int getNightRange() {
-        return (isBuilt || isBuiltServerside) ? nightRange : 0;
-    }
-
-    @Override
-    public void updateBorderBps() {
-        if (!level.isClientSide())
-            return;
-        this.nightBorderBps.clear();
-        this.nightBorderBps.addAll(MiscUtil.getRangeIndicatorCircleBlocks(centrePos,
-                getNightRange() - TimeClientEvents.VISIBLE_BORDER_ADJ, level));
-    }
-
-    @Override
-    public Set<BlockPos> getBorderBps() {
-        return nightBorderBps;
-    }
-
-    @Override
-    public boolean showOnlyWhenSelected() {
-        return false;
-    }
-
-    @Override
-    public void tick(Level tickLevel) {
-        super.tick(tickLevel);
-        if (tickLevel.isClientSide && tickAgeAfterBuilt > 0 && tickAgeAfterBuilt % 100 == 0)
-            updateBorderBps();
+        this.productions.add(ProductionItems.ZOMBIE_VILLAGER, Keybindings.keyQ);
     }
 
     public Faction getFaction() {
         return Faction.MONSTERS;
     }
 
-    public static ArrayList<BuildingBlock> getRelativeBlockData(LevelAccessor level) {
-        return BuildingBlockData.getBuildingBlocks(structureName, level);
+    @Override
+    public BuildingPlacement createBuildingPlacement(Level level, BlockPos pos, Rotation rotation, String ownerName) {
+        return new DarknessProductionBuilding(this, level, pos, rotation, ownerName, getAbsoluteBlockData(getRelativeBlockData(level), level, pos, rotation), true, nightRange,false, true);
     }
 
-    public static AbilityButton getBuildButton(Keybinding hotkey) {
-        return new AbilityButton(Mausoleum.buildingName,
+    public AbilityButton getBuildButton(Keybinding hotkey) {
+        ResourceLocation key = ReignOfNetherRegistries.BUILDING.getKey(this);
+        String name = I18n.get("buildings." + getFaction().name().toLowerCase() + "." + key.getNamespace() + "." + key.getPath());
+        return new AbilityButton(name,
             new ResourceLocation("minecraft", "textures/block/deepslate_tiles.png"),
             hotkey,
-            () -> BuildingClientEvents.getBuildingToPlace() == Mausoleum.class,
+            () -> BuildingClientEvents.getBuildingToPlace() == Buildings.MAUSOLEUM,
             () -> false,
             () -> true,
-            () -> BuildingClientEvents.setBuildingToPlace(Mausoleum.class),
+            () -> BuildingClientEvents.setBuildingToPlace(Buildings.MAUSOLEUM),
             null,
             List.of(FormattedCharSequence.forward(
                     I18n.get("buildings.monsters.reignofnether.mausoleum"),
@@ -138,7 +92,8 @@ public class Mausoleum extends ProductionBuilding implements NightSource, RangeI
                 ), Style.EMPTY),
                 FormattedCharSequence.forward("", Style.EMPTY)
             ),
-            null
+            null,
+                (BuildingPlacement) null
         );
     }
 }

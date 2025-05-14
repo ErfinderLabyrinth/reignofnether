@@ -1,7 +1,7 @@
 package com.solegendary.reignofnether.player;
 
-import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingClientEvents;
+import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientEvents;
 import com.solegendary.reignofnether.gamemode.ClientGameModeHelper;
 import com.solegendary.reignofnether.gamerules.GameruleClient;
@@ -139,7 +139,7 @@ public class PlayerClientEvents {
         }
 
         // remove control of this player's buildings for all players' clients
-        for (Building building : BuildingClientEvents.getBuildings())
+        for (BuildingPlacement building : BuildingClientEvents.getBuildings())
             if (building.ownerName.equals(playerName))
                 building.ownerName = "";
 
@@ -270,8 +270,8 @@ public class PlayerClientEvents {
         ResearchClient.removeAllCheats();
         BuildingClientEvents.getSelectedBuildings().clear();
         if (!isSandbox)
-            BuildingClientEvents.getBuildings().removeIf(b -> b.shouldDestroyOnReset || hardReset);
-        for (Building building : BuildingClientEvents.getBuildings())
+            BuildingClientEvents.getBuildings().removeIf(b -> b.getBuilding().shouldDestroyOnReset || hardReset);
+        for (BuildingPlacement building : BuildingClientEvents.getBuildings())
             building.ownerName = "";
         ResourcesClientEvents.resourcesList.clear();
         ClientGameModeHelper.gameMode = ClientGameModeHelper.DEFAULT_GAMEMODE;

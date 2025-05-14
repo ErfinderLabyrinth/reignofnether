@@ -1,5 +1,6 @@
 package com.solegendary.reignofnether.unit.units.villagers;
 
+import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.PromoteIllager;
 import com.solegendary.reignofnether.ability.heroAbilities.villager.Avatar;
@@ -7,6 +8,7 @@ import com.solegendary.reignofnether.ability.heroAbilities.villager.BattleRagePa
 import com.solegendary.reignofnether.ability.heroAbilities.villager.MaceSlam;
 import com.solegendary.reignofnether.ability.heroAbilities.villager.TauntingCry;
 import com.solegendary.reignofnether.hud.AbilityButton;
+import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.unit.Checkpoint;
@@ -18,6 +20,7 @@ import com.solegendary.reignofnether.unit.interfaces.KeyframeAnimated;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.modelling.animations.RoyalGuardAnimations;
 import com.solegendary.reignofnether.util.Faction;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import net.minecraft.client.animation.AnimationDefinition;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -41,6 +44,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RoyalGuardUnit extends Vindicator implements Unit, AttackerUnit, HeroUnit, KeyframeAnimated {
+    public static final Abilities ABILITIES = new Abilities();
+    static {
+        ABILITIES.add(new MaceSlam());
+        ABILITIES.add(new TauntingCry());
+        ABILITIES.add(new BattleRagePassive());
+        ABILITIES.add(new Avatar());
+    }
+
+    Object2ObjectArrayMap<Ability, Float> cooldowns = Unit.createCooldownMap();
+    Object2ObjectArrayMap<Ability, Integer> charges = new Object2ObjectArrayMap<>();
+
+    Ability autocast;
+
     // region
     private BlockPos anchorPos = new BlockPos(0,0,0);
     public void setAnchor(BlockPos bp) { anchorPos = bp; }
@@ -153,8 +169,8 @@ public class RoyalGuardUnit extends Vindicator implements Unit, AttackerUnit, He
     @Override public float getBaseHealth() { return maxHealth; };
     @Override public float getBaseAttack() { return attackDamage; };
 
-    private final List<AbilityButton> abilityButtons = new ArrayList<>();
-    private final List<Ability> abilities = new ArrayList<>();
+    private List<AbilityButton> abilityButtons = new ArrayList<>();
+    private List<Ability> abilities = new ArrayList<>();
     private final List<ItemStack> items = new ArrayList<>();
 
     public final AnimationState idleAnimState = new AnimationState();
@@ -207,10 +223,7 @@ public class RoyalGuardUnit extends Vindicator implements Unit, AttackerUnit, He
 
     public RoyalGuardUnit(EntityType<? extends Vindicator> entityType, Level level) {
         super(entityType, level);
-        this.abilities.add(new MaceSlam(this));
-        this.abilities.add(new TauntingCry(this));
-        this.abilities.add(new BattleRagePassive(this));
-        this.abilities.add(new Avatar(this));
+
         updateAbilityButtons();
         setStatsForLevel();
     }
@@ -298,5 +311,32 @@ public class RoyalGuardUnit extends Vindicator implements Unit, AttackerUnit, He
 
     public void avatar() {
 
+    }
+
+    @Override
+    public void updateAbilityButtons() {
+        abilities = ABILITIES.get();
+        abilityButtons = ABILITIES.getButtons(this);
+        autocast = ABILITIES.getDefaultAutocast();
+    }
+
+    @Override
+    public Object2ObjectArrayMap<Ability, Float> getCooldowns() {
+        return cooldowns;
+    }
+
+    @Override
+    public boolean hasAutocast(Ability ability) {
+        return autocast == ability;
+    }
+
+    @Override
+    public void setAutocast(Ability autocast) {
+        this.autocast = autocast;
+    }
+
+    @Override
+    public Object2ObjectArrayMap<Ability, Integer> getCharges() {
+        return charges;
     }
 }

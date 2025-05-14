@@ -1,8 +1,8 @@
 package com.solegendary.reignofnether.fogofwar;
 
 import com.solegendary.reignofnether.alliance.AlliancesClient;
-import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingClientEvents;
+import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.BuildingUtils;
 import com.solegendary.reignofnether.building.GarrisonableBuilding;
 import com.solegendary.reignofnether.keybinds.Keybindings;
@@ -127,7 +127,7 @@ public class FogOfWarClientEvents {
 
             if (enabled) {
                 updateFogChunks();
-                for (Building building : BuildingClientEvents.getBuildings())
+                for (BuildingPlacement building : BuildingClientEvents.getBuildings())
                     building.freezeChunks(MC.player.getName().getString(), false);
             } else {
                 for (FrozenChunk frozenChunk : frozenChunks)
@@ -200,7 +200,7 @@ public class FogOfWarClientEvents {
             return BRIGHT;
     }
 
-    public static boolean isBuildingInBrightChunk(Building building) {
+    public static boolean isBuildingInBrightChunk(BuildingPlacement building) {
         if (!isEnabled())
             return true;
 
@@ -258,7 +258,7 @@ public class FogOfWarClientEvents {
             if (UnitClientEvents.getPlayerToEntityRelationship(entity) != Relationship.OWNED)
                 enemyOccupiedChunks.add(new ChunkPos(entity.getOnPos()));
 
-        for (Building building : BuildingClientEvents.getBuildings())
+        for (BuildingPlacement building : BuildingClientEvents.getBuildings())
             if (BuildingClientEvents.getPlayerToBuildingRelationship(building) != Relationship.OWNED &&
                     !isPlayerRevealed(building.ownerName) && MC.level != null)
                 enemyOccupiedChunks.addAll(building.getRenderChunkOrigins(true)
@@ -285,7 +285,7 @@ public class FogOfWarClientEvents {
                 }
             }
         }
-        for (Building building : BuildingClientEvents.getBuildings()) {
+        for (BuildingPlacement building : BuildingClientEvents.getBuildings()) {
             if (BuildingClientEvents.getPlayerToBuildingRelationship(building) == Relationship.OWNED ||
                     isPlayerRevealed(building.ownerName)) {
                 if ((building instanceof GarrisonableBuilding && GarrisonableBuilding.getNumOccupants(building) > 0 && building.isBuilt) ||
@@ -393,7 +393,7 @@ public class FogOfWarClientEvents {
             if (MC.level.getChunk(frozenChunk.origin).getPos().equals(cpos))
                 frozenChunk.unloadBlocks();
 
-        for (Building building : BuildingClientEvents.getBuildings()) {
+        for (BuildingPlacement building : BuildingClientEvents.getBuildings()) {
             if (building.isExploredClientside)
                 continue;
             for (BlockPos bp : building.getRenderChunkOrigins(false))
@@ -428,13 +428,13 @@ public class FogOfWarClientEvents {
     }
 
     public static void setBuildingDestroyedServerside(BlockPos buildingOrigin) {
-        for (Building building : BuildingClientEvents.getBuildings())
+        for (BuildingPlacement building : BuildingClientEvents.getBuildings())
             if (building.originPos.equals(buildingOrigin))
                 building.isDestroyedServerside = true;
     }
 
     public static void setBuildingBuiltServerside(BlockPos buildingOrigin) {
-        for (Building building : BuildingClientEvents.getBuildings())
+        for (BuildingPlacement building : BuildingClientEvents.getBuildings())
             if (building.originPos.equals(buildingOrigin))
                 building.isBuiltServerside = true;
     }

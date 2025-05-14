@@ -1,7 +1,7 @@
 package com.solegendary.reignofnether.mixin;
 
 import com.google.common.collect.Lists;
-import com.solegendary.reignofnether.building.Building;
+import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.GarrisonableBuilding;
 import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
@@ -48,7 +48,7 @@ public abstract class AbstractArrowMixin extends Projectile {
     @Shadow public abstract boolean isNoPhysics();
     @Shadow private int life;
 
-    private boolean isInsideTopOfBuilding(Building building) {
+    private boolean isInsideTopOfBuilding(BuildingPlacement building) {
         BlockPos bp = this.blockPosition();
         boolean isPosInsideBuildingExt =
                 bp.getX() <= building.maxCorner.getX() + 1 && bp.getX() >= building.minCorner.getX() - 1 &&
@@ -69,7 +69,7 @@ public abstract class AbstractArrowMixin extends Projectile {
     public void isNoPhysics(CallbackInfoReturnable<Boolean> cir) {
         if (this.getOwner() instanceof AttackerUnit aUnit) {
             // garrisoned unit -> ground
-            if (GarrisonableBuilding.getGarrison((Unit) aUnit) instanceof Building building &&
+            if (GarrisonableBuilding.getGarrison((Unit) aUnit) instanceof BuildingPlacement building &&
                 isInsideTopOfBuilding(building)) {
                 cir.setReturnValue(true);
             }

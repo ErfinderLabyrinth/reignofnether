@@ -1,9 +1,10 @@
 package com.solegendary.reignofnether.unit.goals;
 
-import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.AbilityClientboundPacket;
+import com.solegendary.reignofnether.ability.abilities.CastSummonVexes;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.unit.UnitAnimationAction;
+import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.packets.UnitAnimationClientboundPacket;
 import com.solegendary.reignofnether.unit.units.villagers.EvokerUnit;
 import net.minecraft.world.entity.LivingEntity;
@@ -12,7 +13,7 @@ import net.minecraft.world.entity.ai.goal.Goal;
 public class CastSummonVexesGoal extends Goal {
 
     private final LivingEntity mob;
-    private Ability ability; // used for syncing cooldown with clientside
+    private CastSummonVexes ability; // used for syncing cooldown with clientside
     private int ticksCasting = 0; // how long have we spent trying to cast this spell
     public boolean isCasting() { return isCasting; }
     public final static int TICKS_CASTING_MAX = 4 * ResourceCost.TICKS_PER_SECOND; // max time required to cast a spell
@@ -22,7 +23,7 @@ public class CastSummonVexesGoal extends Goal {
         this.mob = mob;
     }
 
-    public void setAbility(Ability ability) {
+    public void setAbility(CastSummonVexes ability) {
         this.ability = ability;
     }
 
@@ -37,8 +38,8 @@ public class CastSummonVexesGoal extends Goal {
                 if (this.ability != null && !this.mob.level().isClientSide()) {
                     if (!this.mob.level().isClientSide())
                         AbilityClientboundPacket.sendSetCooldownPacket(this.mob.getId(), this.ability.action, this.ability.cooldownMax);
-                    else
-                        this.ability.setToMaxCooldown();
+                    else if (mob instanceof Unit unit)
+                        this.ability.setToMaxCooldown(unit);
                 }
                 this.stop();
             }

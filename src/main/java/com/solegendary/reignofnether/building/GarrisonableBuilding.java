@@ -27,7 +27,7 @@ public interface GarrisonableBuilding {
 
     // will only return actual Units, not any other LivingEntity
     public default List<LivingEntity> getOccupants() {
-        if (this instanceof Building building) {
+        if (this instanceof BuildingPlacement building) {
             if (building.level.isClientSide())
                 return UnitClientEvents.getAllUnits().stream()
                         .filter(le -> le instanceof Unit u &&
@@ -43,13 +43,13 @@ public interface GarrisonableBuilding {
     }
 
     static GarrisonableBuilding getGarrison(Unit unit) {
-        List<Building> buildings;
+        List<BuildingPlacement> buildings;
         if (((Entity) unit).level().isClientSide())
             buildings = BuildingClientEvents.getBuildings();
         else
             buildings = BuildingServerEvents.getBuildings();
 
-        for (Building building : buildings) {
+        for (BuildingPlacement building : buildings) {
 
             boolean isAllied;
             if (((Entity) unit).level().isClientSide())
@@ -67,7 +67,7 @@ public interface GarrisonableBuilding {
         return null;
     }
 
-    static int getNumOccupants(Building building) {
+    static int getNumOccupants(BuildingPlacement building) {
         List<LivingEntity> entities;
         if (building.getLevel().isClientSide())
             entities = UnitClientEvents.getAllUnits();

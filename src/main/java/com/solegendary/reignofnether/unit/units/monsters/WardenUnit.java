@@ -1,11 +1,13 @@
 package com.solegendary.reignofnether.unit.units.monsters;
 
-import org.joml.Vector3d;
+import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.SonicBoom;
-import com.solegendary.reignofnether.building.Building;
-import com.solegendary.reignofnether.building.buildings.monsters.SculkCatalyst;
+import com.solegendary.reignofnether.building.BuildingPlacement;
+import com.solegendary.reignofnether.building.buildings.placements.SculkCatalystPlacement;
+import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.hud.AbilityButton;
+import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.research.ResearchClient;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
 import com.solegendary.reignofnether.research.researchItems.ResearchSculkAmplifiers;
@@ -20,6 +22,7 @@ import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.util.Faction;
 import com.solegendary.reignofnether.util.MiscUtil;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -43,12 +46,23 @@ import net.minecraft.world.entity.monster.warden.Warden;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Vector3d;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
 public class WardenUnit extends Warden implements Unit, AttackerUnit {
+    public static final Abilities ABILITIES = new Abilities();
+    static {
+        ABILITIES.add(new SonicBoom(), Keybindings.keyQ);
+    }
+
+    Object2ObjectArrayMap<Ability, Float> cooldowns = Unit.createCooldownMap();
+    Object2ObjectArrayMap<Ability, Integer> charges = new Object2ObjectArrayMap<>();
+
+    Ability autocast;
+
     // region
     private BlockPos anchorPos = new BlockPos(0,0,0);
     public void setAnchor(BlockPos bp) { anchorPos = bp; }
@@ -140,8 +154,8 @@ public class WardenUnit extends Warden implements Unit, AttackerUnit {
 
     public SonicBoomGoal getSonicBoomGoal() { return sonicBoomGoal; }
 
-    private final List<AbilityButton> abilityButtons = new ArrayList<>();
-    private final List<Ability> abilities = new ArrayList<>();
+    private List<AbilityButton> abilityButtons;
+    private List<Ability> abilities;
     private final List<ItemStack> items = new ArrayList<>();
 
     public static final float SONIC_BOOM_DAMAGE = 75f;
@@ -150,7 +164,7 @@ public class WardenUnit extends Warden implements Unit, AttackerUnit {
 
     public WardenUnit(EntityType<? extends Warden> entityType, Level level) {
         super(entityType, level);
-        this.abilities.add(new SonicBoom(this));
+
         updateAbilityButtons();
     }
 
@@ -246,7 +260,7 @@ public class WardenUnit extends Warden implements Unit, AttackerUnit {
         targetEntity.push(normTargetPos.x() * knockbackXZ, normTargetPos.y() * knockbackY, normTargetPos.z() * knockbackXZ);
     }
 
-    public void doBuildingSonicBoom(Building targetBuilding) {
+    public void doBuildingSonicBoom(BuildingPlacement targetBuilding) {
         Vec3 startPos = this.position().add(0, 1.6, 0);
         Vec3 targetPos = new Vec3(
                 targetBuilding.centrePos.getX() + 0.5f,
@@ -265,11 +279,11 @@ public class WardenUnit extends Warden implements Unit, AttackerUnit {
         }
         boolean hasResearch;
         if (this.level().isClientSide())
-            hasResearch = ResearchClient.hasResearch(ResearchSculkAmplifiers.itemName);
+            hasResearch = ResearchClient.hasResearch(ProductionItems.RESEARCH_SCULK_AMPLIFIERS);
         else
-            hasResearch = ResearchServerEvents.playerHasResearch(getOwnerName(), ResearchSculkAmplifiers.itemName);
+            hasResearch = ResearchServerEvents.playerHasResearch(getOwnerName(), ProductionItems.RESEARCH_SCULK_AMPLIFIERS);
 
-        if (hasResearch && targetBuilding instanceof SculkCatalyst catalyst && catalyst.isBuilt) {
+        if (hasResearch && targetBuilding instanceof SculkCatalystPlacement catalyst && catalyst.isBuilt) {
             List<Mob> nearbyEnemies = MiscUtil.getEntitiesWithinRange(
                             new Vector3d(targetBuilding.centrePos.getX(), targetBuilding.centrePos.getY(), targetBuilding.centrePos.getZ()),
                             ResearchSculkAmplifiers.SPLIT_BOOM_RANGE, Mob.class, this.level())
@@ -293,5 +307,32 @@ public class WardenUnit extends Warden implements Unit, AttackerUnit {
 
     public void stopSonicBoomAnimation() {
         this.sonicBoomAnimationState.stop();
+    }
+
+    @Override
+    public void updateAbilityButtons() {
+        abilities = ABILITIES.get();
+        abilityButtons = ABILITIES.getButtons(this);
+        autocast = ABILITIES.getDefaultAutocast();
+    }
+
+    @Override
+    public Object2ObjectArrayMap<Ability, Float> getCooldowns() {
+        return cooldowns;
+    }
+
+    @Override
+    public boolean hasAutocast(Ability ability) {
+        return autocast == ability;
+    }
+
+    @Override
+    public void setAutocast(Ability autocast) {
+        this.autocast = autocast;
+    }
+
+    @Override
+    public Object2ObjectArrayMap<Ability, Integer> getCharges() {
+        return charges;
     }
 }

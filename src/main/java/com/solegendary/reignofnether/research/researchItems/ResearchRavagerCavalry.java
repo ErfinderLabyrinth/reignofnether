@@ -2,8 +2,9 @@ package com.solegendary.reignofnether.research.researchItems;
 
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.building.BuildingServerboundPacket;
-import com.solegendary.reignofnether.building.ProductionBuilding;
-import com.solegendary.reignofnether.building.ProductionItem;
+import com.solegendary.reignofnether.building.buildings.placements.ProductionPlacement;
+import com.solegendary.reignofnether.building.production.ProductionItem;
+import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.research.ResearchClient;
@@ -23,35 +24,32 @@ public class ResearchRavagerCavalry extends ProductionItem {
     public final static String itemName = "Ravager Artillery";
     public final static ResourceCost cost = ResourceCosts.RESEARCH_RAVAGER_ARTILLERY;
 
-    public ResearchRavagerCavalry(ProductionBuilding building) {
-        super(building, cost.ticks);
-        this.onComplete = (Level level) -> {
+    public ResearchRavagerCavalry() {
+        super(cost);
+        this.onComplete = (Level level, ProductionPlacement placement) -> {
             if (level.isClientSide()) {
-                ResearchClient.addResearch(this.building.ownerName, ResearchRavagerCavalry.itemName);
+                ResearchClient.addResearch(placement.ownerName, ProductionItems.RESEARCH_RAVAGER_CAVALRY);
             } else {
-                ResearchServerEvents.addResearch(this.building.ownerName, ResearchRavagerCavalry.itemName);
+                ResearchServerEvents.addResearch(placement.ownerName, ProductionItems.RESEARCH_RAVAGER_CAVALRY);
             }
         };
-        this.foodCost = cost.food;
-        this.woodCost = cost.wood;
-        this.oreCost = cost.ore;
     }
 
     public String getItemName() {
         return ResearchRavagerCavalry.itemName;
     }
 
-    public static Button getStartButton(ProductionBuilding prodBuilding, Keybinding hotkey) {
+    public Button getStartButton(ProductionPlacement prodBuilding, Keybinding hotkey) {
         return new Button(ResearchRavagerCavalry.itemName,
             14,
             new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/ravager.png"),
             new ResourceLocation(ReignOfNether.MOD_ID, "textures/hud/icon_frame_bronze.png"),
             hotkey,
             () -> false,
-            () -> ProductionItem.itemIsBeingProduced(ResearchRavagerCavalry.itemName, prodBuilding.ownerName)
-                || ResearchClient.hasResearch(ResearchRavagerCavalry.itemName),
+            () -> ProductionItems.RESEARCH_RAVAGER_CAVALRY.itemIsBeingProduced(prodBuilding.ownerName)
+                || ResearchClient.hasResearch(ProductionItems.RESEARCH_RAVAGER_CAVALRY),
             () -> true,
-            () -> BuildingServerboundPacket.startProduction(prodBuilding.originPos, itemName),
+            () -> BuildingServerboundPacket.startProduction(prodBuilding.originPos, ProductionItems.RESEARCH_RAVAGER_CAVALRY),
             null,
             List.of(FormattedCharSequence.forward(I18n.get("research.reignofnether.ravager_cavalry"),
                     Style.EMPTY.withBold(true)
@@ -65,7 +63,7 @@ public class ResearchRavagerCavalry extends ProductionItem {
         );
     }
 
-    public Button getCancelButton(ProductionBuilding prodBuilding, boolean first) {
+    public Button getCancelButton(ProductionPlacement prodBuilding, boolean first) {
         return new Button(ResearchRavagerCavalry.itemName,
             14,
             new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/ravager.png"),
@@ -74,7 +72,7 @@ public class ResearchRavagerCavalry extends ProductionItem {
             () -> false,
             () -> false,
             () -> true,
-            () -> BuildingServerboundPacket.cancelProduction(prodBuilding.minCorner, itemName, first),
+            () -> BuildingServerboundPacket.cancelProduction(prodBuilding.minCorner, ProductionItems.RESEARCH_RAVAGER_CAVALRY, first),
             null,
             null
         );

@@ -1,7 +1,6 @@
 
 package com.solegendary.reignofnether.unit.modelling.models;
 
-import org.joml.Vector3f;
 import com.solegendary.reignofnether.unit.interfaces.KeyframeAnimated;
 import net.minecraft.client.animation.AnimationDefinition;
 import net.minecraft.client.animation.KeyframeAnimations;
@@ -12,6 +11,7 @@ import net.minecraft.world.entity.AnimationState;
 import net.minecraft.world.entity.Entity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.joml.Vector3f;
 
 import java.util.function.Function;
 

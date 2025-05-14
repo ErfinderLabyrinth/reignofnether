@@ -10,8 +10,7 @@ import com.solegendary.reignofnether.tutorial.TutorialClientEvents;
 import com.solegendary.reignofnether.tutorial.TutorialStage;
 import com.solegendary.reignofnether.unit.UnitAction;
 import com.solegendary.reignofnether.util.Faction;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.language.I18n;
+import com.solegendary.reignofnether.util.LanguageUtil;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.List;
@@ -21,8 +20,6 @@ import static com.solegendary.reignofnether.util.MiscUtil.fcs;
 public class StartButtons {
 
     public static final int ICON_SIZE = 14;
-
-    private static final Minecraft MC = Minecraft.getInstance();
 
     public static Button sandboxStartButton = new Button(
             "Sandbox",
@@ -35,7 +32,7 @@ public class StartButtons {
             () -> PlayerServerboundPacket.startRTS(Faction.NONE, 0d,0d,0d),
             null,
             List.of(
-                    fcs(I18n.get("hud.gamemode.reignofnether.sandbox_confirm"))
+                    fcs(LanguageUtil.getTranslation("hud.gamemode.reignofnether.sandbox_confirm"))
             )
     );
 
@@ -52,8 +49,8 @@ public class StartButtons {
         },
         null,
         List.of(
-            fcs(I18n.get("hud.startbuttons.villagers.reignofnether.first"), true),
-            fcs(I18n.get("hud.startbuttons.villagers.reignofnether.second"))
+            fcs(LanguageUtil.getTranslation("hud.startbuttons.villagers.reignofnether.first"), true),
+            fcs(LanguageUtil.getTranslation("hud.startbuttons.villagers.reignofnether.second"))
         )
     );
 
@@ -68,8 +65,8 @@ public class StartButtons {
         () -> CursorClientEvents.setLeftClickAction(UnitAction.STARTRTS_MONSTERS),
         null,
         List.of(
-            fcs(I18n.get("hud.startbuttons.monsters.reignofnether.first"), true),
-            fcs(I18n.get("hud.startbuttons.monsters.reignofnether.second"))
+            fcs(LanguageUtil.getTranslation("hud.startbuttons.monsters.reignofnether.first"), true),
+            fcs(LanguageUtil.getTranslation("hud.startbuttons.monsters.reignofnether.second"))
         )
     );
 
@@ -84,8 +81,8 @@ public class StartButtons {
         () -> CursorClientEvents.setLeftClickAction(UnitAction.STARTRTS_PIGLINS),
         null,
         List.of(
-            fcs(I18n.get("hud.startbuttons.piglins.reignofnether.first"), true),
-            fcs(I18n.get("hud.startbuttons.piglins.reignofnether.second"))
+            fcs(LanguageUtil.getTranslation("hud.startbuttons.piglins.reignofnether.first"), true),
+            fcs(LanguageUtil.getTranslation("hud.startbuttons.piglins.reignofnether.second"))
         )
     );
 }

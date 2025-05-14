@@ -32,13 +32,13 @@ public class TauntingCry extends HeroAbility {
     private static final int CD_MAX_SECONDS = 5 * ResourceCost.TICKS_PER_SECOND;
     private static int duration = 4 * ResourceCost.TICKS_PER_SECOND;
 
-    public TauntingCry(HeroUnit hero) {
-        super(hero, 3, UnitAction.TAUNTING_CRY, CD_MAX_SECONDS, 0, 0, false);
+    public TauntingCry() {
+        super(3, UnitAction.TAUNTING_CRY, CD_MAX_SECONDS, 0, 0, false);
     }
 
     @Override
-    public boolean rankUp() {
-        if (super.rankUp()) {
+    public boolean rankUp(HeroUnit hero) {
+        if (super.rankUp(hero)) {
             updateStatsForRank();
             return true;
         }
@@ -56,7 +56,7 @@ public class TauntingCry extends HeroAbility {
     }
 
     @Override
-    public AbilityButton getButton(Keybinding hotkey) {
+    public AbilityButton getButton(Keybinding hotkey, Unit hero) {
         return new AbilityButton("Taunting Cry",
                 new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/ominous_banner.png"),
                 hotkey,
@@ -65,20 +65,22 @@ public class TauntingCry extends HeroAbility {
                 () -> true,
                 () -> sendUnitCommand(UnitAction.TAUNTING_CRY),
                 null,
-                getTooltipLines(),
-                this
+                getTooltipLines((HeroUnit) hero),
+                this,
+                hero
         );
     }
 
     @Override
-    public Button getRankUpButton() {
+    public Button getRankUpButton(HeroUnit hero) {
         return super.getRankUpButtonProtected(
                 "Taunting Cry",
-                new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/ominous_banner.png")
+                new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/ominous_banner.png"),
+                hero
         );
     }
 
-    public List<FormattedCharSequence> getTooltipLines() {
+    public List<FormattedCharSequence> getTooltipLines(HeroUnit hero) {
         return List.of(
                 fcs(I18n.get("abilities.reignofnether.taunting_cry") + " " + rankString(), true),
                 fcsIcons(I18n.get("abilities.reignofnether.taunting_cry.stats", CD_MAX_SECONDS / 20)),
@@ -89,10 +91,10 @@ public class TauntingCry extends HeroAbility {
         );
     }
 
-    public List<FormattedCharSequence> getRankUpTooltipLines() {
+    public List<FormattedCharSequence> getRankUpTooltipLines(HeroUnit hero) {
         return List.of(
                 fcs(I18n.get("abilities.reignofnether.taunting_cry"), true),
-                fcs(I18n.get("abilities.reignofnether.level_req", getLevelRequirement()), getLevelReqStyle()),
+                fcs(I18n.get("abilities.reignofnether.level_req", getLevelRequirement()), getLevelReqStyle(hero)),
                 fcs(""),
                 fcs(I18n.get("abilities.reignofnether.taunting_cry.tooltip1")),
                 fcs(I18n.get("abilities.reignofnether.taunting_cry.tooltip2", duration / 20)),

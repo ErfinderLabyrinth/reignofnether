@@ -1,6 +1,6 @@
 package com.solegendary.reignofnether.unit.goals;
 
-import com.solegendary.reignofnether.building.Building;
+import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import net.minecraft.world.entity.LivingEntity;
@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 public class SonicBoomGoal extends GenericTargetedSpellGoal {
 
     public SonicBoomGoal(Mob mob, int channelTicks, int range,
-                         Consumer<LivingEntity> onEntityCast, Consumer<Building> onBuildingCast) {
+                         Consumer<LivingEntity> onEntityCast, Consumer<BuildingPlacement> onBuildingCast) {
         super(mob, channelTicks, range, onEntityCast, null, onBuildingCast);
         this.bonusChannelingRange = 10;
     }

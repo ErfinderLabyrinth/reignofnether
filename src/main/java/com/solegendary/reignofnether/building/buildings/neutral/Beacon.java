@@ -1,60 +1,36 @@
 package com.solegendary.reignofnether.building.buildings.neutral;
 
 import com.solegendary.reignofnether.ability.abilities.*;
-import com.solegendary.reignofnether.alliance.AlliancesServerEvents;
 import com.solegendary.reignofnether.building.*;
-import com.solegendary.reignofnether.building.buildings.monsters.Stronghold;
-import com.solegendary.reignofnether.building.buildings.piglins.Fortress;
-import com.solegendary.reignofnether.building.buildings.villagers.Castle;
+import com.solegendary.reignofnether.building.buildings.placements.BeaconPlacement;
+import com.solegendary.reignofnether.building.production.ProductionBuilding;
+import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.gamerules.GameruleClient;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.keybinds.Keybindings;
-import com.solegendary.reignofnether.player.PlayerServerEvents;
 import com.solegendary.reignofnether.registrars.GameRuleRegistrar;
 import com.solegendary.reignofnether.research.ResearchClient;
-import com.solegendary.reignofnether.research.researchItems.*;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
-import com.solegendary.reignofnether.resources.Resources;
-import com.solegendary.reignofnether.resources.ResourcesServerEvents;
-import com.solegendary.reignofnether.sounds.SoundAction;
-import com.solegendary.reignofnether.sounds.SoundClientboundPacket;
-import com.solegendary.reignofnether.survival.SurvivalServerEvents;
-import com.solegendary.reignofnether.time.TimeClientEvents;
 import com.solegendary.reignofnether.tutorial.TutorialClientEvents;
-import com.solegendary.reignofnether.unit.UnitAction;
-import com.solegendary.reignofnether.unit.interfaces.Unit;
-import com.solegendary.reignofnether.unit.interfaces.WorkerUnit;
-import com.solegendary.reignofnether.unit.packets.BeaconSyncClientboundPacket;
 import com.solegendary.reignofnether.util.Faction;
-import com.solegendary.reignofnether.util.MiscUtil;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.FormattedCharSequence;
-import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Rotation;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import org.joml.Vector3d;
 
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.solegendary.reignofnether.building.BuildingUtils.getAbsoluteBlockData;
 
-public class Beacon extends ProductionBuilding implements RangeIndicator {
+public class Beacon extends ProductionBuilding {
 
     public final static String buildingName = "Beacon";
     public final static String structureName = "beacon_t0";
@@ -75,23 +51,12 @@ public class Beacon extends ProductionBuilding implements RangeIndicator {
         return 24000;
     }
 
-    private MobEffect auraEffect = null;
-    private boolean beaconActive = false;
-    public boolean isBeaconActive() { return auraEffect != null && beaconActive; }
-
-    public BlockPos beaconPos;
-
-    public Beacon(Level level, BlockPos originPos, Rotation rotation, String ownerName) {
-        super(level, originPos, rotation, ownerName, getAbsoluteBlockData(getRelativeBlockData(level), level, originPos, rotation), false);
+    public Beacon() {
+        super(structureName, cost, false);
         this.name = buildingName;
-        this.ownerName = ownerName;
         this.portraitBlock = Blocks.BEACON;
         this.icon = new ResourceLocation("minecraft", "textures/item/nether_star.png");
 
-        this.foodCost = cost.food;
-        this.woodCost = cost.wood;
-        this.oreCost = cost.ore;
-        this.popSupply = cost.population;
         this.buildTimeModifier = 2.0f;
 
         this.capturable = false;
@@ -102,275 +67,42 @@ public class Beacon extends ProductionBuilding implements RangeIndicator {
 
         this.explodeChance = 0.2f;
 
-        this.abilities.add(new BeaconWealth(this));
-        this.abilities.add(new BeaconHaste(this));
-        this.abilities.add(new BeaconRegeneration(this));
-        this.abilities.add(new BeaconResistance(this));
-        this.abilities.add(new BeaconStrength(this));
+        this.abilities.add(new BeaconWealth(), Keybindings.keyQ);
+        this.abilities.add(new BeaconHaste(), Keybindings.keyW);
+        this.abilities.add(new BeaconRegeneration(), Keybindings.keyE);
+        this.abilities.add(new BeaconResistance(), Keybindings.keyR);
+        this.abilities.add(new BeaconStrength(), Keybindings.keyT);
 
-        updateButtons();
-
-        for (BuildingBlock bb : blocks)
-            if (bb.getBlockState().getBlock() == Blocks.BEACON)
-                beaconPos = bb.getBlockPos();
+        this.productions.add(ProductionItems.RESEARCH_BEACON_LEVEL_1, null);
+        this.productions.add(ProductionItems.RESEARCH_BEACON_LEVEL_2, null);
+        this.productions.add(ProductionItems.RESEARCH_BEACON_LEVEL_3, null);
+        this.productions.add(ProductionItems.RESEARCH_BEACON_LEVEL_4, null);
+        this.productions.add(ProductionItems.RESEARCH_BEACON_LEVEL_5, null);
     }
 
-    public void updateButtons() {
-        if (level.isClientSide()) {
-            this.productionButtons = Arrays.asList(
-                    ResearchBeaconLevel1.getStartButton(this, null),
-                    ResearchBeaconLevel2.getStartButton(this, null),
-                    ResearchBeaconLevel3.getStartButton(this, null),
-                    ResearchBeaconLevel4.getStartButton(this, null),
-                    ResearchBeaconLevel5.getStartButton(this, null)
-            );
-            this.abilityButtons.clear();
-            this.abilityButtons.add(abilities.get(0).getButton(Keybindings.keyQ));
-            this.abilityButtons.add(abilities.get(1).getButton(Keybindings.keyW));
-            this.abilityButtons.add(abilities.get(2).getButton(Keybindings.keyE));
-            this.abilityButtons.add(abilities.get(3).getButton(Keybindings.keyR));
-            this.abilityButtons.add(abilities.get(4).getButton(Keybindings.keyT));
-        }
-    }
-
-    @Override
-    public void destroy(ServerLevel serverLevel) {
-        super.destroy(serverLevel);
-        if (!(this instanceof CapturableBeacon) && !ownerName.isBlank())
-            sendWarning("destroy_warning");
-    }
-
-    @Override
-    public String getUpgradedName() {
-        if (getAuraEffect() == MobEffects.LUCK)
-            return name + " (" + I18n.get("ability.reignofnether.beacon_aura.wealth") + ")";
-        else if (getAuraEffect() == MobEffects.DIG_SPEED)
-            return name + " (" + I18n.get("ability.reignofnether.beacon_aura.haste") + ")";
-        else if (getAuraEffect() == MobEffects.REGENERATION)
-            return name + " (" + I18n.get("ability.reignofnether.beacon_aura.regeneration") + ")";
-        else if (getAuraEffect() == MobEffects.DAMAGE_BOOST)
-            return name + " (" + I18n.get("ability.reignofnether.beacon_aura.strength") + ")";
-        else if (getAuraEffect() == MobEffects.DAMAGE_RESISTANCE)
-            return name + " (" + I18n.get("ability.reignofnether.beacon_aura.resistance") + ")";
-        else
-            return name;
-    }
-
-    private Block getBeaconBlock() {
-        return level.getBlockState(beaconPos).getBlock();
-    }
-
-    private BlockEntity getBeaconBlockEntity() {
-        return level.getBlockEntity(beaconPos);
-    }
-
-    public MobEffect getAuraEffect() {
-        if (getBeaconBlockEntity() != null)
-            return auraEffect;
-        return null;
-    }
-
-    public static MobEffect getMobEffectForAction(UnitAction action) {
-        return switch (action) {
-            case BEACON_HASTE -> MobEffects.DIG_SPEED;
-            case BEACON_REGENERATION -> MobEffects.REGENERATION;
-            case BEACON_RESISTANCE -> MobEffects.DAMAGE_RESISTANCE;
-            case BEACON_WEALTH -> MobEffects.LUCK;
-            case BEACON_STRENGTH -> MobEffects.DAMAGE_BOOST;
-            default -> null;
-        };
-    }
-
-    public static UnitAction getActionForMobEffect(MobEffect effect) {
-        if (effect == MobEffects.DIG_SPEED)
-            return UnitAction.BEACON_HASTE;
-        else if (effect == MobEffects.REGENERATION)
-            return UnitAction.BEACON_REGENERATION;
-        else if (effect == MobEffects.DAMAGE_RESISTANCE)
-            return UnitAction.BEACON_RESISTANCE;
-        else if (effect == MobEffects.LUCK)
-            return UnitAction.BEACON_WEALTH;
-        else if (effect == MobEffects.DAMAGE_BOOST)
-            return UnitAction.BEACON_STRENGTH;
-        return UnitAction.NONE;
-    }
-
-    public void activate(MobEffect effect) {
-        beaconActive = true;
-        auraEffect = effect;
-        if (!level.isClientSide()) {
-            SoundClientboundPacket.playSoundAtPos(SoundAction.BEACON_ACTIVATE, beaconPos);
-            BeaconSyncClientboundPacket.syncBeacon(getActionForMobEffect(effect), originPos, true);
-        }
-    }
-
-    public void deactivate() {
-        beaconActive = false;
-        auraEffect = null;
-        if (!level.isClientSide()) {
-            SoundClientboundPacket.playSoundAtPos(SoundAction.BEACON_DEACTIVATE, beaconPos);
-            BeaconSyncClientboundPacket.syncBeacon(UnitAction.NONE, originPos, false);
-        }
-    }
-
-    // serverside only
-    public void setAuraEffect(MobEffect effect) {
-        // turn off the beacon
-        // after delay, turn on the beacon and change the effect
-        if (isBeaconActive()) {
-            deactivate();
-            CompletableFuture.delayedExecutor(2500, TimeUnit.MILLISECONDS).execute(() -> {
-                activate(effect);
-            });
-        } else {
-            activate(effect);
-        }
-    }
-
-    @Override
-    public void tick(Level tickLevel) {
-        super.tick(tickLevel);
-        if (tickLevel.isClientSide && tickAgeAfterBuilt > 0 && tickAgeAfterBuilt % 100 == 0)
-            updateBorderBps();
-
-        if (isBeaconActive() && tickAgeAfterBuilt > 0 && tickAgeAfterBuilt % 20 == 0 &&
-                !this.level.isClientSide()) {
-
-            List<LivingEntity> nearbyEntities = MiscUtil.getEntitiesWithinRange(
-                    new Vector3d(this.centrePos.getX(), this.centrePos.getY(), this.centrePos.getZ()),
-                    RANGE,
-                    LivingEntity.class,
-                    this.level);
-
-            for (LivingEntity le : nearbyEntities) {
-                boolean isOwnedOrFriendlyUnit = le instanceof Unit unit && (unit.getOwnerName().equals(this.ownerName) ||
-                        AlliancesServerEvents.isAllied(this.ownerName, unit.getOwnerName()));
-                boolean isFriendlyPlayer = le instanceof Player player && !player.isCreative() && !player.isSpectator() &&
-                        (player.getName().getString().equals(ownerName) || AlliancesServerEvents.isAllied(player.getName().getString(), ownerName));
-
-                if ((isOwnedOrFriendlyUnit || isFriendlyPlayer) &&
-                        (isFriendlyPlayer || auraEffect != MobEffects.LUCK) &&
-                        getBeaconBlockEntity() != null) {
-                    if (auraEffect != MobEffects.REGENERATION) {
-                        if (le instanceof WorkerUnit || auraEffect != MobEffects.DIG_SPEED) {
-                            le.addEffect(new MobEffectInstance(auraEffect, 25, 0));
-                        }
-                    } else if (tickAgeAfterBuilt % 80 == 0) { // only 1hp/4s
-                        le.addEffect(new MobEffectInstance(auraEffect, 60, 0));
-                    }
-                }
-            }
-
-            if (tickAgeAfterBuilt % 20 == 0 && getAuraEffect() == MobEffects.LUCK && isBeaconActive()) {
-                ResourcesServerEvents.addSubtractResources(new Resources(this.ownerName, 1, 1, 1));
-            }
-        }
-    }
-
-    @Override
-    public void onBuilt() {
-        super.onBuilt();
-        sendWarning("completed_warning");
-    }
-
-    public void sendWarning(String msg) {
-        if (!level.isClientSide) {
-            PlayerServerEvents.sendMessageToAllPlayersNoNewlines("");
-            Beacon beacon = BuildingUtils.getBeacon(level.isClientSide);
-            if (beacon != null && msg.equals("upgraded_warning")) {
-                String upgradeName = "";
-                if (beacon.getUpgradeLevel() == 1) upgradeName = "Iron";
-                else if (beacon.getUpgradeLevel() == 2) upgradeName = "Gold";
-                else if (beacon.getUpgradeLevel() == 3) upgradeName = "Emerald";
-                else if (beacon.getUpgradeLevel() == 4) upgradeName = "Diamond";
-                else if (beacon.getUpgradeLevel() == 5) upgradeName = "Netherite";
-
-                PlayerServerEvents.sendMessageToAllPlayersNoNewlines("buildings.neutral.reignofnether.beacon.upgrade_warning",
-                        true, ownerName, upgradeName, beacon.getUpgradeLevel(), Beacon.MAX_UPGRADE_LEVEL);
-            } else {
-                PlayerServerEvents.sendMessageToAllPlayersNoNewlines("buildings.neutral.reignofnether.beacon." + msg,
-                        true, ownerName);
-            }
-            if (beacon != null && beacon.getUpgradeLevel() >= Beacon.MAX_UPGRADE_LEVEL && !msg.equals("destroy_warning")) {
-                PlayerServerEvents.sendMessageToAllPlayersNoNewlines("buildings.neutral.reignofnether.beacon.time_to_win",
-                        false, ownerName, PlayerServerEvents.getBeaconWinTime(ownerName));
-            }
-            PlayerServerEvents.sendMessageToAllPlayersNoNewlines("");
-            if (SurvivalServerEvents.isEnabled() && !msg.equals("destroy_warning"))
-                SoundClientboundPacket.playSoundForAllPlayers(SoundAction.ALLY);
-            else
-                SoundClientboundPacket.playSoundForAllPlayers(SoundAction.ENEMY);
-        }
-    }
-
-    public static final int RANGE = 40;
-    private final Set<BlockPos> borderBps = new HashSet<>();
-
-    private int getBorderRange() {
-        return isBuilt && getUpgradeLevel() > 0 ? RANGE : 0;
-    }
-
-    @Override
-    public void updateBorderBps() {
-        if (!level.isClientSide())
-            return;
-        this.borderBps.clear();
-        this.borderBps.addAll(MiscUtil.getRangeIndicatorCircleBlocks(centrePos,
-                getBorderRange() - TimeClientEvents.VISIBLE_BORDER_ADJ, level));
-    }
-
-    @Override
-    public Set<BlockPos> getBorderBps() {
-        return borderBps;
-    }
-
-    @Override
-    public boolean showOnlyWhenSelected() {
-        return true;
-    }
-
-    @Override
-    public boolean canDestroyBlock(BlockPos relativeBp) {
-        BlockPos worldBp = relativeBp.offset(this.originPos);
-        Block block = this.getLevel().getBlockState(worldBp).getBlock();
-        Block blockAbove = this.getLevel().getBlockState(worldBp).getBlock();
-        return block != Blocks.BEACON && blockAbove != Blocks.BEACON;
-    }
-
-    public void changeStructure(int structureLevel) {
-        String newStructureName = switch (structureLevel) {
-            case 1 -> Beacon.structureNameT1;
-            case 2 -> Beacon.structureNameT2;
-            case 3 -> Beacon.structureNameT3;
-            case 4 -> Beacon.structureNameT4;
-            case 5 -> Beacon.structureNameT5;
-            default -> Beacon.structureName;
-        };
-        ArrayList<BuildingBlock> newBlocks = BuildingBlockData.getBuildingBlocks(newStructureName, this.getLevel());
-        this.blocks = getAbsoluteBlockData(newBlocks, this.getLevel(), originPos, rotation);
-        super.refreshBlocks();
-    }
-
-    public Faction getFaction() {return Faction.NONE;}
-
-    public static ArrayList<BuildingBlock> getRelativeBlockData(LevelAccessor level) {
+    public ArrayList<BuildingBlock> getRelativeBlockData(LevelAccessor level) {
         return BuildingBlockData.getBuildingBlocks(structureName, level);
     }
 
-    public static AbilityButton getBuildButton(Keybinding hotkey) {
+    @Override
+    public BuildingPlacement createBuildingPlacement(Level level, BlockPos pos, Rotation rotation, String ownerName) {
+        return new BeaconPlacement(this, level, pos, rotation, ownerName, getAbsoluteBlockData(getRelativeBlockData(level), level, pos, rotation), false);
+    }
+
+    public AbilityButton getBuildButton(Keybinding hotkey) {
         return new AbilityButton(
                 buildingName,
                 new ResourceLocation("minecraft", "textures/item/nether_star.png"),
                 hotkey,
-                () -> BuildingClientEvents.getBuildingToPlace() == Beacon.class,
+                () -> BuildingClientEvents.getBuildingToPlace() == this,
                 () -> TutorialClientEvents.isEnabled() || !GameruleClient.allowBeacons,
-                () -> BuildingClientEvents.getBuildings().stream().filter(b -> b instanceof Beacon).toList().isEmpty() && (
-                    BuildingClientEvents.hasFinishedBuilding(Castle.buildingName) ||
-                    BuildingClientEvents.hasFinishedBuilding(Stronghold.buildingName) ||
-                    BuildingClientEvents.hasFinishedBuilding(Fortress.buildingName) ||
+                () -> BuildingClientEvents.getBuildings().stream().filter(b -> b instanceof BeaconPlacement).toList().isEmpty() && (
+                    BuildingClientEvents.hasFinishedBuilding(Buildings.CASTLE) ||
+                    BuildingClientEvents.hasFinishedBuilding(Buildings.STRONGHOLD) ||
+                    BuildingClientEvents.hasFinishedBuilding(Buildings.FORTRESS) ||
                     ResearchClient.hasCheat("modifythephasevariance")
                 ),
-                () -> BuildingClientEvents.setBuildingToPlace(Beacon.class),
+                () -> BuildingClientEvents.setBuildingToPlace(this),
                 null,
                 List.of(
                         FormattedCharSequence.forward(I18n.get("buildings.neutral.reignofnether.beacon"), Style.EMPTY.withBold(true)),
@@ -383,12 +115,13 @@ public class Beacon extends ProductionBuilding implements RangeIndicator {
                         FormattedCharSequence.forward("", Style.EMPTY),
                         FormattedCharSequence.forward(I18n.get("buildings.neutral.reignofnether.beacon.tooltip3"), Style.EMPTY)
                 ),
-                null
+                null,
+                (BuildingPlacement) null
         );
     }
 
-    public int getUpgradeLevel() {
-        for (BuildingBlock block : blocks) {
+    public int getUpgradeLevel(BuildingPlacement placement) {
+        for (BuildingBlock block : placement.getBlocks()) {
             if (block.getBlockState().getBlock() == Blocks.NETHERITE_BLOCK)
                 return 5;
             if (block.getBlockState().getBlock() == Blocks.DIAMOND_BLOCK)
@@ -401,6 +134,11 @@ public class Beacon extends ProductionBuilding implements RangeIndicator {
                 return 1;
         }
         return 0;
+    }
+
+    @Override
+    public Faction getFaction() {
+        return null;
     }
 }
 

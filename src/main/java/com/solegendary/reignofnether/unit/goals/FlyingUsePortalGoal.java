@@ -1,8 +1,8 @@
 package com.solegendary.reignofnether.unit.goals;
 
-import com.solegendary.reignofnether.building.Building;
+import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.BuildingUtils;
-import com.solegendary.reignofnether.building.buildings.piglins.Portal;
+import com.solegendary.reignofnether.building.buildings.placements.PortalPlacement;
 import com.solegendary.reignofnether.hud.HudClientEvents;
 import com.solegendary.reignofnether.sounds.SoundAction;
 import com.solegendary.reignofnether.sounds.SoundClientboundPacket;
@@ -15,14 +15,14 @@ import net.minecraft.world.phys.Vec3;
 
 public class FlyingUsePortalGoal extends FlyingMoveToTargetGoal {
 
-    private Building buildingTarget;
+    private BuildingPlacement buildingTarget;
 
     public FlyingUsePortalGoal(Mob mob) {
         super(mob, 0);
     }
 
     public void tick() {
-        if (buildingTarget instanceof Portal portal && moveTarget != null) {
+        if (buildingTarget instanceof PortalPlacement portal && moveTarget != null) {
             calcMoveTarget();
             if (buildingTarget.getBlocksPlaced() <= 0) {
                 stopUsingPortal();
@@ -46,7 +46,7 @@ public class FlyingUsePortalGoal extends FlyingMoveToTargetGoal {
     }
 
     private void calcMoveTarget() {
-        if (this.buildingTarget instanceof Portal) {
+        if (this.buildingTarget instanceof PortalPlacement) {
             this.moveTarget = this.buildingTarget.centrePos.offset(0,4,0);
         }
     }
@@ -55,7 +55,7 @@ public class FlyingUsePortalGoal extends FlyingMoveToTargetGoal {
         if (blockPos != null) {
             if (this.mob.level().isClientSide()) {
                 this.buildingTarget = BuildingUtils.findBuilding(true, blockPos);
-                if (this.buildingTarget instanceof Portal portal
+                if (this.buildingTarget instanceof PortalPlacement portal
                     && buildingTarget.ownerName.equals(((Unit) mob).getOwnerName())) {
 
                     if (portal.hasDestination()) {
@@ -76,7 +76,7 @@ public class FlyingUsePortalGoal extends FlyingMoveToTargetGoal {
         }
     }
 
-    public Building getBuildingTarget() {
+    public BuildingPlacement getBuildingTarget() {
         return buildingTarget;
     }
 

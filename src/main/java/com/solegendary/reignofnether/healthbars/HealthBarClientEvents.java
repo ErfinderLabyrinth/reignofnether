@@ -2,10 +2,11 @@
 package com.solegendary.reignofnether.healthbars;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Axis;
 import org.joml.Matrix4f;
 import com.solegendary.reignofnether.ReignOfNether;
-import com.solegendary.reignofnether.building.Building;
+import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import net.minecraft.client.Camera;
@@ -19,16 +20,13 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
+import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexFormat;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.StreamSupport;
@@ -161,7 +159,7 @@ public class HealthBarClientEvents {
         render(matrix, percent, percent2, x, y, width, renderMode);
     }
 
-    public static void renderForBuilding(PoseStack matrix, Building building, double x, double y,
+    public static void renderForBuilding(PoseStack matrix, BuildingPlacement building, double x, double y,
                                          float width, RenderMode renderMode) {
         float health = building.getHealth();
         if (health > building.getMaxHealth())

@@ -2,8 +2,9 @@ package com.solegendary.reignofnether.research.researchItems;
 
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.building.BuildingServerboundPacket;
-import com.solegendary.reignofnether.building.ProductionBuilding;
-import com.solegendary.reignofnether.building.ProductionItem;
+import com.solegendary.reignofnether.building.buildings.placements.ProductionPlacement;
+import com.solegendary.reignofnether.building.production.ProductionItem;
+import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.research.ResearchClient;
@@ -23,35 +24,32 @@ public class ResearchWitherClouds extends ProductionItem {
     public final static String itemName = "Wither Death Clouds";
     public final static ResourceCost cost = ResourceCosts.RESEARCH_WITHER_CLOUDS;
 
-    public ResearchWitherClouds(ProductionBuilding building) {
-        super(building, ResourceCosts.RESEARCH_WITHER_CLOUDS.ticks);
-        this.onComplete = (Level level) -> {
+    public ResearchWitherClouds() {
+        super(cost);
+        this.onComplete = (Level level, ProductionPlacement placement) -> {
             if (level.isClientSide()) {
-                ResearchClient.addResearch(this.building.ownerName, ResearchWitherClouds.itemName);
+                ResearchClient.addResearch(placement.ownerName, ProductionItems.RESEARCH_WITHER_CLOUDS);
             } else {
-                ResearchServerEvents.addResearch(this.building.ownerName, ResearchWitherClouds.itemName);
+                ResearchServerEvents.addResearch(placement.ownerName, ProductionItems.RESEARCH_WITHER_CLOUDS);
             }
         };
-        this.foodCost = cost.food;
-        this.woodCost = cost.wood;
-        this.oreCost = cost.ore;
     }
 
     public String getItemName() {
         return ResearchWitherClouds.itemName;
     }
 
-    public static Button getStartButton(ProductionBuilding prodBuilding, Keybinding hotkey) {
+    public Button getStartButton(ProductionPlacement prodBuilding, Keybinding hotkey) {
         return new Button(ResearchWitherClouds.itemName,
             14,
             new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/wither_skeleton.png"),
             new ResourceLocation(ReignOfNether.MOD_ID, "textures/hud/icon_frame_bronze.png"),
             hotkey,
             () -> false,
-            () -> ProductionItem.itemIsBeingProduced(ResearchWitherClouds.itemName, prodBuilding.ownerName)
-                || ResearchClient.hasResearch(ResearchWitherClouds.itemName),
+            () -> ProductionItems.RESEARCH_WITHER_CLOUDS.itemIsBeingProduced(prodBuilding.ownerName)
+                || ResearchClient.hasResearch(ProductionItems.RESEARCH_WITHER_CLOUDS),
             () -> true,
-            () -> BuildingServerboundPacket.startProduction(prodBuilding.originPos, itemName),
+            () -> BuildingServerboundPacket.startProduction(prodBuilding.originPos, ProductionItems.RESEARCH_WITHER_CLOUDS),
             null,
             List.of(FormattedCharSequence.forward(I18n.get("research.reignofnether.wither_clouds"),
                     Style.EMPTY.withBold(true)
@@ -65,7 +63,7 @@ public class ResearchWitherClouds extends ProductionItem {
         );
     }
 
-    public Button getCancelButton(ProductionBuilding prodBuilding, boolean first) {
+    public Button getCancelButton(ProductionPlacement prodBuilding, boolean first) {
         return new Button(ResearchWitherClouds.itemName,
             14,
             new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/wither_skeleton.png"),
@@ -74,7 +72,7 @@ public class ResearchWitherClouds extends ProductionItem {
             () -> false,
             () -> false,
             () -> true,
-            () -> BuildingServerboundPacket.cancelProduction(prodBuilding.minCorner, itemName, first),
+            () -> BuildingServerboundPacket.cancelProduction(prodBuilding.minCorner, ProductionItems.RESEARCH_WITHER_CLOUDS, first),
             null,
             null
         );

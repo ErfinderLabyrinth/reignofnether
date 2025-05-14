@@ -2,8 +2,9 @@ package com.solegendary.reignofnether.research.researchItems;
 
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.building.BuildingServerboundPacket;
-import com.solegendary.reignofnether.building.ProductionBuilding;
-import com.solegendary.reignofnether.building.ProductionItem;
+import com.solegendary.reignofnether.building.buildings.placements.ProductionPlacement;
+import com.solegendary.reignofnether.building.production.ProductionItem;
+import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.research.ResearchClient;
@@ -26,39 +27,36 @@ public class ResearchPillagerCrossbows extends ProductionItem {
     public final static String itemName = "Multishot Crossbows";
     public final static ResourceCost cost = ResourceCosts.RESEARCH_PILLAGER_CROSSBOWS;
 
-    public ResearchPillagerCrossbows(ProductionBuilding building) {
-        super(building, cost.ticks);
-        this.onComplete = (Level level) -> {
+    public ResearchPillagerCrossbows() {
+        super(cost);
+        this.onComplete = (Level level, ProductionPlacement placement) -> {
             if (level.isClientSide()) {
-                ResearchClient.addResearch(this.building.ownerName, ResearchPillagerCrossbows.itemName);
+                ResearchClient.addResearch(placement.ownerName, ProductionItems.RESEARCH_PILLAGER_CROSSBOWS);
             } else {
-                ResearchServerEvents.addResearch(this.building.ownerName, ResearchPillagerCrossbows.itemName);
+                ResearchServerEvents.addResearch(placement.ownerName, ProductionItems.RESEARCH_PILLAGER_CROSSBOWS);
                 for (LivingEntity unit : UnitServerEvents.getAllUnits())
-                    if (unit instanceof PillagerUnit pUnit && pUnit.getOwnerName().equals(building.ownerName)) {
+                    if (unit instanceof PillagerUnit pUnit && pUnit.getOwnerName().equals(placement.ownerName)) {
                         pUnit.setupEquipmentAndUpgradesServer();
                     }
             }
         };
-        this.foodCost = cost.food;
-        this.woodCost = cost.wood;
-        this.oreCost = cost.ore;
     }
 
     public String getItemName() {
         return ResearchPillagerCrossbows.itemName;
     }
 
-    public static Button getStartButton(ProductionBuilding prodBuilding, Keybinding hotkey) {
+    public Button getStartButton(ProductionPlacement prodBuilding, Keybinding hotkey) {
         return new Button(ResearchPillagerCrossbows.itemName,
             14,
             new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/crossbow.png"),
             new ResourceLocation(ReignOfNether.MOD_ID, "textures/hud/icon_frame_bronze.png"),
             hotkey,
             () -> false,
-            () -> ProductionItem.itemIsBeingProduced(ResearchPillagerCrossbows.itemName, prodBuilding.ownerName)
-                || ResearchClient.hasResearch(ResearchPillagerCrossbows.itemName),
+            () -> ProductionItems.RESEARCH_PILLAGER_CROSSBOWS.itemIsBeingProduced(prodBuilding.ownerName)
+                || ResearchClient.hasResearch(ProductionItems.RESEARCH_PILLAGER_CROSSBOWS),
             () -> true,
-            () -> BuildingServerboundPacket.startProduction(prodBuilding.originPos, itemName),
+            () -> BuildingServerboundPacket.startProduction(prodBuilding.originPos, ProductionItems.RESEARCH_PILLAGER_CROSSBOWS),
             null,
             List.of(FormattedCharSequence.forward(I18n.get("research.reignofnether.pillager_crossbows"),
                     Style.EMPTY.withBold(true)
@@ -73,7 +71,7 @@ public class ResearchPillagerCrossbows extends ProductionItem {
         );
     }
 
-    public Button getCancelButton(ProductionBuilding prodBuilding, boolean first) {
+    public Button getCancelButton(ProductionPlacement prodBuilding, boolean first) {
         return new Button(ResearchPillagerCrossbows.itemName,
             14,
             new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/crossbow.png"),
@@ -82,7 +80,7 @@ public class ResearchPillagerCrossbows extends ProductionItem {
             () -> false,
             () -> false,
             () -> true,
-            () -> BuildingServerboundPacket.cancelProduction(prodBuilding.minCorner, itemName, first),
+            () -> BuildingServerboundPacket.cancelProduction(prodBuilding.minCorner, ProductionItems.RESEARCH_PILLAGER_CROSSBOWS, first),
             null,
             null
         );

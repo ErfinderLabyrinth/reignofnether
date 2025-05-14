@@ -10,6 +10,7 @@ import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.hud.RectZone;
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;

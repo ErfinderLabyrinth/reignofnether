@@ -2,7 +2,8 @@ package com.solegendary.reignofnether.ability.abilities;
 
 import com.solegendary.reignofnether.ability.EnchantAbility;
 import com.solegendary.reignofnether.ability.EnchantAbilityServerboundPacket;
-import com.solegendary.reignofnether.building.buildings.villagers.Library;
+import com.solegendary.reignofnether.building.BuildingPlacement;
+import com.solegendary.reignofnether.building.buildings.placements.LibraryPlacement;
 import com.solegendary.reignofnether.cursor.CursorClientEvents;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybinding;
@@ -32,12 +33,14 @@ public class EnchantMaiming extends EnchantAbility {
     public static final int SLOWNESS_DURATION = 5 * ResourceCost.TICKS_PER_SECOND;
     public static final int enchantLevel = 1;
 
-    public EnchantMaiming(Library library) {
-        super(ENCHANT_ACTION, library, ResourceCosts.ENCHANT_MAIMING);
+    public EnchantMaiming() {
+        super(ENCHANT_ACTION, ResourceCosts.ENCHANT_MAIMING);
     }
 
     @Override
-    public AbilityButton getButton(Keybinding hotkey) {
+    public AbilityButton getButton(Keybinding hotkey, BuildingPlacement placement) {
+        if (!(placement instanceof LibraryPlacement)) return null;
+        LibraryPlacement library = (LibraryPlacement) placement;
         return new AbilityButton(
                 "Maiming Enchantment",
                 new ResourceLocation("minecraft", "textures/item/iron_axe.png"),
@@ -63,7 +66,8 @@ public class EnchantMaiming extends EnchantAbility {
                         FormattedCharSequence.forward(I18n.get("ability.reignofnether.enchant.maiming.tooltip3"), Style.EMPTY),
                         FormattedCharSequence.forward(I18n.get("abilities.reignofnether.autocast"), Style.EMPTY)
                 ),
-                this
+                this,
+                placement
         );
     }
 

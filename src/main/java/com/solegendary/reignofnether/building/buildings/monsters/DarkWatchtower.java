@@ -1,6 +1,11 @@
 package com.solegendary.reignofnether.building.buildings.monsters;
 
-import com.solegendary.reignofnether.building.*;
+import com.solegendary.reignofnether.api.ReignOfNetherRegistries;
+import com.solegendary.reignofnether.building.Building;
+import com.solegendary.reignofnether.building.BuildingClientEvents;
+import com.solegendary.reignofnether.building.BuildingPlacement;
+import com.solegendary.reignofnether.building.Buildings;
+import com.solegendary.reignofnether.building.buildings.placements.WatchTowerPlacement;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.research.ResearchClient;
@@ -13,34 +18,25 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Rotation;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.solegendary.reignofnether.building.BuildingUtils.getAbsoluteBlockData;
 
-public class DarkWatchtower extends Building implements GarrisonableBuilding {
+public class DarkWatchtower extends Building {
 
     public final static String buildingName = "Dark Watchtower";
     public final static String structureName = "dark_watchtower";
     public final static ResourceCost cost = ResourceCosts.DARK_WATCHTOWER;
 
-    private final static int MAX_OCCUPANTS = 3;
-
-    public DarkWatchtower(Level level, BlockPos originPos, Rotation rotation, String ownerName) {
-        super(level, originPos, rotation, ownerName, getAbsoluteBlockData(getRelativeBlockData(level), level, originPos, rotation), false);
+    public DarkWatchtower() {
+        super(structureName, cost, false);
         this.name = buildingName;
-        this.ownerName = ownerName;
         this.portraitBlock = Blocks.DEEPSLATE_BRICKS;
         this.icon = new ResourceLocation("minecraft", "textures/block/deepslate_bricks.png");
 
-        this.foodCost = cost.food;
-        this.woodCost = cost.wood;
-        this.oreCost = cost.ore;
-        this.popSupply = cost.population;
         this.buildTimeModifier = 1.0f;
 
         this.startingBlockTypes.add(Blocks.DEEPSLATE_BRICKS);
@@ -50,30 +46,23 @@ public class DarkWatchtower extends Building implements GarrisonableBuilding {
 
     public Faction getFaction() {return Faction.MONSTERS;}
 
-    // don't use this for abilities as it may not be balanced
-    public int getAttackRange() { return 24; }
-    // bonus for units attacking garrisoned units
-    public int getExternalAttackRangeBonus() { return 10; }
-
-    public boolean canDestroyBlock(BlockPos relativeBp) {
-        return relativeBp.getY() != 10 &&
-                relativeBp.getY() != 11;
+    @Override
+    public BuildingPlacement createBuildingPlacement(Level level, BlockPos pos, Rotation rotation, String ownerName) {
+        return new WatchTowerPlacement(this, level, pos, rotation, ownerName, getAbsoluteBlockData(getRelativeBlockData(level), level, pos, rotation), false);
     }
 
-    public static ArrayList<BuildingBlock> getRelativeBlockData(LevelAccessor level) {
-        return BuildingBlockData.getBuildingBlocks(structureName, level);
-    }
-
-    public static AbilityButton getBuildButton(Keybinding hotkey) {
+    public AbilityButton getBuildButton(Keybinding hotkey) {
+        ResourceLocation key = ReignOfNetherRegistries.BUILDING.getKey(this);
+        String name = I18n.get("buildings." + getFaction().name().toLowerCase() + "." + key.getNamespace() + "." + key.getPath());
         return new AbilityButton(
-            DarkWatchtower.buildingName,
+            name,
             new ResourceLocation("minecraft", "textures/block/deepslate_bricks.png"),
             hotkey,
-            () -> BuildingClientEvents.getBuildingToPlace() == DarkWatchtower.class,
+            () -> BuildingClientEvents.getBuildingToPlace() == Buildings.DARK_WATCHTOWER,
             () -> false,
-            () -> BuildingClientEvents.hasFinishedBuilding(Mausoleum.buildingName) ||
+            () -> BuildingClientEvents.hasFinishedBuilding(Buildings.MAUSOLEUM) ||
                     ResearchClient.hasCheat("modifythephasevariance"),
-            () -> BuildingClientEvents.setBuildingToPlace(DarkWatchtower.class),
+            () -> BuildingClientEvents.setBuildingToPlace(Buildings.DARK_WATCHTOWER),
             null,
             List.of(
                     FormattedCharSequence.forward(I18n.get("buildings.monsters.reignofnether.dark_watchtower"), Style.EMPTY.withBold(true)),
@@ -82,38 +71,10 @@ public class DarkWatchtower extends Building implements GarrisonableBuilding {
                     FormattedCharSequence.forward(I18n.get("buildings.monsters.reignofnether.dark_watchtower.tooltip1"), Style.EMPTY),
                     FormattedCharSequence.forward(I18n.get("buildings.monsters.reignofnether.dark_watchtower.tooltip2"), Style.EMPTY),
                     FormattedCharSequence.forward("", Style.EMPTY),
-                    FormattedCharSequence.forward(I18n.get("buildings.monsters.reignofnether.dark_watchtower.tooltip3", MAX_OCCUPANTS), Style.EMPTY)
+                    FormattedCharSequence.forward(I18n.get("buildings.monsters.reignofnether.dark_watchtower.tooltip3", WatchTowerPlacement.MAX_OCCUPANTS), Style.EMPTY)
             ),
-            null
+            null,
+            (BuildingPlacement) null
         );
     }
-
-    @Override
-    public BlockPos getEntryPosition() {
-        if (this.rotation == Rotation.NONE) {
-            return new BlockPos(2,11,2);
-        } else if (this.rotation == Rotation.CLOCKWISE_90) {
-            return new BlockPos(-2,11,2);
-        } else if (this.rotation == Rotation.CLOCKWISE_180) {
-            return new BlockPos(-2,11,-2);
-        } else {
-            return new BlockPos(2,11,-2);
-        }
-    }
-
-    @Override
-    public BlockPos getExitPosition() {
-        if (this.rotation == Rotation.NONE) {
-            return new BlockPos(2,1,2);
-        } else if (this.rotation == Rotation.CLOCKWISE_90) {
-            return new BlockPos(-2,1,2);
-        } else if (this.rotation == Rotation.CLOCKWISE_180) {
-            return new BlockPos(-2,1,-2);
-        } else {
-            return new BlockPos(2,1,-2);
-        }
-    }
-
-    @Override
-    public boolean isFull() { return GarrisonableBuilding.getNumOccupants(this) >= MAX_OCCUPANTS; }
 }

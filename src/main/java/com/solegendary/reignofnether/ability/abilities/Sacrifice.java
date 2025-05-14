@@ -1,9 +1,9 @@
 package com.solegendary.reignofnether.ability.abilities;
 
 import com.solegendary.reignofnether.ability.Ability;
-import com.solegendary.reignofnether.building.Building;
+import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.BuildingUtils;
-import com.solegendary.reignofnether.building.buildings.monsters.SculkCatalyst;
+import com.solegendary.reignofnether.building.buildings.placements.SculkCatalystPlacement;
 import com.solegendary.reignofnether.cursor.CursorClientEvents;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.hud.HudClientEvents;
@@ -26,12 +26,12 @@ public class Sacrifice extends Ability {
     private static final int CD_MAX = 0;
     private static final int RANGE = 8;
 
-    public Sacrifice(Level level) {
-        super(UnitAction.SACRIFICE, level, CD_MAX, RANGE, 0, true, true);
+    public Sacrifice() {
+        super(UnitAction.SACRIFICE, CD_MAX, RANGE, 0, true, true);
     }
 
     @Override
-    public AbilityButton getButton(Keybinding hotkey) {
+    public AbilityButton getButton(Keybinding hotkey, BuildingPlacement placement) {
         return new AbilityButton("Sacrifice",
             new ResourceLocation("minecraft", "textures/item/iron_hoe.png"),
             hotkey,
@@ -49,14 +49,15 @@ public class Sacrifice extends Ability {
                 FormattedCharSequence.forward("", Style.EMPTY),
                 FormattedCharSequence.forward(I18n.get("abilities.reignofnether.sacrifice.tooltip2"), Style.EMPTY)
             ),
-            this
+            this,
+            placement
         );
     }
 
     @Override
-    public void use(Level level, Building buildingUsing, LivingEntity targetEntity) {
+    public void use(Level level, BuildingPlacement buildingUsing, LivingEntity targetEntity) {
 
-        if (!level.isClientSide() && buildingUsing instanceof SculkCatalyst && targetEntity instanceof Unit unit
+        if (!level.isClientSide() && buildingUsing instanceof SculkCatalystPlacement && targetEntity instanceof Unit unit
             && unit.getOwnerName().equals(buildingUsing.ownerName) && !level.getBlockState(targetEntity.getOnPos())
             .isAir() && !BuildingUtils.isWithinRangeOfMaxedCatalyst(targetEntity)
             && !BuildingUtils.isPosInsideAnyBuilding(level.isClientSide(), targetEntity.getOnPos().above())) {

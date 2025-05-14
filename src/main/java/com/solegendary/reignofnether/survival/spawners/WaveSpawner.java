@@ -1,6 +1,7 @@
 package com.solegendary.reignofnether.survival.spawners;
 
 import com.solegendary.reignofnether.building.Building;
+import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.BuildingServerEvents;
 import com.solegendary.reignofnether.building.BuildingUtils;
 import com.solegendary.reignofnether.player.PlayerServerEvents;
@@ -21,7 +22,7 @@ import net.minecraftforge.common.IPlantable;
 
 import java.util.*;
 
-import static com.solegendary.reignofnether.survival.SurvivalServerEvents.*;
+import static com.solegendary.reignofnether.survival.SurvivalServerEvents.ENEMY_OWNER_NAME;
 
 public class WaveSpawner {
 
@@ -106,7 +107,7 @@ public class WaveSpawner {
     }
 
     public static List<BlockPos> getValidSpawnPoints(int amount, Level level, boolean allowLiquid, int flatnessRadius) {
-        List<Building> buildings = BuildingServerEvents.getBuildings()
+        List<BuildingPlacement> buildings = BuildingServerEvents.getBuildings()
                 .stream().filter(b -> !ENEMY_OWNER_NAME.equals(b.ownerName) && !b.ownerName.isBlank())
                 .toList();
 
@@ -116,19 +117,19 @@ public class WaveSpawner {
 
         Vec3 centroid = new Vec3(0,0,0);
 
-        for (Building building : buildings) {
+        for (BuildingPlacement building : buildings) {
             centroid = centroid.add(Vec3.atCenterOf(building.centrePos));
         }
         double invBs = 1f / buildings.size();
         final Vec3 fCentroid = centroid.multiply(new Vec3(invBs, invBs, invBs));
 
         // calculate all valid buildings to spawn around based on distance from the centroid
-        List<Building> sortedBuildings = buildings.stream().sorted(
-            Comparator.comparing((Building b) -> b.centrePos.distToCenterSqr(fCentroid.x, fCentroid.y, fCentroid.z)).reversed()
+        List<BuildingPlacement> sortedBuildings = buildings.stream().sorted(
+                Comparator.comparing((BuildingPlacement b) -> b.centrePos.distToCenterSqr(fCentroid.x, fCentroid.y, fCentroid.z)).reversed()
         ).toList();
 
         int numValidBuildings = (int) (MIN_VALID_BUILDINGS + (buildings.size() * PERCENT_VALID_BUILDINGS));
-        List<Building> validBuildings = sortedBuildings.subList(0, Math.min(sortedBuildings.size(), numValidBuildings));
+        List<BuildingPlacement> validBuildings = sortedBuildings.subList(0, Math.min(sortedBuildings.size(), numValidBuildings));
 
         int spawnAttemptsThisBuilding = 0;
         BlockState spawnBs;
@@ -141,7 +142,7 @@ public class WaveSpawner {
         outerloop:
         do {
             do {
-                Building building = validBuildings.get(random.nextInt(validBuildings.size()));
+                BuildingPlacement building = validBuildings.get(random.nextInt(validBuildings.size()));
 
                 int x = building.centrePos.getX() + random.nextInt(-MAX_SPAWN_RANGE, MAX_SPAWN_RANGE);
                 int z = building.centrePos.getZ() + random.nextInt(-MAX_SPAWN_RANGE, MAX_SPAWN_RANGE);
@@ -159,8 +160,8 @@ public class WaveSpawner {
                         continue;
                 }
                 Vec3 vec3 = new Vec3(x, y, z);
-                Building b = BuildingUtils.findClosestBuilding(false, vec3, (b1) -> !b1.ownerName.equals(ENEMY_OWNER_NAME));
-                Building eb = BuildingUtils.findClosestBuilding(false, vec3, (b1) -> b1.ownerName.equals(ENEMY_OWNER_NAME));
+                BuildingPlacement b = BuildingUtils.findClosestBuilding(false, vec3, (b1) -> !b1.ownerName.equals(ENEMY_OWNER_NAME));
+                BuildingPlacement eb = BuildingUtils.findClosestBuilding(false, vec3, (b1) -> b1.ownerName.equals(ENEMY_OWNER_NAME));
 
                 if (b != null)
                     distSqrToNearestBuilding = b.centrePos.distToCenterSqr(vec3);
@@ -189,18 +190,18 @@ public class WaveSpawner {
         return validSpawns;
     }
 
-    public static Building spawnBuilding(String buildingName, BlockPos bp) {
-        Building building = BuildingServerEvents.placeBuilding(
-                buildingName, bp,
+    public static BuildingPlacement spawnBuilding(Building building, BlockPos bp) {
+        BuildingPlacement placement = BuildingServerEvents.placeBuilding(
+                building, bp,
                 Rotation.NONE,
                 ENEMY_OWNER_NAME,
                 new int[] {},
                 false,
                 false
         );
-        if (building != null)
-            building.selfBuilding = true;
-        BuildingUtils.clearBuildingArea(building);
-        return building;
+        if (placement != null)
+            placement.selfBuilding = true;
+        BuildingUtils.clearBuildingArea(placement);
+        return placement;
     }
 }

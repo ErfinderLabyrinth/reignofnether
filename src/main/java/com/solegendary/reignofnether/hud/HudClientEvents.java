@@ -6,9 +6,12 @@ import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.HeroAbility;
 import com.solegendary.reignofnether.ability.abilities.CallToArmsUnit;
 import com.solegendary.reignofnether.alliance.AlliancesClient;
+import com.solegendary.reignofnether.api.ReignOfNetherRegistries;
 import com.solegendary.reignofnether.attackwarnings.AttackWarningClientEvents;
 import com.solegendary.reignofnether.building.*;
-import com.solegendary.reignofnether.building.buildings.neutral.Beacon;
+import com.solegendary.reignofnether.building.buildings.placements.BeaconPlacement;
+import com.solegendary.reignofnether.building.buildings.placements.ProductionPlacement;
+import com.solegendary.reignofnether.building.production.ActiveProduction;
 import com.solegendary.reignofnether.config.ConfigClientEvents;
 import com.solegendary.reignofnether.gamemode.ClientGameModeHelper;
 import com.solegendary.reignofnether.gamemode.GameMode;
@@ -101,7 +104,7 @@ public class HudClientEvents {
     // unit that is selected in the list of unit icons
     public static LivingEntity hudSelectedEntity = null;
     // building that is selected in the list of unit icons
-    public static Building hudSelectedBuilding = null;
+    public static BuildingPlacement hudSelectedPlacement = null;
     // classes used to render unit or building portrait (mode, frame, healthbar, stats)
     public static PortraitRendererUnit portraitRendererUnit = new PortraitRendererUnit();
     public static PortraitRendererBuilding portraitRendererBuilding = new PortraitRendererBuilding();
@@ -128,8 +131,8 @@ public class HudClientEvents {
             float totalCd = 0;
             if (le instanceof Unit unit) {
                 for (Ability ability : unit.getAbilities()) {
-                    totalCd += ability.getCooldown();
-                    if (ability.isChanneling())
+                    totalCd += ability.getCooldown(unit);
+                    if (ability.isChanneling(unit))
                         totalCd += 10;
                 }
             }
@@ -281,7 +284,7 @@ public class HudClientEvents {
         int hudStartingXPos = Button.DEFAULT_ICON_FRAME_SIZE * 6 + (Button.DEFAULT_ICON_FRAME_SIZE / 2);
 
         ArrayList<LivingEntity> selUnits = UnitClientEvents.getSelectedUnits();
-        ArrayList<Building> selBuildings = BuildingClientEvents.getSelectedBuildings();
+        ArrayList<BuildingPlacement> selBuildings = BuildingClientEvents.getSelectedBuildings();
 
         // create all the unit buttons for this frame
         int screenWidth = MC.getWindow().getGuiScaledWidth();
@@ -309,16 +312,16 @@ public class HudClientEvents {
 
         // assign hudSelectedBuilding like hudSelectedUnit in onRenderLiving
         if (selBuildings.size() <= 0) {
-            hudSelectedBuilding = null;
-        } else if (hudSelectedBuilding == null || selBuildings.size() == 1
-            || !selBuildings.contains(hudSelectedBuilding)) {
-            hudSelectedBuilding = selBuildings.get(0);
+            hudSelectedPlacement = null;
+        } else if (hudSelectedPlacement == null || selBuildings.size() == 1
+            || !selBuildings.contains(hudSelectedPlacement)) {
+            hudSelectedPlacement = selBuildings.get(0);
         }
 
-        if (hudSelectedBuilding != null) {
+        if (hudSelectedPlacement != null) {
             boolean hudSelBuildingOwned =
-                BuildingClientEvents.getPlayerToBuildingRelationship(hudSelectedBuilding) == Relationship.OWNED ||
-                SandboxClientEvents.isSandboxPlayer();
+                BuildingClientEvents.getPlayerToBuildingRelationship(hudSelectedPlacement) == Relationship.OWNED ||
+                        SandboxClientEvents.isSandboxPlayer();
 
             // -----------------
             // Building portrait
@@ -328,7 +331,7 @@ public class HudClientEvents {
             buildingPortraitZone = portraitRendererBuilding.render(evt.getGuiGraphics(),
                 blitX,
                 blitY,
-                hudSelectedBuilding
+                hudSelectedPlacement
             );
             hudZones.add(buildingPortraitZone);
 
@@ -340,24 +343,24 @@ public class HudClientEvents {
             // ---------------------------
             // Multiple selected buildings
             // ---------------------------
-            for (Building building : selBuildings) {
+            for (BuildingPlacement building : selBuildings) {
                 if (hudSelBuildingOwned && buildingButtons.size() < (buttonsPerRow * 2)) {
                     // mob head icon
 
-                    buildingButtons.add(new Button(building.name,
+                    buildingButtons.add(new Button(ReignOfNetherRegistries.BUILDING.getKey(building.getBuilding()).toString(),
                         iconSize,
-                        building.icon,
+                        building.getBuilding().icon,
                         building,
-                        () -> hudSelectedBuilding.name.equals(building.name),
+                        () -> hudSelectedPlacement.getBuilding() == building.getBuilding(),
                         () -> false,
                         () -> true,
                         () -> {
                             // click to select this unit type as a group
-                            if (hudSelectedBuilding.name.equals(building.name)) {
+                            if (hudSelectedPlacement.getBuilding() == building.getBuilding()) {
                                 BuildingClientEvents.clearSelectedBuildings();
                                 BuildingClientEvents.addSelectedBuilding(building);
                             } else { // select this one specific unit
-                                hudSelectedBuilding = building;
+                                hudSelectedPlacement = building;
                             }
                         },
                         null,
@@ -404,19 +407,20 @@ public class HudClientEvents {
                             int numBuildings = 0;
 
                             for (int i = selBuildings.size() - numExtraBuildings; i < selBuildings.size(); i++) {
-                                Building building = selBuildings.get(i);
-                                Building nextBuilding = null;
-                                String buildingName = building.name;
+                                BuildingPlacement placement = selBuildings.get(i);
+                                BuildingPlacement nextPlacement = null;
+                                Building building = placement.getBuilding();
 
-                                String nextBuildingName = null;
+                                Building nextBuilding = null;
                                 numBuildings += 1;
 
                                 if (i < selBuildings.size() - 1) {
-                                    nextBuilding = selBuildings.get(i + 1);
-                                    nextBuildingName = nextBuilding.name;
+                                    nextPlacement = selBuildings.get(i + 1);
+                                    nextBuilding = nextPlacement.getBuilding();
                                 }
-                                if (!buildingName.equals(nextBuildingName)) {
-                                    tooltipLines.add(FormattedCharSequence.forward("x" + numBuildings + " " + I18n.get(buildingName),
+                                if (building != nextBuilding) {
+                                    //TODO
+                                    tooltipLines.add(FormattedCharSequence.forward("x" + numBuildings + " " + I18n.get(ReignOfNetherRegistries.BUILDING.getKey(nextBuilding).getPath()),
                                         Style.EMPTY
                                     ));
                                     numBuildings = 0;
@@ -442,13 +446,13 @@ public class HudClientEvents {
             // ---------------------------------------------------------------
             // Building production queue (show only if 1 building is selected)
             // ---------------------------------------------------------------
-            else if ((hudSelBuildingOwned || !PlayerClientEvents.isRTSPlayer) && hudSelectedBuilding instanceof ProductionBuilding selProdBuilding) {
+            else if ((hudSelBuildingOwned || !PlayerClientEvents.isRTSPlayer) && hudSelectedPlacement instanceof ProductionPlacement selProdBuilding) {
                 blitY = screenHeight - iconFrameSize * 2 - 5;
 
                 for (int i = 0; i < selProdBuilding.productionQueue.size(); i++) {
 
                     Button button = selProdBuilding.productionQueue.get(i)
-                            .getCancelButton(selProdBuilding, i == 0);
+                            .item.getCancelButton(selProdBuilding, i == 0);
                     if (!hudSelBuildingOwned) {
                         button.onLeftClick = () -> { };
                         button.onRightClick = () -> { };
@@ -467,11 +471,11 @@ public class HudClientEvents {
                     ));
 
                     // name and progress %
-                    ProductionItem firstProdItem = selProdBuilding.productionQueue.get(0);
-                    float percentageDoneInv = firstProdItem.ticksLeft / firstProdItem.ticksToProduce;
+                    ActiveProduction firstProdItem = selProdBuilding.productionQueue.get(0);
+                    float percentageDoneInv = firstProdItem.ticksLeft / firstProdItem.item.cost.ticks;
 
                     int colour = 0xFFFFFF;
-                    if (!firstProdItem.isBelowPopulationSupply()) {
+                    if (!firstProdItem.item.isBelowPopulationSupply(selProdBuilding.getLevel(), selProdBuilding.ownerName)) {
                         colour = 0xFF0000;
                         if (percentageDoneInv <= 0) {
                             percentageDoneInv = 0.01f;
@@ -530,7 +534,7 @@ public class HudClientEvents {
             blitX = 0;
             blitY = screenHeight - iconFrameSize;
 
-            if (hudSelectedBuilding != null && (hudSelBuildingOwned) && !hudSelectedBuilding.isBuilt) {
+            if (hudSelectedPlacement != null && (hudSelBuildingOwned) && !hudSelectedPlacement.isBuilt) {
                 if (!buildingCancelButton.isHidden.get()) {
                     buildingCancelButton.render(evt.getGuiGraphics(), 0, screenHeight - iconFrameSize, mouseX, mouseY);
                     renderedButtons.add(buildingCancelButton);
@@ -538,8 +542,8 @@ public class HudClientEvents {
             } else if (hudSelBuildingOwned) {
 
                 List<AbilityButton> buildingAbilities = List.of();
-                if (hudSelectedBuilding != null) {
-                    buildingAbilities = hudSelectedBuilding.getAbilityButtons()
+                if (hudSelectedPlacement != null) {
+                    buildingAbilities = hudSelectedPlacement.getAbilityButtons()
                         .stream()
                         .filter(b -> !b.isHidden.get())
                         .toList();
@@ -549,8 +553,8 @@ public class HudClientEvents {
                 }
 
                 // production buttons on bottom row
-                if (hudSelectedBuilding instanceof ProductionBuilding selProdBuilding) {
-                    List<Button> visibleProdButtons = selProdBuilding.productionButtons.stream()
+                if (hudSelectedPlacement instanceof ProductionPlacement selProdPlacement) {
+                    List<Button> visibleProdButtons = selProdPlacement.productionButtons.stream()
                         .filter(b -> !b.isHidden.get())
                         .toList();
                     if (visibleProdButtons.size() > MAX_BUTTONS_PER_ROW) {
@@ -847,7 +851,7 @@ public class HudClientEvents {
             if (hudSelectedEntity instanceof VillagerUnit vUnit)
                 for (Ability ability : vUnit.getAbilities())
                     if (ability instanceof CallToArmsUnit callToArmsUnit)
-                        actionButtons.add(callToArmsUnit.getButton(Keybindings.keyV));
+                        actionButtons.add(callToArmsUnit.getButton(Keybindings.keyV, vUnit));
 
             for (Button actionButton : actionButtons) {
                 // GATHER button does not have a static icon
@@ -887,12 +891,12 @@ public class HudClientEvents {
                 List<AbilityButton> abilityButtons = List.of();
                 for (LivingEntity livingEntity : selUnits) {
                     if (livingEntity == hudSelectedEntity) {
-                        abilityButtons = ((Unit) livingEntity).getAbilityButtons();
+                        abilityButtons = unit.getAbilityButtons(); // unit == hudSelectedEntity
                         break;
                     }
                 }
                 List<AbilityButton> unitAbilities = abilityButtons.stream()
-                        .filter(ab -> !(ab.ability instanceof CallToArmsUnit))
+                        .filter(ab -> ab != null && !(ab.ability instanceof CallToArmsUnit))
                         .toList();
 
                 int rowsUp = (int) Math.floor((float) (unitAbilities.size() - 1) / MAX_BUTTONS_PER_ROW);
@@ -903,8 +907,8 @@ public class HudClientEvents {
                 for (AbilityButton abilityButton : unitAbilities) {
 
                     if (abilityButton.ability instanceof HeroAbility heroAbility &&
-                        heroAbility.hero.isRankUpMenuOpen()) {
-                        Button rankUpButton = heroAbility.getRankUpButton();
+                            ((HeroUnit)unit).isRankUpMenuOpen()) {
+                        Button rankUpButton = heroAbility.getRankUpButton((HeroUnit)unit);
                         if (!rankUpButton.isHidden.get()) {
                             i += 1;
                             rankUpButton.render(evt.getGuiGraphics(), blitX, blitY, mouseX, mouseY);
@@ -1499,7 +1503,7 @@ public class HudClientEvents {
             }
         }
 
-        Beacon beacon = BuildingUtils.getBeacon(true);
+        BeaconPlacement beacon = BuildingUtils.getBeacon(true);
         if (beacon != null) {
             Button beaconButton = HelperButtons.getBeaconButton(beacon.ownerName);
             if (!beaconButton.isHidden.get()) {
@@ -1627,8 +1631,8 @@ public class HudClientEvents {
         if (MiscUtil.isLeftClickDown(MC)) {
             if (buildingPortraitZone != null && buildingPortraitZone.isMouseOver(mouseX, mouseY)
                 && buildingPortraitZone.isMouseOver(mouseLeftDownX, mouseLeftDownY) && MC.player != null
-                && hudSelectedBuilding != null) {
-                BlockPos pos = hudSelectedBuilding.centrePos;
+                && hudSelectedPlacement != null) {
+                BlockPos pos = hudSelectedPlacement.centrePos;
                 OrthoviewClientEvents.centreCameraOnPos(pos);
 
             } else if (unitPortraitZone != null && unitPortraitZone.isMouseOver(mouseX, mouseY)
@@ -1756,8 +1760,8 @@ public class HudClientEvents {
     }
 
     private static void cycleBuildingSubgroups() {
-        List<Building> buildings = new ArrayList<>(BuildingClientEvents.getSelectedBuildings().stream()
-                .sorted(Comparator.comparing(b -> b.name))
+        List<BuildingPlacement> buildings = new ArrayList<>(BuildingClientEvents.getSelectedBuildings().stream()
+                .sorted(Comparator.comparing(b -> ReignOfNetherRegistries.BUILDING.getKey(b.getBuilding()).toString()))
                 .toList());
 
         if (buildings.isEmpty())
@@ -1766,21 +1770,21 @@ public class HudClientEvents {
         if (Keybindings.shiftMod.isDown())
             Collections.reverse(buildings);
 
-        if (hudSelectedBuilding != null) {
-            String hudSelectedBuildingName = hudSelectedBuilding.name;
-            String lastBuildingName = "";
+        if (hudSelectedPlacement != null) {
+            Building hudSelectedBuilding = hudSelectedPlacement.getBuilding();
+            Building lastBuilding = null;
             boolean cycled = false;
-            for (Building building : buildings) {
-                String currentBuildingName = building.name;
-                if (lastBuildingName.equals(hudSelectedBuildingName) && !currentBuildingName.equals(lastBuildingName)) {
-                    hudSelectedBuilding = building;
+            for (BuildingPlacement building : buildings) {
+                Building currentBuilding = building.getBuilding();
+                if (lastBuilding != null && lastBuilding != hudSelectedBuilding && currentBuilding != lastBuilding) {
+                    hudSelectedPlacement = building;
                     cycled = true;
                     break;
                 }
-                lastBuildingName = currentBuildingName;
+                lastBuilding = currentBuilding;
             }
             if (!cycled)
-                hudSelectedBuilding = buildings.get(0);
+                hudSelectedPlacement = buildings.get(0);
         }
     }
 

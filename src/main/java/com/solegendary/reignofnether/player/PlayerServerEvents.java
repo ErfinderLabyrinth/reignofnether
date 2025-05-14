@@ -5,10 +5,8 @@ import com.solegendary.reignofnether.ability.HeroAbility;
 import com.solegendary.reignofnether.alliance.AlliancesServerEvents;
 import com.solegendary.reignofnether.alliance.AllyCommand;
 import com.solegendary.reignofnether.building.*;
-import com.solegendary.reignofnether.building.buildings.monsters.Mausoleum;
 import com.solegendary.reignofnether.building.buildings.neutral.Beacon;
-import com.solegendary.reignofnether.building.buildings.piglins.CentralPortal;
-import com.solegendary.reignofnether.building.buildings.villagers.TownCentre;
+import com.solegendary.reignofnether.building.buildings.placements.ProductionPlacement;
 import com.solegendary.reignofnether.gamemode.GameMode;
 import com.solegendary.reignofnether.gamemode.GameModeClientboundPacket;
 import com.solegendary.reignofnether.guiscreen.TopdownGuiContainer;
@@ -271,8 +269,8 @@ public class PlayerServerEvents {
         // they are frozen so move them away then BuildingClientEvents.placeBuilding moves them to their base later
         // don't do this if they don't own any buildings
         /*
-        if (isRTSPlayer(playerName) && rtsSyncingEnabled && FogOfWarServerEvents.isEnabled()) {
-            for (Building building : BuildingServerEvents.getBuildings()) {
+        if (isRTSPlayer(playerName) && rtsSyncingEnabled) {
+            for (BuildingPlacement building : BuildingServerEvents.getBuildings()) {
                 if (building.ownerName.equals(playerName)) {
                     movePlayer(serverPlayer.getId(), 0, ORTHOVIEW_PLAYER_BASE_Y, 0);
                     break;
@@ -432,31 +430,31 @@ public class PlayerServerEvents {
             ResourcesServerEvents.resetResources(playerName);
 
             if (readiedStart) {
-                String buildingName = null;
+                Building building = null;
                 ArrayList<BuildingBlock> blocks = null;
 
                 switch (faction) {
                     case VILLAGERS -> {
-                        buildingName = TownCentre.buildingName;
-                        blocks = TownCentre.getRelativeBlockData(level);
+                        building = Buildings.TOWN_CENTRE;
+                        blocks = Buildings.TOWN_CENTRE.getRelativeBlockData(level);
                     }
                     case MONSTERS -> {
-                        buildingName = Mausoleum.buildingName;
-                        blocks = Mausoleum.getRelativeBlockData(level);
+                        building = Buildings.MAUSOLEUM;
+                        blocks = Buildings.MAUSOLEUM.getRelativeBlockData(level);
                     }
                     case PIGLINS -> {
-                        buildingName = CentralPortal.buildingName;
-                        blocks = CentralPortal.getRelativeBlockData(level);
+                        building = Buildings.CENTRAL_PORTAL;
+                        blocks = Buildings.CENTRAL_PORTAL.getRelativeBlockData(level);
                     }
                 };
-                if (buildingName != null) {
+                if (building != null) {
                     BlockPos bp = getBuildingOriginPos(new BlockPos((int) pos.x, (int) pos.y, (int) pos.z), blocks);
                     for (int i = 0; i < workers.size(); i++) {
                         workers.get(i).moveTo(bp.offset(i, 0, 0), 0, 0);
                         level.addFreshEntity(workers.get(i));
                     }
                     int[] workerIds = workers.stream().map(Entity::getId).mapToInt(Integer::intValue).toArray();
-                    BuildingServerEvents.placeBuilding(buildingName, bp, Rotation.NONE, playerName, workerIds, false, false);
+                    BuildingServerEvents.placeBuilding(building, bp, Rotation.NONE, playerName, workerIds, false, false);
                 }
             }
 
@@ -794,9 +792,9 @@ public class PlayerServerEvents {
                             unit.setOwnerName("");
                         }
                     }
-                    for (Building building : BuildingServerEvents.getBuildings()) {
+                    for (BuildingPlacement building : BuildingServerEvents.getBuildings()) {
                         if (building.ownerName.equals(playerName)) {
-                            if (building instanceof ProductionBuilding productionBuilding)
+                            if (building instanceof ProductionPlacement productionBuilding)
                                 productionBuilding.productionQueue.clear();
                             building.ownerName = "";
                         }
@@ -894,15 +892,15 @@ public class PlayerServerEvents {
                 if (entity instanceof Unit unit)
                     unit.setOwnerName("");
 
-            for (Building building : BuildingServerEvents.getBuildings()) {
-                if (building instanceof ProductionBuilding productionBuilding)
+            for (BuildingPlacement building : BuildingServerEvents.getBuildings()) {
+                if (building instanceof ProductionPlacement productionBuilding)
                     productionBuilding.productionQueue.clear();
-                if ((building.shouldDestroyOnReset || hardReset) && !isSandbox)
+                if ((building.getBuilding().shouldDestroyOnReset || hardReset) && !isSandbox)
                     building.destroy((ServerLevel) building.getLevel());
             }
             if (!isSandbox)
-                BuildingServerEvents.getBuildings().removeIf(b -> b.shouldDestroyOnReset || hardReset);
-            for (Building building : BuildingServerEvents.getBuildings())
+                BuildingServerEvents.getBuildings().removeIf(b -> b.getBuilding().shouldDestroyOnReset || hardReset);
+            for (BuildingPlacement building : BuildingServerEvents.getBuildings())
                 building.ownerName = "";
             ResearchServerEvents.removeAllResearch();
             ResearchServerEvents.removeAllCheats();

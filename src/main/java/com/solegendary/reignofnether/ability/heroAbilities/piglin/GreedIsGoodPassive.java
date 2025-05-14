@@ -29,14 +29,14 @@ public class GreedIsGoodPassive extends HeroAbility {
 
     public int maxResourcesPerCast = 100;
 
-    public GreedIsGoodPassive(HeroUnit hero) {
-        super(hero, 3, UnitAction.NONE, 0, 0, 0, false);
+    public GreedIsGoodPassive() {
+        super(3, UnitAction.NONE, 0, 0, 0, false);
         this.autocastEnableAction = UnitAction.ENABLE_GREED_IS_GOOD_PASSIVE;
         this.autocastDisableAction = UnitAction.DISABLE_GREED_IS_GOOD_PASSIVE;
     }
 
-    public boolean rankUp() {
-        if (super.rankUp()) {
+    public boolean rankUp(HeroUnit hero) {
+        if (super.rankUp(hero)) {
             updateStatsForRank();
             return true;
         }
@@ -54,29 +54,31 @@ public class GreedIsGoodPassive extends HeroAbility {
     }
 
     @Override
-    public AbilityButton getButton(Keybinding hotkey) {
+    public AbilityButton getButton(Keybinding hotkey, Unit hero) {
         return new AbilityButton("Greed is Good",
                 new ResourceLocation("minecraft", "textures/block/gold_block.png"),
                 hotkey,
-                this::getAutocast,
+                () -> getAutocast(hero),
                 () -> rank == 0,
                 () -> true,
-                this::toggleAutocast,
+                () -> toggleAutocast(hero),
                 null,
-                getTooltipLines(),
-                this
+                getTooltipLines((HeroUnit) hero),
+                this,
+                hero
         );
     }
 
     @Override
-    public Button getRankUpButton() {
+    public Button getRankUpButton(HeroUnit hero) {
         return super.getRankUpButtonProtected(
                 "Greed is Good",
-                new ResourceLocation("minecraft", "textures/block/gold_block.png")
+                new ResourceLocation("minecraft", "textures/block/gold_block.png"),
+                hero
         );
     }
 
-    public List<FormattedCharSequence> getTooltipLines() {
+    public List<FormattedCharSequence> getTooltipLines(HeroUnit hero) {
         return List.of(
                 fcs(I18n.get("abilities.reignofnether.greed_is_good") + " " + rankString(), true),
                 fcs(""),
@@ -87,10 +89,10 @@ public class GreedIsGoodPassive extends HeroAbility {
         );
     }
 
-    public List<FormattedCharSequence> getRankUpTooltipLines() {
+    public List<FormattedCharSequence> getRankUpTooltipLines(HeroUnit hero) {
         return List.of(
                 fcs(I18n.get("abilities.reignofnether.greed_is_good"), true),
-                fcs(I18n.get("abilities.reignofnether.level_req", getLevelRequirement()), getLevelReqStyle()),
+                fcs(I18n.get("abilities.reignofnether.level_req", getLevelRequirement()), getLevelReqStyle(hero)),
                 fcs(""),
                 fcs(I18n.get("abilities.reignofnether.greed_is_good.tooltip1")),
                 fcs(I18n.get("abilities.reignofnether.greed_is_good.tooltip2", maxResourcesPerCast)),
@@ -103,10 +105,10 @@ public class GreedIsGoodPassive extends HeroAbility {
         );
     }
 
-    public int checkAndSpendResources(ResourceName resName) {
+    public int checkAndSpendResources(ResourceName resName, HeroUnit hero) {
         int totalSpent = 0;
-        String ownerName = ((Unit) hero).getOwnerName();
-        if (getAutocast() && !((LivingEntity) hero).level().isClientSide()) {
+        String ownerName = hero.getOwnerName();
+        if (getAutocast(hero) && !((LivingEntity) hero).level().isClientSide()) {
             for (Resources resources : ResourcesServerEvents.resourcesList) {
                 if (resources.ownerName.equals(ownerName)) {
                     for (int i = 0; i < rank; i++) {

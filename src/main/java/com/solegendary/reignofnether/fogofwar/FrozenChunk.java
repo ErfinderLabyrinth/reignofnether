@@ -1,7 +1,7 @@
 package com.solegendary.reignofnether.fogofwar;
 
-import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingBlock;
+import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.buildings.shared.AbstractBridge;
 import com.solegendary.reignofnether.nether.NetherBlocks;
 import net.minecraft.client.Minecraft;
@@ -29,14 +29,14 @@ public class FrozenChunk {
 
     public BlockPos origin;
     public Map<BlockPos, BlockState> blocks = new HashMap<>();
-    public Building building;
+    public BuildingPlacement building;
     public boolean removeOnExplore = false;
     public boolean hasFakeBlocks = false;
     public boolean unsaved = true;
 
     private static final Minecraft MC = Minecraft.getInstance();
 
-    public FrozenChunk(BlockPos origin, Building building, boolean forceFakeChunks) {
+    public FrozenChunk(BlockPos origin, BuildingPlacement building, boolean forceFakeChunks) {
         this.origin = origin;
         this.building = building;
         if (isFullyLoaded()) {
@@ -47,7 +47,7 @@ public class FrozenChunk {
         }
     }
 
-    public FrozenChunk(BlockPos origin, Building building, FrozenChunk frozenChunkToCopy) {
+    public FrozenChunk(BlockPos origin, BuildingPlacement building, FrozenChunk frozenChunkToCopy) {
         this.origin = origin;
         this.building = building;
         this.hasFakeBlocks = frozenChunkToCopy.hasFakeBlocks;
@@ -108,7 +108,7 @@ public class FrozenChunk {
 
                     for (BuildingBlock bb : bbs) {
                         if (bb.getBlockPos().equals(bp)) {
-                            if (building instanceof AbstractBridge &&
+                            if (building.getBuilding() instanceof AbstractBridge &&
                                 !(bb.getBlockState().getBlock() instanceof WallBlock) &&
                                 !(bb.getBlockState().getBlock() instanceof FenceBlock))
                                 saveBlock(bb.getBlockPos(), Blocks.WATER.defaultBlockState(), bbs);

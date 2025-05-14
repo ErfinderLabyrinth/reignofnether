@@ -2,8 +2,9 @@ package com.solegendary.reignofnether.research.researchItems;
 
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.building.BuildingServerboundPacket;
-import com.solegendary.reignofnether.building.ProductionBuilding;
-import com.solegendary.reignofnether.building.ProductionItem;
+import com.solegendary.reignofnether.building.buildings.placements.ProductionPlacement;
+import com.solegendary.reignofnether.building.production.ProductionItem;
+import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.research.ResearchClient;
@@ -23,35 +24,32 @@ public class ResearchEvokerVexes extends ProductionItem {
     public final static String itemName = "Vexing Summons";
     public final static ResourceCost cost = ResourceCosts.RESEARCH_EVOKER_VEXES;
 
-    public ResearchEvokerVexes(ProductionBuilding building) {
-        super(building, cost.ticks);
-        this.onComplete = (Level level) -> {
+    public ResearchEvokerVexes() {
+        super(cost);
+        this.onComplete = (Level level, ProductionPlacement placement) -> {
             if (level.isClientSide()) {
-                ResearchClient.addResearch(this.building.ownerName, ResearchEvokerVexes.itemName);
+                ResearchClient.addResearch(placement.ownerName, ProductionItems.RESEARCH_EVOKER_VEXES);
             } else {
-                ResearchServerEvents.addResearch(this.building.ownerName, ResearchEvokerVexes.itemName);
+                ResearchServerEvents.addResearch(placement.ownerName, ProductionItems.RESEARCH_EVOKER_VEXES);
             }
         };
-        this.foodCost = cost.food;
-        this.woodCost = cost.wood;
-        this.oreCost = cost.ore;
     }
 
     public String getItemName() {
         return ResearchEvokerVexes.itemName;
     }
 
-    public static Button getStartButton(ProductionBuilding prodBuilding, Keybinding hotkey) {
+    public Button getStartButton(ProductionPlacement prodBuilding, Keybinding hotkey) {
         return new Button(ResearchEvokerVexes.itemName,
             14,
             new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/vex.png"),
             new ResourceLocation(ReignOfNether.MOD_ID, "textures/hud/icon_frame_bronze.png"),
             hotkey,
             () -> false,
-            () -> ProductionItem.itemIsBeingProduced(ResearchEvokerVexes.itemName, prodBuilding.ownerName)
-                || ResearchClient.hasResearch(ResearchEvokerVexes.itemName),
+            () -> ProductionItems.RESEARCH_EVOKER_VEXES.itemIsBeingProduced(prodBuilding.ownerName)
+                || ResearchClient.hasResearch(ProductionItems.RESEARCH_EVOKER_VEXES),
             () -> true,
-            () -> BuildingServerboundPacket.startProduction(prodBuilding.originPos, itemName),
+            () -> BuildingServerboundPacket.startProduction(prodBuilding.originPos, ProductionItems.RESEARCH_EVOKER_VEXES),
             null,
             List.of(FormattedCharSequence.forward(I18n.get("research.reignofnether.evoker_vexes"),
                     Style.EMPTY.withBold(true)
@@ -64,7 +62,7 @@ public class ResearchEvokerVexes extends ProductionItem {
         );
     }
 
-    public Button getCancelButton(ProductionBuilding prodBuilding, boolean first) {
+    public Button getCancelButton(ProductionPlacement prodBuilding, boolean first) {
         return new Button(ResearchEvokerVexes.itemName,
             14,
             new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/vex.png"),
@@ -73,7 +71,7 @@ public class ResearchEvokerVexes extends ProductionItem {
             () -> false,
             () -> false,
             () -> true,
-            () -> BuildingServerboundPacket.cancelProduction(prodBuilding.minCorner, itemName, first),
+            () -> BuildingServerboundPacket.cancelProduction(prodBuilding.minCorner, ProductionItems.RESEARCH_EVOKER_VEXES, first),
             null,
             null
         );

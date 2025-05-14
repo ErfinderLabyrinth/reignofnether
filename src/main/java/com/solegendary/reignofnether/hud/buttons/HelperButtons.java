@@ -3,6 +3,7 @@ package com.solegendary.reignofnether.hud.buttons;
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.building.*;
 import com.solegendary.reignofnether.building.buildings.neutral.Beacon;
+import com.solegendary.reignofnether.building.buildings.placements.BeaconPlacement;
 import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.hud.HudClientEvents;
 import com.solegendary.reignofnether.keybinds.Keybinding;
@@ -28,7 +29,7 @@ import net.minecraft.world.entity.LivingEntity;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.solegendary.reignofnether.hud.HudClientEvents.hudSelectedBuilding;
+import static com.solegendary.reignofnether.hud.HudClientEvents.hudSelectedPlacement;
 import static com.solegendary.reignofnether.unit.UnitClientEvents.getPlayerToEntityRelationship;
 import static com.solegendary.reignofnether.unit.UnitClientEvents.idleWorkerIds;
 import static com.solegendary.reignofnether.util.MiscUtil.fcs;
@@ -111,17 +112,17 @@ public class HelperButtons {
                 Keybindings.cancelBuild,
                 () -> false,
                 () -> {
-                    if (hudSelectedBuilding == null)
+                    if (hudSelectedPlacement == null)
                         return false;
                     boolean isSandboxPlayer = MC.player != null && SandboxClientEvents.isSandboxPlayer(MC.player.getName().getString());
-                    return BuildingUtils.getTotalCompletedBuildingsOwned(true, hudSelectedBuilding.ownerName) == 0 &&
+                    return BuildingUtils.getTotalCompletedBuildingsOwned(true, hudSelectedPlacement.ownerName) == 0 &&
                             !isSandboxPlayer;
                 },
                 () -> true,
                 () -> {
                     if (MC.player != null)
-                        BuildingServerboundPacket.cancelBuilding(hudSelectedBuilding.minCorner, MC.player.getName().getString());
-                    hudSelectedBuilding = null;
+                        BuildingServerboundPacket.cancelBuilding(hudSelectedPlacement.minCorner, MC.player.getName().getString());
+                    hudSelectedPlacement = null;
                 },
                 null,
                 List.of(FormattedCharSequence.forward(I18n.get("hud.helperbuttons.reignofnether.cancel"), Style.EMPTY))
@@ -160,7 +161,7 @@ public class HelperButtons {
 
     private static List<FormattedCharSequence> getBeaconButtonTooltip(String ownerName) {
         ArrayList<FormattedCharSequence> fcsList = new ArrayList<>();
-        Beacon beacon = BuildingUtils.getBeacon(true);
+        BeaconPlacement beacon = BuildingUtils.getBeacon(true);
         if (beacon == null)
             return fcsList;
 
@@ -205,7 +206,7 @@ public class HelperButtons {
                 () -> BuildingUtils.getBeacon(true) == null,
                 () -> true,
                 () -> {
-                    List<Building> beacons = BuildingClientEvents.getBuildings().stream().filter(b -> b instanceof Beacon).toList();
+                    List<BuildingPlacement> beacons = BuildingClientEvents.getBuildings().stream().filter(b -> b instanceof BeaconPlacement).toList();
                     if (!beacons.isEmpty()) {
                         BlockPos bp = beacons.get(0).centrePos;
                         OrthoviewClientEvents.centreCameraOnPos(bp);

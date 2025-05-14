@@ -2,8 +2,9 @@ package com.solegendary.reignofnether.research.researchItems;
 
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.building.BuildingServerboundPacket;
-import com.solegendary.reignofnether.building.ProductionBuilding;
-import com.solegendary.reignofnether.building.ProductionItem;
+import com.solegendary.reignofnether.building.buildings.placements.ProductionPlacement;
+import com.solegendary.reignofnether.building.production.ProductionItem;
+import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.research.ResearchClient;
@@ -23,25 +24,22 @@ public class ResearchSpiderWebs extends ProductionItem {
     public final static String itemName = "Sticky Webbing";
     public final static ResourceCost cost = ResourceCosts.RESEARCH_SPIDER_JOCKEYS;
 
-    public ResearchSpiderWebs(ProductionBuilding building) {
-        super(building, ResourceCosts.RESEARCH_SPIDER_JOCKEYS.ticks);
-        this.onComplete = (Level level) -> {
+    public ResearchSpiderWebs() {
+        super(cost);
+        this.onComplete = (Level level, ProductionPlacement placement) -> {
             if (level.isClientSide())
-                ResearchClient.addResearch(this.building.ownerName, ResearchSpiderWebs.itemName);
+                ResearchClient.addResearch(placement.ownerName, ProductionItems.RESEARCH_SPIDER_WEBS);
             else {
-                ResearchServerEvents.addResearch(this.building.ownerName, ResearchSpiderWebs.itemName);
+                ResearchServerEvents.addResearch(placement.ownerName, ProductionItems.RESEARCH_SPIDER_WEBS);
             }
         };
-        this.foodCost = cost.food;
-        this.woodCost = cost.wood;
-        this.oreCost = cost.ore;
     }
 
     public String getItemName() {
         return ResearchSpiderWebs.itemName;
     }
 
-    public static Button getStartButton(ProductionBuilding prodBuilding, Keybinding hotkey) {
+    public Button getStartButton(ProductionPlacement prodBuilding, Keybinding hotkey) {
         return new Button(
                 ResearchSpiderWebs.itemName,
                 14,
@@ -49,10 +47,10 @@ public class ResearchSpiderWebs extends ProductionItem {
                 new ResourceLocation(ReignOfNether.MOD_ID, "textures/hud/icon_frame_bronze.png"),
                 hotkey,
                 () -> false,
-                () -> ProductionItem.itemIsBeingProduced(ResearchSpiderWebs.itemName, prodBuilding.ownerName) ||
-                        ResearchClient.hasResearch(ResearchSpiderWebs.itemName),
+                () -> ProductionItems.RESEARCH_SPIDER_WEBS.itemIsBeingProduced(prodBuilding.ownerName) ||
+                        ResearchClient.hasResearch(ProductionItems.RESEARCH_SPIDER_WEBS),
                 () -> true,
-                () -> BuildingServerboundPacket.startProduction(prodBuilding.originPos, itemName),
+                () -> BuildingServerboundPacket.startProduction(prodBuilding.originPos, ProductionItems.RESEARCH_SPIDER_WEBS),
                 null,
                 List.of(
                         FormattedCharSequence.forward(I18n.get("research.reignofnether.sticky_webbing"), Style.EMPTY.withBold(true)),
@@ -67,7 +65,7 @@ public class ResearchSpiderWebs extends ProductionItem {
         );
     }
 
-    public Button getCancelButton(ProductionBuilding prodBuilding, boolean first) {
+    public Button getCancelButton(ProductionPlacement prodBuilding, boolean first) {
         return new Button(
                 ResearchSpiderWebs.itemName,
                 14,
@@ -77,7 +75,7 @@ public class ResearchSpiderWebs extends ProductionItem {
                 () -> false,
                 () -> false,
                 () -> true,
-                () -> BuildingServerboundPacket.cancelProduction(prodBuilding.minCorner, itemName, first),
+                () -> BuildingServerboundPacket.cancelProduction(prodBuilding.minCorner, ProductionItems.RESEARCH_SPIDER_WEBS, first),
                 null,
                 null
         );

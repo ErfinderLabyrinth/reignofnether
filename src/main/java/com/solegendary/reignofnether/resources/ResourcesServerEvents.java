@@ -4,7 +4,11 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.solegendary.reignofnether.alliance.AlliancesServerEvents;
-import com.solegendary.reignofnether.building.*;
+import com.solegendary.reignofnether.building.BuildingPlacement;
+import com.solegendary.reignofnether.building.BuildingServerEvents;
+import com.solegendary.reignofnether.building.BuildingUtils;
+import com.solegendary.reignofnether.building.buildings.placements.ProductionPlacement;
+import com.solegendary.reignofnether.building.production.ActiveProduction;
 import com.solegendary.reignofnether.player.PlayerServerEvents;
 import com.solegendary.reignofnether.registrars.BlockRegistrar;
 import com.solegendary.reignofnether.registrars.GameRuleRegistrar;
@@ -20,7 +24,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -78,12 +83,12 @@ public class ResourcesServerEvents {
             int prodFood = 0;
             int prodWood = 0;
             int prodOre = 0;
-            for (Building building : BuildingServerEvents.getBuildings()) {
-                if (building instanceof ProductionBuilding pBuilding) {
-                    for (ProductionItem item : pBuilding.productionQueue) {
-                        prodFood += item.foodCost;
-                        prodWood += item.woodCost;
-                        prodOre += item.oreCost;
+            for (BuildingPlacement building : BuildingServerEvents.getBuildings()) {
+                if (building instanceof ProductionPlacement pBuilding) {
+                    for (ActiveProduction item : pBuilding.productionQueue) {
+                        prodFood += item.item.cost.food;
+                        prodWood += item.item.cost.wood;
+                        prodOre += item.item.cost.ore;
                     }
                 }
             }

@@ -1,16 +1,16 @@
 package com.solegendary.reignofnether.hud;
 
 import com.solegendary.reignofnether.ReignOfNether;
-import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingClientEvents;
+import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
 import com.solegendary.reignofnether.unit.Relationship;
 import com.solegendary.reignofnether.unit.UnitClientEvents;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
+import com.solegendary.reignofnether.util.LanguageUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
@@ -24,8 +24,8 @@ import java.util.List;
 
 import static com.solegendary.reignofnether.building.BuildingClientEvents.getPlayerToBuildingRelationship;
 import static com.solegendary.reignofnether.building.BuildingClientEvents.getSelectedBuildings;
-import static com.solegendary.reignofnether.hud.HudClientEvents.hudSelectedBuilding;
 import static com.solegendary.reignofnether.hud.HudClientEvents.hudSelectedEntity;
+import static com.solegendary.reignofnether.hud.HudClientEvents.hudSelectedPlacement;
 import static com.solegendary.reignofnether.unit.UnitClientEvents.*;
 
 // classic RTS control groups that can contain either buildings or units
@@ -83,7 +83,7 @@ public class ControlGroup {
         this.keybinding = keybinding;
 
         ArrayList<LivingEntity> selUnits = UnitClientEvents.getSelectedUnits();
-        ArrayList<Building> selBuildings = BuildingClientEvents.getSelectedBuildings();
+        ArrayList<BuildingPlacement> selBuildings = BuildingClientEvents.getSelectedBuildings();
 
         if (selUnits.size() > 0 && getPlayerToEntityRelationship(selUnits.get(0)) == Relationship.OWNED) {
             this.entityIds.addAll(selUnits.stream().map(Entity::getId).toList());
@@ -95,8 +95,8 @@ public class ControlGroup {
         if (hudSelectedEntity != null) {
             String unitName = HudClientEvents.getSimpleEntityName(hudSelectedEntity);
             iconRl = new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/" + unitName + ".png");
-        } else if (hudSelectedBuilding != null) {
-            iconRl = hudSelectedBuilding.icon;
+        } else if (hudSelectedPlacement != null) {
+            iconRl = hudSelectedPlacement.getBuilding().icon;
         }
     }
 
@@ -130,13 +130,13 @@ public class ControlGroup {
 
             BuildingClientEvents.clearSelectedBuildings();
             for (BlockPos bp : buildingBps)
-                for (Building building : BuildingClientEvents.getBuildings())
+                for (BuildingPlacement building : BuildingClientEvents.getBuildings())
                     if (building.originPos.equals(bp))
                         BuildingClientEvents.addSelectedBuilding(building);
 
             if (doubleClicked) {
                 BlockPos pos = buildingBps.get(0);
-                for (Building building : BuildingClientEvents.getBuildings())
+                for (BuildingPlacement building : BuildingClientEvents.getBuildings())
                     if (building.originPos.equals(pos))
                         OrthoviewClientEvents.centreCameraOnPos(building.centrePos);
             }
@@ -160,7 +160,7 @@ public class ControlGroup {
                     clearAll();
             },
             List.of(FormattedCharSequence.forward(
-                I18n.get("hud.control_group.reignofnether.control_group", keybinding.buttonLabel),
+                LanguageUtil.getTranslation("hud.control_group.reignofnether.control_group", keybinding.buttonLabel),
                 Style.EMPTY
             ))
         );

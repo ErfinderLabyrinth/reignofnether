@@ -3,6 +3,9 @@ package com.solegendary.reignofnether.tutorial;
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingClientEvents;
+import com.solegendary.reignofnether.building.BuildingPlacement;
+import com.solegendary.reignofnether.building.Buildings;
+import com.solegendary.reignofnether.building.buildings.placements.ProductionPlacement;
 import com.solegendary.reignofnether.building.buildings.villagers.*;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientEvents;
 import com.solegendary.reignofnether.hud.Button;
@@ -65,7 +68,7 @@ public class TutorialClientEvents {
     public static boolean clickedMinimap = false;
     private static int villagersHoldingFood = 0;
 
-    private static final ArrayList<Building> damagedBuildings = new ArrayList<>();
+    private static final ArrayList<BuildingPlacement> damagedBuildings = new ArrayList<>();
 
 
     // all these positions are for camera only, actual spawn locations differ slightly on the serverside
@@ -338,9 +341,9 @@ public class TutorialClientEvents {
             .contains(unitName.toLowerCase());
     }
 
-    private static boolean hasBuildingSelected(String buildingName) {
+    private static boolean hasBuildingSelected(Building building) {
         return BuildingClientEvents.getSelectedBuildings().size() > 0 && BuildingClientEvents.getSelectedBuildings()
-            .get(0).name.equalsIgnoreCase(buildingName);
+            .get(0).getBuilding() == building;
     }
 
     // Whenever doing anything that could be a tutorial action like enabling orthoview or building your first building,
@@ -546,7 +549,7 @@ public class TutorialClientEvents {
                     TutorialRendering.setButtonName(TownCentre.buildingName);
                     progressStage();
                 } else if (stageProgress == 1 && BuildingClientEvents.getBuildings().size() > 0) {
-                    if (BuildingClientEvents.getBuildings().get(0) instanceof TownCentre) {
+                    if (BuildingClientEvents.getBuildings().get(0).getBuilding() instanceof TownCentre) {
                         nextStage();
                     }
                 }
@@ -561,8 +564,8 @@ public class TutorialClientEvents {
                     msg("tutorial.reignofnether.select_building");
                     progressStage();
                 } else if (stageProgress == 2 && BuildingClientEvents.getBuildings().size() > 0) {
-                    if (BuildingClientEvents.getBuildings().get(0) instanceof TownCentre townCentre
-                        && townCentre.isBuilt) {
+                    if (BuildingClientEvents.getBuildings().get(0).getBuilding() instanceof TownCentre townCentre
+                        && BuildingClientEvents.getBuildings().get(0).isBuilt) {
                         specialMsg("tutorial.reignofnether.congratulations");
                         nextStageAfterDelay(100);
                     }
@@ -581,7 +584,8 @@ public class TutorialClientEvents {
                     setHelpButtonText("tutorial.reignofnether.rally_point2");
                     progressStage();
                 } else if (stageProgress == 3 && BuildingClientEvents.getBuildings().size() > 0) {
-                    if (BuildingClientEvents.getBuildings().get(0) instanceof TownCentre townCentre
+                    if (BuildingClientEvents.getBuildings().get(0).getBuilding() instanceof TownCentre
+                        && BuildingClientEvents.getBuildings().get(0) instanceof ProductionPlacement townCentre
                         && townCentre.getRallyPoint() != null) {
                         msg("tutorial.reignofnether.make_villager");
                         setHelpButtonText("tutorial.reignofnether.make_villager2");
@@ -589,7 +593,8 @@ public class TutorialClientEvents {
                         progressStage();
                     }
                 } else if (stageProgress == 4 && BuildingClientEvents.getBuildings().size() > 0) {
-                    if (BuildingClientEvents.getBuildings().get(0) instanceof TownCentre townCentre
+                    if (BuildingClientEvents.getBuildings().get(0).getBuilding() instanceof TownCentre
+                        && BuildingClientEvents.getBuildings().get(0) instanceof ProductionPlacement townCentre
                         && townCentre.productionQueue.size() > 0) {
                         msg("tutorial.reignofnether.tip.queue");
                         progressStage();
@@ -784,8 +789,8 @@ public class TutorialClientEvents {
                     setHelpButtonText("tutorial.reignofnether.build_barracks2");
                     progressStage();
                 } else if (stageProgress == 2) {
-                    for (Building building : BuildingClientEvents.getBuildings()) {
-                        if (building instanceof Barracks barracks && barracks.isBuilt) {
+                    for (BuildingPlacement building : BuildingClientEvents.getBuildings()) {
+                        if (building.getBuilding() instanceof Barracks && building.isBuilt) {
                             specialMsg("tutorial.reignofnether.great_job");
                             nextStageAfterDelay(100);
                             break;
@@ -799,13 +804,13 @@ public class TutorialClientEvents {
                     msg("tutorial.reignofnether.select_barracks");
                     setHelpButtonText("tutorial.reignofnether.select_barracks2");
                     shouldPauseTicking = () -> BuildingClientEvents.getSelectedBuildings().isEmpty()
-                        || !(BuildingClientEvents.getSelectedBuildings().get(0) instanceof Barracks);
+                        || !(BuildingClientEvents.getSelectedBuildings().get(0).getBuilding() instanceof Barracks);
                     progressStageAfterDelay(140);
-                } else if (stageProgress == 1 && hasBuildingSelected(Barracks.buildingName)) {
+                } else if (stageProgress == 1 && hasBuildingSelected(Buildings.BARRACKS)) {
                     TutorialRendering.setButtonName(VindicatorProd.itemName);
                     msg("tutorial.reignofnether.vindicators");
                     progressStageAfterDelay(160);
-                } else if (stageProgress == 2 && hasBuildingSelected(Barracks.buildingName)) {
+                } else if (stageProgress == 2 && hasBuildingSelected(Buildings.BARRACKS)) {
                     clearHelpButtonText();
                     TutorialRendering.setButtonName(PillagerProd.itemName);
                     msg("tutorial.reignofnether.pillagers");
@@ -897,7 +902,7 @@ public class TutorialClientEvents {
             case REPAIR_BUILDING -> {
                 if (stageProgress == 0) {
                     TutorialServerboundPacket.doServerAction(TutorialAction.EXPAND_MONSTER_BASE_B);
-                    for (Building building : BuildingClientEvents.getBuildings())
+                    for (BuildingPlacement building : BuildingClientEvents.getBuildings())
                         if (building.getHealth() < building.getMaxHealth() && building.getFaction() == Faction.VILLAGERS
                             && damagedBuildings.size() < 3) {
                             damagedBuildings.add(building);
@@ -913,7 +918,7 @@ public class TutorialClientEvents {
                     setHelpButtonText("tutorial.reignofnether.repair_buildings2");
                     progressStageAfterDelay(160);
                 } else if (stageProgress == 2) {
-                    for (Building building : damagedBuildings) {
+                    for (BuildingPlacement building : damagedBuildings) {
                         if (building.getHealth() >= building.getMaxHealth()) {
                             specialMsg("tutorial.reignofnether.good_job");
                             clearHelpButtonText();
@@ -947,16 +952,16 @@ public class TutorialClientEvents {
                     setHelpButtonText("tutorial.reignofnether.build_bridge3");
                     progressStage();
                 } else if (stageProgress == 3) {
-                    for (Building building : BuildingClientEvents.getBuildings()) {
-                        if (building instanceof OakBridge bridge) {
+                    for (BuildingPlacement building : BuildingClientEvents.getBuildings()) {
+                        if (building.getBuilding() instanceof OakBridge) {
                             msg("tutorial.reignofnether.tip.bridge_segments");
                             progressStage();
                             break;
                         }
                     }
                 } else if (stageProgress == 4) {
-                    for (Building building : BuildingClientEvents.getBuildings()) {
-                        if (building instanceof OakBridge bridge && bridge.isBuilt) {
+                    for (BuildingPlacement building : BuildingClientEvents.getBuildings()) {
+                        if (building.getBuilding() instanceof OakBridge && building.isBuilt) {
                             specialMsg("tutorial.reignofnether.nice_job");
                             progressStageAfterDelay(100);
                             break;
@@ -986,7 +991,7 @@ public class TutorialClientEvents {
                     msg("tutorial.reignofnether.tip.ranged_no_buildings");
                     progressStageAfterDelay(200);
                 } else if (stageProgress == 3) {
-                    for (Building building : BuildingClientEvents.getBuildings()) {
+                    for (BuildingPlacement building : BuildingClientEvents.getBuildings()) {
                         if (building.getFaction() == Faction.MONSTERS
                             && building.getHealth() < building.getMaxHealth()) {
                             msg("tutorial.reignofnether.tip.monster_capitol");
@@ -996,7 +1001,7 @@ public class TutorialClientEvents {
                     }
                 } else if (stageProgress == 4) {
                     boolean botAlive = false;
-                    for (Building building : BuildingClientEvents.getBuildings())
+                    for (BuildingPlacement building : BuildingClientEvents.getBuildings())
                         if (building.getFaction() == Faction.MONSTERS) {
                             botAlive = true;
                         }

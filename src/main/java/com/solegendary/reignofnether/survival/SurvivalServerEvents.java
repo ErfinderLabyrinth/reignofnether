@@ -2,10 +2,10 @@ package com.solegendary.reignofnether.survival;
 
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.alliance.AlliancesServerEvents;
-import com.solegendary.reignofnether.building.Building;
+import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.BuildingServerEvents;
 import com.solegendary.reignofnether.building.BuildingUtils;
-import com.solegendary.reignofnether.building.buildings.piglins.Portal;
+import com.solegendary.reignofnether.building.buildings.placements.PortalPlacement;
 import com.solegendary.reignofnether.player.PlayerServerEvents;
 import com.solegendary.reignofnether.player.RTSPlayer;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
@@ -52,7 +52,7 @@ public class SurvivalServerEvents {
     private static long lastEnemyCount = 0;
     private static long ticks = 0;
 
-    private static ArrayList<Building> lastPortals = new ArrayList<>();
+    private static ArrayList<BuildingPlacement> lastPortals = new ArrayList<>();
 
     private static ServerLevel serverLevel = null;
 
@@ -148,13 +148,13 @@ public class SurvivalServerEvents {
             enemy.tick(TICK_INTERVAL);
 
         // detect new portals and update portals list accordingly
-        List<Building> currentPortals = BuildingServerEvents.getBuildings().stream().filter(b ->
-                ENEMY_OWNER_NAME.equals(b.ownerName) && !b.ownerName.isBlank() && b instanceof Portal)
+        List<BuildingPlacement> currentPortals = BuildingServerEvents.getBuildings().stream().filter(b ->
+                ENEMY_OWNER_NAME.equals(b.ownerName) && !b.ownerName.isBlank() && b instanceof PortalPlacement)
                 .toList();
 
-        for (Building portal : currentPortals)
+        for (BuildingPlacement portal : currentPortals)
             if (!lastPortals.contains(portal))
-                SurvivalServerEvents.portals.add(new WavePortal((Portal) portal, currentWave != null ? currentWave : nextWave));
+                SurvivalServerEvents.portals.add(new WavePortal((PortalPlacement) portal, currentWave != null ? currentWave : nextWave));
         SurvivalServerEvents.portals.removeIf(p -> !currentPortals.contains(p.getPortal()));
 
         lastPortals.clear();

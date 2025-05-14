@@ -1,29 +1,25 @@
 package com.solegendary.reignofnether.building.buildings.monsters;
 
-import com.solegendary.reignofnether.building.*;
+import com.solegendary.reignofnether.api.ReignOfNetherRegistries;
+import com.solegendary.reignofnether.building.BuildingClientEvents;
+import com.solegendary.reignofnether.building.BuildingPlacement;
+import com.solegendary.reignofnether.building.Buildings;
+import com.solegendary.reignofnether.building.production.ProductionBuilding;
+import com.solegendary.reignofnether.building.production.ProductionItems;
+import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.research.ResearchClient;
-import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
-import com.solegendary.reignofnether.unit.units.monsters.PoisonSpiderProd;
-import com.solegendary.reignofnether.unit.units.monsters.SpiderProd;
 import com.solegendary.reignofnether.util.Faction;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.Rotation;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
-import static com.solegendary.reignofnether.building.BuildingUtils.getAbsoluteBlockData;
+import java.util.List;
 
 public class SpiderLair extends ProductionBuilding {
 
@@ -31,51 +27,35 @@ public class SpiderLair extends ProductionBuilding {
     public final static String structureName = "spider_lair";
     public final static ResourceCost cost = ResourceCosts.SPIDER_LAIR;
 
-    public SpiderLair(Level level, BlockPos originPos, Rotation rotation, String ownerName) {
-        super(level, originPos, rotation, ownerName, getAbsoluteBlockData(getRelativeBlockData(level), level, originPos, rotation), false);
+    public SpiderLair() {
+        super(structureName, cost, false);
         this.name = buildingName;
-        this.ownerName = ownerName;
         this.portraitBlock = Blocks.COBWEB;
         this.icon = new ResourceLocation("minecraft", "textures/block/cobweb.png");
-
-        this.foodCost = cost.food;
-        this.woodCost = cost.wood;
-        this.oreCost = cost.ore;
-        this.popSupply = cost.population;
 
         this.startingBlockTypes.add(Blocks.DEEPSLATE);
         this.startingBlockTypes.add(Blocks.COBBLED_DEEPSLATE);
 
         this.explodeChance = 0.2f;
 
-        updateButtons();
-    }
-
-    public void updateButtons() {
-        if (level.isClientSide()) {
-            this.productionButtons = Arrays.asList(
-                SpiderProd.getStartButton(this, Keybindings.keyQ),
-                PoisonSpiderProd.getStartButton(this, Keybindings.keyW)
-            );
-        }
+        this.productions.add(ProductionItems.SPIDER, Keybindings.keyQ);
+        this.productions.add(ProductionItems.POISON_SPIDER, Keybindings.keyW);
     }
 
     public Faction getFaction() {return Faction.MONSTERS;}
 
-    public static ArrayList<BuildingBlock> getRelativeBlockData(LevelAccessor level) {
-        return BuildingBlockData.getBuildingBlocks(structureName, level);
-    }
-
-    public static AbilityButton getBuildButton(Keybinding hotkey) {
+    public AbilityButton getBuildButton(Keybinding hotkey) {
+        ResourceLocation key = ReignOfNetherRegistries.BUILDING.getKey(this);
+        String name = I18n.get("buildings." + getFaction().name().toLowerCase() + "." + key.getNamespace() + "." + key.getPath());
         return new AbilityButton(
-                SpiderLair.buildingName,
+                name,
                 new ResourceLocation("minecraft", "textures/block/cobweb.png"),
                 hotkey,
-                () -> BuildingClientEvents.getBuildingToPlace() == SpiderLair.class,
+                () -> BuildingClientEvents.getBuildingToPlace() == Buildings.SPIDER_LAIR,
                 () -> false,
-                () -> BuildingClientEvents.hasFinishedBuilding(Graveyard.buildingName) ||
+                () -> BuildingClientEvents.hasFinishedBuilding(Buildings.GRAVEYARD) ||
                         ResearchClient.hasCheat("modifythephasevariance"),
-                () -> BuildingClientEvents.setBuildingToPlace(SpiderLair.class),
+                () -> BuildingClientEvents.setBuildingToPlace(Buildings.SPIDER_LAIR),
                 null,
                 List.of(
                         FormattedCharSequence.forward(I18n.get("buildings.monsters.reignofnether.spider_lair"), Style.EMPTY.withBold(true)),
@@ -85,7 +65,8 @@ public class SpiderLair extends ProductionBuilding {
                         FormattedCharSequence.forward("", Style.EMPTY),
                         FormattedCharSequence.forward(I18n.get("buildings.monsters.reignofnether.spider_lair.tooltip2"), Style.EMPTY)
                 ),
-                null
+                null,
+                (BuildingPlacement) null
         );
     }
 }

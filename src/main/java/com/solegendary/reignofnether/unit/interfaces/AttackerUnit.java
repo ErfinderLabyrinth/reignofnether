@@ -1,6 +1,6 @@
 package com.solegendary.reignofnether.unit.interfaces;
 
-import com.solegendary.reignofnether.building.Building;
+import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.BuildingUtils;
 import com.solegendary.reignofnether.building.GarrisonableBuilding;
 import com.solegendary.reignofnether.unit.Relationship;
@@ -66,7 +66,7 @@ public interface AttackerUnit {
                 mabg.setBuildingTarget(preselectedBlockPos);
         } else {
             Level level = ((LivingEntity) this).level();
-            Building building = BuildingUtils.findBuilding(level.isClientSide(), preselectedBlockPos);
+            BuildingPlacement building = BuildingUtils.findBuilding(level.isClientSide(), preselectedBlockPos);
 
             if (building != null) {
                 BlockPos groundCentrePos = new BlockPos(building.centrePos.getX(), building.originPos.getY() + 1, building.centrePos.getZ());
@@ -223,7 +223,7 @@ public interface AttackerUnit {
             return;
         }
         if (canAttackBuildings() && !(this instanceof RavagerUnit && ((LivingEntity) this).isVehicle()) && !(((Unit) this).getOwnerName()).isEmpty()) {
-            Building closestBuilding = MiscUtil.findClosestAttackableBuilding((Mob) this, aggroRange, level);
+            BuildingPlacement closestBuilding = MiscUtil.findClosestAttackableBuilding((Mob) this, aggroRange, level);
             if (closestBuilding != null) {
                 ((Unit) this).getMoveGoal().stopMoving();
                 setAttackBuildingTarget(closestBuilding.originPos);

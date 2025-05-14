@@ -4,7 +4,7 @@ package com.solegendary.reignofnether.util;
 import com.mojang.datafixers.util.Pair;
 import com.solegendary.reignofnether.alliance.AlliancesClient;
 import com.solegendary.reignofnether.building.*;
-import com.solegendary.reignofnether.building.buildings.shared.AbstractBridge;
+import com.solegendary.reignofnether.building.buildings.placements.BridgePlacement;
 import com.solegendary.reignofnether.cursor.CursorClientEvents;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
@@ -274,16 +274,16 @@ public class MiscUtil {
     }
 
 
-    public static Building findClosestAttackableBuilding(Mob unitMob, float range, ServerLevel level) {
-        List<Building> buildings = unitMob.level().isClientSide() ?
+    public static BuildingPlacement findClosestAttackableBuilding(Mob unitMob, float range, ServerLevel level) {
+        List<BuildingPlacement> buildings = unitMob.level().isClientSide() ?
                 BuildingClientEvents.getBuildings() : BuildingServerEvents.getBuildings();
 
         double closestDist = range;
-        Building closestBuilding = null;
+        BuildingPlacement closestBuilding = null;
 
-        for (Building building : buildings) {
+        for (BuildingPlacement building : buildings) {
             // Check if the building is attackable, taking into account the relationship
-            if (isBuildingAttackable(unitMob, building) && !(building instanceof AbstractBridge)) {
+            if (isBuildingAttackable(unitMob, building) && !(building instanceof BridgePlacement)) {
                 BlockPos attackPos = building.getClosestGroundPos(unitMob.blockPosition(), 1);
                 double dist = Math.sqrt(unitMob.blockPosition().distSqr(attackPos));
                 if (dist < closestDist) {
@@ -295,16 +295,14 @@ public class MiscUtil {
         return closestBuilding;
     }
 
-    private static boolean isBuildingAttackable(Mob unitMob, Building building) {
-        if (building.invulnerable)
-            return false;
-
+    private static boolean isBuildingAttackable(Mob unitMob, BuildingPlacement building) {
         // Get the relationship between the unit and the building's owner
         Relationship relationship = UnitServerEvents.getUnitToBuildingRelationship((Unit) unitMob, building);
 
         // If the relationship is FRIENDLY, do not allow the attack
-        if (relationship == Relationship.FRIENDLY)
+        if (relationship == Relationship.FRIENDLY) {
             return false;
+        }
 
         boolean neutralAggro = unitMob.level().getGameRules().getRule(GameRuleRegistrar.NEUTRAL_AGGRO).get();
         if (relationship == Relationship.NEUTRAL && neutralAggro)
@@ -569,6 +567,7 @@ public class MiscUtil {
                     decisionOver2 += 2 * (z - x) + 1;
                 }
             }
+
             return circleBlocks;
         }
 

@@ -2,8 +2,9 @@ package com.solegendary.reignofnether.research.researchItems;
 
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.building.BuildingServerboundPacket;
-import com.solegendary.reignofnether.building.ProductionBuilding;
-import com.solegendary.reignofnether.building.ProductionItem;
+import com.solegendary.reignofnether.building.buildings.placements.ProductionPlacement;
+import com.solegendary.reignofnether.building.production.ProductionItem;
+import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.research.ResearchClient;
@@ -23,35 +24,28 @@ public class ResearchHealingPotions extends ProductionItem {
     public final static String itemName = "Healing Potions";
     public final static ResourceCost cost = ResourceCosts.RESEARCH_HEALING_POTIONS;
 
-    public ResearchHealingPotions(ProductionBuilding building) {
-        super(building, ResourceCosts.RESEARCH_HEALING_POTIONS.ticks);
-        this.onComplete = (Level level) -> {
+    public ResearchHealingPotions() {
+        super(ResourceCosts.RESEARCH_HEALING_POTIONS);
+        this.onComplete = (Level level, ProductionPlacement building) -> {
             if (level.isClientSide()) {
-                ResearchClient.addResearch(this.building.ownerName, ResearchHealingPotions.itemName);
+                ResearchClient.addResearch(building.ownerName, ProductionItems.RESEARCH_HEALING_POTIONS);
             } else {
-                ResearchServerEvents.addResearch(this.building.ownerName, ResearchHealingPotions.itemName);
+                ResearchServerEvents.addResearch(building.ownerName, ProductionItems.RESEARCH_HEALING_POTIONS);
             }
         };
-        this.foodCost = cost.food;
-        this.woodCost = cost.wood;
-        this.oreCost = cost.ore;
     }
 
-    public String getItemName() {
-        return ResearchHealingPotions.itemName;
-    }
-
-    public static Button getStartButton(ProductionBuilding prodBuilding, Keybinding hotkey) {
+    public Button getStartButton(ProductionPlacement prodBuilding, Keybinding hotkey) {
         return new Button(ResearchHealingPotions.itemName,
             14,
             new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/splash_potion_healing.png"),
             new ResourceLocation(ReignOfNether.MOD_ID, "textures/hud/icon_frame_bronze.png"),
             hotkey,
             () -> false,
-            () -> ProductionItem.itemIsBeingProduced(ResearchHealingPotions.itemName, prodBuilding.ownerName)
-                || ResearchClient.hasResearch(ResearchHealingPotions.itemName),
+            () -> ProductionItems.RESEARCH_HEALING_POTIONS.itemIsBeingProduced(prodBuilding.ownerName)
+                || ResearchClient.hasResearch(ProductionItems.RESEARCH_HEALING_POTIONS),
             () -> true,
-            () -> BuildingServerboundPacket.startProduction(prodBuilding.originPos, itemName),
+            () -> BuildingServerboundPacket.startProduction(prodBuilding.originPos, ProductionItems.RESEARCH_HEALING_POTIONS),
             null,
             List.of(FormattedCharSequence.forward(I18n.get("research.reignofnether.healing_potions"),
                     Style.EMPTY.withBold(true)
@@ -66,7 +60,7 @@ public class ResearchHealingPotions extends ProductionItem {
         );
     }
 
-    public Button getCancelButton(ProductionBuilding prodBuilding, boolean first) {
+    public Button getCancelButton(ProductionPlacement prodBuilding, boolean first) {
         return new Button(ResearchHealingPotions.itemName,
             14,
             new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/splash_potion_healing.png"),
@@ -75,7 +69,7 @@ public class ResearchHealingPotions extends ProductionItem {
             () -> false,
             () -> false,
             () -> true,
-            () -> BuildingServerboundPacket.cancelProduction(prodBuilding.minCorner, itemName, first),
+            () -> BuildingServerboundPacket.cancelProduction(prodBuilding.minCorner, ProductionItems.RESEARCH_HEALING_POTIONS, first),
             null,
             null
         );

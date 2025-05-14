@@ -1,8 +1,11 @@
 package com.solegendary.reignofnether.research;
 
+import com.solegendary.reignofnether.api.ReignOfNetherRegistries;
+import com.solegendary.reignofnether.building.production.ProductionItem;
 import com.solegendary.reignofnether.hud.HudClientEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,7 +16,7 @@ public class ResearchClient {
 
     private final static Minecraft MC = Minecraft.getInstance();
 
-    final private static List<String> researchItems = Collections.synchronizedList(new ArrayList<>());
+    final private static List<ResourceLocation> researchItems = Collections.synchronizedList(new ArrayList<>());
 
     public static void removeAllResearch() {
         synchronized (researchItems) {
@@ -21,24 +24,32 @@ public class ResearchClient {
         }
     }
 
-    public static void addResearch(String ownerName, String researchItemName) {
+    public static void addResearch(String ownerName, ProductionItem researchItem) {
+        addResearch(ownerName, ReignOfNetherRegistries.PRODUCTION_ITEM.getKey(researchItem));
+    }
+
+    public static void addResearch(String ownerName, ResourceLocation researchItemName) {
         synchronized (researchItems) {
             if (MC.player != null && MC.player.getName().getString().equals(ownerName)) {
                 researchItems.add(researchItemName);
                 HudClientEvents.showTemporaryMessage(I18n.get(
                     "research.reignofnether.upgrade_completed",
-                    researchItemName
+                    I18n.get("research." + researchItemName.getNamespace() + "." + researchItemName.getPath())
                 ));
             }
         }
     }
 
-    public static boolean hasResearch(String researchItemName) {
+    public static boolean hasResearch(ProductionItem researchItem) {
+        return hasResearch(ReignOfNetherRegistries.PRODUCTION_ITEM.getKey(researchItem));
+    }
+
+    public static boolean hasResearch(ResourceLocation researchItemName) {
         synchronized (researchItems) {
             if (hasCheat("medievalman")) {
                 return true;
             }
-            for (String researchItem : researchItems)
+            for (ResourceLocation researchItem : researchItems)
                 if (researchItem.equals(researchItemName)) {
                     return true;
                 }

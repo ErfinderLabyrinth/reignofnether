@@ -1,6 +1,6 @@
 package com.solegendary.reignofnether.unit;
 
-import com.solegendary.reignofnether.building.Building;
+import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.resources.ResourceName;
 import com.solegendary.reignofnether.resources.ResourceSource;
 import net.minecraft.core.BlockPos;
@@ -17,7 +17,7 @@ public class TargetResourcesSave {
     @Nullable public BlockPos gatherTarget = null;
     public ResourceName targetResourceName = ResourceName.NONE;
     @Nullable public ResourceSource targetResourceSource = null;
-    @Nullable public Building targetFarm = null;
+    @Nullable public BuildingPlacement targetFarm = null;
 
     public boolean hasData() {
         return this.todoGatherTargets.size() > 0 ||

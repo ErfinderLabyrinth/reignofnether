@@ -6,13 +6,10 @@
 package com.solegendary.reignofnether.unit.modelling.models;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.solegendary.reignofnether.unit.modelling.models.VillagerUnitModel;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import java.io.IOException;
-import java.util.Optional;
 import net.minecraft.Util;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.VillagerHeadModel;
@@ -33,6 +30,9 @@ import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.npc.VillagerType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+
+import java.io.IOException;
+import java.util.Optional;
 
 @OnlyIn(Dist.CLIENT)
 public class VillagerUnitProfessionLayer<T extends LivingEntity & VillagerDataHolder, M extends EntityModel<T> & VillagerHeadModel> extends RenderLayer<T, M> {

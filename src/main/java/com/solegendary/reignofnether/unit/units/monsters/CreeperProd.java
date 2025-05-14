@@ -1,17 +1,22 @@
 package com.solegendary.reignofnether.unit.units.monsters;
 
+import com.solegendary.reignofnether.ReignOfNether;
+import com.solegendary.reignofnether.building.BuildingPlacement;
+import com.solegendary.reignofnether.building.BuildingServerboundPacket;
+import com.solegendary.reignofnether.building.buildings.placements.ProductionPlacement;
+import com.solegendary.reignofnether.building.production.ProductionItem;
+import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.cursor.CursorClientEvents;
 import com.solegendary.reignofnether.hud.AbilityButton;
-import com.solegendary.reignofnether.sandbox.SandboxAction;
-import com.solegendary.reignofnether.sandbox.SandboxClientEvents;
-import net.minecraft.client.resources.language.I18n;
-import com.solegendary.reignofnether.ReignOfNether;
-import com.solegendary.reignofnether.building.*;
 import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.registrars.EntityRegistrar;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
+import com.solegendary.reignofnether.sandbox.SandboxAction;
+import com.solegendary.reignofnether.sandbox.SandboxClientEvents;
+import com.solegendary.reignofnether.unit.interfaces.Unit;
+import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -26,23 +31,19 @@ public class CreeperProd extends ProductionItem {
     public static final ResourceCost cost = ResourceCosts.CREEPER;
     public static Button startButton = null;
 
-    public CreeperProd(ProductionBuilding building) {
-        super(building, cost.ticks);
-        this.onComplete = (Level level) -> {
+    public CreeperProd() {
+        super(cost);
+        this.onComplete = (Level level, ProductionPlacement building) -> {
             if (!level.isClientSide())
                 building.produceUnit((ServerLevel) level, EntityRegistrar.CREEPER_UNIT.get(), building.ownerName, true);
         };
-        this.foodCost = cost.food;
-        this.woodCost = cost.wood;
-        this.oreCost = cost.ore;
-        this.popCost = cost.population;
     }
 
     public String getItemName() {
         return CreeperProd.itemName;
     }
 
-    public static AbilityButton getPlaceButton() {
+    public AbilityButton getPlaceButton() {
         return new AbilityButton(
                 CreeperProd.itemName,
                 new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/creeper.png"),
@@ -63,11 +64,12 @@ public class CreeperProd extends ProductionItem {
                         FormattedCharSequence.forward("", Style.EMPTY),
                         FormattedCharSequence.forward(I18n.get("units.monsters.reignofnether.creeper.tooltip3"), Style.EMPTY)
                 ),
-                null
+                null,
+                (Unit) null
         );
     }
 
-    public static Button getStartButton(ProductionBuilding prodBuilding, Keybinding hotkey) {
+    public Button getStartButton(ProductionPlacement prodBuilding, Keybinding hotkey) {
         return new Button(
             CreeperProd.itemName,
             14,
@@ -76,7 +78,7 @@ public class CreeperProd extends ProductionItem {
             () -> false,
             () -> false,
             () -> true,
-            () -> BuildingServerboundPacket.startProduction(prodBuilding.originPos, itemName),
+            () -> BuildingServerboundPacket.startProduction(prodBuilding.originPos, ProductionItems.CREEPER),
             null,
             List.of(
                 FormattedCharSequence.forward(I18n.get("units.monsters.reignofnether.creeper"), Style.EMPTY.withBold(true)),
@@ -91,7 +93,7 @@ public class CreeperProd extends ProductionItem {
         );
     }
 
-    public Button getCancelButton(ProductionBuilding prodBuilding, boolean first) {
+    public Button getCancelButton(ProductionPlacement prodBuilding, boolean first) {
         return new Button(
             CreeperProd.itemName,
             14,
@@ -100,7 +102,7 @@ public class CreeperProd extends ProductionItem {
             () -> false,
             () -> false,
             () -> true,
-            () -> BuildingServerboundPacket.cancelProduction(prodBuilding.minCorner, itemName, first),
+            () -> BuildingServerboundPacket.cancelProduction(prodBuilding.minCorner, ProductionItems.CREEPER, first),
             null,
             null
         );

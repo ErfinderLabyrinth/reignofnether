@@ -10,7 +10,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 
 import java.util.List;
 
-public interface HeroUnit {
+public interface HeroUnit extends Unit{
 
     int MAX_HERO_LEVEL = 10;
 
@@ -94,12 +94,9 @@ public interface HeroUnit {
     }
 
     default List<HeroAbility> getHeroAbilities() {
-        if (this instanceof Unit unit) {
-            return unit.getAbilities().stream()
-                    .filter(a -> a instanceof HeroAbility)
-                    .map(a -> (HeroAbility) a)
-                    .toList();
-        }
-        return List.of();
+        return getAbilities().stream()
+                .filter(a -> a instanceof HeroAbility)
+                .map(a -> (HeroAbility) a)
+                .toList();
     }
 }

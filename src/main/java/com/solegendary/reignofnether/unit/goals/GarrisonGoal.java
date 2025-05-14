@@ -2,7 +2,7 @@ package com.solegendary.reignofnether.unit.goals;
 
 import com.solegendary.reignofnether.alliance.AlliancesClient;
 import com.solegendary.reignofnether.alliance.AlliancesServerEvents;
-import com.solegendary.reignofnether.building.Building;
+import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.BuildingUtils;
 import com.solegendary.reignofnether.building.GarrisonableBuilding;
 import com.solegendary.reignofnether.hud.HudClientEvents;
@@ -15,7 +15,7 @@ import net.minecraft.world.phys.Vec3;
 
 public class GarrisonGoal extends MoveToTargetBlockGoal {
 
-    private Building buildingTarget;
+    private BuildingPlacement buildingTarget;
 
     public GarrisonGoal(Mob mob) {
         super(mob, true, 0);
@@ -53,7 +53,7 @@ public class GarrisonGoal extends MoveToTargetBlockGoal {
     public void setBuildingTarget(BlockPos blockPos) {
         if (blockPos != null) {
             boolean clientside = this.mob.level().isClientSide();
-            Building building = BuildingUtils.findBuilding(clientside, blockPos);
+            BuildingPlacement building = BuildingUtils.findBuilding(clientside, blockPos);
 
             if (building == null)
                 return;
@@ -87,7 +87,7 @@ public class GarrisonGoal extends MoveToTargetBlockGoal {
         }
     }
 
-    public Building getBuildingTarget() {
+    public BuildingPlacement getBuildingTarget() {
         return buildingTarget;
     }
 

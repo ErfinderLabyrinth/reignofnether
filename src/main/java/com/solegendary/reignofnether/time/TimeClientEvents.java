@@ -4,6 +4,7 @@ import com.mojang.datafixers.util.Pair;
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingClientEvents;
+import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.NightSource;
 import com.solegendary.reignofnether.building.RangeIndicator;
 import com.solegendary.reignofnether.guiscreen.TopdownGui;
@@ -231,7 +232,7 @@ public class TimeClientEvents {
         }
 
         // draw range indicators for buildings with abilities and monster night sources
-        for (Building building : BuildingClientEvents.getBuildings())
+        for (BuildingPlacement building : BuildingClientEvents.getBuildings())
             if (building instanceof RangeIndicator ri) {
                 for (BlockPos bp : ri.getBorderBps()) {
                     if (BuildingClientEvents.getSelectedBuildings().contains(building)) {
@@ -271,7 +272,7 @@ public class TimeClientEvents {
             nightSourceOrigins.clear();
 
             // get list of night source centre:range pairs
-            for (Building building : BuildingClientEvents.getBuildings()) {
+            for (BuildingPlacement building : BuildingClientEvents.getBuildings()) {
                 if (!building.isExploredClientside || !(building instanceof NightSource ns)) {
                     continue;
                 }

@@ -1,10 +1,8 @@
 package com.solegendary.reignofnether.cursor;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.solegendary.reignofnether.unit.NonUnitClientEvents;
-import org.joml.Vector3d;
-import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingClientEvents;
+import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.BuildingUtils;
 import com.solegendary.reignofnether.guiscreen.TopdownGui;
 import com.solegendary.reignofnether.hud.HudClientEvents;
@@ -13,6 +11,7 @@ import com.solegendary.reignofnether.minimap.MinimapClientEvents;
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
 import com.solegendary.reignofnether.resources.ResourceSources;
 import com.solegendary.reignofnether.sandbox.SandboxAction;
+import com.solegendary.reignofnether.unit.NonUnitClientEvents;
 import com.solegendary.reignofnether.unit.Relationship;
 import com.solegendary.reignofnether.unit.UnitAction;
 import com.solegendary.reignofnether.unit.UnitClientEvents;
@@ -42,6 +41,7 @@ import net.minecraftforge.client.event.RenderHighlightEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import org.joml.Vector3d;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -382,7 +382,7 @@ public class CursorClientEvents {
             return;
         if (MC.level != null && OrthoviewClientEvents.isEnabled()) {
 
-            Building preSelBuilding = BuildingClientEvents.getPreselectedBuilding();
+            BuildingPlacement preSelBuilding = BuildingClientEvents.getPreselectedBuilding();
             // don't draw block outline if we've selected a builder unit and are mousing over a building (unless leftClick action is MOVE)
             boolean buildingTargetedByWorker = (HudClientEvents.hudSelectedEntity instanceof WorkerUnit &&
                     preSelBuilding != null &&
@@ -399,8 +399,8 @@ public class CursorClientEvents {
             // do we own any of the selected buildings or entities?
             // will be false if there are none selected in the first place
             boolean ownAnySelected = false;
-            ArrayList<Building> selBuildings = BuildingClientEvents.getSelectedBuildings();
-            for (Building building : selBuildings)
+            ArrayList<BuildingPlacement> selBuildings = BuildingClientEvents.getSelectedBuildings();
+            for (BuildingPlacement building : selBuildings)
                 if (building != null && BuildingClientEvents.getPlayerToBuildingRelationship(building) == Relationship.OWNED)
                     ownAnySelected = true;
             for (LivingEntity entity : UnitClientEvents.getSelectedUnits()) {

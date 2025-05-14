@@ -1,13 +1,18 @@
 package com.solegendary.reignofnether.building;
 
 import com.solegendary.reignofnether.ReignOfNether;
-import com.solegendary.reignofnether.building.buildings.piglins.Portal;
-import com.solegendary.reignofnether.building.buildings.shared.AbstractStockpile;
+import com.solegendary.reignofnether.api.ReignOfNetherRegistries;
+import com.solegendary.reignofnether.building.buildings.piglins.PortalCivilian;
+import com.solegendary.reignofnether.building.buildings.placements.PortalPlacement;
+import com.solegendary.reignofnether.building.buildings.placements.ProductionPlacement;
+import com.solegendary.reignofnether.building.buildings.placements.StockpilePlacement;
+import com.solegendary.reignofnether.building.production.ProductionItem;
 import com.solegendary.reignofnether.hud.HudClientEvents;
 import com.solegendary.reignofnether.registrars.PacketHandler;
 import com.solegendary.reignofnether.sandbox.SandboxServer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -47,17 +52,17 @@ public class BuildingServerboundPacket {
             BuildingAction.CHANGE_PORTAL
     );
 
-    public static void placeBuilding(String itemName, BlockPos originPos, Rotation rotation,
+    public static void placeBuilding(Building building, BlockPos originPos, Rotation rotation,
                                      String ownerName, int[] builderUnitIds, boolean isDiagonalBridge) {
         PacketHandler.INSTANCE.sendToServer(new BuildingServerboundPacket(
                 BuildingAction.PLACE,
-                itemName, originPos, BlockPos.ZERO, rotation, ownerName, builderUnitIds, isDiagonalBridge));
+                ReignOfNetherRegistries.BUILDING.getKey(building).toString(), originPos, BlockPos.ZERO, rotation, ownerName, builderUnitIds, isDiagonalBridge));
     }
-    public static void placeAndQueueBuilding(String itemName, BlockPos originPos, Rotation rotation,
+    public static void placeAndQueueBuilding(Building building, BlockPos originPos, Rotation rotation,
                                              String ownerName, int[] builderUnitIds, boolean isDiagonalBridge) {
         PacketHandler.INSTANCE.sendToServer(new BuildingServerboundPacket(
                 BuildingAction.PLACE_AND_QUEUE,
-                itemName, originPos, BlockPos.ZERO, rotation, ownerName, builderUnitIds, isDiagonalBridge));
+                ReignOfNetherRegistries.BUILDING.getKey(building).toString(), originPos, BlockPos.ZERO, rotation, ownerName, builderUnitIds, isDiagonalBridge));
     }
     public static void cancelBuilding(BlockPos buildingPos, String ownerName) {
         PacketHandler.INSTANCE.sendToServer(new BuildingServerboundPacket(
@@ -74,19 +79,19 @@ public class BuildingServerboundPacket {
                 BuildingAction.SET_RALLY_POINT_ENTITY,
                 "", buildingPos, BlockPos.ZERO, Rotation.NONE, "", new int[]{ entityId }, false));
     }
-    public static void startProduction(BlockPos buildingPos, String itemName) {
+    public static void startProduction(BlockPos buildingPos, ProductionItem item) {
         BuildingClientEvents.switchHudToIdlestBuilding();
 
-        if (HudClientEvents.hudSelectedBuilding != null) {
+        if (HudClientEvents.hudSelectedPlacement != null) {
             PacketHandler.INSTANCE.sendToServer(new BuildingServerboundPacket(
                     BuildingAction.START_PRODUCTION,
-                    itemName, HudClientEvents.hudSelectedBuilding.originPos, BlockPos.ZERO, Rotation.NONE, "", new int[0], false));
+                    ReignOfNetherRegistries.PRODUCTION_ITEM.getKey(item).toString(), HudClientEvents.hudSelectedPlacement.originPos, BlockPos.ZERO, Rotation.NONE, "", new int[0], false));
         }
     }
-    public static void cancelProduction(BlockPos buildingPos, String itemName, boolean frontItem) {
+    public static void cancelProduction(BlockPos buildingPos, ProductionItem item, boolean frontItem) {
         PacketHandler.INSTANCE.sendToServer(new BuildingServerboundPacket(
                 frontItem ? BuildingAction.CANCEL_PRODUCTION : BuildingAction.CANCEL_BACK_PRODUCTION,
-                itemName, buildingPos, BlockPos.ZERO, Rotation.NONE, "", new int[0], false));
+                ReignOfNetherRegistries.PRODUCTION_ITEM.getKey(item).toString(), buildingPos, BlockPos.ZERO, Rotation.NONE, "", new int[0], false));
     }
     public static void checkStockpileChests(BlockPos chestPos) {
         PacketHandler.INSTANCE.sendToServer(new BuildingServerboundPacket(
@@ -137,7 +142,7 @@ public class BuildingServerboundPacket {
     public boolean handle(Supplier<NetworkEvent.Context> ctx) {
         final var success = new AtomicBoolean(false);
         ctx.get().enqueueWork(() -> {
-            Building building = null;
+            BuildingPlacement building = null;
             if (!List.of(BuildingAction.PLACE, BuildingAction.PLACE_AND_QUEUE).contains(this.action)) {
                 building = findBuilding(false, this.buildingPos);
                 if (building == null)
@@ -162,48 +167,49 @@ public class BuildingServerboundPacket {
             }
             switch (this.action) {
                 case PLACE -> {
-                    BuildingServerEvents.placeBuilding(this.itemName, this.buildingPos, this.rotation, this.ownerName, this.builderUnitIds, false, isDiagonalBridge);
+                    BuildingServerEvents.placeBuilding(ReignOfNetherRegistries.BUILDING.get(ResourceLocation.tryParse(this.itemName)), this.buildingPos, this.rotation, this.ownerName, this.builderUnitIds, false, isDiagonalBridge);
                 }
                 case PLACE_AND_QUEUE -> {
-                    BuildingServerEvents.placeBuilding(this.itemName, this.buildingPos, this.rotation, this.ownerName, this.builderUnitIds, true, isDiagonalBridge);
+                    BuildingServerEvents.placeBuilding(ReignOfNetherRegistries.BUILDING.get(ResourceLocation.tryParse(this.itemName)), this.buildingPos, this.rotation, this.ownerName, this.builderUnitIds, true, isDiagonalBridge);
                 }
                 case DESTROY -> {
                     BuildingServerEvents.cancelBuilding(building, this.ownerName);
                 }
                 case SET_RALLY_POINT -> {
-                    if (building instanceof ProductionBuilding productionBuilding)
+                    if (building instanceof ProductionPlacement productionBuilding)
                         productionBuilding.setRallyPoint(rallyPos);
                 }
                 case SET_RALLY_POINT_ENTITY -> {
-                    if (building instanceof ProductionBuilding productionBuilding) {
+                    if (building instanceof ProductionPlacement productionBuilding) {
                         Entity e = building.level.getEntity(this.builderUnitIds[0]);
                         if (e instanceof LivingEntity le)
                             productionBuilding.setRallyPointEntity(le);
                     }
                 }
                 case START_PRODUCTION -> {
-                    boolean prodSuccess = ProductionBuilding.startProductionItem(((ProductionBuilding) building), this.itemName, this.buildingPos);
+                    boolean prodSuccess = ((ProductionPlacement) building).startProductionItem(ReignOfNetherRegistries.PRODUCTION_ITEM.get(ResourceLocation.tryParse(this.itemName)), this.buildingPos);
                     if (prodSuccess)
-                        BuildingClientboundPacket.startProduction(buildingPos, itemName);
+                        BuildingClientboundPacket.startProduction(buildingPos, ReignOfNetherRegistries.PRODUCTION_ITEM.get(ResourceLocation.tryParse(itemName)));
                 }
                 case CANCEL_PRODUCTION -> {
-                    if (building instanceof ProductionBuilding pBuilding) {
-                        boolean cancelSuccess = ProductionBuilding.cancelProductionItem(pBuilding, this.itemName, this.buildingPos, true);
+                    if (building instanceof ProductionPlacement pBuilding) {
+                        boolean cancelSuccess = pBuilding.cancelProductionItem(ReignOfNetherRegistries.PRODUCTION_ITEM.get(ResourceLocation.tryParse(this.itemName)), this.buildingPos, true);
                         if (cancelSuccess || pBuilding.productionQueue.isEmpty())
-                            BuildingClientboundPacket.cancelProduction(buildingPos, itemName, true);
+                            BuildingClientboundPacket.cancelProduction(buildingPos, ReignOfNetherRegistries.PRODUCTION_ITEM.get(ResourceLocation.tryParse(itemName)), true);
                     }
                 }
                 case CANCEL_BACK_PRODUCTION -> {
-                    if (building instanceof ProductionBuilding pBuilding) {
-                        boolean cancelSuccess = ProductionBuilding.cancelProductionItem(pBuilding, this.itemName, this.buildingPos, false);
+                    if (building instanceof ProductionPlacement pBuilding) {
+                        boolean cancelSuccess = pBuilding.cancelProductionItem(ReignOfNetherRegistries.PRODUCTION_ITEM.get(ResourceLocation.tryParse(this.itemName)), this.buildingPos, false);
                         if (cancelSuccess || pBuilding.productionQueue.isEmpty())
-                            BuildingClientboundPacket.cancelProduction(buildingPos, itemName, false);
+                            BuildingClientboundPacket.cancelProduction(buildingPos, ReignOfNetherRegistries.PRODUCTION_ITEM.get(ResourceLocation.tryParse(itemName)), false);
                     }
                 }
                 case CHECK_STOCKPILE_CHEST -> {
-                    if (building instanceof AbstractStockpile ||
-                        building instanceof Portal portal && portal.portalType == Portal.PortalType.CIVILIAN)
-                        AbstractStockpile.checkAndConsumeChestItems(building);
+                    if (building instanceof StockpilePlacement stockpile)
+                        stockpile.checkAndConsumeChestItems();
+                    else if (building instanceof PortalPlacement portal && portal.getBuilding() instanceof PortalCivilian)
+                        portal.checkAndConsumeChestItems();
                 }
                 case REQUEST_REPLACEMENT -> {
                     BuildingServerEvents.replaceClientBuilding(buildingPos);

@@ -2,7 +2,7 @@ package com.solegendary.reignofnether.player;
 
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.building.BuildingUtils;
-import com.solegendary.reignofnether.building.buildings.neutral.Beacon;
+import com.solegendary.reignofnether.building.buildings.placements.BeaconPlacement;
 import com.solegendary.reignofnether.gamemode.ClientGameModeHelper;
 import com.solegendary.reignofnether.gamemode.GameMode;
 import com.solegendary.reignofnether.gamemode.GameModeServerboundPacket;
@@ -108,8 +108,8 @@ public class PlayerServerboundPacket {
                     MC.player.sendSystemMessage(Component.literal(""));
                 });
             } else if (ClientGameModeHelper.gameMode == GameMode.CLASSIC) {
-                Beacon beacon = BuildingUtils.getBeacon(true);
-                boolean isKotB = beacon != null && beacon.capturable;
+                BeaconPlacement beacon = BuildingUtils.getBeacon(true);
+                boolean isKotB = beacon != null && beacon.getBuilding().capturable;
                 if (isKotB) {
                     CompletableFuture.delayedExecutor(2000, TimeUnit.MILLISECONDS).execute(() -> {
                         MC.player.sendSystemMessage(Component.literal(""));

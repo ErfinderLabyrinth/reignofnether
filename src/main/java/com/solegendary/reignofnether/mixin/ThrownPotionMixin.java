@@ -1,8 +1,8 @@
 package com.solegendary.reignofnether.mixin;
 
+import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.research.ResearchClient;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
-import com.solegendary.reignofnether.research.researchItems.ResearchLingeringPotions;
 import com.solegendary.reignofnether.unit.units.villagers.WitchUnit;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -51,9 +51,9 @@ public abstract class ThrownPotionMixin extends Projectile {
             aec.setWaitTime(10);
 
             int duration = WitchUnit.LINGERING_POTION_DURATION;
-            if (this.level().isClientSide() && ResearchClient.hasResearch(ResearchLingeringPotions.itemName)) {
+            if (this.level().isClientSide() && ResearchClient.hasResearch(ProductionItems.RESEARCH_LINGERING_POTIONS)) {
                 duration = WitchUnit.LINGERING_POTION_DURATION_EXTENDED;
-            } else if (!this.level().isClientSide() && ResearchServerEvents.playerHasResearch(witchUnit.getOwnerName(), ResearchLingeringPotions.itemName)) {
+            } else if (!this.level().isClientSide() && ResearchServerEvents.playerHasResearch(witchUnit.getOwnerName(), ProductionItems.RESEARCH_LINGERING_POTIONS)) {
                 duration = WitchUnit.LINGERING_POTION_DURATION_EXTENDED;
             }
             aec.setDuration(duration);

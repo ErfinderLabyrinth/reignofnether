@@ -1,12 +1,16 @@
 package com.solegendary.reignofnether.building.buildings.piglins;
 
-import com.solegendary.reignofnether.building.*;
+import com.solegendary.reignofnether.api.ReignOfNetherRegistries;
+import com.solegendary.reignofnether.building.BuildingClientEvents;
+import com.solegendary.reignofnether.building.BuildingPlacement;
+import com.solegendary.reignofnether.building.Buildings;
+import com.solegendary.reignofnether.building.buildings.placements.BastionPlacement;
+import com.solegendary.reignofnether.building.production.ProductionBuilding;
+import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.research.ResearchClient;
-import com.solegendary.reignofnether.research.researchItems.ResearchBruteShields;
-import com.solegendary.reignofnether.research.researchItems.ResearchHeavyTridents;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.util.Faction;
@@ -16,37 +20,27 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Rotation;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static com.solegendary.reignofnether.building.BuildingUtils.getAbsoluteBlockData;
 
-public class Bastion extends ProductionBuilding implements GarrisonableBuilding {
+public class Bastion extends ProductionBuilding {
 
     public final static String buildingName = "Bastion";
     public final static String structureName = "bastion";
     public final static ResourceCost cost = ResourceCosts.BASTION;
 
-    private final static int MAX_OCCUPANTS = 4;
-
-    public Bastion(Level level, BlockPos originPos, Rotation rotation, String ownerName) {
-        super(level, originPos, rotation, ownerName, getAbsoluteBlockData(getRelativeBlockData(level), level, originPos, rotation), false);
+    public Bastion() {
+        super(structureName, cost, false);
         this.name = buildingName;
-        this.ownerName = ownerName;
         this.portraitBlock = Blocks.CHISELED_POLISHED_BLACKSTONE;
         this.icon = new ResourceLocation("minecraft", "textures/block/chiseled_polished_blackstone.png");
 
         this.canSetRallyPoint = false;
 
-        this.foodCost = cost.food;
-        this.woodCost = cost.wood;
-        this.oreCost = cost.ore;
-        this.popSupply = cost.population;
         this.buildTimeModifier = 0.72f;
 
         this.startingBlockTypes.add(Blocks.POLISHED_BLACKSTONE);
@@ -55,46 +49,29 @@ public class Bastion extends ProductionBuilding implements GarrisonableBuilding 
 
         this.explodeChance = 0.2f;
 
-        updateButtons();
-    }
-
-    public void updateButtons() {
-        if (level.isClientSide()) {
-            this.productionButtons = Arrays.asList(
-                ResearchBruteShields.getStartButton(this, Keybindings.keyQ),
-                ResearchHeavyTridents.getStartButton(this, Keybindings.keyW)
-            );
-        }
+        this.productions.add(ProductionItems.RESEARCH_BRUTE_SHIELDS, Keybindings.keyQ);
+        this.productions.add(ProductionItems.RESEARCH_HEAVY_TRIDENTS, Keybindings.keyW);
     }
 
     public Faction getFaction() {return Faction.PIGLINS;}
 
-    // don't use this for abilities as it may not be balanced
-    public int getAttackRange() { return 24; }
-    // bonus for units attacking garrisoned units
-    public int getExternalAttackRangeBonus() { return 10; }
-
-    public boolean canDestroyBlock(BlockPos relativeBp) {
-        return relativeBp.getY() != 10 &&
-                relativeBp.getY() != 11;
+    @Override
+    public BuildingPlacement createBuildingPlacement(Level level, BlockPos pos, Rotation rotation, String ownerName) {
+        return new BastionPlacement(this, level, pos, rotation, ownerName, getAbsoluteBlockData(getRelativeBlockData(level), level, pos, rotation), false);
     }
 
-    public static ArrayList<BuildingBlock> getRelativeBlockData(LevelAccessor level) {
-        return BuildingBlockData.getBuildingBlocks(structureName, level);
-    }
-
-    public static AbilityButton getBuildButton(Keybinding hotkey) {
+    public AbilityButton getBuildButton(Keybinding hotkey) {
+        ResourceLocation key = ReignOfNetherRegistries.BUILDING.getKey(this);
+        String name = I18n.get("buildings." + getFaction().name().toLowerCase() + "." + key.getNamespace() + "." + key.getPath());
         return new AbilityButton(
-                Bastion.buildingName,
+                name,
                 new ResourceLocation("minecraft", "textures/block/chiseled_polished_blackstone.png"),
                 hotkey,
-                () -> BuildingClientEvents.getBuildingToPlace() == Bastion.class,
+                () -> BuildingClientEvents.getBuildingToPlace() == Buildings.BASTION,
                 () -> false,
-                () -> BuildingClientEvents.hasFinishedBuilding(Portal.buildingName) ||
-                        BuildingClientEvents.hasFinishedBuilding("Civilian Portal") ||
-                        BuildingClientEvents.hasFinishedBuilding("Military Portal") ||
+                () -> BuildingClientEvents.hasFinishedBuilding(Buildings.PORTAL_BASIC) ||
                         ResearchClient.hasCheat("modifythephasevariance"),
-                () -> BuildingClientEvents.setBuildingToPlace(Bastion.class),
+                () -> BuildingClientEvents.setBuildingToPlace(Buildings.BASTION),
                 null,
                 List.of(
                         FormattedCharSequence.forward(I18n.get("buildings.piglins.reignofnether.bastion"), Style.EMPTY.withBold(true)),
@@ -103,40 +80,12 @@ public class Bastion extends ProductionBuilding implements GarrisonableBuilding 
                         FormattedCharSequence.forward(I18n.get("buildings.piglins.reignofnether.bastion.tooltip1"), Style.EMPTY),
                         FormattedCharSequence.forward(I18n.get("buildings.piglins.reignofnether.bastion.tooltip2"), Style.EMPTY),
                         FormattedCharSequence.forward("", Style.EMPTY),
-                        FormattedCharSequence.forward(I18n.get("buildings.piglins.reignofnether.bastion.tooltip3", MAX_OCCUPANTS), Style.EMPTY),
+                        FormattedCharSequence.forward(I18n.get("buildings.piglins.reignofnether.bastion.tooltip3", BastionPlacement.MAX_OCCUPANTS), Style.EMPTY),
                         FormattedCharSequence.forward("", Style.EMPTY),
                         FormattedCharSequence.forward(I18n.get("buildings.piglins.reignofnether.bastion.tooltip4"), Style.EMPTY)
                 ),
-                null
+                null,
+                (BuildingPlacement) null
         );
     }
-
-    @Override
-    public BlockPos getEntryPosition() {
-        if (this.rotation == Rotation.NONE) {
-            return new BlockPos(2,11,2);
-        } else if (this.rotation == Rotation.CLOCKWISE_90) {
-            return new BlockPos(-2,11,2);
-        } else if (this.rotation == Rotation.CLOCKWISE_180) {
-            return new BlockPos(-2,11,-2);
-        } else {
-            return new BlockPos(2,11,-2);
-        }
-    }
-
-    @Override
-    public BlockPos getExitPosition() {
-        if (this.rotation == Rotation.NONE) {
-            return new BlockPos(2,1,2);
-        } else if (this.rotation == Rotation.CLOCKWISE_90) {
-            return new BlockPos(-2,1,2);
-        } else if (this.rotation == Rotation.CLOCKWISE_180) {
-            return new BlockPos(-2,1,-2);
-        } else {
-            return new BlockPos(2,1,-2);
-        }
-    }
-
-    @Override
-    public boolean isFull() { return GarrisonableBuilding.getNumOccupants(this) >= MAX_OCCUPANTS; }
 }

@@ -1,8 +1,8 @@
 package com.solegendary.reignofnether.mixin;
 
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
-import com.solegendary.reignofnether.time.TimeClientEvents;
 import com.solegendary.reignofnether.time.NightUtils;
+import com.solegendary.reignofnether.time.TimeClientEvents;
 import com.solegendary.reignofnether.time.TimeUtils;
 import com.solegendary.reignofnether.util.MiscUtil;
 import net.minecraft.client.Minecraft;

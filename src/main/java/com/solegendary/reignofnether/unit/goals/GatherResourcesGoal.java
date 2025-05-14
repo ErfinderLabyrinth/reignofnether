@@ -1,7 +1,7 @@
 package com.solegendary.reignofnether.unit.goals;
 
-import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingBlock;
+import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.BuildingUtils;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientEvents;
 import com.solegendary.reignofnether.registrars.BlockRegistrar;
@@ -449,7 +449,7 @@ public class GatherResourcesGoal extends MoveToTargetBlockGoal {
     }
 
     // locks the worker to only gather from this specific building
-    public void setTargetFarm(Building building) {
+    public void setTargetFarm(BuildingPlacement building) {
         if (building != null) {
             MiscUtil.addUnitCheckpoint((Unit) mob, building.centrePos, true);
         }

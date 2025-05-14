@@ -1,8 +1,9 @@
 package com.solegendary.reignofnether.unit.goals;
 
-import com.solegendary.reignofnether.building.Building;
+import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.BuildingServerEvents;
 import com.solegendary.reignofnether.building.BuildingUtils;
+import com.solegendary.reignofnether.building.buildings.placements.FarmPlacement;
 import com.solegendary.reignofnether.building.buildings.shared.AbstractBridge;
 import com.solegendary.reignofnether.building.buildings.villagers.OakStockpile;
 import com.solegendary.reignofnether.resources.ResourceName;
@@ -26,8 +27,8 @@ import java.util.List;
 public class BuildRepairGoal extends MoveToTargetBlockGoal {
 
     public boolean ignoreNextCheckpoint = false;
-    public final List<Building> queuedBuildings = new ArrayList<>();
-    private Building buildingTarget;
+    public final List<BuildingPlacement> queuedBuildings = new ArrayList<>();
+    private BuildingPlacement buildingTarget;
 
     private Boolean isBuildingServerside = false;
 
@@ -54,7 +55,7 @@ public class BuildRepairGoal extends MoveToTargetBlockGoal {
     public void tick() {
         if (buildingTarget == null) {
             if (!this.mob.level().isClientSide() && WorkerUnit.isIdle((WorkerUnit) this.mob) && autocastRepair) {
-                Building building = BuildingUtils.findClosestBuilding(
+                BuildingPlacement building = BuildingUtils.findClosestBuilding(
                         this.mob.level().isClientSide(),
                         this.mob.getEyePosition(),
                         b -> b.getBlocksPlaced() < b.getBlocksTotal() &&
@@ -67,12 +68,12 @@ public class BuildRepairGoal extends MoveToTargetBlockGoal {
         }
         if (!BuildingUtils.isBuildingBuildable(this.mob.level().isClientSide(), buildingTarget)) {
             if (!startNextQueuedBuilding()) {
-                if (buildingTarget.name.contains(" Farm") && mob instanceof WorkerUnit workerUnit) {
+                if (buildingTarget instanceof FarmPlacement && mob instanceof WorkerUnit workerUnit) {
                     ((WorkerUnit) mob).getGatherResourceGoal().setTargetResourceName(ResourceName.FOOD);
                     ((WorkerUnit) mob).getGatherResourceGoal().setTargetFarm(buildingTarget);
                 }
                 // look for the nearest resource to gather after completing a stockpile
-                else if (buildingTarget instanceof OakStockpile stockpile && !buildingTarget.isBuilt && mob instanceof WorkerUnit workerUnit) {
+                else if (buildingTarget.getBuilding() instanceof OakStockpile stockpile && !buildingTarget.isBuilt && mob instanceof WorkerUnit workerUnit) {
                     ((Unit) mob).getReturnResourcesGoal().depositItems();
                     workerUnit.getGatherResourceGoal().setTargetResourceName(stockpile.mostAbundantNearbyResource);
                 }
@@ -100,12 +101,12 @@ public class BuildRepairGoal extends MoveToTargetBlockGoal {
 
         if (buildingTarget != null && this.moveTarget != null)
             if (BuildingServerEvents.getUnitToBuildingRelationship((Unit) this.mob, buildingTarget) == Relationship.OWNED ||
-                buildingTarget instanceof AbstractBridge)
+                buildingTarget.getBuilding() instanceof AbstractBridge)
                 return MiscUtil.isMobInRangeOfPos(moveTarget, mob, 2); // buildingTarget.isPosInsideBuilding(mob.getOnPos())
         return false;
     }
 
-    public void setBuildingTarget(@Nullable Building target) {
+    public void setBuildingTarget(@Nullable BuildingPlacement target) {
         if (target != null) {
             if (ignoreNextCheckpoint)
                 ignoreNextCheckpoint = false;
@@ -123,7 +124,7 @@ public class BuildRepairGoal extends MoveToTargetBlockGoal {
         this.start();
     }
 
-    public Building getBuildingTarget() { return buildingTarget; }
+    public BuildingPlacement getBuildingTarget() { return buildingTarget; }
 
     // if we override stop() it for some reason is called after start() and we can never begin this goal...
     public void stopBuilding() {

@@ -1,6 +1,11 @@
 package com.solegendary.reignofnether.building.buildings.villagers;
 
-import com.solegendary.reignofnether.building.*;
+import com.solegendary.reignofnether.api.ReignOfNetherRegistries;
+import com.solegendary.reignofnether.building.BuildingClientEvents;
+import com.solegendary.reignofnether.building.BuildingPlacement;
+import com.solegendary.reignofnether.building.Buildings;
+import com.solegendary.reignofnether.building.production.ProductionBuilding;
+import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.keybinds.Keybindings;
@@ -9,23 +14,14 @@ import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.tutorial.TutorialClientEvents;
 import com.solegendary.reignofnether.tutorial.TutorialStage;
-import com.solegendary.reignofnether.unit.units.villagers.PillagerProd;
-import com.solegendary.reignofnether.unit.units.villagers.VindicatorProd;
 import com.solegendary.reignofnether.util.Faction;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.Rotation;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
-import static com.solegendary.reignofnether.building.BuildingUtils.getAbsoluteBlockData;
+import java.util.List;
 
 public class Barracks extends ProductionBuilding {
 
@@ -33,50 +29,34 @@ public class Barracks extends ProductionBuilding {
     public final static String structureName = "barracks";
     public final static ResourceCost cost = ResourceCosts.BARRACKS;
 
-    public Barracks(Level level, BlockPos originPos, Rotation rotation, String ownerName) {
-        super(level, originPos, rotation, ownerName, getAbsoluteBlockData(getRelativeBlockData(level), level, originPos, rotation), false);
+    public Barracks() {
+        super(structureName, cost, false);
         this.name = buildingName;
-        this.ownerName = ownerName;
         this.portraitBlock = Blocks.FLETCHING_TABLE;
         this.icon = new ResourceLocation("minecraft", "textures/block/fletching_table_front.png");
-
-        this.foodCost = cost.food;
-        this.woodCost = cost.wood;
-        this.oreCost = cost.ore;
-        this.popSupply = cost.population;
 
         this.startingBlockTypes.add(Blocks.POLISHED_ANDESITE_STAIRS);
 
         this.explodeChance = 0.2f;
 
-        updateButtons();
-    }
-
-    public void updateButtons() {
-        if (level.isClientSide()) {
-            this.productionButtons = Arrays.asList(
-                VindicatorProd.getStartButton(this, Keybindings.keyQ),
-                PillagerProd.getStartButton(this, Keybindings.keyW)
-            );
-        }
+        this.productions.add(ProductionItems.VINDICATOR, Keybindings.keyQ);
+        this.productions.add(ProductionItems.PILLAGER, Keybindings.keyW);
     }
 
     public Faction getFaction() {return Faction.VILLAGERS;}
 
-    public static ArrayList<BuildingBlock> getRelativeBlockData(LevelAccessor level) {
-        return BuildingBlockData.getBuildingBlocks(structureName, level);
-    }
-
-    public static AbilityButton getBuildButton(Keybinding hotkey) {
+    public AbilityButton getBuildButton(Keybinding hotkey) {
+        ResourceLocation key = ReignOfNetherRegistries.BUILDING.getKey(this);
+        String name = I18n.get("buildings." + getFaction().name().toLowerCase() + "." + key.getNamespace() + "." + key.getPath());
         return new AbilityButton(
-                Barracks.buildingName,
+                name,
                 new ResourceLocation("minecraft", "textures/block/fletching_table_front.png"),
                 hotkey,
-                () -> BuildingClientEvents.getBuildingToPlace() == Barracks.class,
+                () -> BuildingClientEvents.getBuildingToPlace() == Buildings.BARRACKS,
                 () -> !TutorialClientEvents.isAtOrPastStage(TutorialStage.EXPLAIN_BUILDINGS),
-                () -> BuildingClientEvents.hasFinishedBuilding(TownCentre.buildingName) ||
+                () -> BuildingClientEvents.hasFinishedBuilding(Buildings.TOWN_CENTRE) ||
                         ResearchClient.hasCheat("modifythephasevariance"),
-                () -> BuildingClientEvents.setBuildingToPlace(Barracks.class),
+                () -> BuildingClientEvents.setBuildingToPlace(Buildings.BARRACKS),
                 null,
                 List.of(
                         FormattedCharSequence.forward(I18n.get("buildings.villagers.reignofnether.barracks"), Style.EMPTY.withBold(true)),
@@ -84,7 +64,8 @@ public class Barracks extends ProductionBuilding {
                         FormattedCharSequence.forward("", Style.EMPTY),
                         FormattedCharSequence.forward(I18n.get("buildings.villagers.reignofnether.barracks.tooltip1"), Style.EMPTY)
                 ),
-                null
+                null,
+                (BuildingPlacement) null
         );
     }
 }

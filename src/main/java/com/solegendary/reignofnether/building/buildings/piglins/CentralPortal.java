@@ -1,12 +1,17 @@
 package com.solegendary.reignofnether.building.buildings.piglins;
 
-import com.solegendary.reignofnether.building.*;
+import com.solegendary.reignofnether.api.ReignOfNetherRegistries;
+import com.solegendary.reignofnether.building.BuildingClientEvents;
+import com.solegendary.reignofnether.building.BuildingPlacement;
+import com.solegendary.reignofnether.building.Buildings;
+import com.solegendary.reignofnether.building.buildings.placements.CentralPortalPlacement;
+import com.solegendary.reignofnether.building.production.ProductionBuilding;
+import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
-import com.solegendary.reignofnether.unit.units.piglins.GruntProd;
 import com.solegendary.reignofnether.util.Faction;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
@@ -15,113 +20,51 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Rotation;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static com.solegendary.reignofnether.building.BuildingUtils.getAbsoluteBlockData;
 
-public class CentralPortal extends ProductionBuilding implements NetherConvertingBuilding {
+public class CentralPortal extends ProductionBuilding {
 
     public final static String buildingName = "Central Portal";
     public final static String structureName = "central_portal";
     public final static ResourceCost cost = ResourceCosts.CENTRAL_PORTAL;
 
-    public NetherZone netherConversionZone = null;
-
-    @Override public double getMaxRange() { return 30; }
-    @Override public double getStartingRange() { return 6; }
-    @Override public NetherZone getZone() { return netherConversionZone; }
-
-    @Override
-    public void tick(Level tickLevel) {
-        super.tick(tickLevel);
-
-        if (!this.getLevel().isClientSide() && this.getBlocksPlaced() >= getBlocksTotal()) {
-            BlockPos bp;
-            if (this.rotation == Rotation.CLOCKWISE_90 ||
-                this.rotation == Rotation.COUNTERCLOCKWISE_90) {
-                bp = this.centrePos.offset(0,-1,0);
-            } else {
-                bp = this.centrePos.offset(-1,0,0);
-            }
-            if (this.getLevel().getBlockState(bp).isAir())
-                this.getLevel().setBlockAndUpdate(bp, Blocks.FIRE.defaultBlockState());
-        }
-    }
-
-    public CentralPortal(Level level, BlockPos originPos, Rotation rotation, String ownerName) {
-        super(level, originPos, rotation, ownerName, getAbsoluteBlockData(getRelativeBlockData(level), level, originPos, rotation), true);
+    public CentralPortal() {
+        super(structureName, cost, true);
         this.name = buildingName;
-        this.ownerName = ownerName;
         this.portraitBlock = Blocks.OBSIDIAN;
         this.icon = new ResourceLocation("minecraft", "textures/block/obsidian.png");
 
-        this.foodCost = cost.food;
-        this.woodCost = cost.wood;
-        this.oreCost = cost.ore;
-        this.popSupply = cost.population;
         this.buildTimeModifier = 0.32f; // 100s total build time with 1 villager
         this.canAcceptResources = true;
 
         this.startingBlockTypes.add(Blocks.NETHER_BRICKS);
 
-        updateButtons();
-    }
-
-    public void updateButtons() {
-        if (level.isClientSide()) {
-            this.productionButtons = Arrays.asList(
-                GruntProd.getStartButton(this, Keybindings.keyQ)
-            );
-        }
-    }
-
-    @Override
-    public void setNetherZone(NetherZone nz) {
-        if (netherConversionZone == null) {
-            netherConversionZone = nz;
-            if (!level.isClientSide()) {
-                BuildingServerEvents.netherZones.add(netherConversionZone);
-                BuildingServerEvents.saveNetherZones((ServerLevel) level);
-            }
-        }
-    }
-
-    @Override
-    public void onBuilt() {
-        super.onBuilt();
-        if (getMaxRange() > 0)
-            setNetherZone(new NetherZone(centrePos.offset(0,-6,0), getMaxRange(), getStartingRange()));
-    }
-
-    @Override
-    public boolean canDestroyBlock(BlockPos relativeBp) {
-        BlockPos worldBp = relativeBp.offset(this.originPos);
-        Block block = this.getLevel().getBlockState(worldBp).getBlock();
-        return block != Blocks.OBSIDIAN && block != Blocks.NETHER_PORTAL;
+        this.productions.add(ProductionItems.GRUNT, Keybindings.keyQ);
     }
 
     public Faction getFaction() {return Faction.PIGLINS;}
 
-    public static ArrayList<BuildingBlock> getRelativeBlockData(LevelAccessor level) {
-        return BuildingBlockData.getBuildingBlocks(structureName, level);
+    @Override
+    public BuildingPlacement createBuildingPlacement(Level level, BlockPos pos, Rotation rotation, String ownerName) {
+        return new CentralPortalPlacement(this, level, pos, rotation, ownerName, getAbsoluteBlockData(getRelativeBlockData(level), level, pos, rotation), true);
     }
 
-    public static AbilityButton getBuildButton(Keybinding hotkey) {
+    public AbilityButton getBuildButton(Keybinding hotkey) {
+        ResourceLocation key = ReignOfNetherRegistries.BUILDING.getKey(this);
+        String name = I18n.get("buildings." + getFaction().name().toLowerCase() + "." + key.getNamespace() + "." + key.getPath());
         return new AbilityButton(
-                CentralPortal.buildingName,
+                name,
                 new ResourceLocation("minecraft", "textures/block/obsidian.png"),
                 hotkey,
-                () -> BuildingClientEvents.getBuildingToPlace() == CentralPortal.class,
+                () -> BuildingClientEvents.getBuildingToPlace() == Buildings.CENTRAL_PORTAL,
                 () -> false,
                 () -> true,
-                () -> BuildingClientEvents.setBuildingToPlace(CentralPortal.class),
+                () -> BuildingClientEvents.setBuildingToPlace(Buildings.CENTRAL_PORTAL),
                 null,
                 List.of(
                         FormattedCharSequence.forward(I18n.get("buildings.piglins.reignofnether.central_portal"), Style.EMPTY.withBold(true)),
@@ -130,12 +73,13 @@ public class CentralPortal extends ProductionBuilding implements NetherConvertin
                         FormattedCharSequence.forward("", Style.EMPTY),
                         FormattedCharSequence.forward(I18n.get("buildings.piglins.reignofnether.central_portal.tooltip1"), Style.EMPTY)
                 ),
-                null
+                null,
+                (BuildingPlacement) null
         );
     }
 
     @Override
-    public BlockPos getIndoorSpawnPoint(ServerLevel level) {
-        return super.getIndoorSpawnPoint(level).offset(0,-5,0);
+    public BlockPos getIndoorSpawnPoint(ServerLevel level, BlockPos originPos) {
+        return super.getIndoorSpawnPoint(level, originPos).offset(0,-5,0);
     }
 }

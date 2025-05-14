@@ -2,9 +2,16 @@ package com.solegendary.reignofnether.unit;
 
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.alliance.AlliancesClient;
-import com.solegendary.reignofnether.building.*;
-import com.solegendary.reignofnether.building.buildings.shared.AbstractBridge;
-import com.solegendary.reignofnether.building.buildings.villagers.IronGolemBuilding;
+import com.solegendary.reignofnether.building.BuildingClientEvents;
+import com.solegendary.reignofnether.building.BuildingPlacement;
+import com.solegendary.reignofnether.building.BuildingUtils;
+import com.solegendary.reignofnether.building.GarrisonableBuilding;
+import com.solegendary.reignofnether.building.buildings.placements.BridgePlacement;
+import com.solegendary.reignofnether.building.buildings.placements.IronGolemPlacement;
+import com.solegendary.reignofnether.building.buildings.placements.ProductionPlacement;
+import com.solegendary.reignofnether.building.buildings.shared.AbstractFarm;
+import com.solegendary.reignofnether.building.production.ActiveProduction;
+import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.cursor.CursorClientEvents;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientEvents;
 import com.solegendary.reignofnether.gamerules.GameruleClient;
@@ -15,9 +22,6 @@ import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
 import com.solegendary.reignofnether.player.PlayerServerboundPacket;
 import com.solegendary.reignofnether.registrars.PacketHandler;
 import com.solegendary.reignofnether.research.ResearchClient;
-import com.solegendary.reignofnether.research.researchItems.ResearchHoglinCavalry;
-import com.solegendary.reignofnether.research.researchItems.ResearchRavagerCavalry;
-import com.solegendary.reignofnether.research.researchItems.ResearchSpiderJockeys;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.resources.ResourceName;
 import com.solegendary.reignofnether.resources.ResourceSources;
@@ -75,6 +79,7 @@ import static com.solegendary.reignofnether.cursor.CursorClientEvents.getPresele
 import static com.solegendary.reignofnether.hud.HudClientEvents.hudSelectedEntity;
 import static com.solegendary.reignofnether.unit.Checkpoint.CHECKPOINT_TICKS_FADE;
 import static net.minecraftforge.client.event.RenderLevelStageEvent.Stage.AFTER_ENTITIES;
+
 
 public class UnitClientEvents {
 
@@ -157,12 +162,12 @@ public class UnitClientEvents {
                     if (unit.getOwnerName().equals(playerName))
                         currentPopulation += unit.getCost().population;
             }
-            for (Building building : BuildingClientEvents.getBuildings())
+            for (BuildingPlacement building : BuildingClientEvents.getBuildings())
                 if (building.ownerName.equals(playerName))
-                    if (building instanceof ProductionBuilding prodBuilding) {
-                        for (ProductionItem prodItem : prodBuilding.productionQueue)
-                            currentPopulation += prodItem.popCost;
-                    } else if (building instanceof IronGolemBuilding) {
+                    if (building instanceof ProductionPlacement prodBuilding) {
+                        for (ActiveProduction prodItem : prodBuilding.productionQueue)
+                            currentPopulation += prodItem.item.cost.population;
+                    } else if (building instanceof IronGolemPlacement) {
                         currentPopulation += ResourceCosts.IRON_GOLEM.population;
                     }
         }
@@ -277,7 +282,7 @@ public class UnitClientEvents {
                     .filter(u -> {
                         if (u instanceof Unit unit)
                             for (Ability ability : unit.getAbilities())
-                                if (ability.isChanneling() && ability.oneClickOneUse && ability.action == action)
+                                if (ability.isChanneling(unit) && ability.oneClickOneUse && ability.action == action)
                                     return false;
                         return true;
                     })
@@ -289,7 +294,7 @@ public class UnitClientEvents {
                 preselectedUnits.size() > 0 ? preselectedUnits.get(0).getId() : -1,
                 selUnits,
                 bp,
-                HudClientEvents.hudSelectedBuilding != null ? HudClientEvents.hudSelectedBuilding.originPos : new BlockPos(0,0,0)
+                HudClientEvents.hudSelectedPlacement != null ? HudClientEvents.hudSelectedPlacement.originPos : new BlockPos(0,0,0)
             );
             actionItem.action(MC.level);
 
@@ -299,7 +304,7 @@ public class UnitClientEvents {
                 preselectedUnits.size() > 0 ? preselectedUnits.get(0).getId() : -1,
                 selUnits,
                 bp,
-                HudClientEvents.hudSelectedBuilding != null ? HudClientEvents.hudSelectedBuilding.originPos : new BlockPos(0,0,0),
+                HudClientEvents.hudSelectedPlacement != null ? HudClientEvents.hudSelectedPlacement.originPos : new BlockPos(0,0,0),
                 Keybindings.shiftMod.isDown()
             ));
         }
@@ -620,7 +625,7 @@ public class UnitClientEvents {
                 return;
             }
             if (selectedUnits.size() > 0) {
-                Building preSelBuilding = BuildingClientEvents.getPreselectedBuilding();
+                BuildingPlacement preSelBuilding = BuildingClientEvents.getPreselectedBuilding();
 
                 // right click -> mount friendly unit
                 if (preselectedUnits.size() == 1 && canMountUnit(hudSelectedEntity, preselectedUnits.get(0))) {
@@ -655,8 +660,8 @@ public class UnitClientEvents {
                 // right click -> attack unfriendly building
                 else if (hudSelectedEntity instanceof AttackerUnit &&
                         (preSelBuilding != null) &&
-                        !preSelBuilding.invulnerable &&
-                        !(preSelBuilding instanceof AbstractBridge) &&
+                        !preSelBuilding.getBuilding().invulnerable &&
+                        !(preSelBuilding instanceof BridgePlacement) &&
                         ((GameruleClient.neutralAggro && getPlayerToBuildingRelationship(preSelBuilding) == Relationship.NEUTRAL) ||
                         getPlayerToBuildingRelationship(preSelBuilding) == Relationship.HOSTILE)) {
                     sendUnitCommand(UnitAction.ATTACK_BUILDING);
@@ -665,16 +670,16 @@ public class UnitClientEvents {
                 else if (hudSelectedEntity instanceof Unit unit &&
                         unit.getReturnResourcesGoal() != null &&
                         Resources.getTotalResourcesFromItems(unit.getItems()).getTotalValue() > 0 &&
-                        preSelBuilding != null && preSelBuilding.canAcceptResources && preSelBuilding.isBuilt &&
+                        preSelBuilding != null && preSelBuilding.getBuilding().canAcceptResources && preSelBuilding.isBuilt &&
                         getPlayerToBuildingRelationship(preSelBuilding) == Relationship.OWNED) {
                     sendUnitCommand(UnitAction.RETURN_RESOURCES);
                 }
                 // right click -> build or repair preselected building
                 else if (hudSelectedEntity instanceof WorkerUnit && preSelBuilding != null &&
                         (getPlayerToBuildingRelationship(preSelBuilding) == Relationship.OWNED) ||
-                        preSelBuilding instanceof AbstractBridge) {
+                        preSelBuilding instanceof BridgePlacement) {
 
-                    if (preSelBuilding.name.contains(" Farm") && preSelBuilding.isBuilt)
+                    if (preSelBuilding.getBuilding() instanceof AbstractFarm && preSelBuilding.isBuilt)
                         sendUnitCommand(UnitAction.FARM);
                     else if (BuildingUtils.isBuildingBuildable(true, preSelBuilding))
                         sendUnitCommand(UnitAction.BUILD_REPAIR);
@@ -1050,13 +1055,13 @@ public class UnitClientEvents {
         if (!((Unit) passenger).getOwnerName().equals(((Unit) vehicle).getOwnerName()))
             return false;
         if (hudSelectedEntity instanceof PillagerUnit && getPreselectedUnits().get(0) instanceof RavagerUnit &&
-            ResearchClient.hasResearch(ResearchRavagerCavalry.itemName))
+            ResearchClient.hasResearch(ProductionItems.RESEARCH_RAVAGER_CAVALRY))
             return true;
         if (hudSelectedEntity instanceof HeadhunterUnit && getPreselectedUnits().get(0) instanceof HoglinUnit &&
-            ResearchClient.hasResearch(ResearchHoglinCavalry.itemName))
+            ResearchClient.hasResearch(ProductionItems.RESEARCH_HOGLIN_CAVALRY))
             return true;
         if (hudSelectedEntity instanceof Unit && hudSelectedEntity instanceof Skeleton && getPreselectedUnits().get(0) instanceof RavagerUnit &&
-            ResearchClient.hasResearch(ResearchSpiderJockeys.itemName))
+            ResearchClient.hasResearch(ProductionItems.RESEARCH_SPIDER_JOCKEYS))
             return true;
         return false;
     }

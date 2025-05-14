@@ -1,6 +1,6 @@
 package com.solegendary.reignofnether.unit.goals;
 
-import com.solegendary.reignofnether.building.Building;
+import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.BuildingUtils;
 import com.solegendary.reignofnether.unit.UnitAnimationAction;
 import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
@@ -30,7 +30,7 @@ public class MeleeAttackBuildingGoal extends MoveToTargetBlockGoal {
 
     private int ticksToNextBlockBreak = ((AttackerUnit) mob).getAttackCooldown();
 
-    private Building buildingTarget;
+    private BuildingPlacement buildingTarget;
 
     protected final int RECALC_COOLDOWN_MAX = 10;
     protected int recalcCooldown = 0; // limit start() used by canContinueToUse
@@ -118,8 +118,8 @@ public class MeleeAttackBuildingGoal extends MoveToTargetBlockGoal {
     public void setBuildingTarget(BlockPos blockPos) {
         if (blockPos != null) {
             if (this.mob.level().isClientSide()) {
-                Building b = BuildingUtils.findBuilding(this.mob.level().isClientSide(), blockPos);
-                if (b != null && !b.invulnerable) {
+                BuildingPlacement b = BuildingUtils.findBuilding(this.mob.level().isClientSide(), blockPos);
+                if (b != null && !b.getBuilding().invulnerable) {
                     this.buildingTarget = b;
                     MiscUtil.addUnitCheckpoint(((Unit) mob), new BlockPos(
                             buildingTarget.centrePos.getX(),
@@ -130,8 +130,8 @@ public class MeleeAttackBuildingGoal extends MoveToTargetBlockGoal {
                 }
             }
             else {
-                Building b = BuildingUtils.findBuilding(this.mob.level().isClientSide(), blockPos);
-                if (b != null && !b.invulnerable) {
+                BuildingPlacement b = BuildingUtils.findBuilding(this.mob.level().isClientSide(), blockPos);
+                if (b != null && !b.getBuilding().invulnerable) {
                     this.buildingTarget = b;
                     if (this.mob.isVehicle() && this.mob.getFirstPassenger() instanceof AttackerUnit aUnit &&
                             aUnit.getAttackBuildingGoal() instanceof RangedAttackBuildingGoal<?> rabg)
@@ -143,7 +143,7 @@ public class MeleeAttackBuildingGoal extends MoveToTargetBlockGoal {
         }
     }
 
-    public Building getBuildingTarget() { return buildingTarget; }
+    public BuildingPlacement getBuildingTarget() { return buildingTarget; }
 
     // if we override stop() it for some reason is called after start() and we can never begin this goal...
     public void stopAttacking() {

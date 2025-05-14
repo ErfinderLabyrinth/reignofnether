@@ -6,8 +6,6 @@
 package com.solegendary.reignofnether.unit.modelling.renderers;
 
 import com.google.common.collect.ImmutableMap;
-import java.util.Map;
-
 import com.solegendary.reignofnether.registrars.EntityRegistrar;
 import com.solegendary.reignofnether.unit.modelling.models.PiglinUnitModel;
 import net.minecraft.client.Minecraft;
@@ -23,6 +21,8 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+
+import java.util.Map;
 
 @OnlyIn(Dist.CLIENT)
 public class PiglinUnitRenderer extends HumanoidMobRenderer<Mob, PiglinUnitModel<Mob>> {

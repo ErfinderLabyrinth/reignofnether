@@ -2,7 +2,7 @@ package com.solegendary.reignofnether.unit.goals;
 
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.AbilityClientboundPacket;
-import com.solegendary.reignofnether.building.Building;
+import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.BuildingUtils;
 import com.solegendary.reignofnether.unit.UnitAnimationAction;
 import com.solegendary.reignofnether.unit.packets.UnitAnimationClientboundPacket;
@@ -26,7 +26,7 @@ public class GenericTargetedSpellGoal extends MoveToTargetBlockGoal {
     protected final float range;
     public Consumer<LivingEntity> onEntityCast;
     public Consumer<BlockPos> onGroundCast;
-    public Consumer<Building> onBuildingCast;
+    public Consumer<BuildingPlacement> onBuildingCast;
     public boolean hasKeyframeAnimations = false;
     protected float bonusChannelingRange = 0; // extra range added while channeling
     protected final UnitAnimationAction animationStart;
@@ -35,7 +35,7 @@ public class GenericTargetedSpellGoal extends MoveToTargetBlockGoal {
                                     UnitAnimationAction animationStart,
                                     @Nullable Consumer<LivingEntity> onEntityCast,
                                     @Nullable Consumer<BlockPos> onGroundCast,
-                                    @Nullable Consumer<Building> onBuildingCast) {
+                                    @Nullable Consumer<BuildingPlacement> onBuildingCast) {
         super(mob, false, 0);
         this.channelTicks = channelTicks;
         this.range = range;
@@ -50,7 +50,7 @@ public class GenericTargetedSpellGoal extends MoveToTargetBlockGoal {
     public GenericTargetedSpellGoal(Mob mob, int channelTicks, float range,
                                     @Nullable Consumer<LivingEntity> onEntityCast,
                                     @Nullable Consumer<BlockPos> onGroundCast,
-                                    @Nullable Consumer<Building> onBuildingCast) {
+                                    @Nullable Consumer<BuildingPlacement> onBuildingCast) {
         super(mob, false, 0);
         this.channelTicks = channelTicks;
         this.range = range;
@@ -70,7 +70,7 @@ public class GenericTargetedSpellGoal extends MoveToTargetBlockGoal {
         this.setMoveTarget(bpTarget);
         this.setTarget((LivingEntity) null);
     }
-    public void setTarget(Building building) {
+    public void setTarget(BuildingPlacement building) {
         this.setMoveTarget(building.centrePos);
         this.setTarget((LivingEntity) null);
     }
@@ -125,7 +125,7 @@ public class GenericTargetedSpellGoal extends MoveToTargetBlockGoal {
                     if (onEntityCast != null && targetEntity != null)
                         onEntityCast.accept(targetEntity);
                     else if (onGroundCast != null || onBuildingCast != null) {
-                        Building targetBuilding = BuildingUtils.findBuilding(mob.level().isClientSide(), castTarget);
+                        BuildingPlacement targetBuilding = BuildingUtils.findBuilding(mob.level().isClientSide(), castTarget);
                         if (onBuildingCast != null && targetBuilding != null) {
                             onBuildingCast.accept(targetBuilding);
                         }

@@ -1,7 +1,7 @@
 package com.solegendary.reignofnether.gamemode;
 
 import com.solegendary.reignofnether.building.BuildingUtils;
-import com.solegendary.reignofnether.building.buildings.neutral.Beacon;
+import com.solegendary.reignofnether.building.buildings.placements.BeaconPlacement;
 import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.startpos.StartPosClientEvents;
@@ -54,8 +54,8 @@ public class ClientGameModeHelper {
     }
 
     private static boolean isKotB() {
-        Beacon beacon = BuildingUtils.getBeacon(true);
-        return (beacon != null && beacon.capturable);
+        BeaconPlacement beacon = BuildingUtils.getBeacon(true);
+        return (beacon != null && beacon.getBuilding().capturable);
     }
 
     private static Button getClassicButton() {

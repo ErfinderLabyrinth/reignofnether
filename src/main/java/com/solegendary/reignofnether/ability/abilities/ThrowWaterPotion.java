@@ -2,6 +2,7 @@ package com.solegendary.reignofnether.ability.abilities;
 
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.ability.Ability;
+import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.cursor.CursorClientEvents;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybinding;
@@ -28,43 +29,42 @@ public class ThrowWaterPotion extends Ability {
 
     public static final int CD_MAX_SECONDS = 5;
 
-    private final WitchUnit witchUnit;
-
     public final Potion potion = Potions.WATER;
 
-    public ThrowWaterPotion(WitchUnit witchUnit) {
+    //TODO Fix potionThrowRange for Witches gathering on a building
+    public ThrowWaterPotion(int potionThrowRange) {
         super(
             UnitAction.THROW_WATER_POTION,
-            witchUnit.level(),
             CD_MAX_SECONDS * ResourceCost.TICKS_PER_SECOND,
-            witchUnit.getPotionThrowRange(),
+            potionThrowRange,
             0,
             true,
             true
         );
-        this.witchUnit = witchUnit;
         this.autocastEnableAction = UnitAction.THROW_WATER_POTION_AUTOCAST_ENABLE;
         this.autocastDisableAction = UnitAction.THROW_WATER_POTION_AUTOCAST_DISABLE;
     }
 
     @Override
-    public AbilityButton getButton(Keybinding hotkey) {
+    public AbilityButton getButton(Keybinding hotkey, Unit unit) {
+        WitchUnit witchUnit = (WitchUnit) unit;
         return new AbilityButton(
             "Water Potion",
             new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/splash_potion_water.png"),
             hotkey,
-            () -> CursorClientEvents.getLeftClickAction() == UnitAction.THROW_WATER_POTION || getAutocast(),
-            () -> !ResearchClient.hasResearch(ResearchWaterPotions.itemName),
+            () -> CursorClientEvents.getLeftClickAction() == UnitAction.THROW_WATER_POTION || getAutocast(unit),
+            () -> !ResearchClient.hasResearch(ProductionItems.RESEARCH_WATER_POTIONS),
             () -> true,
             () -> CursorClientEvents.setLeftClickAction(UnitAction.THROW_WATER_POTION),
-            this::toggleAutocast,
+            () -> toggleAutocast(unit),
             List.of(
                 fcs(I18n.get("abilities.reignofnether.water_potion"), true),
                 fcsIcons(I18n.get("abilities.reignofnether.water_potion.tooltip1", CD_MAX_SECONDS, witchUnit.getPotionThrowRange())),
                 fcs(I18n.get("abilities.reignofnether.water_potion.tooltip2")),
                 fcs(I18n.get("abilities.reignofnether.autocast"))
             ),
-            this
+            this,
+            unit
         );
     }
 

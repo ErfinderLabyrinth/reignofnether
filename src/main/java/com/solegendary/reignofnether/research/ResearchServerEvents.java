@@ -2,6 +2,9 @@ package com.solegendary.reignofnether.research;
 
 import com.mojang.datafixers.util.Pair;
 import com.solegendary.reignofnether.ReignOfNether;
+import com.solegendary.reignofnether.api.ReignOfNetherRegistries;
+import com.solegendary.reignofnether.building.production.ProductionItem;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.event.server.ServerStartedEvent;
@@ -12,7 +15,7 @@ import java.util.ArrayList;
 // class to track status of research items for all players
 public class ResearchServerEvents {
 
-    private static final ArrayList<Pair<String, String>> researchItems = new ArrayList<>();
+    private static final ArrayList<Pair<String, ResourceLocation>> researchItems = new ArrayList<>();
 
     private static ServerLevel serverLevel = null;
 
@@ -37,7 +40,7 @@ public class ResearchServerEvents {
             ResearchSaveData researchData = ResearchSaveData.getInstance(level);
             researchItems.clear();
             researchItems.addAll(researchData.researchItems);
-            for (Pair<String, String> researchItem : researchItems)
+            for (Pair<String, ResourceLocation> researchItem : researchItems)
                 syncResearch(researchItem.getFirst());
 
             ReignOfNether.LOGGER.info("loaded " + researchItems.size() + " researchItems in serverevents");
@@ -55,27 +58,35 @@ public class ResearchServerEvents {
     }
 
     public static void syncResearch(String playerName) {
-        for (Pair<String, String> researchItem : researchItems)
+        for (Pair<String, ResourceLocation> researchItem : researchItems)
             if (playerName.equals(researchItem.getFirst())) {
-                ResearchClientboundPacket.addResearch(researchItem.getFirst(), researchItem.getSecond());
+                ResearchClientboundPacket.addResearch(researchItem.getFirst(), researchItem.getSecond().toString());
             }
     }
 
-    public static void addResearch(String playerName, String researchItemName) {
+    public static void addResearch(String playerName, ProductionItem researchItem) {
+        addResearch(playerName, ReignOfNetherRegistries.PRODUCTION_ITEM.getKey(researchItem));
+    }
+
+    public static void addResearch(String playerName, ResourceLocation researchItemName) {
         researchItems.add(new Pair<>(playerName, researchItemName));
         saveResearch();
     }
 
-    public static void removeResearch(String playerName, String researchItemName) {
+    public static void removeResearch(String playerName, ResourceLocation researchItemName) {
         researchItems.removeIf(p -> p.getFirst().equals(playerName) && p.getSecond().equals(researchItemName));
         saveResearch();
     }
 
-    public static boolean playerHasResearch(String playerName, String researchItemName) {
+    public static boolean playerHasResearch(String playerName, ProductionItem researchItem) {
+        return playerHasResearch(playerName, ReignOfNetherRegistries.PRODUCTION_ITEM.getKey(researchItem));
+    }
+
+    public static boolean playerHasResearch(String playerName, ResourceLocation researchItemName) {
         if (playerHasCheat(playerName, "medievalman")) {
             return true;
         }
-        for (Pair<String, String> researchItem : researchItems)
+        for (Pair<String, ResourceLocation> researchItem : researchItems)
             if (researchItem.getFirst().equals(playerName) && researchItem.getSecond().equals(researchItemName)) {
                 return true;
             }

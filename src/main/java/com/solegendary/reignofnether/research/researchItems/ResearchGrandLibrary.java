@@ -2,9 +2,10 @@ package com.solegendary.reignofnether.research.researchItems;
 
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.building.BuildingServerboundPacket;
-import com.solegendary.reignofnether.building.ProductionBuilding;
-import com.solegendary.reignofnether.building.ProductionItem;
+import com.solegendary.reignofnether.building.buildings.placements.ProductionPlacement;
 import com.solegendary.reignofnether.building.buildings.villagers.Library;
+import com.solegendary.reignofnether.building.production.ProductionItem;
+import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.resources.ResourceCost;
@@ -22,22 +23,19 @@ public class ResearchGrandLibrary extends ProductionItem {
     public final static String itemName = "Grand Library";
     public final static ResourceCost cost = ResourceCosts.RESEARCH_GRAND_LIBRARY;
 
-    public ResearchGrandLibrary(ProductionBuilding building) {
-        super(building, cost.ticks);
-        this.onComplete = (Level level) -> {
-            if (this.building instanceof Library library)
-                library.changeStructure(Library.upgradedStructureName);
+    public ResearchGrandLibrary() {
+        super(cost);
+        this.onComplete = (Level level, ProductionPlacement placement) -> {
+            if (placement.getBuilding() instanceof Library)
+                placement.changeStructure(Library.upgradedStructureName);
         };
-        this.foodCost = cost.food;
-        this.woodCost = cost.wood;
-        this.oreCost = cost.ore;
     }
 
     public String getItemName() {
         return ResearchGrandLibrary.itemName;
     }
 
-    public static Button getStartButton(ProductionBuilding prodBuilding, Keybinding hotkey) {
+    public Button getStartButton(ProductionPlacement prodBuilding, Keybinding hotkey) {
         return new Button(
                 ResearchGrandLibrary.itemName,
                 14,
@@ -45,10 +43,10 @@ public class ResearchGrandLibrary extends ProductionItem {
                 new ResourceLocation(ReignOfNether.MOD_ID, "textures/hud/icon_frame_bronze.png"),
                 hotkey,
                 () -> false,
-                () -> ProductionItem.itemIsBeingProduced(ResearchGrandLibrary.itemName, prodBuilding) ||
-                        (prodBuilding instanceof Library library && library.getUpgradeLevel() > 0),
+                () -> ProductionItems.RESEARCH_GRAND_LIBRARY.itemIsBeingProduced(prodBuilding.ownerName) ||
+                        (prodBuilding.getBuilding() instanceof Library && prodBuilding.getUpgradeLevel() > 0),
                 () -> true,
-                () -> BuildingServerboundPacket.startProduction(prodBuilding.originPos, itemName),
+                () -> BuildingServerboundPacket.startProduction(prodBuilding.originPos, ProductionItems.RESEARCH_GRAND_LIBRARY),
                 null,
                 List.of(
                         FormattedCharSequence.forward(I18n.get("research.reignofnether.grand_library"), Style.EMPTY.withBold(true)),
@@ -60,7 +58,7 @@ public class ResearchGrandLibrary extends ProductionItem {
         );
     }
 
-    public Button getCancelButton(ProductionBuilding prodBuilding, boolean first) {
+    public Button getCancelButton(ProductionPlacement prodBuilding, boolean first) {
         return new Button(
                 ResearchGrandLibrary.itemName,
                 14,
@@ -70,7 +68,7 @@ public class ResearchGrandLibrary extends ProductionItem {
                 () -> false,
                 () -> false,
                 () -> true,
-                () -> BuildingServerboundPacket.cancelProduction(prodBuilding.minCorner, itemName, first),
+                () -> BuildingServerboundPacket.cancelProduction(prodBuilding.minCorner, ProductionItems.RESEARCH_GRAND_LIBRARY, first),
                 null,
                 null
         );

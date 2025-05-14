@@ -3,9 +3,10 @@ package com.solegendary.reignofnether.research.researchItems;
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.building.BuildingClientEvents;
 import com.solegendary.reignofnether.building.BuildingServerboundPacket;
-import com.solegendary.reignofnether.building.ProductionBuilding;
-import com.solegendary.reignofnether.building.ProductionItem;
-import com.solegendary.reignofnether.building.buildings.monsters.Graveyard;
+import com.solegendary.reignofnether.building.Buildings;
+import com.solegendary.reignofnether.building.buildings.placements.ProductionPlacement;
+import com.solegendary.reignofnether.building.production.ProductionItem;
+import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.registrars.EntityRegistrar;
@@ -30,34 +31,31 @@ public class ResearchDrowned extends ProductionItem {
     public final static String itemName = "Drowned Zombies";
     public final static ResourceCost cost = ResourceCosts.RESEARCH_DROWNED;
 
-    public ResearchDrowned(ProductionBuilding building) {
-        super(building, cost.ticks);
-        this.onComplete = (Level level) -> {
+    public ResearchDrowned() {
+        super(cost);
+        this.onComplete = (Level level, ProductionPlacement placement) -> {
             if (level.isClientSide()) {
-                ResearchClient.addResearch(this.building.ownerName, ResearchDrowned.itemName);
+                ResearchClient.addResearch(placement.ownerName, ProductionItems.RESEARCH_DROWNED);
             } else {
-                ResearchServerEvents.addResearch(this.building.ownerName, ResearchDrowned.itemName);
+                ResearchServerEvents.addResearch(placement.ownerName, ProductionItems.RESEARCH_DROWNED);
 
                 // convert all zombies into drowned with the same stats/inventory/etc.
                 UnitServerEvents.convertAllToUnit(
-                    this.building.ownerName,
+                        placement.ownerName,
                     (ServerLevel) level,
                     (LivingEntity entity) -> entity instanceof ZombieUnit zUnit && zUnit.getOwnerName()
-                        .equals(building.ownerName),
+                        .equals(placement.ownerName),
                     EntityRegistrar.DROWNED_UNIT.get()
                 );
             }
         };
-        this.foodCost = cost.food;
-        this.woodCost = cost.wood;
-        this.oreCost = cost.ore;
     }
 
     public String getItemName() {
         return ResearchDrowned.itemName;
     }
 
-    public static Button getStartButton(ProductionBuilding prodBuilding, Keybinding hotkey) {
+    public Button getStartButton(ProductionPlacement prodBuilding, Keybinding hotkey) {
         return new Button(
             ResearchDrowned.itemName,
             14,
@@ -65,10 +63,10 @@ public class ResearchDrowned extends ProductionItem {
             new ResourceLocation(ReignOfNether.MOD_ID, "textures/hud/icon_frame_bronze.png"),
             hotkey,
             () -> false,
-            () -> ProductionItem.itemIsBeingProduced(ResearchDrowned.itemName, prodBuilding.ownerName)
-                || ResearchClient.hasResearch(ResearchDrowned.itemName),
-            () -> BuildingClientEvents.hasFinishedBuilding(Graveyard.buildingName),
-            () -> BuildingServerboundPacket.startProduction(prodBuilding.originPos, itemName),
+            () -> ProductionItems.RESEARCH_DROWNED.itemIsBeingProduced(prodBuilding.ownerName)
+                || ResearchClient.hasResearch(ProductionItems.RESEARCH_DROWNED),
+            () -> BuildingClientEvents.hasFinishedBuilding(Buildings.GRAVEYARD),
+            () -> BuildingServerboundPacket.startProduction(prodBuilding.originPos, ProductionItems.RESEARCH_DROWNED),
             null,
             List.of(
                 FormattedCharSequence.forward(I18n.get("research.reignofnether.drowned"), Style.EMPTY.withBold(true)),
@@ -83,7 +81,7 @@ public class ResearchDrowned extends ProductionItem {
         );
     }
 
-    public Button getCancelButton(ProductionBuilding prodBuilding, boolean first) {
+    public Button getCancelButton(ProductionPlacement prodBuilding, boolean first) {
         return new Button(
             ResearchDrowned.itemName,
             14,
@@ -93,7 +91,7 @@ public class ResearchDrowned extends ProductionItem {
             () -> false,
             () -> false,
             () -> true,
-            () -> BuildingServerboundPacket.cancelProduction(prodBuilding.minCorner, itemName, first),
+            () -> BuildingServerboundPacket.cancelProduction(prodBuilding.minCorner, ProductionItems.RESEARCH_DROWNED, first),
             null,
             null
         );

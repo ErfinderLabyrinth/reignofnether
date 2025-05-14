@@ -36,12 +36,12 @@ public class BloodMoon extends HeroAbility {
     public static final int DURATION = 60 * ResourceCost.TICKS_PER_SECOND;
     public static final int BONUS_DURATION_PER_SOUL_RANK = 10 * ResourceCost.TICKS_PER_SECOND;
 
-    public BloodMoon(HeroUnit hero) {
-        super(hero, 1, UnitAction.BLOOD_MOON, CD_MAX, 0, 0, false);
+    public BloodMoon() {
+        super(1, UnitAction.BLOOD_MOON, CD_MAX, 0, 0, false);
     }
 
     @Override
-    public AbilityButton getButton(Keybinding hotkey) {
+    public AbilityButton getButton(Keybinding hotkey, Unit hero) {
         return new AbilityButton("Blood Moon",
             new ResourceLocation("minecraft", "textures/block/redstone_block.png"),
             hotkey,
@@ -50,20 +50,22 @@ public class BloodMoon extends HeroAbility {
             () -> true,
             () -> sendUnitCommand(UnitAction.BLOOD_MOON),
             null,
-            getTooltipLines(),
-            this
+            getTooltipLines((HeroUnit) hero),
+            this,
+            hero
         );
     }
 
     @Override
-    public Button getRankUpButton() {
+    public Button getRankUpButton(HeroUnit hero) {
         return super.getRankUpButtonProtected(
-            "Blood Moon",
-            new ResourceLocation("minecraft", "textures/block/redstone_block.png")
+                "Blood Moon",
+                new ResourceLocation("minecraft", "textures/block/redstone_block.png"),
+                hero
         );
     }
 
-    public List<FormattedCharSequence> getTooltipLines() {
+    public List<FormattedCharSequence> getTooltipLines(HeroUnit hero) {
         return List.of(
                 fcs(I18n.get("abilities.reignofnether.blood_moon"), true),
                 fcsIcons(I18n.get("abilities.reignofnether.blood_moon.stats", CD_MAX / 20)),
@@ -75,10 +77,10 @@ public class BloodMoon extends HeroAbility {
         );
     }
 
-    public List<FormattedCharSequence> getRankUpTooltipLines() {
+    public List<FormattedCharSequence> getRankUpTooltipLines(HeroUnit hero) {
         return List.of(
                 fcs(I18n.get("abilities.reignofnether.blood_moon"), true),
-                fcs(I18n.get("abilities.reignofnether.level_req", getLevelRequirement()), getLevelReqStyle()),
+                fcs(I18n.get("abilities.reignofnether.level_req", getLevelRequirement()), getLevelReqStyle(hero)),
                 fcs(""),
                 fcs(I18n.get("abilities.reignofnether.blood_moon.tooltip1")),
                 fcs(I18n.get("abilities.reignofnether.blood_moon.tooltip2")),

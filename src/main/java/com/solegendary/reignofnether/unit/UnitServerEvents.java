@@ -6,14 +6,20 @@ import com.solegendary.reignofnether.ability.AbilityClientboundPacket;
 import com.solegendary.reignofnether.ability.HeroAbility;
 import com.solegendary.reignofnether.ability.heroAbilities.monster.SoulSiphonPassive;
 import com.solegendary.reignofnether.alliance.AlliancesServerEvents;
-import com.solegendary.reignofnether.building.*;
+import com.solegendary.reignofnether.building.BuildingPlacement;
+import com.solegendary.reignofnether.building.BuildingServerEvents;
+import com.solegendary.reignofnether.building.BuildingUtils;
+import com.solegendary.reignofnether.building.GarrisonableBuilding;
 import com.solegendary.reignofnether.building.buildings.monsters.SculkCatalyst;
+import com.solegendary.reignofnether.building.buildings.placements.ProductionPlacement;
+import com.solegendary.reignofnether.building.buildings.placements.SculkCatalystPlacement;
 import com.solegendary.reignofnether.building.buildings.villagers.IronGolemBuilding;
 import com.solegendary.reignofnether.hero.HeroClientboundPacket;
+import com.solegendary.reignofnether.building.production.ActiveProduction;
+import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.player.PlayerServerEvents;
 import com.solegendary.reignofnether.registrars.EntityRegistrar;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
-import com.solegendary.reignofnether.research.researchItems.ResearchHeavyTridents;
 import com.solegendary.reignofnether.resources.*;
 import com.solegendary.reignofnether.sandbox.SandboxServer;
 import com.solegendary.reignofnether.unit.interfaces.*;
@@ -247,25 +253,26 @@ public class UnitServerEvents {
                     currentPopulation += unit.getCost().population;
                 }
             }
-        for (Building building : BuildingServerEvents.getBuildings())
+        for (BuildingPlacement building : BuildingServerEvents.getBuildings())
             if (building.ownerName.equals(ownerName)) {
-                if (building instanceof ProductionBuilding prodBuilding) {
-                    for (ProductionItem prodItem : prodBuilding.productionQueue)
-                        currentPopulation += prodItem.popCost;
-                } else if (building instanceof IronGolemBuilding) {
+                if (building instanceof ProductionPlacement prodPlacement) {
+                    for (ActiveProduction prodItem : prodPlacement.productionQueue)
+                        currentPopulation += prodItem.item.cost.population;
+                } else if (building.getBuilding() instanceof IronGolemBuilding) {
                     currentPopulation += ResourceCosts.IRON_GOLEM.population;
                 }
             }
         return currentPopulation;
     }
 
+    // manually provide all the variables required to do unit actions
     public static void addActionItem(
-            String ownerName,
-            UnitAction action,
-            int unitId,
-            int[] unitIds,
-            BlockPos preselectedBlockPos,
-            BlockPos selectedBuildingPos
+        String ownerName,
+        UnitAction action,
+        int unitId,
+        int[] unitIds,
+        BlockPos preselectedBlockPos,
+        BlockPos selectedBuildingPos
     ) {
         addActionItem(ownerName, action, unitId, unitIds, preselectedBlockPos, selectedBuildingPos, false);
     }
@@ -336,7 +343,7 @@ public class UnitServerEvents {
         }
     }
     // similar to UnitClientEvents getUnitRelationship: given a Unit and Entity, what is the relationship between them
-    public static Relationship getUnitToBuildingRelationship(Unit unit, Building building) {
+    public static Relationship getUnitToBuildingRelationship(Unit unit, BuildingPlacement building) {
         String unitOwnerName = unit.getOwnerName();
         String buildingOwnerName = building.ownerName;
 
@@ -484,8 +491,8 @@ public class UnitServerEvents {
         // Convert nearby blocks arond a death into something that is sculk convertible
         // supposed to add to sculk_spreadable.json tag under the data/minecraft/tags/blocks but doesn't work for
         // some reason
-        for (Building building : BuildingServerEvents.getBuildings()) {
-            if (building instanceof SculkCatalyst sc && evt.getEntity().distanceToSqr(Vec3.atCenterOf(sc.centrePos))
+        for (BuildingPlacement building : BuildingServerEvents.getBuildings()) {
+            if (building instanceof SculkCatalystPlacement sc && evt.getEntity().distanceToSqr(Vec3.atCenterOf(sc.centrePos))
                 < SculkCatalyst.ESTIMATED_RANGE * SculkCatalyst.ESTIMATED_RANGE) {
                 Level level = evt.getEntity().level();
                 BlockPos bp = evt.getEntity().getOnPos();
@@ -603,7 +610,7 @@ public class UnitServerEvents {
             for (NecromancerUnit necromancerUnit : necromancers) {
                 SoulSiphonPassive soulSiphon = necromancerUnit.getSoulSiphon();
                 if (soulSiphon != null) {
-                    soulSiphon.checkAndGainSouls(evt.getEntity(), necromancers.size());
+                    soulSiphon.checkAndGainSouls(evt.getEntity(), necromancers.size(), necromancerUnit);
                     AbilityClientboundPacket.doAbility(necromancerUnit.getId(), UnitAction.SOUL_SIPHON_UPDATE, soulSiphon.souls);
                 }
             }
@@ -622,11 +629,17 @@ public class UnitServerEvents {
 
             evt.setCanceled(true);
 
-            if (lastHuntedAnimalId != evt.getEntity().getId()) {
-                for (ItemStack itemStack : ResourceSources.getFoodItemsFromAnimal((Animal) evt.getEntity())) {
-                    ResourceSource res = ResourceSources.getFromItem(itemStack.getItem());
-                    if (res != null)
-                        unit.getItems().add(itemStack);
+            if (lastHuntedAnimalId != evt.getEntity().getId()) {            for (ItemStack itemStack : ResourceSources.getFoodItemsFromAnimal((Animal) evt.getEntity())) {
+                ResourceSource res = ResourceSources.getFromItem(itemStack.getItem());
+
+                if (res != null) {
+                    unit.getItems().add(itemStack);
+                    if (unit instanceof VillagerUnit vUnit) {
+                        vUnit.incrementHunterExp();
+                        if (!(evt.getEntity() instanceof Chicken))
+                            vUnit.incrementHunterExp();
+                    }
+                }
                 }
                 if (Unit.atThresholdResources(unit)) {
                     unit.getReturnResourcesGoal().returnToClosestBuilding();
@@ -766,7 +779,7 @@ public class UnitServerEvents {
 
         if (shooter instanceof HeadhunterUnit headhunterUnit && projectile instanceof ThrownTrident) {
             return !ResearchServerEvents.playerHasResearch(headhunterUnit.getOwnerName(),
-                ResearchHeavyTridents.itemName
+                    ProductionItems.RESEARCH_HEAVY_TRIDENTS
             );
         }
         if (shooter instanceof SlimeUnit slimeUnit && slimeUnit.isTiny())

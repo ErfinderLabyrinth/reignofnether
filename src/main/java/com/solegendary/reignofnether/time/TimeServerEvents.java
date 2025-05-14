@@ -2,7 +2,7 @@ package com.solegendary.reignofnether.time;
 
 import com.solegendary.reignofnether.ability.AbilityClientboundPacket;
 import com.solegendary.reignofnether.ability.heroAbilities.monster.BloodMoon;
-import com.solegendary.reignofnether.building.Building;
+import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.BuildingServerEvents;
 import com.solegendary.reignofnether.player.PlayerServerEvents;
 import com.solegendary.reignofnether.registrars.EntityRegistrar;
@@ -65,19 +65,19 @@ public class TimeServerEvents {
                 .filter(name -> !name.equals(((Unit) bloodMoonOwner).getOwnerName()))
                 .toList();
 
-        ArrayList<Building> enemyBuildings = new ArrayList<>(BuildingServerEvents.getBuildings().stream()
-                .filter(b -> !b.ownerName.equals(((Unit) bloodMoonOwner).getOwnerName()) && !b.invulnerable)
+        ArrayList<BuildingPlacement> enemyBuildings = new ArrayList<>(BuildingServerEvents.getBuildings().stream()
+                .filter(b -> !b.ownerName.equals(((Unit) bloodMoonOwner).getOwnerName()) && !b.getBuilding().invulnerable)
                 .toList());
         Collections.shuffle(enemyBuildings);
 
         // one random building per enemyPlayerName
-        ArrayList<Building> singleEnemyBuildings = new ArrayList<>();
-        for (Building building : enemyBuildings) {
+        ArrayList<BuildingPlacement> singleEnemyBuildings = new ArrayList<>();
+        for (BuildingPlacement building : enemyBuildings) {
             if (!singleEnemyBuildings.stream().map(b -> b.ownerName).toList().contains(building.ownerName))
                 singleEnemyBuildings.add(building);
         }
 
-        for (Building building : singleEnemyBuildings) {
+        for (BuildingPlacement building : singleEnemyBuildings) {
             int x = building.centrePos.getX() + random.nextInt(-10, 10);
             int z = building.centrePos.getZ() + random.nextInt(-10, 10);
 
