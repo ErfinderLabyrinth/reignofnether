@@ -49,8 +49,6 @@ public class Castle extends ProductionBuilding {
         this.startingBlockTypes.add(Blocks.SPRUCE_PLANKS);
         this.startingBlockTypes.add(Blocks.DARK_OAK_PLANKS);
 
-
-
         this.productions.add(ProductionItems.RAVAGER, Keybindings.keyQ);
         this.productions.add(ProductionItems.RESEARCH_RAVAGER_CAVALRY, Keybindings.keyW);
         this.productions.add(ProductionItems.RESEARCH_CASTLE_FLAG, Keybindings.keyE);

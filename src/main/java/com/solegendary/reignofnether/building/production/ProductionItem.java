@@ -105,6 +105,16 @@ public abstract class ProductionItem {
         return false;
     }
 
+    // check if this is being produced at one particular building
+    public boolean itemIsBeingProduced(ProductionPlacement placement) {
+        for (BuildingPlacement building : BuildingClientEvents.getBuildings())
+            if (building == placement)
+                for (ActiveProduction prodItem : placement.productionQueue)
+                    if (prodItem.item == this)
+                        return true;
+        return false;
+    }
+
     // Button object to build
     public Button getStartButton(ProductionPlacement prodBuilding, Keybinding keybinding) {
         return null;
