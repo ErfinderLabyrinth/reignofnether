@@ -225,7 +225,7 @@
     "abilities.reignofnether.mace_slam.rank2": "Ур. 2: 20 урона, оглушение 3с",
     "abilities.reignofnether.mace_slam.rank3": "Ур. 3: 25 урона, оглушение 4с",
     "abilities.reignofnether.taunting_cry": "Насмешливый крик",
-    "abilities.reignofnether.taunting_cry.stats": "\uE004  %dс",
+    "abilities.reignofnether.taunting_cry.stats": "\uE004  %dc   \uE005  %d",
     "abilities.reignofnether.taunting_cry.tooltip1": "Издаёт насмешливый крик, заставляющий ближайших врагов",
     "abilities.reignofnether.taunting_cry.tooltip2": "потерять контроль и атаковать гвардейца %dс.",
     "abilities.reignofnether.taunting_cry.tooltip3": "Во время действия даёт Сопротивление и Замедление.",
@@ -243,7 +243,7 @@
     "abilities.reignofnether.avatar.stats": "\uE004  %dс",
     "abilities.reignofnether.avatar.tooltip1": "Увеличивается в размере и силе, воплощая саму войну.",
     "abilities.reignofnether.avatar.tooltip2": "Даёт +%d макс. здоровья и +%d урона пока активно.",
-    "abilities.reignofnether.avatar.tooltip3": "Длится %dс +1с за каждые %d полученного урона.",
+    "abilities.reignofnether.avatar.tooltip3": "Длится %dс",
 
     "abilities.reignofnether.can_be_toggled": "Можно включать/выключать",
     "abilities.reignofnether.level_req": "[Требуется уровень %d]",

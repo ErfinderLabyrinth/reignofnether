@@ -236,7 +236,7 @@
     "abilities.reignofnether.mace_slam.rank2": "Rank 2: 20 damage, 3s stun",
     "abilities.reignofnether.mace_slam.rank3": "Rank 3: 25 damage, 4s stun",
     "abilities.reignofnether.taunting_cry": "Taunting Cry",
-    "abilities.reignofnether.taunting_cry.stats": "\uE004  %ds",
+    "abilities.reignofnether.taunting_cry.stats": "\uE004  %ds   \uE005  %d",
     "abilities.reignofnether.taunting_cry.tooltip1": "Let out a mocking cry that forces nearby enemy units to ",
     "abilities.reignofnether.taunting_cry.tooltip2": "lose control and force them to attack the guard for %ds.",
     "abilities.reignofnether.taunting_cry.tooltip3": "While active, the Royal Guard has Resistance and Slowness.",
@@ -254,7 +254,7 @@
     "abilities.reignofnether.avatar.stats": "\uE004  %ds",
     "abilities.reignofnether.avatar.tooltip1": "Grow in size and strength, becoming an embodient of war itself.",
     "abilities.reignofnether.avatar.tooltip2": "Grants +%d max health and +%d damage while active.",
-    "abilities.reignofnether.avatar.tooltip3": "Lasts %ds +1s per %d damage taken from an enemy.",
+    "abilities.reignofnether.avatar.tooltip3": "Lasts %ds",
 
     "abilities.reignofnether.can_be_toggled": "Can be toggled on or off",
     "abilities.reignofnether.level_req": "[Requires Level %d]",

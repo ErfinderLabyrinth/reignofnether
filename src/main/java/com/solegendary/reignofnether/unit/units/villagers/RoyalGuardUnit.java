@@ -7,10 +7,13 @@ import com.solegendary.reignofnether.ability.heroAbilities.villager.BattleRagePa
 import com.solegendary.reignofnether.ability.heroAbilities.villager.MaceSlam;
 import com.solegendary.reignofnether.ability.heroAbilities.villager.TauntingCry;
 import com.solegendary.reignofnether.hud.AbilityButton;
+import com.solegendary.reignofnether.registrars.MobEffectRegistrar;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.unit.Checkpoint;
+import com.solegendary.reignofnether.unit.Relationship;
 import com.solegendary.reignofnether.unit.UnitAnimationAction;
+import com.solegendary.reignofnether.unit.UnitServerEvents;
 import com.solegendary.reignofnether.unit.goals.*;
 import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.HeroUnit;
@@ -18,14 +21,19 @@ import com.solegendary.reignofnether.unit.interfaces.KeyframeAnimated;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.modelling.animations.RoyalGuardAnimations;
 import com.solegendary.reignofnether.util.Faction;
+import com.solegendary.reignofnether.util.MiscUtil;
 import net.minecraft.client.animation.AnimationDefinition;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.util.Mth;
 import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
@@ -34,6 +42,7 @@ import net.minecraft.world.entity.monster.Vindicator;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -162,7 +171,7 @@ public class RoyalGuardUnit extends Vindicator implements Unit, AttackerUnit, He
     public final AnimationState spellActivateAnimState = new AnimationState();
     public final AnimationState attackAnimState = new AnimationState();
 
-    final static private int ATTACK_WINDUP_TICKS = 2;
+    final static private int ATTACK_WINDUP_TICKS = 3;
 
     // non-looping animations
     public AnimationDefinition activeAnimDef = null;
@@ -238,6 +247,35 @@ public class RoyalGuardUnit extends Vindicator implements Unit, AttackerUnit, He
         }
         this.castMaceSlamGoal.tick();
         this.castTauntingCryGoal.tick();
+        this.tickBattleRage();
+    }
+
+    public MaceSlam getMaceSlam() {
+        for (Ability ability : abilities)
+            if (ability instanceof MaceSlam)
+                return (MaceSlam) ability;
+        return null;
+    }
+
+    public TauntingCry getTauntingCry() {
+        for (Ability ability : abilities)
+            if (ability instanceof TauntingCry)
+                return (TauntingCry) ability;
+        return null;
+    }
+
+    public BattleRagePassive getBattleRage() {
+        for (Ability ability : abilities)
+            if (ability instanceof BattleRagePassive)
+                return (BattleRagePassive) ability;
+        return null;
+    }
+
+    public Avatar getAvatar() {
+        for (Ability ability : abilities)
+            if (ability instanceof Avatar)
+                return (Avatar) ability;
+        return null;
     }
 
     public void initialiseGoals() {
@@ -250,7 +288,7 @@ public class RoyalGuardUnit extends Vindicator implements Unit, AttackerUnit, He
         this.returnResourcesGoal = new ReturnResourcesGoal(this);
         this.castMaceSlamGoal = new GenericTargetedSpellGoal(
                 this,
-                20,
+                14,
                 MaceSlam.RANGE,
                 UnitAnimationAction.ATTACK_UNIT,
                 null,
@@ -288,14 +326,94 @@ public class RoyalGuardUnit extends Vindicator implements Unit, AttackerUnit, He
 
 
     public void maceSlam(BlockPos blockPos) {
+        if (level().isClientSide())
+            return;
+        List<LivingEntity> hitEntities = MiscUtil.getEntitiesWithinRange(Vec3.atCenterOf(blockPos.above()), MaceSlam.RADIUS, LivingEntity.class, level())
+                .stream()
+                .filter(e -> {
+                    if (e instanceof Unit unit) {
+                        return !List.of(Relationship.OWNED, Relationship.FRIENDLY)
+                                .contains(UnitServerEvents.getUnitToEntityRelationship(unit, this));
+                    }
+                    return true;
+                })
+                .toList();
 
+        MaceSlam maceSlam = getMaceSlam();
+        if (maceSlam != null && maceSlam.rank > 0) {
+            level().explode(null, null, null, blockPos.getX(), blockPos.getY(), blockPos.getZ(),
+                    2.0f, false, Level.ExplosionInteraction.NONE);
+            for (LivingEntity hitEntity : hitEntities) {
+                if (hitEntity instanceof Unit unit) {
+                    Unit.fullResetBehaviours(unit);
+                    hitEntity.addEffect(new MobEffectInstance(MobEffectRegistrar.STUN.get(), maceSlam.stunDuration));
+                } else {
+                    hitEntity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, maceSlam.stunDuration, 63));
+                }
+
+                boolean hurt = hitEntity.hurt(this.damageSources().mobAttack(this), maceSlam.damage);
+                if (hurt) {
+                    float kb = (float)this.getAttributeValue(Attributes.ATTACK_KNOCKBACK);
+                    hitEntity.knockback(kb * 0.5F, Mth.sin(this.getYRot() * 0.017453292F), -Mth.cos(this.getYRot() * 0.017453292F));
+                    this.setDeltaMovement(this.getDeltaMovement().multiply(0.6, 1.0, 0.6));
+                    this.setLastHurtMob(hitEntity);
+                }
+            }
+        }
     }
 
     public void tauntingCry() {
+        if (level().isClientSide())
+            return;
+        List<AttackerUnit> tauntableUnits = MiscUtil.getEntitiesWithinRange(position(), TauntingCry.RANGE, Mob.class, level())
+                .stream()
+                .filter(e -> e instanceof AttackerUnit unit &&
+                        !List.of(Relationship.OWNED, Relationship.FRIENDLY)
+                        .contains(UnitServerEvents.getUnitToEntityRelationship((Unit) unit, this)))
+                .map(e -> (AttackerUnit) e)
+                .toList();
 
+        TauntingCry tauntingCry = getTauntingCry();
+        if (tauntingCry != null && tauntingCry.rank > 0) {
+            for (AttackerUnit unit : tauntableUnits) {
+                Unit.fullResetBehaviours((Unit) unit);
+                unit.setUnitAttackTargetForced(this);
+                ((LivingEntity) unit).addEffect(new MobEffectInstance(MobEffectRegistrar.UNCONTROLLABLE.get(), tauntingCry.duration));
+            }
+            this.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, tauntingCry.duration, 2));
+            this.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, tauntingCry.duration, 2));
+        }
+    }
+
+    public void tickBattleRage() {
+        if (tickCount % 20 != 0)
+            return;
+        BattleRagePassive battleRage = getBattleRage();
+        if (battleRage != null && battleRage.rank > 0) {
+            float percentRage = 1 - (getHealth() / getMaxHealth());
+            heal(percentRage * battleRage.maxHpRegen);
+            AttributeInstance ai = getAttribute(Attributes.ATTACK_DAMAGE);
+            if (ai != null)
+                ai.setBaseValue(RoyalGuardUnit.attackDamage + (percentRage * battleRage.maxBonusDamage));
+            updateAbilityButtons();
+        }
     }
 
     public void avatar() {
 
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

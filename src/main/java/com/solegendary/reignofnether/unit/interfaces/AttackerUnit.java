@@ -3,6 +3,8 @@ package com.solegendary.reignofnether.unit.interfaces;
 import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.BuildingUtils;
 import com.solegendary.reignofnether.building.GarrisonableBuilding;
+import com.solegendary.reignofnether.registrars.GameRuleRegistrar;
+import com.solegendary.reignofnether.registrars.MobEffectRegistrar;
 import com.solegendary.reignofnether.unit.Relationship;
 import com.solegendary.reignofnether.unit.UnitServerEvents;
 import com.solegendary.reignofnether.unit.goals.*;
@@ -104,7 +106,7 @@ public interface AttackerUnit {
     // move to a block but chase/attack a target if there is one close by (for a limited distance)
     public void setAttackMoveTarget(@Nullable BlockPos bp);
 
-    private static boolean isAttackingBuilding(AttackerUnit attackerUnit) {
+    static boolean isAttackingBuilding(AttackerUnit attackerUnit) {
         boolean isAttackingBuilding = false;
         Goal attackBuildingGoal = attackerUnit.getAttackBuildingGoal();
         if (attackBuildingGoal instanceof RangedAttackBuildingGoal<?> rabg)
@@ -140,6 +142,11 @@ public interface AttackerUnit {
         }
 
         if (!unitMob.level().isClientSide && unitMob.tickCount % 4 == 0) {
+            if (((LivingEntity) unit).getEffect(MobEffectRegistrar.STUN.get()) != null) {
+                Unit.fullResetBehaviours(unit);
+                return;
+            }
+
             boolean isAttackingBuilding = isAttackingBuilding(attackerUnit);
 
             // enact attack moving
@@ -182,7 +189,7 @@ public interface AttackerUnit {
                 }
             }
             // enact aggression when idle
-            if (unit.isIdle() && !isAttackingBuilding && attackerUnit.getAggressiveWhenIdle())
+            if (unit.isIdle() && attackerUnit.getAggressiveWhenIdle())
                 attackerUnit.attackClosestEnemy((ServerLevel) unitMob.level());
 
             // if attacking another unit as melee, retarget the closest unit periodically
@@ -226,7 +233,9 @@ public interface AttackerUnit {
             setUnitAttackTarget(entity);
             return;
         }
-        if (canAttackBuildings() && !(this instanceof RavagerUnit && ((LivingEntity) this).isVehicle()) && !(((Unit) this).getOwnerName()).isEmpty()) {
+        if (canAttackBuildings() && !(this instanceof RavagerUnit && ((LivingEntity) this).isVehicle()) &&
+                (!(((Unit) this).getOwnerName()).isEmpty() || level.getGameRules().getRule(GameRuleRegistrar.NEUTRAL_AGGRO).get()))
+        {
             BuildingPlacement closestBuilding = MiscUtil.findClosestAttackableBuilding((Mob) this, aggroRange, level);
             if (closestBuilding != null) {
                 ((Unit) this).getMoveGoal().stopMoving();

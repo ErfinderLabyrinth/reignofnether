@@ -6,6 +6,9 @@
 Features
 --------
 
+[❌] Custom structure block to register new buildings
+    - That are also saved to the level
+
 [❌] Walls
     - Connect to garrisonable towers
     - 3 layers that are broken starting from where the unit attacking it is positioned
@@ -16,14 +19,7 @@ Features
     - Because without Fog of war, transport portals are too weak
     - Includes minimap and sound warning
 
-[❌] More serverside logging for major player actions
-    - Building creation
-    - Start/complete research
-    - Created unit
-    - Used ability
 
-[❌] Custom structure block to register new buildings
-    - That are also saved to the level
 
 [❌] Import the Bedrock Minecraft Movie addon piglins
 
@@ -37,21 +33,21 @@ Features
 
 Bugfixes
 --------
-[❌] Kicked for sending too many packets when spam clicking large army (rate-limit in server.properties?)
-
 [❌] Dying in survival puts you in a bugged survival mode
 
 [❌] Villagers with professions don't use the correct texture for their arms, esp. farmers
 
-[❌] Have too-fast mod be built-in
-
-[❌] GUI sometimes still going above size 3 when set to auto
 
 
 
 Quality of Life Features
 ------------------------
-[❌] Added a lot more serverside logging to track player actions
+
+[❌] More serverside logging for major player actions
+    - Building creation
+    - Start/complete research
+    - Created unit
+    - Used ability
 
 [❌] Colours for different players (with toggle under map options for ally/enemy)
 

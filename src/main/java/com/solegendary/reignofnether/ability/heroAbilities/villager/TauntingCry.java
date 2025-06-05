@@ -29,8 +29,9 @@ import static com.solegendary.reignofnether.util.MiscUtil.fcsIcons;
 
 public class TauntingCry extends HeroAbility {
 
+    public static final int RANGE = 6;
     private static final int CD_MAX_SECONDS = 5 * ResourceCost.TICKS_PER_SECOND;
-    private static int duration = 4 * ResourceCost.TICKS_PER_SECOND;
+    public int duration = 4 * ResourceCost.TICKS_PER_SECOND;
 
     public TauntingCry(HeroUnit hero) {
         super(hero, 3, UnitAction.TAUNTING_CRY, CD_MAX_SECONDS, 0, 0, false);
@@ -81,7 +82,7 @@ public class TauntingCry extends HeroAbility {
     public List<FormattedCharSequence> getTooltipLines() {
         return List.of(
                 fcs(I18n.get("abilities.reignofnether.taunting_cry") + " " + rankString(), true),
-                fcsIcons(I18n.get("abilities.reignofnether.taunting_cry.stats", CD_MAX_SECONDS / 20)),
+                fcsIcons(I18n.get("abilities.reignofnether.taunting_cry.stats", CD_MAX_SECONDS / 20, range)),
                 fcs(""),
                 fcs(I18n.get("abilities.reignofnether.taunting_cry.tooltip1")),
                 fcs(I18n.get("abilities.reignofnether.taunting_cry.tooltip2", duration / 20)),
@@ -96,6 +97,7 @@ public class TauntingCry extends HeroAbility {
                 fcs(""),
                 fcs(I18n.get("abilities.reignofnether.taunting_cry.tooltip1")),
                 fcs(I18n.get("abilities.reignofnether.taunting_cry.tooltip2", duration / 20)),
+                fcs(I18n.get("abilities.reignofnether.taunting_cry.tooltip3")),
                 fcs(""),
                 fcs(I18n.get("abilities.reignofnether.taunting_cry.rank1"), rank == 0),
                 fcs(I18n.get("abilities.reignofnether.taunting_cry.rank2"), rank == 1),

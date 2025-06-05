@@ -219,7 +219,7 @@
     "abilities.reignofnether.mace_slam.rank2": "Rango 2: 20 daño, 3s de aturdimiento",
     "abilities.reignofnether.mace_slam.rank3": "Rango 3: 25 daño, 4s de aturdimiento",
     "abilities.reignofnether.taunting_cry": "Grito de Provocación",
-    "abilities.reignofnether.taunting_cry.stats": "\uE004  %ds",
+    "abilities.reignofnether.taunting_cry.stats": "\uE004  %ds   \uE005  %d",
     "abilities.reignofnether.taunting_cry.tooltip1": "Emite un grito burlón que obliga a las unidades enemigas cercanas a ",
     "abilities.reignofnether.taunting_cry.tooltip2": "perder el control y las fuerza a atacar al guardia durante %ds.",
     "abilities.reignofnether.taunting_cry.tooltip3": "Mientras está activo, el Guardia Real obtiene Resistencia y Lentitud.",
@@ -237,7 +237,7 @@
     "abilities.reignofnether.avatar.stats": "\uE004  %ds",
     "abilities.reignofnether.avatar.tooltip1": "Crece en tamaño y fuerza, convirtiéndose en la encarnación de la guerra misma.",
     "abilities.reignofnether.avatar.tooltip2": "Otorga +%d de salud máxima y +%d de daño mientras está activo.",
-    "abilities.reignofnether.avatar.tooltip3": "Dura %ds +1s por cada %d de daño recibido de un enemigo.",
+    "abilities.reignofnether.avatar.tooltip3": "Dura %ds",
 
     "abilities.reignofnether.can_be_toggled": "Puedes activarlo o desactivarlo.",
     "abilities.reignofnether.level_req": "[Necesita Nivel %d]",

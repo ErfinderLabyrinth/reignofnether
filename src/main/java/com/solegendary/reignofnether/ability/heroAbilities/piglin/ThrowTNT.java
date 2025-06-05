@@ -30,7 +30,7 @@ import static com.solegendary.reignofnether.util.MiscUtil.fcsIcons;
 public class ThrowTNT extends HeroAbility {
 
     public static final int RANGE = 12;
-    private static float explosionPower = 2;
+    public float explosionPower = 2;
     private static int LESS_COOLDOWN_PER_100_RESOURCES = 5 * ResourceCost.TICKS_PER_SECOND;
 
     public ThrowTNT(HeroUnit hero) {

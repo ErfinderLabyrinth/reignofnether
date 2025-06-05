@@ -30,10 +30,8 @@ public class Avatar extends HeroAbility {
 
     private static final int CD_MAX_SECONDS = 300 * ResourceCost.TICKS_PER_SECOND;
     private static final int DURATION = 60 * ResourceCost.TICKS_PER_SECOND;
-    private static final float DAMAGE_PER_BONUS_DURATION = 5 * ResourceCost.TICKS_PER_SECOND;
 
-    private static final float BONUS_HEALTH = 100;
-    private static final float BONUS_DAMAGE = 5;
+    private static final float BONUS_HEALTH = 150;
 
     public Avatar(HeroUnit hero) {
         super(hero, 1, UnitAction.AVATAR, CD_MAX_SECONDS, 0, 0, false);
@@ -68,8 +66,8 @@ public class Avatar extends HeroAbility {
                 fcsIcons(I18n.get("abilities.reignofnether.avatar.stats", CD_MAX_SECONDS / 20)),
                 fcs(""),
                 fcs(I18n.get("abilities.reignofnether.avatar.tooltip1")),
-                fcs(I18n.get("abilities.reignofnether.avatar.tooltip2", BONUS_HEALTH, BONUS_DAMAGE)),
-                fcs(I18n.get("abilities.reignofnether.avatar.tooltip3", DURATION / 20, DAMAGE_PER_BONUS_DURATION / 20))
+                fcs(I18n.get("abilities.reignofnether.avatar.tooltip2", BONUS_HEALTH)),
+                fcs(I18n.get("abilities.reignofnether.avatar.tooltip3", DURATION / 20))
         );
     }
 
@@ -79,8 +77,8 @@ public class Avatar extends HeroAbility {
                 fcs(I18n.get("abilities.reignofnether.level_req", getLevelRequirement()), getLevelReqStyle()),
                 fcs(""),
                 fcs(I18n.get("abilities.reignofnether.avatar.tooltip1")),
-                fcs(I18n.get("abilities.reignofnether.avatar.tooltip2", BONUS_HEALTH, BONUS_DAMAGE)),
-                fcs(I18n.get("abilities.reignofnether.avatar.tooltip3", DURATION / 20, DAMAGE_PER_BONUS_DURATION / 20))
+                fcs(I18n.get("abilities.reignofnether.avatar.tooltip2", BONUS_HEALTH)),
+                fcs(I18n.get("abilities.reignofnether.avatar.tooltip3", DURATION / 20))
         );
     }
 

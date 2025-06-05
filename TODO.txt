@@ -1,5 +1,5 @@
 
-1.19.2-1.1.7
+1.19.2-1.1.7a
 
 [✔] Done and tested
 [🟡] Partially done and/or needs testing
@@ -17,12 +17,6 @@ HEROES (in order of priority)
     - mana?
     - equipment
 
-Hero Revives
-    [🟡] Sync with client when logging in/out of server
-    [🟡] Save to world (add field isDead)
-    [🟡] enforce entityType field in ReviveHeroProductionItem
-        [❌] Revival cost is not being enforced, including tick time
-        [❌] Save ability and ranks correctly
 
 Necromancer
     [❌] Purple particles on soul usage and soul gain
@@ -49,19 +43,22 @@ Piglin Merchant
 
 Royal Guard
     - Mace Slam
-        [❌] AOE damage and knockback in a circle in front of the guard
+        [🟡] AOE damage and knockback in a circle in front of the guard
         [❌] Raise ground blocks with block displays?
-        [❌] Add 'stun' effect to all units
+        [🟡] Add 'stun' effect to all units
             - While active, repeats stop commands and ignores all other commands
-            - Show potion swirling particles, but don't make them move upwards
 
     - Taunting Cry
-        [❌] Add 'taunt' effect to all units
+        [🟡] Add 'taunt' effect to all units
             - While active, repeats attack commands on the taunting unit and ignores all other commands
             - Show angry villager particle effects
 
+    - Battle Rage
+        [❌] Change damage bonus to damage resist
+
     - Avatar of War
         [❌] Enlarge size smoothly
+        [❌] When active, cause a tiny explosion and splash damage on regular attacks
 
 
 
@@ -72,37 +69,16 @@ Bugfixes
 
 [❌] ServerStoppingEvent doesn't run on dedicated servers
 
-[✔] Readded water and healing potions to witches
-
-[✔] Experience for heroes no longer drops from a lone hero dying and now decays after 2mins
-
-[✔] Fixed a bug where the gamerules flyingMaxYLevel and groundYLevel didn't match the menu number when updated via command
-
-[🟡] Wheat that is now transformed netherwart is now fully grown and harvestable
-
-[🟡] Units hit by blaze fireballs no longer delay their fire tick damage
-    - This was causing a weird situation where shooting one unit with too many fireballs made them take LESS damage
-        TODO: check all setRemainingFireTicks() calls
-
-[🟡] Mounted units now attack with melee when right-clicking enemy units
-    - This previously only commanded the riding ranged unit to attack
-
-[🟡] Spiders no longer use webs when autocast is disabled
 
 
+[❌] vanilla mob spawners keep spawning regular mobs with no limit ?
+    -  can't recreate? maybe only naturally spawning ones?
+[🟡] Nether conversion no longer turns Healing Fountain water into lava
+[🟡] Fixed neutral unit aggro to buildings when neutralAggro is enabled (again)
 
 
 Quality of Life
 ---------------
-[✔] Witch lingering potions no longer collide with mobs
-    - This means they will more accurately spread across the ground
-
-[🟡] Vanilla mob spawners loaded with Reign of Nether units now have custom spawn rules:
-    - They now spawn mobs at any light level (but won't spawn monster units during the day)
-    - Max 3 mobs per spawner, or 1 if for castle-tier units (ghasts, ravagers, wardens)
-    - They can spawn without any nearby players, but only if there are no player units in a 30 block range
-    - Spawn delay is always 30 seconds, instead of a random time between 10-40 seconds
-    - Mobs are anchored to their spawns (ie. they retreat back there if you run away)
 
 
 Balancing

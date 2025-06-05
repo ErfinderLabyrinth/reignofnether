@@ -350,6 +350,8 @@ public class UnitServerEvents {
         // If not allied, check if the owners are the same
         if (ownerName1.equals(ownerName2)) {
             return Relationship.FRIENDLY;
+        } else if (ownerName1.isBlank() || ownerName2.isBlank()) {
+            return Relationship.NEUTRAL;
         } else {
             return Relationship.HOSTILE;
         }
@@ -359,11 +361,10 @@ public class UnitServerEvents {
         String unitOwnerName = unit.getOwnerName();
         String buildingOwnerName = building.ownerName;
 
-        if (buildingOwnerName.isEmpty()) {
-            return Relationship.NEUTRAL;
-        }
         if (unitOwnerName.equals(buildingOwnerName)) {
             return Relationship.OWNED;
+        } else if (buildingOwnerName.isBlank() || unitOwnerName.isBlank()) {
+            return Relationship.NEUTRAL;
         } else if (AlliancesServerEvents.isAllied(unitOwnerName, buildingOwnerName)) {
             return Relationship.FRIENDLY;
         } else {

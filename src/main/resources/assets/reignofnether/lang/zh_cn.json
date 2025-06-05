@@ -219,7 +219,7 @@
   "abilities.reignofnether.mace_slam.rank2": "等级 2：造成 20 伤害值，眩晕 3 秒",
   "abilities.reignofnether.mace_slam.rank3": "等级 3：造成 25 伤害值，眩晕 4 秒",
   "abilities.reignofnether.taunting_cry": "嘲弄怒号",
-  "abilities.reignofnether.taunting_cry.stats": "\uE004  %ds",
+  "abilities.reignofnether.taunting_cry.stats": "\uE004  %ds   \uE005  %d",
   "abilities.reignofnether.taunting_cry.tooltip1": "发出一声嘲讽战吼，强制附近的敌对单位不受敌人控制",
   "abilities.reignofnether.taunting_cry.tooltip2": "并优先攻击所选皇家守卫，持续 %d 秒。",
   "abilities.reignofnether.taunting_cry.tooltip3": "技能期间，所选皇家守卫获得抗性提升与缓慢效果。",
@@ -237,7 +237,7 @@
   "abilities.reignofnether.avatar.stats": "\uE004  %ds",
   "abilities.reignofnether.avatar.tooltip1": "体型与力量不断增长，成为战争本身的化身。",
   "abilities.reignofnether.avatar.tooltip2": "技能期间，所选皇家守卫 +%d 最大生命值，+%d 伤害值。",
-  "abilities.reignofnether.avatar.tooltip3": "持续 %d 秒，每承受 %d 敌方伤害，技能再延长 1 秒。",
+  "abilities.reignofnether.avatar.tooltip3": "持续 %d 秒",
 
   "abilities.reignofnether.can_be_toggled": "可以切换启用/禁用状态",
   "abilities.reignofnether.level_req": "[需要至少 %d 级]",
