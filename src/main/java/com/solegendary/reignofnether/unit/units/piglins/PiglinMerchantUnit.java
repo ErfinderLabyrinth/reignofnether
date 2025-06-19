@@ -38,6 +38,7 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.piglin.Piglin;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.phys.Vec3;
@@ -414,7 +415,7 @@ public class PiglinMerchantUnit extends Piglin implements Unit, AttackerUnit, He
         if (greedIsGood.isAutocasting())
             resourceBonus = greedIsGood.spendResourcesAndGet100sSpent(ResourceName.FOOD);
 
-        int numItems = FancyFeast.BASE_ITEMS + (FancyFeast.BONUS_ITEMS_PER_RESOURCES * resourceBonus);
+        int numItems = FancyFeast.BASE_ITEMS + (FancyFeast.BONUS_ITEMS_PER_100_RESOURCES * resourceBonus);
 
         for (int i = 0; i < numItems; i++) {
             ItemEntity foodEntity = new ItemEntity(level(), pos.x, pos.y, pos.z, new ItemStack(getFancyFeast().getFoodItem()));
@@ -435,6 +436,28 @@ public class PiglinMerchantUnit extends Piglin implements Unit, AttackerUnit, He
     }
 
     public void lootExplosion() {
+        Vec3 pos = getEyePosition();
 
+        GreedIsGoodPassive greedIsGood = getGreedIsGood();
+        int resourceBonus = 0;
+        if (greedIsGood.isAutocasting())
+            resourceBonus = greedIsGood.spendResourcesAndGet100sSpent(ResourceName.ORE);
+
+        int numItems = LootExplosion.BASE_ITEMS + (LootExplosion.BONUS_ITEMS_PER_100_RESOURCES * resourceBonus);
+
+
+        for (int i = 0; i < numItems; i++) {
+            ItemEntity item = new ItemEntity(level(), pos.x, pos.y, pos.z, new ItemStack(Items.GOLDEN_CHESTPLATE));
+            item.setThrower(getUUID());
+            Vec3 dMove = new Vec3(
+                    (random.nextFloat() - 0.5f) / 2,
+                    0.5,
+                    (random.nextFloat() - 0.5f) / 2
+            );
+            item.setDeltaMovement(dMove);
+            level().addFreshEntity(item);
+        }
+        level().explode(null, null, null, getX(), getY(), getZ(),
+                2.0f, false, Level.ExplosionInteraction.NONE);
     }
 }

@@ -382,7 +382,7 @@ public class UnitClientEvents {
         for(LivingEntity entity : allUnits) {
             if (entity.getId() == entityId && MC.level != null) {
                 if (entity instanceof Unit unit) {
-                    unit.getItems().removeIf(i -> !i.getItem().isEdible());
+                    unit.getItems().removeIf(i -> !ResourceSources.isPreparedFood(i.getItem()));
                     unit.getItems().add(new ItemStack(Items.SUGAR, res.food));
                     unit.getItems().add(new ItemStack(Items.STICK, res.wood));
                     unit.getItems().add(new ItemStack(Items.STONE, res.ore));

@@ -1,5 +1,5 @@
 
-1.19.2-1.1.7c
+1.19.2-1.1.7d
 
 [✔] Done and tested
 [🟡] Partially done and/or needs testing
@@ -52,7 +52,6 @@ Royal Guard
     - Avatar of War
         [❌] Fix portrait scale/yoffset
 
-
 Features
 --------
 [🟡] Enabled the Royal Guard hero in sandbox
@@ -67,10 +66,6 @@ Features
 
 Bugfixes
 --------
-[🟡] RTS Start Blocks that are removed via command are no longer tracked
-[🟡] Fixed Ravager Artillery arrows not damaging buildings
-[🟡] Fixed the Drowned production button not working correctly
-
 [❌] Don't allow regular attack during ability animations'
     - set windup ticks to 0 repeatedly during channelling
 

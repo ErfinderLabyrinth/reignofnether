@@ -53,7 +53,8 @@ public abstract class ItemEntityRendererMixin {
         }
 
         if (OrthoviewClientEvents.isEnabled() &&
-                (pEntity.getItem().isEdible() || ResourceSources.getFromItem(pEntity.getItem().getItem()) != null)) {
+                (ResourceSources.isPreparedFood(pEntity.getItem().getItem()) ||
+                 ResourceSources.getFromItem(pEntity.getItem().getItem()) != null)) {
             ci.cancel();
 
             pPoseStack.pushPose();

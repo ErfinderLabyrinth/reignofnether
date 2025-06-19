@@ -95,15 +95,15 @@ public interface Unit {
     public int getMaxResources();
 
     public default boolean isEatingFood() { return getEatingTicksLeft() > 0; };
-    public default boolean isHoldingFood() {
+    public default boolean isHoldingEdibleFood() {
         for (ItemStack itemStack : getItems())
-            if (itemStack.getItem().isEdible())
+            if (ResourceSources.isPreparedFood(itemStack.getItem()))
                 return true;
         return false;
     };
     public default Item getFoodBeingEaten() {
         for (ItemStack itemStack : getItems())
-            if (itemStack.getItem().isEdible())
+            if (ResourceSources.isPreparedFood(itemStack.getItem()))
                 return itemStack.getItem();
         return Items.AIR;
     }
@@ -180,8 +180,8 @@ public interface Unit {
                     cp.startFading();
             }
         } else {
-            checkAndPickupResources(unit);
             checkAndPickupEdibleFood(unit);
+            checkAndPickupResources(unit);
 
             // sync target variables between goals and Mob
             if (unit.getTargetGoal().getTarget() == null || !unit.getTargetGoal().getTarget().isAlive() ||
@@ -256,7 +256,7 @@ public interface Unit {
             unit.setEatingTicksLeft(unit.getEatingTicksLeft() - 1);
             if (!unit.isEatingFood()) {
                 for (ItemStack itemStack : unit.getItems()) {
-                    if (itemStack.getItem().isEdible()) {
+                    if (ResourceSources.isPreparedFood(itemStack.getItem())) {
                         unitMob.level().playSound(null, unitMob.getX(), unitMob.getY(), unitMob.getZ(),
                                 SoundEvents.PLAYER_BURP, SoundSource.PLAYERS, 0.5F,
                                 unitMob.getRandom().nextFloat() * 0.1F + 0.9F
@@ -275,7 +275,7 @@ public interface Unit {
             }
         } else {
             for (ItemStack itemStack : unit.getItems()) {
-                if (itemStack.getItem().isEdible()) {
+                if (ResourceSources.isPreparedFood(itemStack.getItem())) {
                     unit.setEatingTicksLeft(40);
                     break;
                 }
@@ -316,16 +316,15 @@ public interface Unit {
 
     private static void checkAndPickupEdibleFood(Unit unit) {
         Mob unitMob = (Mob) unit;
-        if (!unit.isHoldingFood() && unitMob.getHealth() < unitMob.getMaxHealth()) {
+        if (!unit.isHoldingEdibleFood() && unitMob.getHealth() < unitMob.getMaxHealth()) {
             for (ItemEntity itementity : unitMob.level().getEntitiesOfClass(ItemEntity.class, unitMob.getBoundingBox().inflate(1, 0, 1))) {
 
                 Relationship rl = UnitServerEvents.getUnitToEntityRelationship(unit, itementity);
                 if (!itementity.isRemoved() && !itementity.getItem().isEmpty() && !itementity.hasPickUpDelay() && unitMob.isAlive() &&
-                    (rl != Relationship.HOSTILE)) {
+                    (rl != Relationship.HOSTILE) && ResourceSources.isPreparedFood(itementity.getItem().getItem())) {
                     ItemStack itemstack = itementity.getItem();
-                    if (itemstack.getItem().isEdible() &&
-                            unitMob.getHealth() < unitMob.getMaxHealth() &&
-                            !unitMob.getItemBySlot(EquipmentSlot.OFFHAND).getItem().isEdible()) {
+                    if (ResourceSources.isPreparedFood(itemstack.getItem()) &&
+                            unitMob.getHealth() < unitMob.getMaxHealth()) {
                         unitMob.onItemPickup(itementity);
                         unitMob.take(itementity, 1);
                         unit.getItems().add(new ItemStack(itemstack.getItem(), 1));

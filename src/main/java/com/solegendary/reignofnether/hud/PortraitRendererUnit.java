@@ -38,7 +38,6 @@ import net.minecraft.client.model.Model;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
@@ -58,6 +57,8 @@ import org.joml.Quaternionf;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.solegendary.reignofnether.util.MiscUtil.fcs;
 
 // Renders a Unit's portrait including its animated head, name, healthbar, list of stats and UI frames for these
 
@@ -89,7 +90,7 @@ public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<
     private final int lookRangeX = 100;
     private final int lookRangeY = 40;
 
-    public final int HERO_Y_OFFSET = 8;
+    public final int HERO_Y_OFFSET = 10;
 
     public PortraitRendererUnit() {
     }
@@ -222,7 +223,7 @@ public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<
         // draw name (unless a player, since their nametag will be rendered anyway)
         if (entity instanceof HeroUnit heroUnit) {
             y -= 6;
-            name += I18n.get("hud.hero.reignofnether.level", heroUnit.getHeroLevel());
+            //name += I18n.get("hud.hero.reignofnether.level", heroUnit.getHeroLevel());
         }
         if (!(entity instanceof Player)) {
             guiGraphics.drawString(Minecraft.getInstance().font, name, x + 4, y - 9, 0xFFFFFFFF);
@@ -282,7 +283,7 @@ public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<
             texts.add(manaText);
         }
 
-        renderStatText(texts, entity, x, (entity instanceof HeroUnit ? y - HERO_Y_OFFSET : y), guiGraphics);
+        renderStatText(texts, entity, x, (entity instanceof HeroUnit ? y - HERO_Y_OFFSET + 2 : y), guiGraphics);
 
         if (hasBanner)
             entity.setItemSlot(EquipmentSlot.HEAD, bannerStack);
@@ -373,6 +374,18 @@ public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<
             msInt *= 0.45f;
         }
         statStrings.add(String.valueOf(msInt)); // prevent rounding errors
+
+        if (unit instanceof HeroUnit heroUnit) {
+            int heroLvl = heroUnit.getHeroLevel();
+            guiGraphics.drawString(
+                    Minecraft.getInstance().font,
+                    fcs((heroLvl >= 10 ? "Lv " : "Lvl ") + heroLvl, true),
+                    blitXIcon + 1,
+                    blitYIcon - 1,
+                    0xFFFFFF
+            );
+            blitYIcon += HERO_Y_OFFSET + 1;
+        }
 
         // render based on prepped strings/icons
         for (int i = 0; i < statStrings.size(); i++) {
