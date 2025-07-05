@@ -18,13 +18,11 @@ import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.hero.HeroServerEvents;
 import com.solegendary.reignofnether.player.PlayerServerEvents;
 import com.solegendary.reignofnether.registrars.EntityRegistrar;
+import com.solegendary.reignofnether.registrars.MobEffectRegistrar;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
 import com.solegendary.reignofnether.resources.*;
 import com.solegendary.reignofnether.sandbox.SandboxServer;
-import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
-import com.solegendary.reignofnether.unit.interfaces.ConvertableUnit;
-import com.solegendary.reignofnether.unit.interfaces.Unit;
-import com.solegendary.reignofnether.unit.interfaces.WorkerUnit;
+import com.solegendary.reignofnether.unit.interfaces.*;
 import com.solegendary.reignofnether.unit.packets.UnitConvertClientboundPacket;
 import com.solegendary.reignofnether.unit.packets.UnitIdleWorkerClientBoundPacket;
 import com.solegendary.reignofnether.unit.packets.UnitSyncClientboundPacket;
@@ -450,7 +448,7 @@ public class UnitServerEvents {
             creeperUnit.explodeCreeper();
         }
 
-        boolean drownedInfected = evt.getEntity().getActiveEffectsMap().containsKey(MobEffects.HUNGER);
+        boolean drownedInfected = evt.getEntity().getActiveEffectsMap().containsKey(MobEffectRegistrar.ZOMBIE_INFECTED.get());
         boolean slimeInfected = evt.getEntity().getActiveEffectsMap().containsKey(MobEffects.CONFUSION);
 
         if (evt.getEntity().getLastHurtByMob() instanceof Unit unit && (drownedInfected || slimeInfected)) {
@@ -789,8 +787,14 @@ public class UnitServerEvents {
         }
 
         // ensure projectiles from units do the damage of the unit, not the item
-        if (evt.getSource().is(DamageTypeTags.IS_PROJECTILE) && evt.getSource().getEntity() instanceof AttackerUnit attackerUnit) {
-            evt.setAmount(attackerUnit.getUnitAttackDamage());
+        if (evt.getSource().is(DamageTypeTags.IS_PROJECTILE) &&
+            evt.getSource().getEntity() instanceof AttackerUnit attackerUnit) {
+            float dmg = attackerUnit.getUnitAttackDamage();
+            if (evt.getAmount() > dmg) {
+                if (evt.getEntity() instanceof Unit unit)
+                    dmg *= (1 - unit.getUnitArmorPercentage());
+                evt.setAmount(dmg);
+            }
         }
 
         // ignore added weapon damage for workers
@@ -840,6 +844,14 @@ public class UnitServerEvents {
                 evt.setCanceled(true);
             }
         }
+
+        if (evt.getEntity().getAbsorptionAmount() > 0)
+            UnitSyncClientboundPacket.sendSyncStatsPacket(evt.getEntity());
+
+        if (evt.getSource().getEntity() instanceof HeadhunterUnit headhunterUnit &&
+                headhunterUnit.hasFireAspectTrident() &&
+                evt.getAmount() > 0)
+            evt.getEntity().setSecondsOnFire(4);
     }
 
     @SubscribeEvent

@@ -18,12 +18,16 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.List;
 
 // brightness shading for blocks excluding liquids and flat flace blocks (like tall grass)
 
@@ -33,6 +37,29 @@ public abstract class ItemEntityRendererMixin {
     @Final @Shadow private ItemRenderer itemRenderer;
     @Final @Shadow private RandomSource random = RandomSource.create();
     @Shadow protected int getRenderAmount(ItemStack pStack) { return 0; }
+    
+    private static final List<Item> enlargedItems = List.of(
+        Items.GOLDEN_CHESTPLATE,
+        Items.GOLDEN_LEGGINGS,
+        Items.GOLDEN_BOOTS,
+        Items.GOLDEN_HELMET,
+        Items.NETHERITE_CHESTPLATE,
+        Items.NETHERITE_LEGGINGS,
+        Items.NETHERITE_BOOTS,
+        Items.NETHERITE_HELMET,
+        Items.NETHERITE_SWORD,
+        Items.TRIDENT
+    );
+
+    @Unique
+    private boolean reignofnether$shouldRenderLargeItemEntity(ItemEntity itemEntity) {
+        Item item = itemEntity.getItem().getItem();
+        if (!OrthoviewClientEvents.isEnabled())
+            return false;
+        return ResourceSources.isPreparedFood(item) ||
+                ResourceSources.getFromItem(item) != null ||
+                enlargedItems.contains(item);
+    }
 
     @Inject(
             method = "render(Lnet/minecraft/world/entity/item/ItemEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",
@@ -52,9 +79,8 @@ public abstract class ItemEntityRendererMixin {
             return;
         }
 
-        if (OrthoviewClientEvents.isEnabled() &&
-                (ResourceSources.isPreparedFood(pEntity.getItem().getItem()) ||
-                 ResourceSources.getFromItem(pEntity.getItem().getItem()) != null)) {
+        // enlarge and brighten items that units can use
+        if (reignofnether$shouldRenderLargeItemEntity(pEntity)) {
             ci.cancel();
 
             pPoseStack.pushPose();

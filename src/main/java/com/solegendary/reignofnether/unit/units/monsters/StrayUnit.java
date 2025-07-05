@@ -113,7 +113,7 @@ public class StrayUnit extends Stray implements Unit, AttackerUnit, RangedAttack
     public float getMovementSpeed() {return movementSpeed;}
     public float getUnitAttackDamage() {return attackDamage;}
     public float getUnitMaxHealth() {return maxHealth;}
-    public float getUnitArmorValue() {return armorValue;}
+
     @Nullable
     public ResourceCost getCost() {return ResourceCosts.STRAY;}
     public boolean canAttackBuildings() {return getAttackBuildingGoal() != null;}
@@ -195,7 +195,11 @@ public class StrayUnit extends Stray implements Unit, AttackerUnit, RangedAttack
 
     @Override
     public SunlightEffect getSunlightEffect() {
-        return SunlightEffect.FIRE;
+        if (hasItemInSlot(EquipmentSlot.HEAD)) {
+            return SunlightEffect.MOVEMENT_SLOWDOWN;
+        } else {
+            return SunlightEffect.FIRE;
+        }
     }
 
     public void initialiseGoals() {

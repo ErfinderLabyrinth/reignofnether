@@ -116,7 +116,7 @@ public class SlimeUnit extends Slime implements Unit, AttackerUnit {
     public boolean getAggressiveWhenIdle() {return aggressiveWhenIdle && !isVehicle();}
     public float getAttackRange() { return ((getSize() + 1) * 0.5f); }
     public float getMovementSpeed() {return movementSpeed;}
-    public float getUnitArmorValue() {return armorValue;}
+
     public ResourceCost getCost() {
         int popCost = getSize();
         if (getSize() == 1)

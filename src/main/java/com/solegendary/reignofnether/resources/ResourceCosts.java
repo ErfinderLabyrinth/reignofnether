@@ -44,6 +44,8 @@ public class ResourceCosts {
     public static final ResourceCost NECROMANCER = new ResourceCost(ID, "NECROMANCER");
     public static final ResourceCost ROYAL_GUARD = new ResourceCost(ID, "ROYAL_GUARD");
     public static final ResourceCost PIGLIN_MERCHANT = new ResourceCost(ID, "PIGLIN_MERCHANT");
+    public static final ResourceCost HERO_BASE_REVIVE_COST = new ResourceCost(ID, "HERO_BASE_REVIVE_COST");
+    public static final ResourceCost HERO_EXTRA_REVIVE_COST_PER_LEVEL = new ResourceCost(ID, "HERO_REVIVE_COST_PER_LEVEL");
 
     public static final ResourceCost ENDERMAN = new ResourceCost(ID, "ENDERMAN");
     public static final ResourceCost POLAR_BEAR = new ResourceCost(ID, "POLAR_BEAR");
@@ -226,6 +228,9 @@ public class ResourceCosts {
         PANDA.bakeValues(ReignOfNetherCommonConfigs.UnitCosts.PANDA);
         WOLF.bakeValues(ReignOfNetherCommonConfigs.UnitCosts.WOLF);
         LLAMA.bakeValues(ReignOfNetherCommonConfigs.UnitCosts.LLAMA);
+
+        HERO_BASE_REVIVE_COST.bakeValues(ReignOfNetherCommonConfigs.UnitCosts.HERO_BASE_REVIVE_COST);
+        HERO_EXTRA_REVIVE_COST_PER_LEVEL.bakeValues(ReignOfNetherCommonConfigs.UnitCosts.HERO_EXTRA_REVIVE_COST_PER_LEVEL);
 
         // ******************* BUILDINGS ******************* //
         BEACON.bakeValues(ReignOfNetherCommonConfigs.BuildingCosts.BEACON);

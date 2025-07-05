@@ -132,7 +132,7 @@ public class HudClientEvents {
             if (le instanceof Unit unit) {
                 for (Ability ability : unit.getAbilities()) {
                     totalCd += ability.getCooldown();
-                    if (ability.isChanneling())
+                    if (ability.isCasting())
                         totalCd += 10;
                 }
             }
@@ -151,36 +151,13 @@ public class HudClientEvents {
         hudSelectedEntity = entity;
     }
 
-    // eg. entity.reignofnether.zombie_unit -> zombie
-    public static String getSimpleEntityName(Entity entity) {
-        if (entity instanceof PhantomSummon)
-            return "Phantom";
-
-        if (entity instanceof Unit) {
-            if (entity.hasCustomName()) {
-                return entity.getType()
-                    .getDescription()
-                    .getString()
-                    .replace(" ", "")
-                    .replace("entity.reignofnether.", "")
-                    .replace("_unit", "")
-                    .replace(".none", "");
-            } else {
-                return entity.getName()
-                    .getString()
-                    .replace(" ", "")
-                    .replace("entity.reignofnether.", "")
-                    .replace("_unit", "")
-                    .replace(".none", "");
-            }
-        } else {
-            return entity.getName().getString().toLowerCase();
-        }
-    }
 
     // not to be used for resource paths
     public static String getModifiedEntityName(LivingEntity entity) {
-        String name = getSimpleEntityName(entity);
+        if (entity == null)
+            return "";
+
+        String name = MiscUtil.getSimpleEntityName(entity);
 
         if (entity.isBaby())
             name = I18n.get("units.neutral.reignofnether.baby") + " " + name;
@@ -208,7 +185,7 @@ public class HudClientEvents {
             }else if (entity instanceof HoglinUnit && passenger instanceof HeadhunterUnit) {
                 name = I18n.get("units.piglins.reignofnether.hoglin_rider");
             } else {
-                String pName = getSimpleEntityName(entity.getPassengers().get(0)).replace("_", " ");
+                String pName = MiscUtil.getSimpleEntityName(entity.getPassengers().get(0)).replace("_", " ");
                 String nameCap = pName.substring(0, 1).toUpperCase() + pName.substring(1);
                 name += " & " + nameCap;
             }
@@ -322,6 +299,7 @@ public class HudClientEvents {
             boolean hudSelBuildingOwned =
                 BuildingClientEvents.getPlayerToBuildingRelationship(hudSelectedPlacement) == Relationship.OWNED ||
                         SandboxClientEvents.isSandboxPlayer();
+                        //AlliancesClient.canControlAlly(hudSelectedPlacement.ownerName) ||
 
             // -----------------
             // Building portrait
@@ -636,7 +614,8 @@ public class HudClientEvents {
                     hudZones.add(portraitRendererUnit.renderResourcesHeld(evt.getGuiGraphics(), blitX, blitY, unit));
 
                     // return button
-                    if (getPlayerToEntityRelationship(hudSelectedEntity) == Relationship.OWNED) {
+                    if (getPlayerToEntityRelationship(hudSelectedEntity) == Relationship.OWNED ||
+                        AlliancesClient.canControlAlly(hudSelectedEntity)) {
                         Button returnButton = new Button("Return resources",
                             Button.itemIconSize,
                             new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/chest.png"),
@@ -674,9 +653,12 @@ public class HudClientEvents {
         blitY = screenHeight - iconFrameSize * 2 - 10;
 
         for (LivingEntity unit : selUnits) {
-            if ((getPlayerToEntityRelationship(unit) == Relationship.OWNED || NonUnitClientEvents.canControlNonUnits()) && unitButtons.size() < (buttonsPerRow * 2)) {
+            if ((getPlayerToEntityRelationship(unit) == Relationship.OWNED ||
+                    NonUnitClientEvents.canControlAllMobs() ||
+                    AlliancesClient.canControlAlly(unit)) &&
+                unitButtons.size() < (buttonsPerRow * 2)) {
                 // mob head icon
-                String unitName = getSimpleEntityName(unit);
+                String unitName = MiscUtil.getSimpleEntityName(unit);
                 String buttonImagePath;
 
                 if (unit.isVehicle()) {
@@ -706,7 +688,7 @@ public class HudClientEvents {
                     List.of(fcs(capitaliseAndSpace(getModifiedEntityName(unit))))
                 );
                 if (unit.isVehicle() && unit instanceof Unit) {
-                    String passengerName = getSimpleEntityName(unit.getFirstPassenger());
+                    String passengerName = MiscUtil.getSimpleEntityName(unit.getFirstPassenger());
                     button.bgIconResource = new ResourceLocation(ReignOfNether.MOD_ID,
                         "textures/mobheads/" + passengerName + ".png"
                     );
@@ -801,7 +783,8 @@ public class HudClientEvents {
         // Unit sandbox action buttons
         // ---------------------------
         if (selUnits.size() > 0 && SandboxClientEvents.isSandboxPlayer() && hudSelectedEntity instanceof Unit &&
-            getPlayerToEntityRelationship(selUnits.get(0)) != Relationship.OWNED) {
+            (getPlayerToEntityRelationship(selUnits.get(0)) != Relationship.OWNED &&
+                    !AlliancesClient.canControlAlly(selUnits.get(0)))) {
             blitX = 0;
             blitY = screenHeight - (iconFrameSize * 2);
             ArrayList<Button> actionButtons = new ArrayList<>();
@@ -824,7 +807,8 @@ public class HudClientEvents {
         // Unit action buttons (attack, stop, move, abilities etc.)
         // --------------------------------------------------------
         if (selUnits.size() > 0 &&
-                (getPlayerToEntityRelationship(selUnits.get(0)) == Relationship.OWNED || NonUnitClientEvents.canControlNonUnits()) &&
+                (getPlayerToEntityRelationship(selUnits.get(0)) == Relationship.OWNED ||
+                        NonUnitClientEvents.canControlAllMobs() || AlliancesClient.canControlAlly(selUnits.get(0))) &&
                 hudSelectedEntity instanceof Unit unit) {
             blitX = 0;
             blitY = screenHeight - iconFrameSize;
@@ -892,7 +876,9 @@ public class HudClientEvents {
             blitY = screenHeight - (iconFrameSize * 2) - 4;
 
             // includes worker building buttons
-            if (TutorialClientEvents.isAtOrPastStage(TutorialStage.BUILD_INTRO) && getPlayerToEntityRelationship(selUnits.get(0)) == Relationship.OWNED) {
+            if (TutorialClientEvents.isAtOrPastStage(TutorialStage.BUILD_INTRO) &&
+                    (getPlayerToEntityRelationship(selUnits.get(0)) == Relationship.OWNED) ||
+                    AlliancesClient.canControlAlly(selUnits.get(0))) {
                 List<AbilityButton> abilityButtons = List.of();
                 for (LivingEntity livingEntity : selUnits) {
                     if (livingEntity == hudSelectedEntity) {
@@ -998,7 +984,8 @@ public class HudClientEvents {
         // -----------------
         // Non-unit controls
         // -----------------
-        else if (!(hudSelectedEntity instanceof Unit) && !getSelectedUnits().isEmpty() && NonUnitClientEvents.canControlNonUnits()) {
+        else if (!(hudSelectedEntity instanceof Unit) && !getSelectedUnits().isEmpty() &&
+                NonUnitClientEvents.canControlAllMobs()) {
             blitX = 0;
             blitY = screenHeight - iconFrameSize;
             ArrayList<Button> actionButtons = new ArrayList<>();
@@ -1034,7 +1021,7 @@ public class HudClientEvents {
         boolean isSelPlayer = MC.player != null && MC.player.getName().getString().equals(selPlayerName);
 
         // during a match if nothing is selected, then show your own resources by default
-        if (MC.player != null && !isSelPlayer && PlayerClientEvents.isRTSPlayer) {
+        if (MC.player != null && !isSelPlayer && PlayerClientEvents.isRTSPlayer && selPlayerName == null) {
             selPlayerName = MC.player.getName().getString();
             isSelPlayer = true;
         }
@@ -1147,7 +1134,7 @@ public class HudClientEvents {
                     numWorkersAssigned = UnitClientEvents.getAllUnits()
                         .stream()
                         .filter(u -> u instanceof WorkerUnit
-                            && UnitClientEvents.getPlayerToEntityRelationship(u) == Relationship.OWNED)
+                                && ((Unit) u).getOwnerName().equals(finalSelPlayerName))
                         .toList()
                         .size();
                 } else {
@@ -1198,6 +1185,7 @@ public class HudClientEvents {
             }
 
             blitY = resourceBlitYStart;
+            final String finalSelPlayerName = selPlayerName;
             for (String resourceName : new String[] { "food", "wood", "ore", "population" }) {
                 String locName = I18n.get("resources.reignofnether." + resourceName);
                 List<FormattedCharSequence> tooltip;
@@ -1221,7 +1209,7 @@ public class HudClientEvents {
                         int numWorkers = UnitClientEvents.getAllUnits()
                             .stream()
                             .filter(u -> u instanceof WorkerUnit
-                                && UnitClientEvents.getPlayerToEntityRelationship(u) == Relationship.OWNED)
+                                && ((Unit) u).getOwnerName().equals(finalSelPlayerName))
                             .toList()
                             .size();
                         tooltipWorkersAssigned =
@@ -1656,8 +1644,19 @@ public class HudClientEvents {
 
         ArrayList<LivingEntity> units = UnitClientEvents.getSelectedUnits();
 
-        // sort and hudSelect the first unit type in the list
-        units.sort(Comparator.comparing(HudClientEvents::getSimpleEntityName));
+        // sort and hudSelect the first unit type in the list, putting heroes first
+        units.sort(Comparator.comparing(MiscUtil::getSimpleEntityName));
+
+        ArrayList<LivingEntity> heroUnits = new ArrayList<>();
+        units.removeIf(le -> {
+            if (le instanceof HeroUnit heroUnit) {
+                heroUnits.add(le);
+                return true;
+            }
+            return false;
+        });
+        for (LivingEntity heroUnit : heroUnits)
+            units.add(0, heroUnit);
 
         if (units.size() <= 0) {
             HudClientEvents.setHudSelectedEntity(null);
@@ -1735,7 +1734,7 @@ public class HudClientEvents {
     private static void cycleUnitSubgroups() {
         List<LivingEntity> entities = new ArrayList<>(getSelectedUnits().stream()
                 .filter(e -> e instanceof Unit)
-                .sorted(Comparator.comparing(HudClientEvents::getSimpleEntityName))
+                .sorted(Comparator.comparing(MiscUtil::getSimpleEntityName))
                 .toList());
 
         if (entities.isEmpty())

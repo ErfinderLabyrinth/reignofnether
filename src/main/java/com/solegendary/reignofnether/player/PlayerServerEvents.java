@@ -58,6 +58,7 @@ import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.network.NetworkHooks;
 
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -160,6 +161,16 @@ public class PlayerServerEvents {
         synchronized (rtsPlayers) {
             return rtsPlayers.stream().filter(p -> p.name.equals(playerName)).toList().size() > 0;
         }
+    }
+
+    @Nullable
+    public static RTSPlayer getRTSPlayer(String playerName) {
+        synchronized (rtsPlayers) {
+            for (RTSPlayer rtsPlayer : rtsPlayers)
+                if (rtsPlayer.name.equals(playerName))
+                    return rtsPlayer;
+        }
+        return null;
     }
 
     public static boolean isRTSPlayer(int id) {
@@ -324,8 +335,9 @@ public class PlayerServerEvents {
                 serverPlayer.sendSystemMessage(Component.literal(""));
             }
         }
-        if (isRTSPlayer(playerName)) {
-            PlayerClientboundPacket.enableRTSStatus(playerName);
+        RTSPlayer rtsPlayer = getRTSPlayer(playerName);
+        if (rtsPlayer != null) {
+            PlayerClientboundPacket.enableRTSStatus(playerName, rtsPlayer.faction);
         } else {
             PlayerClientboundPacket.disableRTSStatus(playerName);
         }
@@ -398,7 +410,7 @@ public class PlayerServerEvents {
 
             String playerName = serverPlayer.getName().getString();
             ResourcesServerEvents.assignResources(playerName);
-            PlayerClientboundPacket.enableRTSStatus(playerName);
+            PlayerClientboundPacket.enableRTSStatus(playerName, faction);
 
             ServerLevel level = (ServerLevel) serverPlayer.level();
             ArrayList<Entity> workers = new ArrayList<>();
@@ -742,8 +754,25 @@ public class PlayerServerEvents {
         }
     }
 
+    public static void sendMessageToPlayerNoNewLines(String playerName, String msg) {
+        sendMessageToPlayerNoNewLines(playerName, msg, false);
+    }
+
     public static void sendMessageToPlayer(String playerName, String msg) {
         sendMessageToPlayer(playerName, msg, false);
+    }
+
+    public static void sendMessageToPlayerNoNewLines(String playerName, String msg, boolean bold, Object... formatArgs) {
+        for (ServerPlayer player : players) {
+            if (player.getName().getString().equals(playerName)) {
+                if (bold) {
+                    player.sendSystemMessage(Component.translatable(msg, formatArgs).withStyle(Style.EMPTY.withBold(true)));
+                } else {
+                    player.sendSystemMessage(Component.translatable(msg, formatArgs));
+                }
+                return;
+            }
+        }
     }
 
     public static void sendMessageToPlayer(String playerName, String msg, boolean bold, Object... formatArgs) {
@@ -938,6 +967,7 @@ public class PlayerServerEvents {
             player.setGameMode(GameType.SPECTATOR);
 
         playerDefaultGameModes.replaceAll((key, oldValue) -> GameType.SPECTATOR);
+        AlliancesServerEvents.playersWithAlliedControl.clear();
     }
 
     public static void setRTSLock(boolean lock) {

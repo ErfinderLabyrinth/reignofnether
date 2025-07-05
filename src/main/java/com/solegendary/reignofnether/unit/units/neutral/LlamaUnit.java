@@ -90,7 +90,7 @@ public class LlamaUnit extends Llama implements Unit, AttackerUnit, RangedAttack
     // combat stats
     public float getMovementSpeed() {return movementSpeed;}
     public float getUnitMaxHealth() {return maxHealth;}
-    public float getUnitArmorValue() {return armorValue;}
+
     @Nullable
     public ResourceCost getCost() {return ResourceCosts.LLAMA;}
     public boolean getWillRetaliate() {return willRetaliate;}

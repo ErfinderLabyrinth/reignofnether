@@ -24,9 +24,11 @@ import com.solegendary.reignofnether.unit.interfaces.WorkerUnit;
 import com.solegendary.reignofnether.unit.units.monsters.CreeperUnit;
 import com.solegendary.reignofnether.unit.units.monsters.ZombieUnit;
 import com.solegendary.reignofnether.unit.units.piglins.BruteUnit;
+import com.solegendary.reignofnether.unit.units.piglins.HeadhunterUnit;
 import com.solegendary.reignofnether.unit.units.villagers.EvokerUnit;
 import com.solegendary.reignofnether.unit.units.villagers.PillagerUnit;
 import com.solegendary.reignofnether.unit.units.villagers.VindicatorUnit;
+import com.solegendary.reignofnether.util.MiscUtil;
 import com.solegendary.reignofnether.util.MyMath;
 import com.solegendary.reignofnether.util.MyRenderer;
 import net.minecraft.ReportedException;
@@ -191,6 +193,10 @@ public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<
         guiGraphics.pose().translate(0,0,2000);
         name = WordUtils.capitalize(name);
 
+        if ((entity instanceof BruteUnit bUnit && bUnit.hasEnchantedNetheriteSword()) ||
+            (entity instanceof HeadhunterUnit hUnit && hUnit.hasFireAspectTrident())) {
+            name += " (FA)";
+        }
         if (entity instanceof VindicatorUnit pUnit && pUnit.getEnchant() == Enchantments.SHARPNESS) {
             name += " (S)";
         }
@@ -243,6 +249,13 @@ public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<
                     frameWidth - 9,
                     HealthBarClientEvents.RenderMode.GUI_PORTRAIT
             );
+            HealthBarClientEvents.renderAbsorbForEntity(guiGraphics.pose(),
+                    entity,
+                    x + (frameWidth / 2f),
+                    y + frameHeight - 22,
+                    frameWidth - 9,
+                    HealthBarClientEvents.RenderMode.GUI_PORTRAIT
+            );
             HealthBarClientEvents.renderManaForEntity(guiGraphics.pose(),
                     heroUnit,
                     x + (frameWidth / 2f),
@@ -258,17 +271,29 @@ public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<
                     frameWidth - 9,
                     HealthBarClientEvents.RenderMode.GUI_PORTRAIT
             );
+            HealthBarClientEvents.renderAbsorbForEntity(guiGraphics.pose(),
+                    entity,
+                    x + (frameWidth / 2f),
+                    y + frameHeight - 14,
+                    frameWidth - 9,
+                    HealthBarClientEvents.RenderMode.GUI_PORTRAIT
+            );
         }
 
         ArrayList<String> texts = new ArrayList<>();
         String healthText = "";
         float health = entity.getHealth();
+        health += entity.getAbsorptionAmount();
         if (health >= 1) {
             healthText = String.valueOf((int) health);
         } else {
             healthText = String.valueOf(health).substring(0, 3);
         }
-        healthText += "/" + (int) entity.getMaxHealth();
+        float maxHealth = entity.getMaxHealth();
+        if (entity.getAbsorptionAmount() > 0)
+            maxHealth += MiscUtil.getMaxAbsorptionAmount(entity);
+
+        healthText += "/" + ((int) maxHealth);
         texts.add(healthText);
 
         if (entity instanceof HeroUnit heroUnit) {
@@ -365,7 +390,7 @@ public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<
         textureStatIcons.add(new ResourceLocation("reignofnether", "textures/icons/items/chestplate.png"));
         textureStatIcons.add(new ResourceLocation("reignofnether", "textures/icons/items/boots.png"));
 
-        statStrings.add(String.valueOf((int) (unit.getUnitArmorValue())));
+        statStrings.add((int) (unit.getUnitArmorPercentage() * 100) + "%");
         AttributeInstance ms = ((LivingEntity) unit).getAttribute(Attributes.MOVEMENT_SPEED);
 
         int msInt = ms != null ? (int) (ms.getValue() * 101) : 0;

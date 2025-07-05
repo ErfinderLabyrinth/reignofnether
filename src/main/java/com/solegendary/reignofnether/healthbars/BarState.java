@@ -1,6 +1,7 @@
 package com.solegendary.reignofnether.healthbars;
 
 import com.solegendary.reignofnether.unit.interfaces.HeroUnit;
+import com.solegendary.reignofnether.util.MiscUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.entity.Entity;
@@ -19,7 +20,8 @@ public class BarState {
 
   public enum BarStateType {
     HEALTH,
-    MANA
+    MANA,
+    ABSORB
   }
 
   private static final float AMOUNT_INDICATOR_DELAY = 10;
@@ -39,8 +41,10 @@ public class BarState {
 
       if (entity instanceof HeroUnit heroUnit && barStateType == BarStateType.MANA) {
         amount = Math.min(heroUnit.getMana(), heroUnit.getMaxMana());
-      } else {
+      } else if (barStateType == BarStateType.HEALTH) {
         amount = Math.min(livingEntity.getHealth(), livingEntity.getMaxHealth());
+      } else if (barStateType == BarStateType.ABSORB) {
+        amount = Math.min(livingEntity.getAbsorptionAmount(), MiscUtil.getMaxAbsorptionAmount(livingEntity));
       }
       incrementTimers();
 

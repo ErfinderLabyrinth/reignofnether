@@ -3,6 +3,8 @@ package com.solegendary.reignofnether.unit;
 import com.mojang.datafixers.util.Pair;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.HeroAbility;
+import com.solegendary.reignofnether.alliance.AlliancesClient;
+import com.solegendary.reignofnether.alliance.AlliancesServerEvents;
 import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.BuildingUtils;
 import com.solegendary.reignofnether.building.GarrisonableBuilding;
@@ -113,8 +115,17 @@ public class UnitActionItem {
         ArrayList<Unit> actionableUnits = new ArrayList<>();
         for (int id : unitIds) {
             Entity entity = level.getEntity(id);
-            if (entity instanceof Unit unit && (unit.getOwnerName().equals(this.ownerName) || isSandboxPlayer)) {
-                actionableUnits.add(unit);
+
+            if (entity instanceof Unit unit) {
+                boolean alliedControl;
+                if (level.isClientSide())
+                    alliedControl = AlliancesClient.canControlAlly(unit.getOwnerName());
+                else
+                    alliedControl = AlliancesServerEvents.canControlAlly(this.ownerName, unit.getOwnerName());
+
+                if (unit.getOwnerName().equals(this.ownerName) || isSandboxPlayer || alliedControl) {
+                    actionableUnits.add(unit);
+                }
             }
         }
 
@@ -420,8 +431,8 @@ public class UnitActionItem {
             }
         }
 
-        if ((level.isClientSide() && NonUnitClientEvents.canControlNonUnits()) ||
-            (!level.isClientSide() && NonUnitServerEvents.canControlNonUnits(level, ownerName))) {
+        if ((level.isClientSide() && NonUnitClientEvents.canControlAllMobs()) ||
+            (!level.isClientSide() && NonUnitServerEvents.canControlAllMobs(level, ownerName))) {
 
             for (PathfinderMob mob : actionableNonUnits) {
                 if (mob instanceof Unit)

@@ -22,9 +22,9 @@ public class GenericTargetedSpellGoal extends MoveToTargetBlockGoal {
     protected LivingEntity targetEntity = null;
     protected Ability ability; // used for syncing cooldown with clientside
     protected int channelTicks = 0; // how long have we spent trying to cast this spell
-    public boolean isChannelling() { return isChannelling; }
+    public boolean isCasting() { return isCasting; }
     protected final int channelTicksMax; // max time required to cast a spell
-    protected boolean isChannelling = false;
+    protected boolean isCasting = false;
     protected BlockPos castTarget = null; // pos that the spell will be cast at
     protected final float range;
     public Consumer<LivingEntity> onEntityCast;
@@ -90,7 +90,7 @@ public class GenericTargetedSpellGoal extends MoveToTargetBlockGoal {
 
     protected boolean isInRange() {
         float finalRange = range;
-        if (isChannelling())
+        if (isCasting())
             finalRange += bonusChannelingRange;
 
         if (moveTarget != null && MyMath.distance(
@@ -115,7 +115,7 @@ public class GenericTargetedSpellGoal extends MoveToTargetBlockGoal {
             if (isInRange()) {
                 if (moveTarget != null)
                     castTarget = moveTarget;
-                if (!isChannelling)
+                if (!isCasting)
                     startCasting();
                 this.stopMoving();
             } else {
@@ -123,7 +123,7 @@ public class GenericTargetedSpellGoal extends MoveToTargetBlockGoal {
                 this.setMoveTarget(moveTarget);
             }
 
-            if (isChannelling && castTarget != null) {
+            if (isCasting && castTarget != null) {
                 this.mob.getLookControl().setLookAt(castTarget.getX(), castTarget.getY(), castTarget.getZ());
                 channelTicks += 1;
                 if (channelTicks >= channelTicksMax) {
@@ -139,12 +139,14 @@ public class GenericTargetedSpellGoal extends MoveToTargetBlockGoal {
                     }
                     if (this.ability != null && !this.mob.level().isClientSide()) {
                         if (!this.mob.level().isClientSide()) {
-                            AbilityClientboundPacket.sendSetCooldownPacket(this.mob.getId(), this.ability.action, this.ability.cooldownMax);
+                            if (this.ability.isOffCooldown()) {
+                                AbilityClientboundPacket.sendSetCooldownPacket(this.mob.getId(), this.ability.action, this.ability.cooldownMax);
+                            }
                             if (mob instanceof HeroUnit heroUnit && this.ability instanceof HeroAbility heroAbility) {
                                 heroUnit.setMana(heroUnit.getMana() - heroAbility.manaCost);
                             }
                         }
-                        else if (mob instanceof Unit unit) {
+                        else if (mob instanceof Unit unit && this.ability.isOffCooldown()) {
                             this.ability.setToMaxCooldown();
                         }
                     }
@@ -159,7 +161,7 @@ public class GenericTargetedSpellGoal extends MoveToTargetBlockGoal {
     }
 
     public void startCasting() {
-        this.isChannelling = true;
+        this.isCasting = true;
         this.castTarget = moveTarget;
         if (!this.mob.level().isClientSide()) {
             if (!hasKeyframeAnimations) {
@@ -170,7 +172,7 @@ public class GenericTargetedSpellGoal extends MoveToTargetBlockGoal {
         }
     }
     public void stopCasting() {
-        this.isChannelling = false;
+        this.isCasting = false;
         this.channelTicks = 0;
         this.castTarget = null;
         if (!this.mob.level().isClientSide() && channelTicks < channelTicksMax) {
@@ -192,7 +194,7 @@ public class GenericTargetedSpellGoal extends MoveToTargetBlockGoal {
     public void stopExceptAnimations() {
         this.stopMoving();
         this.setTarget((LivingEntity) null);
-        this.isChannelling = false;
+        this.isCasting = false;
         this.channelTicks = 0;
         this.castTarget = null;
     }

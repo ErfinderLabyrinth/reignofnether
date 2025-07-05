@@ -27,9 +27,9 @@ public class NonUnitClientEvents {
 
     public static boolean isMoveCheckpointGreen = true;
 
-    public static boolean canControlNonUnits() {
+    public static boolean canControlAllMobs() {
         return MC.player != null &&
-            (ResearchClient.hasCheat("wouldyoukindly"));
+                (ResearchClient.hasCheat("wouldyoukindly"));
     }
 
     public static boolean canAttack(LivingEntity le) {

@@ -96,7 +96,7 @@ public class SilverfishUnit extends Silverfish implements Unit, AttackerUnit {
     public float getMovementSpeed() {return movementSpeed;}
     public float getUnitAttackDamage() {return attackDamage;}
     public float getUnitMaxHealth() {return maxHealth;}
-    public float getUnitArmorValue() {return armorValue;}
+
     public ResourceCost getCost() {return ResourceCost.Unit(0,0, 0, 0,0);}
     public boolean canAttackBuildings() {return getAttackBuildingGoal() != null;}
 

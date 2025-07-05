@@ -10,6 +10,7 @@ import java.util.Map;
 public class BarStates {
 
   private static final Map<Integer, BarState> HEALTH_STATES = new HashMap<>();
+  private static final Map<Integer, BarState> ABSORB_STATES = new HashMap<>();
   private static final Map<Integer, BarState> MANA_STATES = new HashMap<>();
   private static int tickCount = 0;
 
@@ -22,6 +23,12 @@ public class BarStates {
       if (state == null) {
         state = new BarState(id, barStateType);
         HEALTH_STATES.put(id, state);
+      }
+    } else if (barStateType == BarState.BarStateType.ABSORB) {
+      state = ABSORB_STATES.get(id);
+      if (state == null) {
+        state = new BarState(id, barStateType);
+        ABSORB_STATES.put(id, state);
       }
     } else {
       state = MANA_STATES.get(id);
@@ -37,6 +44,9 @@ public class BarStates {
     for (BarState state : HEALTH_STATES.values()) {
       state.tick();
     }
+    for (BarState state : ABSORB_STATES.values()) {
+      state.tick();
+    }
     for (BarState state : MANA_STATES.values()) {
       state.tick();
     }
@@ -49,6 +59,7 @@ public class BarStates {
 
   private static void cleanCache() {
     HEALTH_STATES.entrySet().removeIf(BarStates::stateExpired);
+    ABSORB_STATES.entrySet().removeIf(BarStates::stateExpired);
     MANA_STATES.entrySet().removeIf(BarStates::stateExpired);
   }
 

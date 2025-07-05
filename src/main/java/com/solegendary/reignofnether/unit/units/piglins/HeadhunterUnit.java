@@ -37,6 +37,7 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.piglin.PiglinBrute;
 import net.minecraft.world.entity.projectile.ThrownTrident;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -108,7 +109,7 @@ public class HeadhunterUnit extends PiglinBrute implements Unit, AttackerUnit, R
     // combat stats
     public float getMovementSpeed() {return movementSpeed;}
     public float getUnitMaxHealth() {return maxHealth;}
-    public float getUnitArmorValue() {return armorValue;}
+
     @Nullable
     public ResourceCost getCost() {return ResourceCosts.HEADHUNTER;}
     public boolean getWillRetaliate() {return willRetaliate;}
@@ -287,5 +288,34 @@ public class HeadhunterUnit extends PiglinBrute implements Unit, AttackerUnit, R
     public boolean fireImmune() {
         BuildingPlacement bpl = BuildingUtils.findBuilding(level().isClientSide(), getOnPos());
         return super.fireImmune() || (bpl != null && (bpl.getBuilding() instanceof FlameSanctuary || bpl.getBuilding() instanceof BasaltSprings));
+    }
+
+    public boolean hasFireAspectTrident() {
+        ItemStack itemStack = this.getItemBySlot(EquipmentSlot.MAINHAND);
+        return itemStack.getAllEnchantments().containsKey(Enchantments.FIRE_ASPECT);
+    }
+
+    @Override
+    public boolean canPickUpEquipment(ItemStack itemStack) {
+        Item item = itemStack.getItem();
+        ItemStack currentItemStack = getItemBySlot(getEquipmentSlotForItem(itemStack));
+        return ((item == Items.GOLDEN_CHESTPLATE ||
+                item == Items.GOLDEN_LEGGINGS ||
+                item == Items.GOLDEN_BOOTS ||
+                item == Items.GOLDEN_HELMET ||
+                item == Items.NETHERITE_CHESTPLATE ||
+                item == Items.NETHERITE_LEGGINGS ||
+                item == Items.NETHERITE_BOOTS ||
+                item == Items.NETHERITE_HELMET ||
+                item == Items.TRIDENT) &&
+                (currentItemStack.getItem() != item ||
+                        (!hasFireAspectTrident() && itemStack.isEnchanted())));
+    }
+
+    @Override
+    public void onPickupEquipment(ItemStack itemStack) {
+        AttributeModifier mod = new AttributeModifier(UUID.randomUUID().toString(), 0, AttributeModifier.Operation.ADDITION);
+        itemStack.addAttributeModifier(Attributes.ATTACK_DAMAGE, mod, EquipmentSlot.MAINHAND);
+        setItemSlot(getEquipmentSlotForItem(itemStack), itemStack);
     }
 }

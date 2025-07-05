@@ -58,6 +58,11 @@ public class HeroClientboundPacket {
                 new HeroClientboundPacket(HeroAction.ACTIVATE_ABILITY_CLIENTSIDE, unitId, 0, abilityIndex));
     }
 
+    public static void deactivateAbilityClientside(int unitId, int abilityIndex) {
+        PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(),
+                new HeroClientboundPacket(HeroAction.DEACTIVATE_ABILITY_CLIENTSIDE, unitId, 0, abilityIndex));
+    }
+
     public HeroClientboundPacket(HeroAction action, int unitId, float value, int abilityIndex) {
         this.action = action;
         this.unitId = unitId;

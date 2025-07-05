@@ -136,7 +136,7 @@ public class NecromancerUnit extends Skeleton implements Unit, AttackerUnit, Ran
     public float getMovementSpeed() {return movementSpeed;}
     public float getUnitAttackDamage() {return attackDamage + (attackBonusPerLevel * getHeroLevel());}
     public float getUnitMaxHealth() {return maxHealth + (maxHealthBonusPerLevel * getHeroLevel());}
-    public float getUnitArmorValue() {return armorValue;}
+
     @Nullable
     public ResourceCost getCost() {return ResourceCosts.NECROMANCER;}
     public boolean canAttackBuildings() {return getAttackBuildingGoal() != null;}
@@ -339,7 +339,7 @@ public class NecromancerUnit extends Skeleton implements Unit, AttackerUnit, Ran
 
     @Override
     public SunlightEffect getSunlightEffect() {
-        return SunlightEffect.FIRE;
+        return SunlightEffect.MOVEMENT_SLOWDOWN;
     }
 
     public void initialiseGoals() {
@@ -391,6 +391,7 @@ public class NecromancerUnit extends Skeleton implements Unit, AttackerUnit, Ran
     @Override
     public void setupEquipmentAndUpgradesServer() {
         this.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
+        this.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.PAPER)); // prevent burning in sunlight
     }
 
     // override to make inaccuracy 0
@@ -447,28 +448,37 @@ public class NecromancerUnit extends Skeleton implements Unit, AttackerUnit, Ran
                 zombieUnit.setOwnerName(this.getOwnerName());
                 this.level().addFreshEntity(zombieUnit);
 
+                ItemStack helmet = new ItemStack(Items.LEATHER_HELMET);
                 ItemStack chestPlate = new ItemStack(Items.LEATHER_CHESTPLATE);
                 ItemStack leggings = new ItemStack(Items.LEATHER_LEGGINGS);
                 ItemStack boots = new ItemStack(Items.LEATHER_BOOTS);
+                ItemStack sword = new ItemStack(Items.WOODEN_SWORD);
                 if (raiseDeadRank == 2) {
+                    helmet = new ItemStack(Items.CHAINMAIL_HELMET);
                     chestPlate = new ItemStack(Items.CHAINMAIL_CHESTPLATE);
                     leggings = new ItemStack(Items.CHAINMAIL_LEGGINGS);
                     boots = new ItemStack(Items.CHAINMAIL_BOOTS);
+                    sword = new ItemStack(Items.STONE_SWORD);
                 } else if (raiseDeadRank >= 3) {
+                    helmet = new ItemStack(Items.IRON_HELMET);
                     chestPlate = new ItemStack(Items.IRON_CHESTPLATE);
                     leggings = new ItemStack(Items.IRON_LEGGINGS);
                     boots = new ItemStack(Items.IRON_BOOTS);
+                    sword = new ItemStack(Items.IRON_SWORD);
                 }
                 if (soulRank >= 1)
                     chestPlate.enchant(Enchantments.THORNS, 3);
                 if (soulRank >= 2)
                     leggings.enchant(Enchantments.THORNS, 3);
-                if (soulRank >= 3)
-                    boots.enchant(Enchantments.THORNS, 3);
-
+                if (soulRank >= 3) {
+                    boots.enchant(Enchantments.THORNS, 2);
+                    helmet.enchant(Enchantments.THORNS, 2);
+                }
+                zombieUnit.setItemSlot(EquipmentSlot.HEAD, helmet);
                 zombieUnit.setItemSlot(EquipmentSlot.CHEST, chestPlate);
                 zombieUnit.setItemSlot(EquipmentSlot.LEGS, leggings);
                 zombieUnit.setItemSlot(EquipmentSlot.FEET, boots);
+                zombieUnit.setItemSlot(EquipmentSlot.MAINHAND, sword);
             }
         }
     }

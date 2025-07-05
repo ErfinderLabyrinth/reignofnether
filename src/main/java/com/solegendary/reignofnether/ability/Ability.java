@@ -85,7 +85,7 @@ public class Ability {
         }
     }
 
-    public boolean isChanneling() { return false; }
+    public boolean isCasting() { return false; }
 
     public float getCooldown() { return this.cooldown; }
 

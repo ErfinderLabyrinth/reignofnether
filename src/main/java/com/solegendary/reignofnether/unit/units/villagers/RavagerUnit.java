@@ -116,7 +116,7 @@ public class RavagerUnit extends Ravager implements Unit, AttackerUnit {
     public float getMovementSpeed() {return movementSpeed;}
     public float getUnitAttackDamage() {return attackDamage;}
     public float getUnitMaxHealth() {return maxHealth;}
-    public float getUnitArmorValue() {return armorValue;}
+
     @Nullable
     public ResourceCost getCost() {return ResourceCosts.RAVAGER;}
     public boolean canAttackBuildings() {return getAttackBuildingGoal() != null;}

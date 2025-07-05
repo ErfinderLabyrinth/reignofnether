@@ -1,10 +1,15 @@
 package com.solegendary.reignofnether.hero;
 
 import com.solegendary.reignofnether.alliance.AlliancesServerEvents;
+import com.solegendary.reignofnether.player.PlayerServerEvents;
+import com.solegendary.reignofnether.player.RTSPlayer;
+import com.solegendary.reignofnether.sounds.SoundAction;
+import com.solegendary.reignofnether.sounds.SoundClientboundPacket;
 import com.solegendary.reignofnether.unit.HeroUnitSave;
 import com.solegendary.reignofnether.unit.UnitServerEvents;
 import com.solegendary.reignofnether.unit.interfaces.HeroUnit;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
+import com.solegendary.reignofnether.util.MiscUtil;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -12,6 +17,7 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import org.apache.commons.lang3.text.WordUtils;
 
 import java.util.ArrayList;
 
@@ -72,6 +78,17 @@ public class HeroServerEvents {
             fallenHeroes.add(fallenHero);
             FallenHeroClientboundPacket.addFallenHero(fallenHero);
             UnitServerEvents.saveFallenHeroUnits((ServerLevel) evt.getEntity().level());
+
+            for (RTSPlayer rtsPlayer : PlayerServerEvents.rtsPlayers) {
+                if (rtsPlayer.name.equals(heroUnit.getOwnerName()) ||
+                    AlliancesServerEvents.isAllied(rtsPlayer.name, heroUnit.getOwnerName())) {
+                    PlayerServerEvents.sendMessageToPlayer(rtsPlayer.name, "hud.hero.reignofnether.death", true,
+                            heroUnit.getOwnerName(),
+                            WordUtils.capitalize(MiscUtil.getSimpleEntityName(evt.getEntity()).replace("_", " ")),
+                            heroUnit.getHeroLevel());
+                    SoundClientboundPacket.playSoundForPlayer(SoundAction.ENEMY, rtsPlayer.name);
+                }
+            }
         }
     }
 

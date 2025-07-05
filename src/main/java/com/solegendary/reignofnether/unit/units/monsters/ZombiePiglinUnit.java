@@ -101,7 +101,7 @@ public class ZombiePiglinUnit extends ZombifiedPiglin implements Unit, AttackerU
     public float getMovementSpeed() {return movementSpeed;}
     public float getUnitAttackDamage() {return attackDamage;}
     public float getUnitMaxHealth() {return maxHealth;}
-    public float getUnitArmorValue() {return armorValue;}
+
     @Nullable
     public ResourceCost getCost() {return ResourceCosts.ZOMBIE_PIGLIN;}
     public boolean canAttackBuildings() {return getAttackBuildingGoal() != null;}

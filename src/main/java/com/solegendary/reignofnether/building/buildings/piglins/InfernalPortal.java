@@ -6,6 +6,7 @@ import com.solegendary.reignofnether.building.Buildings;
 import com.solegendary.reignofnether.building.buildings.placements.PortalPlacement;
 import com.solegendary.reignofnether.building.production.ProductionBuilding;
 import com.solegendary.reignofnether.building.production.ProductionItems;
+import com.solegendary.reignofnether.gamerules.GameruleClient;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.keybinds.Keybindings;
@@ -59,7 +60,7 @@ public class InfernalPortal extends ProductionBuilding {
                 new ResourceLocation("minecraft", "textures/block/crying_obsidian.png"),
                 hotkey,
                 () -> BuildingClientEvents.getBuildingToPlace() == Buildings.INFERNAL_PORTAL,
-                () -> !SandboxClientEvents.isSandboxPlayer(), // false,
+                () -> !SandboxClientEvents.isSandboxPlayer() && !GameruleClient.allowHeroes,
                 () -> BuildingClientEvents.hasFinishedBuilding(Buildings.CENTRAL_PORTAL) ||
                         ResearchClient.hasCheat("modifythephasevariance"),
                 () -> BuildingClientEvents.setBuildingToPlace(Buildings.INFERNAL_PORTAL),

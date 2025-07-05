@@ -5,6 +5,7 @@ import com.solegendary.reignofnether.hero.HeroClientEvents;
 import com.solegendary.reignofnether.hero.HeroClientboundPacket;
 import com.solegendary.reignofnether.hero.HeroServerEvents;
 import com.solegendary.reignofnether.resources.ResourceCost;
+import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.sounds.SoundAction;
 import com.solegendary.reignofnether.sounds.SoundClientboundPacket;
 import com.solegendary.reignofnether.unit.HeroUnitSave;
@@ -23,11 +24,7 @@ import java.util.List;
 
 public interface HeroUnit extends Unit {
 
-    int FOOD_REVIVE_COST_BASE = 100;
-    int FOOD_REVIVE_COST_PER_LEVEL = 50;
-    int REVIVE_SECONDS_BASE = 30;
-    int REVIVE_SECONDS_PER_LEVEL = 5;
-    int POP_COST = 5;
+    float EXP_REQ_MULTIPLIER = 1.2f;
 
     public static void tick(HeroUnit heroUnit) {
         if (((LivingEntity) heroUnit).tickCount % 20 == 0) {
@@ -37,10 +34,11 @@ public interface HeroUnit extends Unit {
 
     public static ResourceCost getReviveCost(int heroLevel) {
         return ResourceCost.Unit(
-                FOOD_REVIVE_COST_BASE + (Mth.clamp(heroLevel, 1, 10) * FOOD_REVIVE_COST_PER_LEVEL),
-                0,0,
-                REVIVE_SECONDS_BASE + (Mth.clamp(heroLevel, 1, 10) * REVIVE_SECONDS_PER_LEVEL),
-                POP_COST);
+                ResourceCosts.HERO_BASE_REVIVE_COST.food + (Mth.clamp(heroLevel, 1, 10) * ResourceCosts.HERO_EXTRA_REVIVE_COST_PER_LEVEL.food),
+                ResourceCosts.HERO_BASE_REVIVE_COST.wood + (Mth.clamp(heroLevel, 1, 10) * ResourceCosts.HERO_EXTRA_REVIVE_COST_PER_LEVEL.wood),
+                ResourceCosts.HERO_BASE_REVIVE_COST.ore + (Mth.clamp(heroLevel, 1, 10) * ResourceCosts.HERO_EXTRA_REVIVE_COST_PER_LEVEL.ore),
+                (ResourceCosts.HERO_BASE_REVIVE_COST.ticks + (Mth.clamp(heroLevel, 1, 10) * ResourceCosts.HERO_EXTRA_REVIVE_COST_PER_LEVEL.ticks)) / 20,
+                ResourceCosts.HERO_BASE_REVIVE_COST.population);
     }
 
     public static List<HeroUnit> getHeroes(boolean isClientside) {
@@ -142,12 +140,12 @@ public interface HeroUnit extends Unit {
 
     static int getHeroLevel(int exp) {
         int level = 0;
-        int expToNextLevel = 200;
+        int expToNextLevel = (int) (200 * EXP_REQ_MULTIPLIER);
         do {
             level += 1;
             exp -= expToNextLevel;
-            expToNextLevel += 100;
-        } while (exp > 0 && level < MAX_HERO_LEVEL);
+            expToNextLevel += (100 * EXP_REQ_MULTIPLIER);
+        } while (exp >= 0 && level < MAX_HERO_LEVEL);
         return level;
     }
 
@@ -155,7 +153,7 @@ public interface HeroUnit extends Unit {
     default int getExpOnCurrentLevel() {
         if (getHeroLevel() >= MAX_HERO_LEVEL)
             return 0;
-        int expToNextLevel = 200;
+        int expToNextLevel = (int) (200 * EXP_REQ_MULTIPLIER);
         int expCount = 0;
         int exp = getExperience();
         while (expCount < exp) {
@@ -163,7 +161,7 @@ public interface HeroUnit extends Unit {
                 return exp - expCount;
             }
             expCount += expToNextLevel;
-            expToNextLevel += 100;
+            expToNextLevel += (100 * EXP_REQ_MULTIPLIER);
         }
         return 0;
     }
@@ -171,7 +169,7 @@ public interface HeroUnit extends Unit {
     default int getExpToNextlevel() {
         if (getHeroLevel() >= MAX_HERO_LEVEL)
             return 0;
-        return (getHeroLevel() + 1) * 100;
+        return (int) ((getHeroLevel() + 1) * (100 * EXP_REQ_MULTIPLIER));
     }
 
     default List<HeroAbility> getHeroAbilities() {

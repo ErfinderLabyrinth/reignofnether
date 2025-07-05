@@ -35,6 +35,7 @@ import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.piglin.PiglinBrute;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -106,7 +107,7 @@ public class BruteUnit extends PiglinBrute implements Unit, AttackerUnit {
     // combat stats
     public float getMovementSpeed() {return isHoldingUpShield ? movementSpeed * SHIELD_MOVE_MULTIPLIER : movementSpeed;}
     public float getUnitMaxHealth() {return maxHealth;}
-    public float getUnitArmorValue() {return armorValue;}
+
     @Nullable
     public ResourceCost getCost() {return ResourceCosts.BRUTE;}
     public boolean getWillRetaliate() {return willRetaliate;}
@@ -264,10 +265,10 @@ public class BruteUnit extends PiglinBrute implements Unit, AttackerUnit {
 
     @Override
     public void setupEquipmentAndUpgradesServer() {
-        ItemStack axeStack = new ItemStack(Items.GOLDEN_SWORD);
+        ItemStack swordStack = new ItemStack(Items.GOLDEN_SWORD);
         AttributeModifier mod = new AttributeModifier(UUID.randomUUID().toString(), 0, AttributeModifier.Operation.ADDITION);
-        axeStack.addAttributeModifier(Attributes.ATTACK_DAMAGE, mod, EquipmentSlot.MAINHAND);
-        this.setItemSlot(EquipmentSlot.MAINHAND, axeStack);
+        swordStack.addAttributeModifier(Attributes.ATTACK_DAMAGE, mod, EquipmentSlot.MAINHAND);
+        this.setItemSlot(EquipmentSlot.MAINHAND, swordStack);
 
         if (ResearchServerEvents.playerHasResearch(this.getOwnerName(), ProductionItems.RESEARCH_BRUTE_SHIELDS)) {
             ItemStack shieldStack = new ItemStack(Items.SHIELD);
@@ -279,5 +280,34 @@ public class BruteUnit extends PiglinBrute implements Unit, AttackerUnit {
     public boolean fireImmune() {
         BuildingPlacement bpl = BuildingUtils.findBuilding(level().isClientSide(), getOnPos());
         return super.fireImmune() || (bpl != null && (bpl.getBuilding() instanceof FlameSanctuary || bpl.getBuilding() instanceof BasaltSprings));
+    }
+
+    public boolean hasEnchantedNetheriteSword() {
+        ItemStack itemStack = this.getItemBySlot(EquipmentSlot.MAINHAND);
+        return itemStack.getItem() == Items.NETHERITE_SWORD && itemStack.isEnchanted();
+    }
+
+    @Override
+    public boolean canPickUpEquipment(ItemStack itemStack) {
+        Item item = itemStack.getItem();
+        return (item == Items.GOLDEN_CHESTPLATE ||
+                item == Items.GOLDEN_LEGGINGS ||
+                item == Items.GOLDEN_BOOTS ||
+                item == Items.GOLDEN_HELMET ||
+                item == Items.NETHERITE_CHESTPLATE ||
+                item == Items.NETHERITE_LEGGINGS ||
+                item == Items.NETHERITE_BOOTS ||
+                item == Items.NETHERITE_HELMET ||
+                item == Items.NETHERITE_SWORD) &&
+                getItemBySlot(getEquipmentSlotForItem(itemStack)).getItem() != item;
+    }
+
+    @Override
+    public void onPickupEquipment(ItemStack itemStack) {
+        if (itemStack.getItem() == Items.NETHERITE_SWORD) {
+            AttributeModifier mod = new AttributeModifier(UUID.randomUUID().toString(), 2, AttributeModifier.Operation.ADDITION);
+            itemStack.addAttributeModifier(Attributes.ATTACK_DAMAGE, mod, EquipmentSlot.MAINHAND);
+        }
+        setItemSlot(getEquipmentSlotForItem(itemStack), itemStack);
     }
 }

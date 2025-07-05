@@ -98,7 +98,7 @@ public class ZoglinUnit extends Zoglin implements Unit, AttackerUnit {
     // combat stats
     public float getMovementSpeed() {return movementSpeed;}
     public float getUnitMaxHealth() {return maxHealth;}
-    public float getUnitArmorValue() {return armorValue;}
+
     @Nullable
     public ResourceCost getCost() {return ResourceCosts.ZOGLIN;}
     public boolean getWillRetaliate() {return willRetaliate;}

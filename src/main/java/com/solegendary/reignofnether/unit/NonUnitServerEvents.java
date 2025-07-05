@@ -30,7 +30,7 @@ public class NonUnitServerEvents {
 
     public static final List<Pair<PathfinderMob, BlockPos>> nonUnitMoveTargets = Collections.synchronizedList(new ArrayList<>());
 
-    public static boolean canControlNonUnits(Level level, String playerName) {
+    public static boolean canControlAllMobs(Level level, String playerName) {
         return ResearchServerEvents.playerHasCheat(playerName, "wouldyoukindly");
     }
 

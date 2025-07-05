@@ -111,7 +111,7 @@ public class VindicatorUnit extends Vindicator implements Unit, AttackerUnit {
     public float getMovementSpeed() {return movementSpeed;}
     public float getUnitAttackDamage() {return attackDamage + (hasSharpnessEnchant() ? 2 : 0);}
     public float getUnitMaxHealth() {return maxHealth;}
-    public float getUnitArmorValue() {return armorValue;}
+
     @Nullable
     public ResourceCost getCost() {return ResourceCosts.VINDICATOR;}
     public boolean canAttackBuildings() {return getAttackBuildingGoal() != null;}
@@ -224,20 +224,6 @@ public class VindicatorUnit extends Vindicator implements Unit, AttackerUnit {
         this.goalSelector.addGoal(4, new RandomLookAroundUnitGoal(this));
     }
 
-    /*
-    @Override
-    public void setupEquipmentAndUpgradesClient() {
-        if (hasAnyEnchant())
-            return;
-
-        // weapon is purely visual, damage is based solely on entity attribute ATTACK_DAMAGE
-        Item axe = Items.IRON_AXE;
-        //if (ResearchClient.hasResearch(ResearchVindicatorAxes.itemName))
-        //    axe = Items.DIAMOND_AXE;
-        this.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(axe));
-    }
-     */
-
     @Override
     public void setupEquipmentAndUpgradesServer() {
         if (hasAnyEnchant())
@@ -246,10 +232,6 @@ public class VindicatorUnit extends Vindicator implements Unit, AttackerUnit {
         // weapon is purely visual, damage is based solely on entity attribute ATTACK_DAMAGE
         Item axe = Items.IRON_AXE;
         int damageMod = 0;
-        //if (ResearchServerEvents.playerHasResearch(this.getOwnerName(), ResearchVindicatorAxes.itemName)) {
-        //    axe = Items.DIAMOND_AXE;
-        //    damageMod = 2;
-        //}
         ItemStack axeStack = new ItemStack(axe);
         AttributeModifier mod = new AttributeModifier(UUID.randomUUID().toString(), damageMod, AttributeModifier.Operation.ADDITION);
         axeStack.addAttributeModifier(Attributes.ATTACK_DAMAGE, mod, EquipmentSlot.MAINHAND);

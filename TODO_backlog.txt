@@ -36,8 +36,6 @@ Features
 
 Bugfixes
 --------
-[❌] Armour on units doesn't do anything against other mob projectiles?
-
 [❌] Dying in survival puts you in a bugged survival mode
 
 [❌] Villagers with professions don't use the correct texture for their arms, esp. farmers

@@ -15,6 +15,7 @@ import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.time.TimeClientEvents;
 import com.solegendary.reignofnether.time.TimeServerEvents;
 import com.solegendary.reignofnether.unit.UnitAction;
+import com.solegendary.reignofnether.unit.goals.GenericUntargetedSpellGoal;
 import com.solegendary.reignofnether.unit.interfaces.HeroUnit;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.units.monsters.NecromancerUnit;
@@ -33,6 +34,8 @@ import static com.solegendary.reignofnether.util.MiscUtil.fcsIcons;
 
 public class BloodMoon extends HeroAbility {
 
+    public static final String ENEMY_NAME = "Blood Moon";
+
     public static final int SPAWN_INTERVAL_TICKS = 120; // how often to spawn a unit
     public static final int CHANNEL_TICKS = 40;
     private static final int CD_MAX = 360 * ResourceCost.TICKS_PER_SECOND;
@@ -41,6 +44,16 @@ public class BloodMoon extends HeroAbility {
 
     public BloodMoon(HeroUnit hero) {
         super(hero, 1, 150, UnitAction.BLOOD_MOON, CD_MAX, 0, 0, false);
+    }
+
+    @Override
+    public boolean isCasting() {
+        if (this.hero instanceof NecromancerUnit necromancerUnit) {
+            GenericUntargetedSpellGoal goal = necromancerUnit.getCastBloodMoonGoal();
+            if (goal != null)
+                return goal.isCasting();
+        }
+        return false;
     }
 
     @Override

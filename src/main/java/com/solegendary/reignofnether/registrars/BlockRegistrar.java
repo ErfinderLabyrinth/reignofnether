@@ -3,6 +3,7 @@ package com.solegendary.reignofnether.registrars;
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.blocks.FallingRotatedPillarBlock;
 import com.solegendary.reignofnether.blocks.RTSStartBlock;
+import com.solegendary.reignofnether.blocks.RTSStructureBlock;
 import com.solegendary.reignofnether.blocks.WalkableMagmaBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -170,6 +171,10 @@ public class BlockRegistrar {
 
     public static final RegistryObject<Block> RTS_START_BLOCK_PINK = registerBlock("rts_start_block_pink", () ->
             new RTSStartBlock(BlockBehaviour.Properties.copy(Blocks.STONE).mapColor(MapColor.COLOR_PINK)
+                    .strength(-1.0F, 3600000.0F).noLootTable()), CreativeModeTabs.FUNCTIONAL_BLOCKS);
+
+    public static final RegistryObject<Block> RTS_STRUCTURE_BLOCK = registerBlock("rts_structure_block", () ->
+            new RTSStructureBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).requiresCorrectToolForDrops()
                     .strength(-1.0F, 3600000.0F).noLootTable()), CreativeModeTabs.FUNCTIONAL_BLOCKS);
 
     private static boolean always(BlockState p_50775_, BlockGetter p_50776_, BlockPos p_50777_) {

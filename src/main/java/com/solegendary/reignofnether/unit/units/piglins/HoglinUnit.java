@@ -7,12 +7,15 @@ import com.solegendary.reignofnether.building.BuildingUtils;
 import com.solegendary.reignofnether.building.buildings.piglins.BasaltSprings;
 import com.solegendary.reignofnether.building.buildings.piglins.FlameSanctuary;
 import com.solegendary.reignofnether.hud.AbilityButton;
+import com.solegendary.reignofnether.registrars.EntityRegistrar;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.unit.Checkpoint;
 import com.solegendary.reignofnether.unit.goals.*;
 import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
+import com.solegendary.reignofnether.unit.interfaces.ConvertableUnit;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
+import com.solegendary.reignofnether.unit.packets.UnitConvertClientboundPacket;
 import com.solegendary.reignofnether.util.Faction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -28,7 +31,9 @@ import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.hoglin.Hoglin;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.Block;
@@ -42,7 +47,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class HoglinUnit extends Hoglin implements Unit, AttackerUnit {
+public class HoglinUnit extends Hoglin implements Unit, AttackerUnit, ConvertableUnit {
     // region
     private int eatingTicksLeft = 0;
     public void setEatingTicksLeft(int amount) { eatingTicksLeft = amount; }
@@ -101,7 +106,7 @@ public class HoglinUnit extends Hoglin implements Unit, AttackerUnit {
     // combat stats
     public float getMovementSpeed() {return movementSpeed;}
     public float getUnitMaxHealth() {return maxHealth;}
-    public float getUnitArmorValue() {return armorValue;}
+
     @Nullable
     public ResourceCost getCost() {return ResourceCosts.HOGLIN;}
     public boolean getWillRetaliate() {return willRetaliate;}
@@ -117,6 +122,11 @@ public class HoglinUnit extends Hoglin implements Unit, AttackerUnit {
     public Goal getAttackBuildingGoal() { return attackBuildingGoal; }
     public void setAttackMoveTarget(@Nullable BlockPos bp) { this.attackMoveTarget = bp; }
     public void setFollowTarget(@Nullable LivingEntity target) { this.followTarget = target; }
+
+    // ConvertableUnit
+    private boolean shouldDiscard = false;
+    public boolean shouldDiscard() { return shouldDiscard; }
+    public void setShouldDiscard(boolean discard) { this.shouldDiscard = discard; }
 
     // endregion
 
@@ -195,10 +205,14 @@ public class HoglinUnit extends Hoglin implements Unit, AttackerUnit {
     }
 
     public void tick() {
-        this.setCanPickUpLoot(false);
-        super.tick();
-        Unit.tick(this);
-        AttackerUnit.tick(this);
+        if (shouldDiscard)
+            this.discard();
+        else {
+            this.setCanPickUpLoot(false);
+            super.tick();
+            Unit.tick(this);
+            AttackerUnit.tick(this);
+        }
     }
 
     @Override
@@ -253,5 +267,24 @@ public class HoglinUnit extends Hoglin implements Unit, AttackerUnit {
     public boolean fireImmune() {
         BuildingPlacement bpl = BuildingUtils.findBuilding(level().isClientSide(), getOnPos());
         return super.fireImmune() || (bpl != null && (bpl.getBuilding() instanceof FlameSanctuary || bpl.getBuilding() instanceof BasaltSprings));
+    }
+
+    @Override
+    public boolean canPickUpEquipment(ItemStack itemStack) {
+        Item item = itemStack.getItem();
+        return item == Items.NETHERITE_CHESTPLATE &&
+                !hasItemInSlot(EquipmentSlot.CHEST) &&
+                !(this.getName().getString().contains("armoured"));
+    }
+
+    @Override
+    public void onPickupEquipment(ItemStack itemStack) {
+        Item item = itemStack.getItem();
+        if (item == Items.NETHERITE_CHESTPLATE &&
+            !(this.getName().getString().contains("armoured")) &&
+            !level().isClientSide()) {
+            LivingEntity newEntity = this.convertToUnit(EntityRegistrar.ARMOURED_HOGLIN_UNIT.get());
+            UnitConvertClientboundPacket.syncConvertedUnits(getOwnerName(), List.of(getId()), List.of(newEntity.getId()));
+        }
     }
 }

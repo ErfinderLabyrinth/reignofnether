@@ -113,33 +113,39 @@ public class PortalPlacement extends ProductionPlacement implements NetherConver
             case CIVILIAN -> {
                 setBuilding(Buildings.PORTAL_CIVILIAN);
                 newStructureName = PortalCivilian.structureName;
-                if (this.getLevel().isClientSide()) {
-                    this.productionButtons = List.of(ProductionItems.RESEARCH_RESOURCE_CAPACITY.getStartButton(this, Keybindings.keyQ));
-                }
             }
             case MILITARY -> {
                 setBuilding(Buildings.PORTAL_MILITARY);
                 newStructureName = PortalMilitary.structureName;
-                if (this.getLevel().isClientSide()) {
-                    this.productionButtons = Arrays.asList(ProductionItems.BRUTE.getStartButton(this, Keybindings.keyQ),
-                            ProductionItems.HEADHUNTER.getStartButton(this, Keybindings.keyW),
-                            ProductionItems.HOGLIN.getStartButton(this, Keybindings.keyE),
-                            ProductionItems.BLAZE.getStartButton(this, Keybindings.keyR),
-                            ProductionItems.WITHER_SKELETON.getStartButton(this, Keybindings.keyT),
-                            ProductionItems.MAGMA_CUBE.getStartButton(this, Keybindings.keyY),
-                            ProductionItems.GHAST.getStartButton(this, Keybindings.keyU)
-                    );
-                }
             }
             case TRANSPORT -> {
                 setBuilding(Buildings.PORTAL_TRANSPORT);
                 newStructureName = PortalTransport.structureName;
             }
         }
+        updateButtons();
         if (!newStructureName.isEmpty()) {
             ArrayList<BuildingBlock> newBlocks = BuildingBlockData.getBuildingBlocks(newStructureName, this.getLevel());
             this.blocks = getAbsoluteBlockData(newBlocks, this.getLevel(), originPos, rotation);
             super.refreshBlocks();
+        }
+    }
+
+    @Override
+    public void updateButtons() {
+        if (level.isClientSide()) {
+            switch (this.getPortalType()) {
+                case CIVILIAN -> this.productionButtons = List.of(ProductionItems.RESEARCH_RESOURCE_CAPACITY.getStartButton(this, Keybindings.keyQ));
+                case MILITARY -> this.productionButtons = Arrays.asList(ProductionItems.BRUTE.getStartButton(this, Keybindings.keyQ),
+                        ProductionItems.HEADHUNTER.getStartButton(this, Keybindings.keyW),
+                        ProductionItems.HOGLIN.getStartButton(this, Keybindings.keyE),
+                        ProductionItems.BLAZE.getStartButton(this, Keybindings.keyR),
+                        ProductionItems.WITHER_SKELETON.getStartButton(this, Keybindings.keyT),
+                        ProductionItems.MAGMA_CUBE.getStartButton(this, Keybindings.keyY),
+                        ProductionItems.GHAST.getStartButton(this, Keybindings.keyU)
+                );
+                case TRANSPORT -> this.productionButtons = List.of();
+            }
         }
     }
 

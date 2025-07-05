@@ -90,7 +90,7 @@ public class PandaUnit extends Panda implements Unit, AttackerUnit {
     // combat stats
     public float getMovementSpeed() {return movementSpeed;}
     public float getUnitMaxHealth() {return maxHealth;}
-    public float getUnitArmorValue() {return armorValue;}
+
     @Nullable
     public ResourceCost getCost() {return ResourceCosts.PANDA;}
     public boolean getWillRetaliate() {return willRetaliate;}

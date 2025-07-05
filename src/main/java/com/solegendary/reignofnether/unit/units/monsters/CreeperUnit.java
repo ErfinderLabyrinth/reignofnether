@@ -101,7 +101,7 @@ public class CreeperUnit extends Creeper implements Unit, AttackerUnit {
     public float getMovementSpeed() {return movementSpeed;}
     public float getUnitAttackDamage() {return attackDamage;}
     public float getUnitMaxHealth() {return maxHealth;}
-    public float getUnitArmorValue() {return armorValue;}
+
     @Nullable //Defined after CommonSetup, as this value is loaded from configuration
     public ResourceCost getCost() {return ResourceCosts.CREEPER;}
     public boolean canAttackBuildings() {return getAttackBuildingGoal() != null;}

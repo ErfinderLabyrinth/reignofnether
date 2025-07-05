@@ -33,12 +33,13 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.TicketType;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.damagesource.CombatRules;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Slime;
 import net.minecraft.world.item.Item;
@@ -135,7 +136,6 @@ public interface Unit {
 
     public float getMovementSpeed();
     public float getUnitMaxHealth();
-    public float getUnitArmorValue();
     public ResourceCost getCost();
 
     public LivingEntity getFollowTarget();
@@ -144,6 +144,11 @@ public interface Unit {
 
     public String getOwnerName();
     public void setOwnerName(String name);
+
+    default float getUnitArmorPercentage() {
+        Mob mob = (Mob) this;
+        return 1 - CombatRules.getDamageAfterAbsorb(1, (float)mob.getArmorValue(), (float)mob.getAttributeValue(Attributes.ARMOR_TOUGHNESS));
+    }
 
     public static void tick(Unit unit) {
         Mob unitMob = (Mob) unit;
@@ -182,6 +187,7 @@ public interface Unit {
         } else {
             checkAndPickupEdibleFood(unit);
             checkAndPickupResources(unit);
+            checkAndPickupEquipment(unit);
 
             // sync target variables between goals and Mob
             if (unit.getTargetGoal().getTarget() == null || !unit.getTargetGoal().getTarget().isAlive() ||
@@ -245,9 +251,7 @@ public interface Unit {
         }
 
         if (unitMob.tickCount % 20 == 0) {
-            if (unitMob.hasEffect(MobEffectRegistrar.STUN.get())) {
-                addParticlesAroundSelf(unit, ParticleTypes.ENTITY_EFFECT);
-            } else if (unitMob.hasEffect(MobEffectRegistrar.UNCONTROLLABLE.get())) {
+            if (unitMob.hasEffect(MobEffectRegistrar.UNCONTROLLABLE.get())) {
                 addParticlesAroundSelf(unit, ParticleTypes.ANGRY_VILLAGER);
             }
         }
@@ -262,7 +266,12 @@ public interface Unit {
                                 unitMob.getRandom().nextFloat() * 0.1F + 0.9F
                         );
                         int nutrition = itemStack.getItem().getFoodProperties(itemStack, (LivingEntity) unit).getNutrition();
-                        unitMob.heal(nutrition * HEAL_PER_NUTRITION);
+                        if (itemStack.getItem() == Items.ENCHANTED_GOLDEN_APPLE) {
+                            unitMob.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, 999999, 5));
+                            unitMob.setAbsorptionAmount(24);
+                        } else {
+                            unitMob.heal(nutrition * HEAL_PER_NUTRITION);
+                        }
                         itemStack.setCount(itemStack.getCount() - 1);
                         break;
                     }
@@ -281,6 +290,8 @@ public interface Unit {
                 }
             }
         }
+        if (unitMob.hasEffect(MobEffects.ABSORPTION) && unitMob.getAbsorptionAmount() <= 0)
+            unitMob.removeEffect(MobEffects.ABSORPTION);
     }
 
     private static void checkAndPickupResources(Unit unit) {
@@ -314,17 +325,46 @@ public interface Unit {
         }
     }
 
+    private static void checkAndPickupEquipment(Unit unit) {
+        Mob unitMob = (Mob) unit;
+        for (ItemEntity itementity : unitMob.level().getEntitiesOfClass(ItemEntity.class, unitMob.getBoundingBox().inflate(1, 0, 1))) {
+
+            Relationship rl = UnitServerEvents.getUnitToEntityRelationship(unit, itementity);
+            ItemStack itemstack = itementity.getItem();
+            if (unit.canPickUpEquipment(itemstack) && !itementity.isRemoved() &&
+                !itemstack.isEmpty() && !itementity.hasPickUpDelay() && unitMob.isAlive() &&
+                (rl != Relationship.HOSTILE || itementity.tickCount > 100)) {
+
+                unitMob.onItemPickup(itementity);
+                unitMob.take(itementity, 1);
+                unit.onPickupEquipment(itemstack);
+                itementity.discard();
+                break;
+            }
+        }
+    }
+
+    default boolean canPickUpEquipment(ItemStack itemStack) { return false; }
+
+    default void onPickupEquipment(ItemStack itemStack) { }
+
     private static void checkAndPickupEdibleFood(Unit unit) {
         Mob unitMob = (Mob) unit;
-        if (!unit.isHoldingEdibleFood() && unitMob.getHealth() < unitMob.getMaxHealth()) {
+        if (!unit.isHoldingEdibleFood()) {
             for (ItemEntity itementity : unitMob.level().getEntitiesOfClass(ItemEntity.class, unitMob.getBoundingBox().inflate(1, 0, 1))) {
 
+                ItemStack itemstack = itementity.getItem();
+                if (itemstack.getItem() == Items.ENCHANTED_GOLDEN_APPLE) {
+                    if (unitMob.getAbsorptionAmount() > 0)
+                        continue;
+                } else if (unitMob.getHealth() >= unitMob.getMaxHealth()) {
+                    continue;
+                }
                 Relationship rl = UnitServerEvents.getUnitToEntityRelationship(unit, itementity);
-                if (!itementity.isRemoved() && !itementity.getItem().isEmpty() && !itementity.hasPickUpDelay() && unitMob.isAlive() &&
-                    (rl != Relationship.HOSTILE) && ResourceSources.isPreparedFood(itementity.getItem().getItem())) {
-                    ItemStack itemstack = itementity.getItem();
+                if (!itementity.isRemoved() && !itemstack.isEmpty() && !itementity.hasPickUpDelay() && unitMob.isAlive() &&
+                    (rl != Relationship.HOSTILE || itementity.tickCount > 100) && ResourceSources.isPreparedFood(itemstack.getItem())) {
                     if (ResourceSources.isPreparedFood(itemstack.getItem()) &&
-                            unitMob.getHealth() < unitMob.getMaxHealth()) {
+                            (unitMob.getHealth() < unitMob.getMaxHealth() || itemstack.getItem() == Items.ENCHANTED_GOLDEN_APPLE)) {
                         unitMob.onItemPickup(itementity);
                         unitMob.take(itementity, 1);
                         unit.getItems().add(new ItemStack(itemstack.getItem(), 1));
@@ -512,7 +552,22 @@ public interface Unit {
             double d1 = RANDOM.nextGaussian() * 0.02;
             double d2 = RANDOM.nextGaussian() * 0.02;
             Entity entity = (Entity) unit;
-            entity.level().addParticle(pParticleOption, entity.getRandomX(1.0), entity.getRandomY() + 1.0, entity.getRandomZ(1.0), d0, d1, d2);
+
+            if (!entity.level().isClientSide) {
+                ((ServerLevel) entity.level()).sendParticles(pParticleOption,
+                        entity.getRandomX(1.0),
+                        entity.getRandomY() + 1.0,
+                        entity.getRandomZ(1.0),
+                        1, d0, d1, d2, 0
+                );
+            }
         }
+    }
+
+    public default boolean isCasting() {
+        for (Ability ability : getAbilities())
+            if (ability.isCasting())
+                return true;
+        return false;
     }
 }

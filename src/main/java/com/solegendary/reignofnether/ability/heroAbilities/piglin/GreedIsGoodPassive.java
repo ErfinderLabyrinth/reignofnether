@@ -10,9 +10,7 @@ import com.solegendary.reignofnether.ability.HeroAbility;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.keybinds.Keybinding;
-import com.solegendary.reignofnether.resources.ResourceName;
-import com.solegendary.reignofnether.resources.Resources;
-import com.solegendary.reignofnether.resources.ResourcesServerEvents;
+import com.solegendary.reignofnether.resources.*;
 import com.solegendary.reignofnether.unit.UnitAction;
 import com.solegendary.reignofnether.unit.interfaces.HeroUnit;
 import net.minecraft.client.resources.language.I18n;
@@ -107,8 +105,10 @@ public class GreedIsGoodPassive extends HeroAbility {
     public int spendResourcesAndGet100sSpent(ResourceName resName) {
         int totalSpent = 0;
         String ownerName = hero.getOwnerName();
-        if (isAutocasting() && !((LivingEntity) hero).level().isClientSide()) {
-            for (Resources resources : ResourcesServerEvents.resourcesList) {
+        boolean isClientSide = ((LivingEntity) hero).level().isClientSide();
+        List<Resources> resourcesList = isClientSide ? ResourcesClientEvents.resourcesList : ResourcesServerEvents.resourcesList;
+        if (isAutocasting()) {
+            for (Resources resources : resourcesList) {
                 if (resources.ownerName.equals(ownerName)) {
                     for (int i = 0; i < rank; i++) {
                         Resources resToSpend = new Resources(hero.getOwnerName(), 0, 0, 0);
@@ -122,7 +122,9 @@ public class GreedIsGoodPassive extends HeroAbility {
                             resToSpend.ore -= 100;
                             totalSpent += 100;
                         }
-                        ResourcesServerEvents.addSubtractResources(resToSpend);
+                        if (!isClientSide) {
+                            ResourcesServerEvents.addSubtractResources(resToSpend);
+                        }
                     }
                 }
             }

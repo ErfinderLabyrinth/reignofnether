@@ -43,7 +43,7 @@ public class PiglinMerchantProd extends HeroProductionItem {
                 null,
                 () -> SandboxClientEvents.spawnUnitName.equals(itemName),
                 () -> false,
-                () -> false,// true,
+                () -> true,
                 () -> {
                     CursorClientEvents.setLeftClickSandboxAction(SandboxAction.SPAWN_UNIT);
                     SandboxClientEvents.spawnUnitName = itemName;
@@ -70,7 +70,7 @@ public class PiglinMerchantProd extends HeroProductionItem {
                 hotkey,
                 () -> false,
                 () -> itemIsBeingProduced(prodBuilding.ownerName) || heroOwned(prodBuilding.level.isClientSide(), prodBuilding.ownerName),
-                () -> false,// true,
+                () -> true,
                 () -> BuildingServerboundPacket.startProduction(prodBuilding.originPos, this),
                 null,
                 List.of(

@@ -97,7 +97,7 @@ public class IronGolemUnit extends IronGolem implements Unit, AttackerUnit {
     public float getUnitAttackDamage() {return attackDamage;}
     public float getMovementSpeed() {return movementSpeed;}
     public float getUnitMaxHealth() {return maxHealth;}
-    public float getUnitArmorValue() {return armorValue;}
+
     @Nullable
     public ResourceCost getCost() {return ResourceCosts.IRON_GOLEM;}
     public boolean canAttackBuildings() {return getAttackBuildingGoal() != null;}

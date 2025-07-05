@@ -162,13 +162,16 @@ public interface AttackerUnit {
                     unit.setMoveTarget(attackerUnit.getAttackMoveTarget());
             }
 
+            boolean isCasting = unit.isCasting();
+
             // retaliate against a mob that damaged us UNLESS already on another command
             if (unitMob.getLastDamageSource() != null &&
                     attackerUnit.getWillRetaliate() &&
                     !isAttackingBuilding &&
                     unit.getTargetGoal().getTarget() == null &&
                     (unit.getMoveGoal().getMoveTarget() == null || unit.getHoldPosition()) &&
-                    unit.getFollowTarget() == null) {
+                    unit.getFollowTarget() == null &&
+                    !isCasting) {
 
                 Entity lastDSEntity = unitMob.getLastDamageSource().getEntity();
 
@@ -191,7 +194,7 @@ public interface AttackerUnit {
                 }
             }
             // enact aggression when idle
-            if (unit.isIdle() && attackerUnit.getAggressiveWhenIdle())
+            if (unit.isIdle() && !isCasting && attackerUnit.getAggressiveWhenIdle())
                 attackerUnit.attackClosestEnemy((ServerLevel) unitMob.level());
 
             // if attacking another unit as melee, retarget the closest unit periodically

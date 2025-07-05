@@ -8,7 +8,9 @@ import com.solegendary.reignofnether.ability.HeroAbility;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.keybinds.Keybinding;
+import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.unit.UnitAction;
+import com.solegendary.reignofnether.unit.goals.GenericUntargetedSpellGoal;
 import com.solegendary.reignofnether.unit.interfaces.HeroUnit;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.units.piglins.PiglinMerchantUnit;
@@ -27,12 +29,12 @@ import static com.solegendary.reignofnether.util.MiscUtil.fcsIcons;
 
 public class LootExplosion extends HeroAbility {
 
-    private static final int CD_MAX_SECONDS = 100;// 240 * ResourceCost.TICKS_PER_SECOND; // and 120 mana cost
-    public static final int BASE_ITEMS = 10;
+    private static final int CD_MAX_SECONDS = 300 * ResourceCost.TICKS_PER_SECOND;
+    public static final int BASE_ITEMS = 12;
     public static final int BONUS_ITEMS_PER_100_RESOURCES = 3;
 
     public LootExplosion(HeroUnit hero) {
-        super(hero, 1, 5, UnitAction.LOOT_EXPLOSION, CD_MAX_SECONDS, 0, 0, false);
+        super(hero, 1, 125, UnitAction.LOOT_EXPLOSION, CD_MAX_SECONDS, 0, 0, false);
     }
 
     @Override
@@ -48,6 +50,16 @@ public class LootExplosion extends HeroAbility {
                 getTooltipLines(),
                 this
         );
+    }
+
+    @Override
+    public boolean isCasting() {
+        if (this.hero instanceof PiglinMerchantUnit piglinMerchantUnit) {
+            GenericUntargetedSpellGoal goal = piglinMerchantUnit.getCastLootExplosionGoal();
+            if (goal != null)
+                return goal.isCasting();
+        }
+        return false;
     }
 
     @Override

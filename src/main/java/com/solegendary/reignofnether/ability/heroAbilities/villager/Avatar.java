@@ -6,12 +6,16 @@ package com.solegendary.reignofnether.ability.heroAbilities.villager;
 
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.ability.HeroAbility;
+import com.solegendary.reignofnether.hero.HeroClientboundPacket;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.hud.HudClientEvents;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.resources.ResourceCost;
+import com.solegendary.reignofnether.sounds.SoundAction;
+import com.solegendary.reignofnether.sounds.SoundClientboundPacket;
 import com.solegendary.reignofnether.unit.UnitAction;
+import com.solegendary.reignofnether.unit.goals.GenericUntargetedSpellGoal;
 import com.solegendary.reignofnether.unit.interfaces.HeroUnit;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.units.villagers.RoyalGuardUnit;
@@ -30,14 +34,24 @@ import static com.solegendary.reignofnether.util.MiscUtil.fcsIcons;
 
 public class Avatar extends HeroAbility {
 
-    private static final int CD_MAX_SECONDS = 5 * ResourceCost.TICKS_PER_SECOND;
-    public static final int DURATION = 10 * ResourceCost.TICKS_PER_SECOND;
+    private static final int CD_MAX_SECONDS = 300 * ResourceCost.TICKS_PER_SECOND;
+    public static final int DURATION = 60 * ResourceCost.TICKS_PER_SECOND;
     public static final float ATTACK_SPLASH_RADIUS = 2.5f;
     public static final float ATTACK_SPLASH_MULT = 0.5f;
     public static final float BONUS_HEALTH = 100;
 
     public Avatar(HeroUnit hero) {
         super(hero, 1, 100, UnitAction.AVATAR, CD_MAX_SECONDS, 0, 0, false);
+    }
+
+    @Override
+    public boolean isCasting() {
+        if (this.hero instanceof RoyalGuardUnit royalGuardUnit) {
+            GenericUntargetedSpellGoal goal = royalGuardUnit.getCastAvatarGoal();
+            if (goal != null)
+                return goal.isCasting();
+        }
+        return false;
     }
 
     @Override
@@ -106,6 +120,10 @@ public class Avatar extends HeroAbility {
             ((RoyalGuardUnit) unitUsing).getCastAvatarGoal().setAbility(this);
             ((RoyalGuardUnit) unitUsing).getCastAvatarGoal().startCasting();
             ((RoyalGuardUnit) unitUsing).avatarScalingStarted = true;
+            if (!level.isClientSide()) {
+                SoundClientboundPacket.playSoundAtPos(SoundAction.BLOODLUST, ((LivingEntity) unitUsing).getOnPos().above());
+                HeroClientboundPacket.activateAbilityClientside(((RoyalGuardUnit) unitUsing).getId(), 3);
+            }
         }
     }
 }

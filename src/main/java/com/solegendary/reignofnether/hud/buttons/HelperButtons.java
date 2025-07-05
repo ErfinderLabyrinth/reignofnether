@@ -64,7 +64,7 @@ public class HelperButtons {
         idleWorkerButton = new Button(
                 "Idle workers (CTRL-click to select all)",
                 ICON_SIZE,
-                new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/villager.png"),
+                getIdleWorkerIcon(),
                 Keybindings.keyJ,
                 () -> false,
                 idleWorkerIds::isEmpty,
@@ -163,6 +163,14 @@ public class HelperButtons {
                         fcs(I18n.get("hud.helperbuttons.reignofnether.select_all_military_units_shift"), Style.EMPTY)
                 )
         );
+    }
+
+    private static ResourceLocation getIdleWorkerIcon() {
+        return switch (PlayerClientEvents.faction) {
+            case MONSTERS -> new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/zombie_villager.png");
+            case PIGLINS -> new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/grunt.png");
+            default -> new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/villager.png");
+        };
     }
 
     private static List<FormattedCharSequence> getBeaconButtonTooltip(String ownerName) {

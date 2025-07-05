@@ -82,7 +82,7 @@ public class HeroExperienceOrb extends ExperienceOrb {
         checkTouchedHero();
 
         ++this.age;
-        if (this.age >= 1200) {
+        if (this.age >= 1200 || followingHero == null || followingHero.isDeadOrDying()) {
             this.discard();
         }
     }

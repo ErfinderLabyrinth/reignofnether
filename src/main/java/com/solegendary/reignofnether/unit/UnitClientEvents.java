@@ -15,6 +15,7 @@ import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.cursor.CursorClientEvents;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientEvents;
 import com.solegendary.reignofnether.gamerules.GameruleClient;
+import com.solegendary.reignofnether.hero.HeroServerboundPacket;
 import com.solegendary.reignofnether.hud.HudClientEvents;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.minimap.MinimapClientEvents;
@@ -31,6 +32,7 @@ import com.solegendary.reignofnether.tutorial.TutorialClientEvents;
 import com.solegendary.reignofnether.unit.goals.MeleeAttackBuildingGoal;
 import com.solegendary.reignofnether.unit.interfaces.*;
 import com.solegendary.reignofnether.unit.packets.UnitActionServerboundPacket;
+import com.solegendary.reignofnether.unit.packets.UnitSyncServerboundPacket;
 import com.solegendary.reignofnether.unit.units.monsters.CreeperUnit;
 import com.solegendary.reignofnether.unit.units.monsters.PhantomSummon;
 import com.solegendary.reignofnether.unit.units.monsters.WardenUnit;
@@ -129,7 +131,7 @@ public class UnitClientEvents {
         if (unit.isPassenger())
             return;
         selectedUnits.add(unit);
-        selectedUnits.sort(Comparator.comparing(HudClientEvents::getSimpleEntityName));
+        selectedUnits.sort(Comparator.comparing(MiscUtil::getSimpleEntityName));
         selectedUnits.sort(Comparator.comparing(Entity::getId));
         BuildingClientEvents.clearSelectedBuildings();
         NonUnitClientEvents.isMoveCheckpointGreen = true;
@@ -283,14 +285,18 @@ public class UnitClientEvents {
                     .filter(u -> {
                         if (u instanceof Unit unit)
                             for (Ability ability : unit.getAbilities())
-                                if (ability.isChanneling() && ability.oneClickOneUse && ability.action == action)
+                                if (ability.isCasting() && ability.oneClickOneUse && ability.action == action)
                                     return false;
                         return true;
                     })
                     .mapToInt(Entity::getId).toArray();
 
+            String playerName = MC.player.getName().getString();
+            if (hudSelectedEntity instanceof Unit unit && AlliancesClient.canControlAlly(hudSelectedEntity))
+                playerName = unit.getOwnerName();
+
             UnitActionItem actionItem = new UnitActionItem(
-                MC.player.getName().getString(),
+                playerName,
                 action,
                 preselectedUnits.size() > 0 ? preselectedUnits.get(0).getId() : -1,
                 selUnits,
@@ -300,7 +306,7 @@ public class UnitClientEvents {
             actionItem.action(MC.level);
 
             PacketHandler.INSTANCE.sendToServer(new UnitActionServerboundPacket(
-                MC.player.getName().getString(),
+                playerName,
                 action,
                 preselectedUnits.size() > 0 ? preselectedUnits.get(0).getId() : -1,
                 selUnits,
@@ -351,7 +357,7 @@ public class UnitClientEvents {
      * Update data on a unit from serverside, mainly to ensure unit HUD data is up-to-date
      * Only try to update health and pos if out of view
      */
-    public static void syncUnitStats(int entityId, float health, Vec3 pos, String ownerName) {
+    public static void syncUnitStats(int entityId, float health, float absorb, Vec3 pos, String ownerName) {
         for (LivingEntity entity : allUnits) {
             if (entity.getId() == entityId && MC.level != null) {
                 boolean isLoadedClientside = MC.level.getEntity(entityId) != null;
@@ -359,6 +365,7 @@ public class UnitClientEvents {
                     entity.setHealth(health);
                     entity.setPos(pos);
                 }
+                entity.setAbsorptionAmount(absorb);
                 MinimapClientEvents.removeMinimapUnit(entityId);
                 return;
             }
@@ -520,6 +527,11 @@ public class UnitClientEvents {
             unit.setupEquipmentAndUpgradesClient();
 
             addUnitPoofs(evt.getLevel(), entity);
+
+            UnitSyncServerboundPacket.requestSyncAbilities(entity.getId());
+
+            if (entity instanceof HeroUnit)
+                HeroServerboundPacket.requestHeroSync(entity.getId());
         }
         if (entity instanceof LivingEntity le && (ResourceSources.isHuntableAnimal(le) || le instanceof PhantomSummon))
             addUnitPoofs(evt.getLevel(), entity);
@@ -567,7 +579,10 @@ public class UnitClientEvents {
                         selectedUnits.get(0).getClass(),
                         MC.level
                 );
-                if (getPlayerToEntityRelationship(selectedUnit) == Relationship.OWNED || NonUnitClientEvents.canControlNonUnits()) {
+                if (getPlayerToEntityRelationship(selectedUnit) == Relationship.OWNED ||
+                        NonUnitClientEvents.canControlAllMobs() ||
+                        AlliancesClient.canControlAlly(selectedUnit)) {
+
                     clearSelectedUnits();
                     for (LivingEntity entity : nearbyEntities) {
                         boolean bothVillagers = entity instanceof VillagerUnit &&
@@ -579,7 +594,9 @@ public class UnitClientEvents {
                         boolean garrisoned2 = entity instanceof Unit unit2 && GarrisonableBuilding.getGarrison(unit2) != null;
                         boolean garrionStatusMatches = (garrisoned1 && garrisoned2) || (!garrisoned1 && !garrisoned2);
 
-                        if ((getPlayerToEntityRelationship(entity) == Relationship.OWNED || NonUnitClientEvents.canControlNonUnits()) &&
+                        if ((getPlayerToEntityRelationship(entity) == Relationship.OWNED ||
+                                NonUnitClientEvents.canControlAllMobs() ||
+                                AlliancesClient.canControlAlly(entity)) &&
                                 (!bothVillagers || sameProfession) && garrionStatusMatches) {
                             addSelectedUnit(entity);
                         }
@@ -605,7 +622,8 @@ public class UnitClientEvents {
 
                 if (Keybindings.shiftMod.isDown() && !deselected &&
                     ((preselectedUnits.get(0) instanceof Unit && getPlayerToEntityRelationship(preselectedUnits.get(0)) == Relationship.OWNED) ||
-                    (NonUnitClientEvents.canControlNonUnits()))) {
+                    AlliancesClient.canControlAlly(preselectedUnits.get(0)) ||
+                    NonUnitClientEvents.canControlAllMobs())) {
                         addSelectedUnit(preselectedUnits.get(0));
                 }
                 else if (!deselected) { // select a single unit - this should be the only code path that allows you to select a non-owned unit
@@ -617,7 +635,8 @@ public class UnitClientEvents {
             // and disallow selecting > 1 non-owned unit or the client player
             if (selectedUnits.size() > 1) {
                 selectedUnits.removeIf(e ->
-                    (getPlayerToEntityRelationship(e) != Relationship.OWNED && !NonUnitClientEvents.canControlNonUnits()) || e.getId() == MC.player.getId()
+                    (getPlayerToEntityRelationship(e) != Relationship.OWNED && !NonUnitClientEvents.canControlAllMobs() && !AlliancesClient.canControlAlly(e)) ||
+                            e.getId() == MC.player.getId()
                 );
             }
 
@@ -680,7 +699,7 @@ public class UnitClientEvents {
                 }
                 // right click -> build or repair preselected building
                 else if (hudSelectedEntity instanceof WorkerUnit && preSelBuilding != null &&
-                        (getPlayerToBuildingRelationship(preSelBuilding) == Relationship.OWNED) ||
+                        (getPlayerToBuildingRelationship(preSelBuilding) == Relationship.OWNED || AlliancesClient.canControlAlly(hudSelectedEntity)) ||
                         preSelBuilding instanceof BridgePlacement) {
 
                     if (preSelBuilding.getBuilding() instanceof AbstractFarm && preSelBuilding.isBuilt)
