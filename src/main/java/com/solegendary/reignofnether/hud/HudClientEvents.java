@@ -11,6 +11,7 @@ import com.solegendary.reignofnether.attackwarnings.AttackWarningClientEvents;
 import com.solegendary.reignofnether.building.*;
 import com.solegendary.reignofnether.building.buildings.placements.BeaconPlacement;
 import com.solegendary.reignofnether.building.buildings.placements.ProductionPlacement;
+import com.solegendary.reignofnether.building.custombuilding.CustomBuilding;
 import com.solegendary.reignofnether.building.production.ActiveProduction;
 import com.solegendary.reignofnether.config.ConfigClientEvents;
 import com.solegendary.reignofnether.gamemode.ClientGameModeHelper;
@@ -325,7 +326,14 @@ public class HudClientEvents {
                 if (hudSelBuildingOwned && buildingButtons.size() < (buttonsPerRow * 2)) {
                     // mob head icon
 
-                    buildingButtons.add(new Button(ReignOfNetherRegistries.BUILDING.getKey(building.getBuilding()).toString(),
+                    String name;
+                    if (building.getBuilding() instanceof CustomBuilding customBuilding) {
+                        name = customBuilding.name;
+                    } else {
+                        ResourceLocation key = ReignOfNetherRegistries.BUILDING.getKey(building.getBuilding());
+                        name = ReignOfNetherRegistries.BUILDING.getKey(building.getBuilding()).toString();
+                    }
+                    buildingButtons.add(new Button(name,
                         iconSize,
                         building.getBuilding().icon,
                         building,

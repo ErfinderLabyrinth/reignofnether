@@ -73,7 +73,7 @@ public class Beacon extends ProductionBuilding {
     }
 
     public ArrayList<BuildingBlock> getRelativeBlockData(LevelAccessor level) {
-        return BuildingBlockData.getBuildingBlocks(structureName, level);
+        return BuildingBlockData.getBuildingBlocksFromNbt(structureName, level);
     }
 
     @Override

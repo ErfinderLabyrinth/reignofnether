@@ -274,7 +274,7 @@ public class BeaconPlacement extends ProductionPlacement implements RangeIndicat
             case 5 -> Beacon.structureNameT5;
             default -> Beacon.structureName;
         };
-        ArrayList<BuildingBlock> newBlocks = BuildingBlockData.getBuildingBlocks(newStructureName, this.getLevel());
+        ArrayList<BuildingBlock> newBlocks = BuildingBlockData.getBuildingBlocksFromNbt(newStructureName, this.getLevel());
         this.blocks = getAbsoluteBlockData(newBlocks, this.getLevel(), originPos, rotation);
         super.refreshBlocks();
     }

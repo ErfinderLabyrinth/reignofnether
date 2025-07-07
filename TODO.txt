@@ -1,5 +1,5 @@
 
-1.19.2-1.2.0b
+1.19.2-1.2.0c
 
 [✔] Done and tested
 [🟡] Partially done and/or needs testing
@@ -27,14 +27,9 @@ Royal Guard
 
 Features
 --------
-Ron Structure block to register custom neutral buildings
-    1. Create custom block extending StructureBlock
-    2. Mixin StructureTemplate.save to check whether its from a Structure block
-    3. Create a generic Building CustomBuilding with no special abilities
-    4. Create a BuildingPlacement for CustomBuilding
-    5. Add menu options in sandbox that can change the CustomBuilding:
-        - Give it features like production, nether spread, garrisoning, etc.
-        - Toggle indestructible/capturable flags
+[✔] Structure block to register custom buildings
+    [❌] test in multiplayer
+    [❌] new tab in sandbox menu to let you place previously registered custom buildings
 
 
 Bugfixes

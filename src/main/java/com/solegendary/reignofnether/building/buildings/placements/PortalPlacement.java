@@ -125,7 +125,7 @@ public class PortalPlacement extends ProductionPlacement implements NetherConver
         }
         updateButtons();
         if (!newStructureName.isEmpty()) {
-            ArrayList<BuildingBlock> newBlocks = BuildingBlockData.getBuildingBlocks(newStructureName, this.getLevel());
+            ArrayList<BuildingBlock> newBlocks = BuildingBlockData.getBuildingBlocksFromNbt(newStructureName, this.getLevel());
             this.blocks = getAbsoluteBlockData(newBlocks, this.getLevel(), originPos, rotation);
             super.refreshBlocks();
         }
@@ -134,6 +134,7 @@ public class PortalPlacement extends ProductionPlacement implements NetherConver
     @Override
     public void updateButtons() {
         if (level.isClientSide()) {
+            super.updateButtons();
             switch (this.getPortalType()) {
                 case CIVILIAN -> this.productionButtons = List.of(ProductionItems.RESEARCH_RESOURCE_CAPACITY.getStartButton(this, Keybindings.keyQ));
                 case MILITARY -> this.productionButtons = Arrays.asList(ProductionItems.BRUTE.getStartButton(this, Keybindings.keyQ),
