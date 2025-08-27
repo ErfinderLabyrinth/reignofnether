@@ -809,10 +809,6 @@ public class UnitServerEvents {
             evt.setAmount(attackerUnit.getUnitAttackDamage());
         }
 
-        if (evt.getEntity() instanceof BruteUnit brute && brute.isHoldingUpShield && (evt.getSource().is(DamageTypeTags.IS_PROJECTILE))) {
-            evt.setAmount(evt.getAmount() / 4);
-        }
-
         if (evt.getSource() == evt.getEntity().damageSources().lightningBolt()) {
             if (evt.getEntity() instanceof CreeperUnit) {
                 evt.setCanceled(true);
@@ -825,10 +821,6 @@ public class UnitServerEvents {
         if (evt.getSource().getEntity() instanceof WorkerUnit && evt.getSource()
             .getEntity() instanceof AttackerUnit attackerUnit) {
             evt.setAmount(attackerUnit.getUnitAttackDamage());
-        }
-
-        if (evt.getEntity() instanceof BruteUnit brute && brute.isHoldingUpShield && (evt.getSource().is(DamageTypeTags.IS_PROJECTILE))) {
-            evt.setAmount(evt.getAmount() / 3);
         }
         
         if (evt.getSource() == evt.getEntity().damageSources().lightningBolt()) {

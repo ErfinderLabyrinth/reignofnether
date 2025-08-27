@@ -339,7 +339,7 @@ public class NecromancerUnit extends Skeleton implements Unit, AttackerUnit, Ran
 
     @Override
     public SunlightEffect getSunlightEffect() {
-        return SunlightEffect.MOVEMENT_SLOWDOWN;
+        return SunlightEffect.SLOWNESS_I;
     }
 
     public void initialiseGoals() {

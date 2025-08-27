@@ -383,7 +383,7 @@ public class SlimeUnit extends Slime implements Unit, AttackerUnit {
 
     @Override
     public SunlightEffect getSunlightEffect() {
-        return SunlightEffect.MOVEMENT_SLOWDOWN;
+        return SunlightEffect.SLOWNESS_II;
     }
 
     // break leaves that are touched

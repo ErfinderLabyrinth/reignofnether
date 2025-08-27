@@ -204,7 +204,7 @@ public class WardenUnit extends Warden implements Unit, AttackerUnit {
 
     @Override
     public SunlightEffect getSunlightEffect() {
-        return SunlightEffect.MOVEMENT_SLOWDOWN;
+        return SunlightEffect.SLOWNESS_II;
     }
 
     public void initialiseGoals() {

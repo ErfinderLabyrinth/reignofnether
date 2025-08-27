@@ -124,8 +124,10 @@ public abstract class LivingEntityMixin extends Entity {
             ci.cancel();
 
             float dmg = attackerUnit.getUnitAttackDamage();
-            if (this instanceof Unit unit)
+            if (this instanceof Unit unit) {
                 dmg *= (1 - unit.getUnitPhysicalArmorPercentage());
+                dmg *= (1 - unit.getUnitRangedArmorPercentage());
+            }
 
             if (!this.isInvulnerableTo(pDamageSource)) {
                 dmg = ForgeHooks.onLivingHurt((LivingEntity) (Object) this, pDamageSource, dmg);

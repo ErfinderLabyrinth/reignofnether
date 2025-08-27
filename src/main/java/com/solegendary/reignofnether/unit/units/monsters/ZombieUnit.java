@@ -210,7 +210,7 @@ public class ZombieUnit extends Zombie implements Unit, AttackerUnit, Convertabl
     @Override
     public SunlightEffect getSunlightEffect() {
         if (hasItemInSlot(EquipmentSlot.HEAD)) {
-            return SunlightEffect.MOVEMENT_SLOWDOWN;
+            return SunlightEffect.SLOWNESS_II;
         } else {
             return SunlightEffect.FIRE;
         }

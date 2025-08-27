@@ -10,6 +10,7 @@ import com.mojang.math.Axis;
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.ability.abilities.EnchantMaiming;
 import com.solegendary.reignofnether.ability.abilities.EnchantVigor;
+import com.solegendary.reignofnether.ability.abilities.ToggleShield;
 import com.solegendary.reignofnether.building.GarrisonableBuilding;
 import com.solegendary.reignofnether.healthbars.HealthBarClientEvents;
 import com.solegendary.reignofnether.resources.ResourceSource;
@@ -442,9 +443,11 @@ public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<
         ));
         AttributeInstance ms = ((LivingEntity) unit).getAttribute(Attributes.MOVEMENT_SPEED);
         int msInt = ms != null ? (int) (ms.getValue() * 101) : 0;
-        if ((unit instanceof BruteUnit pbUnit && pbUnit.isHoldingUpShield) ||
-            unit instanceof Slime) {
+        if (unit instanceof Slime) {
             msInt *= 0.45f;
+        }
+        if (unit instanceof BruteUnit pbUnit && pbUnit.isHoldingUpShield) {
+            msInt *= ToggleShield.MOVESPEED_MULTIPLIER;
         }
         int msColour = 0xFFFFFFFF;
         double msAttr = ((Mob) unit).getAttributeValue(Attributes.MOVEMENT_SPEED);

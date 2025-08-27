@@ -237,7 +237,7 @@ public class SpiderUnit extends Spider implements Unit, AttackerUnit, Convertabl
 
     @Override
     public SunlightEffect getSunlightEffect() {
-        return SunlightEffect.MOVEMENT_SLOWDOWN;
+        return SunlightEffect.SLOWNESS_II;
     }
 
     @Override

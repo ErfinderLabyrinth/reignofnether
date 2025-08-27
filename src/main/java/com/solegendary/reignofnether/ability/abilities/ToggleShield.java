@@ -26,6 +26,9 @@ public class ToggleShield extends Ability {
 
     private final BruteUnit bruteUnit;
 
+    public static final float MOVESPEED_MULTIPLIER = 0.5f;
+    public static final float PROJECTILE_DAMAGE_RESIST = 0.75f;
+
     public ToggleShield(BruteUnit bruteUnit) {
         super(
                 UnitAction.NONE,

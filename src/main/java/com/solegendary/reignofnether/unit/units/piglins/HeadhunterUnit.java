@@ -49,6 +49,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static com.solegendary.reignofnether.ability.abilities.Bloodlust.BLOODLUST_ATTACK_SPEED_MULTIPLIER;
+
 public class HeadhunterUnit extends PiglinBrute implements Unit, AttackerUnit, RangedAttackerUnit {
     // region
     private int eatingTicksLeft = 0;
@@ -138,8 +140,6 @@ public class HeadhunterUnit extends PiglinBrute implements Unit, AttackerUnit, R
             return (int) (20 / (attacksPerSecond * BLOODLUST_ATTACK_SPEED_MULTIPLIER));
         return (int) (20 / attacksPerSecond);
     }
-
-    final static public float BLOODLUST_ATTACK_SPEED_MULTIPLIER = 1.6f;
 
     final static public float attackDamage = 6.0f;
     final static public float attacksPerSecond = 0.3f;

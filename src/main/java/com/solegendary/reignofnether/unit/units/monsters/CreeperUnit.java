@@ -206,7 +206,7 @@ public class CreeperUnit extends Creeper implements Unit, AttackerUnit {
 
     @Override
     public SunlightEffect getSunlightEffect() {
-        return SunlightEffect.MOVEMENT_SLOWDOWN;
+        return SunlightEffect.SLOWNESS_II;
     }
 
     @Override

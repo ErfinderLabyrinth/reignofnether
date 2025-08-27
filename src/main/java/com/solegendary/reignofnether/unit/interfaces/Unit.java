@@ -252,12 +252,15 @@ public interface Unit {
         if (unitMob.tickCount % 50 == 0)
             checkAndRetreatToAnchor(unit);
 
-        if (unit.getSunlightEffect() == SunlightEffect.MOVEMENT_SLOWDOWN) {
-            // apply slowness level 2 during daytime for a short time repeatedly
+        if (unit.getSunlightEffect() == SunlightEffect.SLOWNESS_II ||
+            unit.getSunlightEffect() == SunlightEffect.SLOWNESS_I) {
+            // apply slowness during daytime for a short time repeatedly
             if (unitMob.tickCount % 10 == 0 && !unitMob.level().isClientSide() && unitMob.level().isDay() &&
                     !NightUtils.isInRangeOfNightSource(unitMob.getEyePosition(), false) &&
                     !ResearchServerEvents.playerHasCheat(unit.getOwnerName(), "slipslopslap"))
-                unitMob.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 15, 1));
+                unitMob.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 15,
+                        unit.getSunlightEffect() == SunlightEffect.SLOWNESS_I ? 0 : 1
+                ));
         }
 
         if (unitMob.tickCount % 20 == 0) {
@@ -418,7 +421,8 @@ public interface Unit {
 
     public enum SunlightEffect {
         NONE,
-        MOVEMENT_SLOWDOWN,
+        SLOWNESS_II,
+        SLOWNESS_I,
         FIRE
     }
 

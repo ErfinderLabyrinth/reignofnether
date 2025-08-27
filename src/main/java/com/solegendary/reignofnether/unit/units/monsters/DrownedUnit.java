@@ -122,6 +122,7 @@ public class DrownedUnit extends Drowned implements Unit, AttackerUnit {
     final static public float aggroRange = 10;
     final static public boolean willRetaliate = true; // will attack when hurt by an enemy
     final static public boolean aggressiveWhenIdle = true;
+    final static public float rangedDamageResist = 0.2f;
 
     public int maxResources = 100;
 
@@ -134,6 +135,11 @@ public class DrownedUnit extends Drowned implements Unit, AttackerUnit {
 
     public DrownedUnit(EntityType<? extends Drowned> entityType, Level level) {
         super(entityType, level);
+    }
+
+    @Override
+    public float getUnitRangedArmorPercentage() {
+        return rangedDamageResist;
     }
 
     @Override
@@ -187,7 +193,7 @@ public class DrownedUnit extends Drowned implements Unit, AttackerUnit {
     @Override
     public SunlightEffect getSunlightEffect() {
         if (hasItemInSlot(EquipmentSlot.HEAD)) {
-            return SunlightEffect.MOVEMENT_SLOWDOWN;
+            return SunlightEffect.SLOWNESS_II;
         } else {
             return SunlightEffect.FIRE;
         }

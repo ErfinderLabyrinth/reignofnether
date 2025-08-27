@@ -3,7 +3,6 @@ package com.solegendary.reignofnether.unit.units.monsters;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.MountSpider;
 import com.solegendary.reignofnether.ability.heroAbilities.monster.BloodMoon;
-import com.solegendary.reignofnether.ability.heroAbilities.monster.RaiseDead;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientboundPacket;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.resources.ResourceCost;
@@ -211,7 +210,7 @@ public class SkeletonUnit extends Skeleton implements Unit, AttackerUnit, Ranged
     @Override
     public SunlightEffect getSunlightEffect() {
         if (hasItemInSlot(EquipmentSlot.HEAD)) {
-            return SunlightEffect.MOVEMENT_SLOWDOWN;
+            return SunlightEffect.SLOWNESS_II;
         } else {
             return SunlightEffect.FIRE;
         }

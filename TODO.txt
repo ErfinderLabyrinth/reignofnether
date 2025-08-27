@@ -1,14 +1,13 @@
 
-1.19.2-1.2.1b
+1.19.2-1.2.1c
 
 [✔] Done and tested
 [🟡] Partially done and/or needs testing
 [❌] Not done, including unmerged PRs
 
 
-
 Necromancer
-    [❌] Purple particles on soul usage and soul gain
+    [❌] Purple particles on soul usage
     [❌] Magical projectile model and sound
 
 Royal Guard
@@ -35,20 +34,15 @@ Bugfixes
 [❌] keyframe animations are cancelled upon being hit
 [❌] Avatar state is reset when unloaded
 [❌] When someone relogs, bridges revert to original rotations
-
 [❌] heroes are not resetting when switching worlds until /rts-reset is used
-[❌] population count is messed up when consuming slimes
 
-[🟡] Zombie production time increased from 10s to 18s
-    - This was an error, all other zombies, skeletons and their variants take 18s to build
-[🟡] Fixed heroes not being produced in new games on the same map even with /rts-reset
-[🟡] Fixed Netherite Chestplates not granting armour to headhunters
-[🟡] Evokers with Vigor no longer have increased channelling time
-[🟡] Evoker Circle Fangs now correctly do 12 damage instead of 6
-[🟡] Music from your opponents' factions no longer plays when they start their game
-[🟡] Fixed units with absorption from golden apples taking double damage from projectiles
-[🟡] Fixed a crash when using a transport portal with many units
-[ ] Fixed Skeletons and Pillagers being able to break their bows if used too many times
+[✔] Fixed many bugs with Brutes with raised shields:
+    - Armour stat incorrectly showed 0%
+    - Ranged damage to absorption wasn't being reduced
+    - Moving at 45% speed instead of 50% speed
+
+[✔] Fixed Evoker vexes having too short a cooldown when autocasted
+
 
 Quality of Life
 ---------------
@@ -56,13 +50,6 @@ Quality of Life
 [❌] players starting at the same colour of RTS Start Blocks are automatically allied at the start of a match
     - including a tooltip showing who will be on your own team
 
-[✔] Spectators can now hold tab to show a list of players and their resources in the match
-    - Thanks to @Daratrix!
-
-[✔] All unit stats can now be hovered over for tooltips
-    [🟡] - bonus stats like hoglins bonus damage to buildings are shown here
-    [🟡] - stats are shown in green or red when affected by any buffs or debuffs
-    [🟡] - armor is shown in different colours depending on what it is effective against
 
 
 
@@ -72,8 +59,4 @@ Balancing
 [❌] Skeletons are too good earlygame and too bad lategame
     - backport bogged?
 
-[✔] Ravagers no longer benefit from the movement speed buff from Captains
-[✔] All basic melee units (brutes, zombies, vindicators) now have 20% armour against ranged attacks
-[✔] -1 speed to all basic ranged units (headhunters, skeletons, pillagers)
-[✔] Population cost max-sized (size 6) slimes and magma cubes reduced from 6 to 5
-[✔] The Necromancer can now consume souls to heal itself for 1.5hp per soul
+[✔] Necromancer daytime slowdown reduced from Slowness II (-36%) to Slowness I (-20%)
