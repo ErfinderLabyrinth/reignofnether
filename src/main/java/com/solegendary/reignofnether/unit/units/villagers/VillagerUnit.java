@@ -20,6 +20,7 @@ import com.solegendary.reignofnether.unit.interfaces.*;
 import com.solegendary.reignofnether.unit.packets.UnitConvertClientboundPacket;
 import com.solegendary.reignofnether.unit.packets.UnitSyncClientboundPacket;
 import com.solegendary.reignofnether.util.Faction;
+import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
@@ -29,6 +30,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
@@ -56,6 +58,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.solegendary.reignofnether.unit.units.villagers.VillagerUnitProfession.*;
+import static com.solegendary.reignofnether.util.MiscUtil.fcs;
 
 public class VillagerUnit extends Vindicator implements Unit, WorkerUnit, AttackerUnit, ArmSwingingUnit, VillagerDataHolder, ConvertableUnit {
     // region
@@ -454,6 +457,22 @@ public class VillagerUnit extends Vindicator implements Unit, WorkerUnit, Attack
     @Nullable
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor pLevel, DifficultyInstance pDifficulty, MobSpawnType pReason, @Nullable SpawnGroupData pSpawnData, @Nullable CompoundTag pDataTag) {
         return pSpawnData;
+    }
+
+    @Override
+    public List<FormattedCharSequence> getAttackDamageStatTooltip() {
+        if (getUnitProfession() == HUNTER) {
+            return List.of(
+                    fcs(I18n.get("unitstats.reignofnether.attack_damage"), true),
+                    fcs(I18n.get("unitstats.reignofnether.attack_damage_bonus_animals", isVeteran() ? "100%" : "50%"))
+            );
+        } else {
+            return List.of(fcs(I18n.get("unitstats.reignofnether.attack_damage"), true));
+        }
+    }
+    @Override
+    public boolean hasBonusDamage() {
+        return getUnitProfession() == HUNTER;
     }
 
     private static final EntityDataAccessor<VillagerData> VILLAGER_DATA;

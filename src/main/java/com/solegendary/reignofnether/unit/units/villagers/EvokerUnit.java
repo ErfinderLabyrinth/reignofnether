@@ -390,7 +390,7 @@ public class EvokerUnit extends Evoker implements Unit, AttackerUnit, RangedAtta
             }
         }
         for (Ability ability : getAbilities())
-            if (ability instanceof CastSummonVexes castSummonVexes)
+            if (ability instanceof CastSummonVexes)
                 AbilityClientboundPacket.sendSetCooldownPacket(getId(), UnitAction.CAST_SUMMON_VEXES, CastSummonVexes.CD_MAX_SECONDS * 20);
 
         if (getCastFangsGoal() != null)
