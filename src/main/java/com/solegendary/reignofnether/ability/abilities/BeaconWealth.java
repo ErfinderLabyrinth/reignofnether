@@ -1,6 +1,7 @@
 package com.solegendary.reignofnether.ability.abilities;
 
 import com.solegendary.reignofnether.ability.BeaconAbility;
+import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.buildings.placements.BeaconPlacement;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybinding;
@@ -19,15 +20,17 @@ public class BeaconWealth extends BeaconAbility {
 
     public final static MobEffect AURA_EFFECT = MobEffects.LUCK;
 
-    public BeaconWealth(BeaconPlacement beacon) {
-        super(UnitAction.BEACON_WEALTH, AURA_EFFECT, beacon);
+    public BeaconWealth() {
+        super(UnitAction.BEACON_WEALTH, AURA_EFFECT);
     }
 
     @Override
-    public AbilityButton getButton(Keybinding hotkey) {
+    public AbilityButton getButton(Keybinding hotkey, BuildingPlacement placement) {
+        if (!(placement instanceof BeaconPlacement beacon)) return null;
+
         return new AbilityButton(
                 "Wealth Aura",
-                new ResourceLocation("minecraft", "textures/mob_effect/hero_of_the_village.png"),
+                ResourceLocation.fromNamespaceAndPath("minecraft", "textures/mob_effect/hero_of_the_village.png"),
                 hotkey,
                 () -> beacon.getAuraEffect() == AURA_EFFECT,
                 () -> false,
@@ -40,7 +43,8 @@ public class BeaconWealth extends BeaconAbility {
                         fcs(I18n.get("ability.reignofnether.beacon_aura.wealth.tooltip1")),
                         fcs(I18n.get("ability.reignofnether.beacon_aura.one_aura"))
                 ),
-                this
+                this,
+                placement
         );
     }
 }

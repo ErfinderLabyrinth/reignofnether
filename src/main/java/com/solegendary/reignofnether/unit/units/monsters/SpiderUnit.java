@@ -1,5 +1,6 @@
 package com.solegendary.reignofnether.unit.units.monsters;
 
+import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.AbilityClientboundPacket;
 import com.solegendary.reignofnether.ability.abilities.Eject;
@@ -8,6 +9,7 @@ import com.solegendary.reignofnether.ability.abilities.SpinWebs;
 import com.solegendary.reignofnether.blocks.BlockServerEvents;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.hud.HudClientEvents;
+import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.unit.Checkpoint;
@@ -18,6 +20,7 @@ import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.util.Faction;
 import com.solegendary.reignofnether.util.MiscUtil;
 import com.solegendary.reignofnether.util.MyMath;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -48,6 +51,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SpiderUnit extends Spider implements Unit, AttackerUnit, ConvertableUnit {
+    public static final Abilities ABILITIES = new Abilities();
+    static {
+        ABILITIES.add(new SpiderClimbing(), Keybindings.keyQ);
+        ABILITIES.add(new Eject(), Keybindings.keyW);
+        ABILITIES.add(new SpinWebs(), Keybindings.keyE);
+    }
+
+    Object2ObjectArrayMap<Ability, Float> cooldowns = Unit.createCooldownMap();
+    Object2ObjectArrayMap<Ability, Integer> charges = new Object2ObjectArrayMap<>();
+
+    Ability autocast;
+
     // region
     private int eatingTicksLeft = 0;
     public void setEatingTicksLeft(int amount) { eatingTicksLeft = amount; }
@@ -67,8 +82,7 @@ public class SpiderUnit extends Spider implements Unit, AttackerUnit, Convertabl
     public boolean canUsePortal() { return getUsePortalGoal() != null; }
 
     public Faction getFaction() {return Faction.MONSTERS;}
-    public List<AbilityButton> getAbilityButtons() {return abilityButtons;};
-    public List<Ability> getAbilities() {return abilities;};
+    public Abilities getAbilities() {return abilities;};
     public List<ItemStack> getItems() {return items;};
     public MoveToTargetBlockGoal getMoveGoal() {return moveGoal;}
     public SelectedTargetGoal<? extends LivingEntity> getTargetGoal() {return targetGoal;}
@@ -150,22 +164,17 @@ public class SpiderUnit extends Spider implements Unit, AttackerUnit, Convertabl
 
     @Nullable
     public SpinWebs getWebAbility() {
-        for (Ability ability : this.getAbilities())
+        for (Ability ability : this.getAbilities().get())
             if (ability instanceof SpinWebs spinWebs)
                 return spinWebs;
         return null;
     }
 
-    private final List<AbilityButton> abilityButtons = new ArrayList<>();
-    protected final List<Ability> abilities = new ArrayList<>();
+    protected Abilities abilities = ABILITIES.clone();
     private final List<ItemStack> items = new ArrayList<>();
 
     public SpiderUnit(EntityType<? extends Spider> entityType, Level level) {
         super(entityType, level);
-        this.abilities.add(new SpiderClimbing(this));
-        this.abilities.add(new Eject(this));
-        this.abilities.add(new SpinWebs(this));
-        updateAbilityButtons();
     }
 
     public boolean isWallClimbing() { return wallClimbing; }
@@ -278,7 +287,7 @@ public class SpiderUnit extends Spider implements Unit, AttackerUnit, Convertabl
     @Override
     public boolean doHurtTarget(@NotNull Entity pEntity) {
         if (super.doHurtTarget(pEntity)) {
-            if (getWebAbility() != null && getWebAbility().isAutocasting())
+            if (getWebAbility() != null && getWebAbility().isAutocasting(this))
                 getWebAbility().use(this.level(), this, pEntity.getOnPos());
             return true;
         } else {
@@ -320,9 +329,35 @@ public class SpiderUnit extends Spider implements Unit, AttackerUnit, Convertabl
             }
         }
         if (!isVehicle()) {
-            spinWebs.setToMaxCooldown();
+            spinWebs.setToMaxCooldown(this);
             if (!level().isClientSide())
                 AbilityClientboundPacket.sendSetCooldownPacket(getId(), spinWebs.action, spinWebs.cooldownMax);
         }
+    }
+
+    @Override
+    public void updateAbilityButtons() {
+        abilities = ABILITIES.clone();
+        autocast = ABILITIES.getDefaultAutocast();
+    }
+
+    @Override
+    public Object2ObjectArrayMap<Ability, Float> getCooldowns() {
+        return cooldowns;
+    }
+
+    @Override
+    public boolean hasAutocast(Ability ability) {
+        return autocast == ability;
+    }
+
+    @Override
+    public void setAutocast(Ability autocast) {
+        this.autocast = autocast;
+    }
+
+    @Override
+    public Object2ObjectArrayMap<Ability, Integer> getCharges() {
+        return charges;
     }
 }

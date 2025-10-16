@@ -1,5 +1,6 @@
 package com.solegendary.reignofnether.unit.units.neutral;
 
+import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.resources.ResourceCost;
@@ -9,6 +10,7 @@ import com.solegendary.reignofnether.unit.goals.*;
 import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.util.Faction;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -35,6 +37,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WolfUnit extends Wolf implements Unit, AttackerUnit {
+    public static final Abilities ABILITIES = new Abilities();
+
+    Object2ObjectArrayMap<Ability, Float> cooldowns = Unit.createCooldownMap();
+    Object2ObjectArrayMap<Ability, Integer> charges = new Object2ObjectArrayMap<>();
+
+    Ability autocast;
+
     // region
     private int eatingTicksLeft = 0;
     public void setEatingTicksLeft(int amount) { eatingTicksLeft = amount; }
@@ -54,8 +63,7 @@ public class WolfUnit extends Wolf implements Unit, AttackerUnit {
     public boolean canUsePortal() { return getUsePortalGoal() != null; }
 
     public Faction getFaction() {return Faction.NONE;}
-    public List<AbilityButton> getAbilityButtons() {return abilityButtons;};
-    public List<Ability> getAbilities() {return abilities;}
+    public Abilities getAbilities() {return abilities;}
     public List<ItemStack> getItems() {return items;};
     public MoveToTargetBlockGoal getMoveGoal() {return moveGoal;}
     public SelectedTargetGoal<? extends LivingEntity> getTargetGoal() {return targetGoal;}
@@ -124,12 +132,14 @@ public class WolfUnit extends Wolf implements Unit, AttackerUnit {
     final static public float movementSpeed = 0.31f;
     public int maxResources = 100;
 
-    private final List<AbilityButton> abilityButtons = new ArrayList<>();
-    private final List<Ability> abilities = new ArrayList<>();
+    private List<AbilityButton> abilityButtons = new ArrayList<>();
+    private Abilities abilities = ABILITIES.clone();
     private final List<ItemStack> items = new ArrayList<>();
 
     public WolfUnit(EntityType<? extends Wolf> entityType, Level level) {
         super(entityType, level);
+
+        updateAbilityButtons();
     }
 
     @Override
@@ -209,5 +219,31 @@ public class WolfUnit extends Wolf implements Unit, AttackerUnit {
     @Nullable
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor pLevel, DifficultyInstance pDifficulty, MobSpawnType pReason, @Nullable SpawnGroupData pSpawnData, @Nullable CompoundTag pDataTag) {
         return pSpawnData;
+    }
+
+    @Override
+    public void updateAbilityButtons() {
+        abilities = ABILITIES.clone();
+        autocast = ABILITIES.getDefaultAutocast();
+    }
+
+    @Override
+    public Object2ObjectArrayMap<Ability, Float> getCooldowns() {
+        return cooldowns;
+    }
+
+    @Override
+    public boolean hasAutocast(Ability ability) {
+        return autocast == ability;
+    }
+
+    @Override
+    public void setAutocast(Ability autocast) {
+        this.autocast = autocast;
+    }
+
+    @Override
+    public Object2ObjectArrayMap<Ability, Integer> getCharges() {
+        return charges;
     }
 }

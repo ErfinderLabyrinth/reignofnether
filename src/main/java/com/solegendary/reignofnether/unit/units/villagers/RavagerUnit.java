@@ -1,11 +1,13 @@
 package com.solegendary.reignofnether.unit.units.villagers;
 
+import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.Eject;
 import com.solegendary.reignofnether.ability.abilities.Roar;
 import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.BuildingUtils;
 import com.solegendary.reignofnether.hud.AbilityButton;
+import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.unit.Checkpoint;
@@ -16,6 +18,7 @@ import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.util.Faction;
 import com.solegendary.reignofnether.util.MiscUtil;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -49,6 +52,17 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 public class RavagerUnit extends Ravager implements Unit, AttackerUnit {
+    public static final Abilities ABILITIES = new Abilities();
+    static {
+        ABILITIES.add(new Roar(), Keybindings.keyQ);
+        ABILITIES.add(new Eject(), Keybindings.keyW);
+    }
+
+    Object2ObjectArrayMap<Ability, Float> cooldowns = Unit.createCooldownMap();
+    Object2ObjectArrayMap<Ability, Integer> charges = new Object2ObjectArrayMap<>();
+
+    Ability autocast;
+
     // region
     private int eatingTicksLeft = 0;
     public void setEatingTicksLeft(int amount) { eatingTicksLeft = amount; }
@@ -69,8 +83,7 @@ public class RavagerUnit extends Ravager implements Unit, AttackerUnit {
     public boolean canUsePortal() { return getUsePortalGoal() != null; }
 
     public Faction getFaction() {return Faction.VILLAGERS;}
-    public List<AbilityButton> getAbilityButtons() {return abilityButtons;};
-    public List<Ability> getAbilities() {return abilities;};
+    public Abilities getAbilities() {return abilities;};
     public List<ItemStack> getItems() {return items;};
     public MoveToTargetBlockGoal getMoveGoal() {return moveGoal;}
     public SelectedTargetGoal<? extends LivingEntity> getTargetGoal() {return targetGoal;}
@@ -141,8 +154,8 @@ public class RavagerUnit extends Ravager implements Unit, AttackerUnit {
     private AbstractMeleeAttackUnitGoal attackGoal;
     private MeleeAttackBuildingGoal attackBuildingGoal;
 
-    private final List<AbilityButton> abilityButtons = new ArrayList<>();
-    private final List<Ability> abilities = new ArrayList<>();
+    private List<AbilityButton> abilityButtons = new ArrayList<>();
+    private Abilities abilities = ABILITIES.clone();
     private final List<ItemStack> items = new ArrayList<>();
 
     public final static float ROAR_DAMAGE = 8.0f;
@@ -154,8 +167,7 @@ public class RavagerUnit extends Ravager implements Unit, AttackerUnit {
 
     public RavagerUnit(EntityType<? extends Ravager> entityType, Level level) {
         super(entityType, level);
-        this.abilities.add(new Roar(this));
-        this.abilities.add(new Eject(this));
+
         updateAbilityButtons();
     }
 
@@ -299,5 +311,31 @@ public class RavagerUnit extends Ravager implements Unit, AttackerUnit {
                 this.playSound(SoundEvents.GENERIC_EXPLODE, 1.0F, 1.0F);
             }
         }
+    }
+
+    @Override
+    public void updateAbilityButtons() {
+        abilities = ABILITIES.clone();
+        autocast = ABILITIES.getDefaultAutocast();
+    }
+
+    @Override
+    public Object2ObjectArrayMap<Ability, Float> getCooldowns() {
+        return cooldowns;
+    }
+
+    @Override
+    public boolean hasAutocast(Ability ability) {
+        return autocast == ability;
+    }
+
+    @Override
+    public void setAutocast(Ability autocast) {
+        this.autocast = autocast;
+    }
+
+    @Override
+    public Object2ObjectArrayMap<Ability, Integer> getCharges() {
+        return charges;
     }
 }

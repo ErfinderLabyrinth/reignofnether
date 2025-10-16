@@ -33,28 +33,30 @@ public class LootExplosion extends HeroAbility {
     public static final int BASE_ITEMS = 12;
     public static final int BONUS_ITEMS_PER_100_RESOURCES = 3;
 
-    public LootExplosion(HeroUnit hero) {
-        super(hero, 1, 125, UnitAction.LOOT_EXPLOSION, CD_MAX_SECONDS, 0, 0, false);
+    public LootExplosion() {
+        super(1, 125, UnitAction.LOOT_EXPLOSION, CD_MAX_SECONDS, 0, 0, false);
     }
 
     @Override
-    public AbilityButton getButton(Keybinding hotkey) {
+    public AbilityButton getButton(Keybinding hotkey, Unit unit) {
+        if (!(unit instanceof HeroUnit hero)) return null;
         return new AbilityButton("Loot Explosion",
-                new ResourceLocation("minecraft", "textures/item/iron_chestplate.png"),
+                ResourceLocation.fromNamespaceAndPath("minecraft", "textures/item/iron_chestplate.png"),
                 hotkey,
                 () -> false,
-                () -> rank == 0,
+                () -> getRank(hero) == 0,
                 () -> true,
                 () -> sendUnitCommand(UnitAction.LOOT_EXPLOSION),
                 null,
-                getTooltipLines(),
-                this
+                getTooltipLines(hero),
+                this,
+                hero
         );
     }
 
     @Override
-    public boolean isCasting() {
-        if (this.hero instanceof PiglinMerchantUnit piglinMerchantUnit) {
+    public boolean isCasting(Unit unit) {
+        if (unit instanceof PiglinMerchantUnit piglinMerchantUnit) {
             GenericUntargetedSpellGoal goal = piglinMerchantUnit.getCastLootExplosionGoal();
             if (goal != null)
                 return goal.isCasting();
@@ -63,16 +65,17 @@ public class LootExplosion extends HeroAbility {
     }
 
     @Override
-    public Button getRankUpButton() {
+    public Button getRankUpButton(HeroUnit hero) {
         return super.getRankUpButtonProtected(
                 "Loot Explosion",
-                new ResourceLocation("minecraft", "textures/item/iron_chestplate.png")
+                ResourceLocation.fromNamespaceAndPath("minecraft", "textures/item/iron_chestplate.png"),
+                hero
         );
     }
 
-    public List<FormattedCharSequence> getTooltipLines() {
+    public List<FormattedCharSequence> getTooltipLines(HeroUnit hero) {
         return List.of(
-                fcs(I18n.get("abilities.reignofnether.loot_explosion") + " " + rankString(), true),
+                fcs(I18n.get("abilities.reignofnether.loot_explosion") + " " + rankString(hero), true),
                 fcsIcons(I18n.get("abilities.reignofnether.loot_explosion.stats", CD_MAX_SECONDS / 20, manaCost)),
                 fcs(""),
                 fcs(I18n.get("abilities.reignofnether.loot_explosion.tooltip1")),
@@ -81,10 +84,10 @@ public class LootExplosion extends HeroAbility {
         );
     }
 
-    public List<FormattedCharSequence> getRankUpTooltipLines() {
+    public List<FormattedCharSequence> getRankUpTooltipLines(HeroUnit hero) {
         return List.of(
                 fcs(I18n.get("abilities.reignofnether.loot_explosion"), true),
-                fcs(I18n.get("abilities.reignofnether.level_req", getLevelRequirement()), getLevelReqStyle()),
+                fcs(I18n.get("abilities.reignofnether.level_req", getLevelRequirement(hero)), getLevelReqStyle(hero)),
                 fcs(""),
                 fcs(I18n.get("abilities.reignofnether.loot_explosion.tooltip1")),
                 fcs(I18n.get("abilities.reignofnether.loot_explosion.tooltip2")),

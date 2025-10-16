@@ -50,16 +50,16 @@ public abstract class ReviveHeroProductionItem extends ProductionItem {
                     HeroClientboundPacket.setSkillPoints(entity.getId(), oldHero.skillPoints);
                     newHero.setStatsForLevel(true);
                     if (newHero.getHeroAbilities().size() > 0) {
-                        newHero.getHeroAbilities().get(0).rank = oldHero.ability1Rank;
+                        newHero.getHeroAbilities().get(0).setRank(newHero, oldHero.ability1Rank);
                         HeroClientboundPacket.setAbilityRank(entity.getId(), oldHero.ability1Rank, 0);
                     } if (newHero.getHeroAbilities().size() > 1) {
-                        newHero.getHeroAbilities().get(1).rank = oldHero.ability2Rank;
+                        newHero.getHeroAbilities().get(1).setRank(newHero, oldHero.ability2Rank);
                         HeroClientboundPacket.setAbilityRank(entity.getId(), oldHero.ability2Rank, 1);
                     } if (newHero.getHeroAbilities().size() > 2) {
-                        newHero.getHeroAbilities().get(2).rank = oldHero.ability3Rank;
+                        newHero.getHeroAbilities().get(2).setRank(newHero, oldHero.ability3Rank);
                         HeroClientboundPacket.setAbilityRank(entity.getId(), oldHero.ability3Rank, 2);
                     } if (newHero.getHeroAbilities().size() > 3) {
-                        newHero.getHeroAbilities().get(3).rank = oldHero.ability4Rank;
+                        newHero.getHeroAbilities().get(3).setRank(newHero, oldHero.ability4Rank);
                         HeroClientboundPacket.setAbilityRank(entity.getId(), oldHero.ability4Rank, 3);
                     }
                     for (HeroAbility abl : newHero.getHeroAbilities())
@@ -95,38 +95,30 @@ public abstract class ReviveHeroProductionItem extends ProductionItem {
         return HeroUnit.getReviveCost(1);
     }
 
-    public Button getStartButton(ProductionPlacement prodBuilding, Keybinding hotkey) {
-        return new Button(
+    public StartProductionButton getStartButton(ProductionPlacement prodBuilding, Keybinding hotkey) {
+        return new StartProductionButton(
                 itemName,
-                14,
                 iconRl,
                 hotkey,
-                () -> false,
                 () -> this.itemIsBeingProduced(prodBuilding.ownerName) ||
                         HeroUnit.getFallenHero(true, prodBuilding.ownerName, getHeroEntityType().getDescriptionId()) == null,
                 () -> true,
-                () -> BuildingServerboundPacket.startProduction(this),
-                null,
                 List.of(
                         fcs(getTooltip(prodBuilding.ownerName), true),
                         ResourceCosts.getFormattedCost(getCost(prodBuilding.level.isClientSide(), prodBuilding.ownerName)),
                         ResourceCosts.getFormattedPopAndTime(getCost(prodBuilding.level.isClientSide(), prodBuilding.ownerName))
-                )
+                ),
+                this
         );
     }
 
-    public Button getCancelButton(ProductionPlacement prodBuilding, boolean first) {
-        return new Button(
+    public StopProductionButton getCancelButton(ProductionPlacement prodBuilding, boolean first) {
+        return new StopProductionButton(
                 itemName,
-                14,
                 iconRl,
-                (Keybinding) null,
-                () -> false,
-                () -> false,
-                () -> true,
-                () -> BuildingServerboundPacket.cancelProduction(prodBuilding.originPos, this, first),
-                null,
-                null
+                prodBuilding,
+                this,
+                first
         );
     }
 }

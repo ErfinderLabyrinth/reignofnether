@@ -1,5 +1,6 @@
 package com.solegendary.reignofnether.unit.units.piglins;
 
+import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.Bloodlust;
 import com.solegendary.reignofnether.ability.abilities.MountHoglin;
@@ -10,6 +11,7 @@ import com.solegendary.reignofnether.building.buildings.piglins.FlameSanctuary;
 import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientboundPacket;
 import com.solegendary.reignofnether.hud.AbilityButton;
+import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
@@ -19,6 +21,7 @@ import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.RangedAttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.util.Faction;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -52,6 +55,17 @@ import java.util.UUID;
 import static com.solegendary.reignofnether.ability.abilities.Bloodlust.BLOODLUST_ATTACK_SPEED_MULTIPLIER;
 
 public class HeadhunterUnit extends PiglinBrute implements Unit, AttackerUnit, RangedAttackerUnit {
+    public static final Abilities ABILITIES = new Abilities();
+    static {
+        ABILITIES.add(new MountHoglin(), Keybindings.keyQ);
+        ABILITIES.add(new Bloodlust(), Keybindings.keyW);
+    }
+
+    Object2ObjectArrayMap<Ability, Float> cooldowns = Unit.createCooldownMap();
+    Object2ObjectArrayMap<Ability, Integer> charges = new Object2ObjectArrayMap<>();
+
+    Ability autocast;
+
     // region
     private int eatingTicksLeft = 0;
     public void setEatingTicksLeft(int amount) { eatingTicksLeft = amount; }
@@ -72,8 +86,7 @@ public class HeadhunterUnit extends PiglinBrute implements Unit, AttackerUnit, R
     public boolean canUsePortal() { return getUsePortalGoal() != null; }
 
     public Faction getFaction() {return Faction.PIGLINS;}
-    public List<AbilityButton> getAbilityButtons() {return abilityButtons;};
-    public List<Ability> getAbilities() {return abilities;}
+    public Abilities getAbilities() {return abilities;}
     public List<ItemStack> getItems() {return items;};
     public MoveToTargetBlockGoal getMoveGoal() {return moveGoal;}
     public SelectedTargetGoal<? extends LivingEntity> getTargetGoal() {return targetGoal;}
@@ -159,14 +172,12 @@ public class HeadhunterUnit extends PiglinBrute implements Unit, AttackerUnit, R
     public int getFogRevealDuration() { return fogRevealDuration; }
     public void setFogRevealDuration(int duration) { fogRevealDuration = duration; }
 
-    private final List<AbilityButton> abilityButtons = new ArrayList<>();
-    private final List<Ability> abilities = new ArrayList<>();
+    private Abilities abilities;
     private final List<ItemStack> items = new ArrayList<>();
 
     public HeadhunterUnit(EntityType<? extends PiglinBrute> entityType, Level level) {
         super(entityType, level);
-        this.abilities.add(new MountHoglin(this));
-        this.abilities.add(new Bloodlust(this));
+
         updateAbilityButtons();
     }
 
@@ -288,6 +299,32 @@ public class HeadhunterUnit extends PiglinBrute implements Unit, AttackerUnit, R
     public boolean fireImmune() {
         BuildingPlacement bpl = BuildingUtils.findBuilding(level().isClientSide(), getOnPos());
         return super.fireImmune() || (bpl != null && (bpl.getBuilding() instanceof FlameSanctuary || bpl.getBuilding() instanceof BasaltSprings));
+    }
+
+    @Override
+    public void updateAbilityButtons() {
+        abilities = ABILITIES.clone();
+        autocast = ABILITIES.getDefaultAutocast();
+    }
+
+    @Override
+    public Object2ObjectArrayMap<Ability, Float> getCooldowns() {
+        return cooldowns;
+    }
+
+    @Override
+    public boolean hasAutocast(Ability ability) {
+        return autocast == ability;
+    }
+
+    @Override
+    public void setAutocast(Ability autocast) {
+        this.autocast = autocast;
+    }
+
+    @Override
+    public Object2ObjectArrayMap<Ability, Integer> getCharges() {
+        return charges;
     }
 
     public boolean hasFireAspectTrident() {

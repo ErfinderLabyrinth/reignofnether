@@ -1,10 +1,12 @@
 package com.solegendary.reignofnether.unit.interfaces;
 
+import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.building.BuildingUtils;
 import com.solegendary.reignofnether.building.buildings.placements.BridgePlacement;
 import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.hud.AbilityButton;
+import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.nether.NetherBlocks;
@@ -13,6 +15,7 @@ import com.solegendary.reignofnether.research.ResearchClient;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
 import com.solegendary.reignofnether.resources.*;
 import com.solegendary.reignofnether.time.NightUtils;
+import com.solegendary.reignofnether.tps.TPSClientEvents;
 import com.solegendary.reignofnether.unit.*;
 import com.solegendary.reignofnether.unit.goals.*;
 import com.solegendary.reignofnether.unit.packets.UnitAnimationClientboundPacket;
@@ -20,6 +23,7 @@ import com.solegendary.reignofnether.unit.packets.UnitSyncClientboundPacket;
 import com.solegendary.reignofnether.unit.units.piglins.BruteUnit;
 import com.solegendary.reignofnether.unit.units.piglins.GhastUnit;
 import com.solegendary.reignofnether.util.Faction;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import com.solegendary.reignofnether.util.MiscUtil;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
@@ -47,12 +51,14 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import static com.solegendary.reignofnether.util.MiscUtil.fcs;
@@ -64,39 +70,47 @@ import static com.solegendary.reignofnether.util.MiscUtil.fcs;
 
 public interface Unit {
 
-    static int ANCHOR_RETREAT_RANGE = 30;
+    int ANCHOR_RETREAT_RANGE = 30;
 
-    static int PIGLIN_HEALING_TICKS = 8 * ResourceCost.TICKS_PER_SECOND;
-    static int MONSTER_HEALING_TICKS = 12 * ResourceCost.TICKS_PER_SECOND;
+    int PIGLIN_HEALING_TICKS = 8 * ResourceCost.TICKS_PER_SECOND;
+    int MONSTER_HEALING_TICKS = 12 * ResourceCost.TICKS_PER_SECOND;
 
     // used for increasing pathfinding calculation range, default is 16 for most mobs
-    static int FOLLOW_RANGE_IMPROVED = 64;
-    static int FOLLOW_RANGE = 16;
+    int FOLLOW_RANGE_IMPROVED = 64;
+    int FOLLOW_RANGE = 16;
+
+    static Object2ObjectArrayMap<Ability, Float> createCooldownMap() {
+        Object2ObjectArrayMap<Ability, Float> map = new Object2ObjectArrayMap<>();
+        map.defaultReturnValue(0F);
+        return map;
+    }
 
     static float HEAL_PER_NUTRITION = 2.5f;
 
     // position that neutral units run back to when past leash range
-    public void setAnchor(BlockPos bp);
-    public BlockPos getAnchor();
+    void setAnchor(BlockPos bp);
+    BlockPos getAnchor();
 
-    public static int getFollowRange() {
+    static int getFollowRange() {
         return UnitServerEvents.improvedPathfinding ? FOLLOW_RANGE_IMPROVED : FOLLOW_RANGE;
     }
 
     // list of positions to draw lines between to indicate unit intents - will fade over time unless shift is held
-    public ArrayList<Checkpoint> getCheckpoints();
+    ArrayList<Checkpoint> getCheckpoints();
 
-    public GarrisonGoal getGarrisonGoal();
-    public boolean canGarrison();
+    GarrisonGoal getGarrisonGoal();
+    boolean canGarrison();
 
-    public MoveToTargetBlockGoal getUsePortalGoal();
-    public boolean canUsePortal();
+    MoveToTargetBlockGoal getUsePortalGoal();
+    boolean canUsePortal();
 
-    public Faction getFaction();
-    public List<AbilityButton> getAbilityButtons();
-    public List<Ability> getAbilities();
-    public List<ItemStack> getItems();
-    public int getMaxResources();
+    Faction getFaction();
+    Abilities getAbilities();
+    default List<Button> getAbilityButtons() {
+        return getAbilities().getButtons(this);
+    }
+    List<ItemStack> getItems();
+    int getMaxResources();
 
     public default boolean isEatingFood() { return getEatingTicksLeft() > 0; };
     public default boolean isHoldingEdibleFood() {
@@ -123,30 +137,21 @@ public interface Unit {
             Keybindings.keyY
     );
 
-    default public void updateAbilityButtons() {
-        if (((LivingEntity) this).level().isClientSide()) {
-            this.getAbilityButtons().clear();
-            for (int i = 0; i < this.getAbilities().size() && i < ABILITY_KEYBINDS.size(); i++) {
-                this.getAbilityButtons().add(this.getAbilities().get(i).getButton(ABILITY_KEYBINDS.get(i)));
-            }
-        }
-    }
-
     // note that attackGoal is specific to unit types
-    public MoveToTargetBlockGoal getMoveGoal();
-    public SelectedTargetGoal<?> getTargetGoal();
-    public ReturnResourcesGoal getReturnResourcesGoal();
+    MoveToTargetBlockGoal getMoveGoal();
+    SelectedTargetGoal<?> getTargetGoal();
+    ReturnResourcesGoal getReturnResourcesGoal();
 
     public float getMovementSpeed();
     public float getUnitMaxHealth();
     public ResourceCost getCost();
 
-    public LivingEntity getFollowTarget();
-    public boolean getHoldPosition();
-    public void setHoldPosition(boolean holdPosition);
+    LivingEntity getFollowTarget();
+    boolean getHoldPosition();
+    void setHoldPosition(boolean holdPosition);
 
-    public String getOwnerName();
-    public void setOwnerName(String name);
+    String getOwnerName();
+    void setOwnerName(String name);
 
     // SOURCE: armour attribute and armour items
     default float getUnitPhysicalArmorPercentage() {
@@ -192,8 +197,24 @@ public interface Unit {
                 }
             }
         }
-        for (Ability ability : unit.getAbilities())
-            ability.tickCooldown();
+        for (Map.Entry<Ability, Float> cooldownEntry : unit.getCooldowns().entrySet()) {
+            Ability ability = cooldownEntry.getKey();
+            float cooldown = cooldownEntry.getValue();
+            if (cooldown > 0 || unit.getCharges(ability) < ability.maxCharges) {
+                if (unit.level().isClientSide())
+                    unit.getCooldowns().put(ability, (float) (cooldown - (TPSClientEvents.getCappedTPS() / 20D)));
+                else
+                    unit.getCooldowns().put(ability, cooldown - 1);
+
+                if (cooldown <= 0 && ability.usesCharges() && unit.getCharges(ability) < ability.maxCharges) {
+                    unit.setCharges(ability, unit.getCharges(ability) + 1);
+                    if (unit.getCharges(ability) < ability.maxCharges)
+                        unit.getCooldowns().put(ability, ability.cooldownMax);
+                    if (unit.getCharges(ability) > ability.maxCharges)
+                        unit.setCharges(ability, ability.maxCharges);
+                }
+            }
+        }
 
         // ------------- CHECKPOINT LOGIC ------------- //
         if (unitMob.level().isClientSide()) {
@@ -451,7 +472,7 @@ public interface Unit {
         return SunlightEffect.NONE;
     }
 
-    public static boolean hasAnchor(Unit unit) {
+    static boolean hasAnchor(Unit unit) {
         return unit.getAnchor() != null && !unit.getAnchor().equals(new BlockPos(0,0,0));
     }
 
@@ -476,20 +497,20 @@ public interface Unit {
         return hasCarryBags ? 100 : 50;
     }
 
-    public static boolean atMaxResources(Unit unit) {
+    static boolean atMaxResources(Unit unit) {
         return Resources.getTotalResourcesFromItems(unit.getItems()).getTotalValue() >= unit.getMaxResources();
     }
 
-    public static boolean atThresholdResources(Unit unit) {
+    static boolean atThresholdResources(Unit unit) {
         return Resources.getTotalResourcesFromItems(unit.getItems()).getTotalValue() >= getThresholdResources(unit);
     }
 
-    public default boolean hasLivingTarget() {
+    default boolean hasLivingTarget() {
         Mob unitMob = (Mob) this;
         return unitMob.getTarget() != null && unitMob.getTarget().isAlive();
     }
 
-    public static void fullResetBehaviours(Unit unit) {
+    static void fullResetBehaviours(Unit unit) {
         if (((Entity) unit).level().isClientSide() && !Keybindings.shiftMod.isDown())
             unit.getCheckpoints().clear();
         unit.resetBehaviours();
@@ -502,7 +523,7 @@ public interface Unit {
         }
     }
 
-    public static void resetBehaviours(Unit unit) {
+    static void resetBehaviours(Unit unit) {
         unit.getTargetGoal().setTarget(null);
         unit.getMoveGoal().stopMoving();
         if (unit.getReturnResourcesGoal() != null)
@@ -520,18 +541,18 @@ public interface Unit {
     }
 
     // can be overridden in the Unit's class to do additional logic on a reset
-    public default void resetBehaviours() { }
+    default void resetBehaviours() { }
 
     // this setter sets a Unit field and so can't be defaulted
     // move to a block ignoring all else until reaching it
-    public default void setMoveTarget(@Nullable BlockPos bp) {
+    default void setMoveTarget(@Nullable BlockPos bp) {
         this.getMoveGoal().setMoveTarget(bp);
     }
 
     // continuously move to a target until told to do something else
-    public void setFollowTarget(@Nullable LivingEntity target);
+    void setFollowTarget(@Nullable LivingEntity target);
 
-    public void initialiseGoals();
+    void initialiseGoals();
 
     // weapons aren't provided automatically when spawned by custom code
     // also recalculate stats based on upgrades
@@ -540,21 +561,21 @@ public interface Unit {
     // equipment only needs to be done serverside, but mod-specific fields need to be done clientside too
     default void setupEquipmentAndUpgradesClient() { }
 
-    public static float getSpeedModifier(Unit unit) {
+    static float getSpeedModifier(Unit unit) {
         if (unit instanceof BruteUnit brute && brute.isHoldingUpShield) {
             return 0.5f;
         }
         return 1.0f;
     }
 
-    public static Ability getAbility(Unit unit, UnitAction abilityAction) {
-        for (Ability ability : unit.getAbilities())
+    static Ability getAbility(Unit unit, UnitAction abilityAction) {
+        for (Ability ability : unit.getAbilities().get())
             if (ability.action.equals(abilityAction))
                 return ability;
         return null;
     }
 
-    public default boolean isIdle() {
+    default boolean isIdle() {
         boolean idleAttacker = true;
         boolean idleBuildingAttacker = true;
         if (this instanceof AttackerUnit attackerUnit) {
@@ -599,9 +620,12 @@ public interface Unit {
         }
     }
 
-    public default boolean isCasting() {
-        for (Ability ability : getAbilities())
-            if (ability.isCasting())
+    void updateAbilityButtons();
+    Level level();
+
+    default boolean isCasting() {
+        for (Ability ability : getAbilities().get())
+            if (ability.isCasting(this))
                 return true;
         return false;
     }
@@ -657,4 +681,27 @@ public interface Unit {
             case MOVEMENT_SPEED -> getMovementSpeedStatTooltip();
         };
     }
+
+    default void setCooldown(Ability abilityClass, float cooldown) {
+        getCooldowns().put(abilityClass, cooldown);
+    }
+
+    default float getCooldown(Ability abilityClass) {
+        return getCooldowns().get(abilityClass);
+    }
+
+    Object2ObjectArrayMap<Ability,Float> getCooldowns();
+
+    boolean hasAutocast(Ability ability);
+    void setAutocast(Ability ability);
+    default void setCharges(Ability abilityClass, int cooldown) {
+        getCharges().put(abilityClass, cooldown);
+    }
+
+    default int getCharges(Ability ability) {
+        if (!getCharges().containsKey(ability))
+            getCharges().put(ability, ability.maxCharges);
+        return getCharges().get(ability);
+    }
+    Object2ObjectArrayMap<Ability,Integer> getCharges();
 }

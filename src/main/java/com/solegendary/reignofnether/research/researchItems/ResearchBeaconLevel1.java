@@ -6,6 +6,8 @@ import com.solegendary.reignofnether.building.buildings.placements.BeaconPlaceme
 import com.solegendary.reignofnether.building.buildings.placements.ProductionPlacement;
 import com.solegendary.reignofnether.building.production.ProdDupeRule;
 import com.solegendary.reignofnether.building.production.ProductionItem;
+import com.solegendary.reignofnether.building.production.StartProductionButton;
+import com.solegendary.reignofnether.building.production.StopProductionButton;
 import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.resources.ResourceCost;
@@ -39,19 +41,15 @@ public class ResearchBeaconLevel1 extends ProductionItem {
         return itemName;
     }
 
-    public Button getStartButton(ProductionPlacement prodBuilding, Keybinding hotkey) {
-        return new Button(
+    public StartProductionButton getStartButton(ProductionPlacement prodBuilding, Keybinding hotkey) {
+        return new StartProductionButton(
                 itemName,
-                14,
-                new ResourceLocation("minecraft", "textures/block/iron_block.png"),
-                new ResourceLocation(ReignOfNether.MOD_ID, "textures/hud/icon_frame_bronze.png"),
+                ResourceLocation.fromNamespaceAndPath("minecraft", "textures/block/iron_block.png"),
+                ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/hud/icon_frame_bronze.png"),
                 hotkey,
-                () -> false,
                 () -> itemIsBeingProducedAt(prodBuilding) ||
                         (prodBuilding instanceof BeaconPlacement beacon && beacon.getUpgradeLevel() != 0),
                 () -> true,
-                () -> BuildingServerboundPacket.startProduction(this),
-                null,
                 List.of(
                         FormattedCharSequence.forward(I18n.get("research.reignofnether.beacon_level1"), Style.EMPTY.withBold(true)),
                         ResourceCosts.getFormattedCost(cost),
@@ -60,23 +58,19 @@ public class ResearchBeaconLevel1 extends ProductionItem {
                         FormattedCharSequence.forward(I18n.get("research.reignofnether.beacon_level1.tooltip1"), Style.EMPTY),
                         FormattedCharSequence.forward("", Style.EMPTY),
                         FormattedCharSequence.forward(I18n.get("research.reignofnether.beacon_level_win"), Style.EMPTY)
-                )
+                ),
+                this
         );
     }
 
-    public Button getCancelButton(ProductionPlacement prodBuilding, boolean first) {
-        return new Button(
+    public StopProductionButton getCancelButton(ProductionPlacement prodBuilding, boolean first) {
+        return new StopProductionButton(
                 itemName,
-                14,
-                new ResourceLocation("minecraft", "textures/block/iron_block.png"),
-                new ResourceLocation(ReignOfNether.MOD_ID, "textures/hud/icon_frame_bronze.png"),
-                null,
-                () -> false,
-                () -> false,
-                () -> true,
-                () -> BuildingServerboundPacket.cancelProduction(prodBuilding.minCorner, this, first),
-                null,
-                null
+                ResourceLocation.fromNamespaceAndPath("minecraft", "textures/block/iron_block.png"),
+                ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/hud/icon_frame_bronze.png"),
+                prodBuilding,
+                this,
+                first
         );
     }
 }

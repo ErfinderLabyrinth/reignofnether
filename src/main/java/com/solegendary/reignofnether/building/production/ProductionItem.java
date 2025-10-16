@@ -27,6 +27,7 @@ public abstract class ProductionItem {
     public static String itemName;
 
     public ResourceCost defaultCost;
+    public boolean canDuplicate; // is building allowed to build more than one of these? eg. tech upgrades can't be duplicated
     public BiConsumer<Level, ProductionPlacement> onComplete;
     public ProdDupeRule dupeRule;
 
@@ -140,12 +141,12 @@ public abstract class ProductionItem {
     }
 
     // Button object to build
-    public Button getStartButton(ProductionPlacement prodBuilding, Keybinding keybinding) {
+    public StartProductionButton getStartButton(ProductionPlacement prodBuilding, Keybinding keybinding) {
         return null;
     }
     // Button object to show in-progress items
     // firstItem means this button will cancel the currently-building item
-    public Button getCancelButton(ProductionPlacement prodBuilding, boolean first) {
+    public StopProductionButton getCancelButton(ProductionPlacement prodBuilding, boolean first) {
         return null;
     }
 

@@ -39,7 +39,7 @@ public class CastSummonVexesGoal extends Goal {
                     if (!this.mob.level().isClientSide())
                         AbilityClientboundPacket.sendSetCooldownPacket(this.mob.getId(), this.ability.action, this.ability.cooldownMax);
                     else if (mob instanceof Unit unit)
-                        this.ability.setToMaxCooldown();
+                        this.ability.setToMaxCooldown(unit);
                 }
                 this.stop();
             }

@@ -6,12 +6,14 @@ import com.solegendary.reignofnether.building.buildings.placements.ProductionPla
 import com.solegendary.reignofnether.building.production.ProdDupeRule;
 import com.solegendary.reignofnether.building.production.ProductionItem;
 import com.solegendary.reignofnether.building.production.ProductionItems;
+import com.solegendary.reignofnether.building.production.StopProductionButton;
 import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.research.ResearchClient;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
+import com.solegendary.reignofnether.building.production.StartProductionButton;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
@@ -36,18 +38,14 @@ public class ResearchSoulFireballs extends ProductionItem {
         };
     }
 
-    public Button getStartButton(ProductionPlacement prodBuilding, Keybinding hotkey) {
-        return new Button(ResearchSoulFireballs.itemName,
-            14,
-            new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/soul_fireball.png"),
-            new ResourceLocation(ReignOfNether.MOD_ID, "textures/hud/icon_frame_bronze.png"),
+    public StartProductionButton getStartButton(ProductionPlacement prodBuilding, Keybinding hotkey) {
+        return new StartProductionButton(ResearchSoulFireballs.itemName,
+            ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/icons/items/soul_fireball.png"),
+            ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/hud/icon_frame_bronze.png"),
             hotkey,
-            () -> false,
             () -> ProductionItems.RESEARCH_SOUL_FIREBALLS.itemIsBeingProduced(prodBuilding.ownerName)
                 || ResearchClient.hasResearch(ProductionItems.RESEARCH_SOUL_FIREBALLS),
             () -> true,
-            () -> BuildingServerboundPacket.startProduction(ProductionItems.RESEARCH_SOUL_FIREBALLS),
-            null,
             List.of(FormattedCharSequence.forward(I18n.get("research.reignofnether.soul_fireballs"),
                     Style.EMPTY.withBold(true)
                 ),
@@ -56,22 +54,18 @@ public class ResearchSoulFireballs extends ProductionItem {
                 FormattedCharSequence.forward("", Style.EMPTY),
                 FormattedCharSequence.forward(I18n.get("research.reignofnether.soul_fireballs.tooltip1"), Style.EMPTY),
                 FormattedCharSequence.forward(I18n.get("research.reignofnether.soul_fireballs.tooltip2"), Style.EMPTY)
-            )
+            ),
+            this
         );
     }
 
-    public Button getCancelButton(ProductionPlacement prodBuilding, boolean first) {
-        return new Button(ResearchSoulFireballs.itemName,
-            14,
-            new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/soul_fireball.png"),
-            new ResourceLocation(ReignOfNether.MOD_ID, "textures/hud/icon_frame_bronze.png"),
-            null,
-            () -> false,
-            () -> false,
-            () -> true,
-            () -> BuildingServerboundPacket.cancelProduction(prodBuilding.minCorner, ProductionItems.RESEARCH_SOUL_FIREBALLS, first),
-            null,
-            null
+    public StopProductionButton getCancelButton(ProductionPlacement prodBuilding, boolean first) {
+        return new StopProductionButton(ResearchSoulFireballs.itemName,
+            ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/icons/items/soul_fireball.png"),
+            ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/hud/icon_frame_bronze.png"),
+            prodBuilding,
+            this,
+            first
         );
     }
 }

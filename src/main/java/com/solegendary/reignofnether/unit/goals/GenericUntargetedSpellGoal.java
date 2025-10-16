@@ -69,7 +69,7 @@ public class GenericUntargetedSpellGoal extends Goal {
                         }
                     }
                     else if (mob instanceof Unit unit) {
-                        this.ability.setToMaxCooldown();
+                        this.ability.setToMaxCooldown(unit);
                     }
                 }
                 this.ticksCasting = 0;

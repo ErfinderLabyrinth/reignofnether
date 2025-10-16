@@ -31,10 +31,9 @@ public class CallToArmsBuilding extends Ability {
 
     private static final int RANGE = TownCentre.MILITIA_RANGE;
 
-    public CallToArmsBuilding(Level level) {
+    public CallToArmsBuilding() {
         super(
                 UnitAction.CALL_TO_ARMS_BUILDING,
-                level,
                 0,
                 RANGE,
                 0,
@@ -45,10 +44,10 @@ public class CallToArmsBuilding extends Ability {
     }
 
     @Override
-    public AbilityButton getButton(Keybinding hotkey) {
+    public AbilityButton getButton(Keybinding hotkey, BuildingPlacement placement) {
         return new AbilityButton(
                 "Call To Arms (Building)",
-                new ResourceLocation("minecraft", "textures/item/bell.png"),
+                ResourceLocation.fromNamespaceAndPath("minecraft", "textures/item/bell.png"),
                 hotkey,
                 () -> false,
                 () -> false,
@@ -62,7 +61,8 @@ public class CallToArmsBuilding extends Ability {
                         FormattedCharSequence.forward(I18n.get("abilities.reignofnether.call_to_arms_building.tooltip2"), Style.EMPTY),
                         FormattedCharSequence.forward(I18n.get("abilities.reignofnether.call_to_arms_building.tooltip3", TownCentre.MILITIA_RANGE), Style.EMPTY)
                 ),
-                this
+                this,
+                placement
         );
     }
 

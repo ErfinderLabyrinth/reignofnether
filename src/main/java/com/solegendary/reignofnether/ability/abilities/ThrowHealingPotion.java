@@ -28,41 +28,40 @@ public class ThrowHealingPotion extends Ability {
 
     public static final int CD_MAX_SECONDS = 12;
 
-    private final WitchUnit witchUnit;
-
     public final Potion potion = Potions.STRONG_HEALING;
 
-    public ThrowHealingPotion(WitchUnit witchUnit) {
+    //TODO Fix potionThrowRange for Witches gathering on a building
+    public ThrowHealingPotion(int potionThrowRange) {
         super(UnitAction.THROW_HEALING_POTION,
-            witchUnit.level(),
             CD_MAX_SECONDS * ResourceCost.TICKS_PER_SECOND,
-            witchUnit.getPotionThrowRange(),
+                potionThrowRange,
             0,
             true,
             true
         );
-        this.witchUnit = witchUnit;
         this.autocastEnableAction = UnitAction.THROW_HEALING_POTION_AUTOCAST_ENABLE;
         this.autocastDisableAction = UnitAction.THROW_HEALING_POTION_AUTOCAST_DISABLE;
     }
 
     @Override
-    public AbilityButton getButton(Keybinding hotkey) {
+    public AbilityButton getButton(Keybinding hotkey, Unit unit) {
+        WitchUnit witchUnit = (WitchUnit) unit;
         return new AbilityButton("Healing Potion",
-            new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/splash_potion_healing.png"),
+            ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/icons/items/splash_potion_healing.png"),
             hotkey,
-            () -> CursorClientEvents.getLeftClickAction() == UnitAction.THROW_HEALING_POTION || isAutocasting(),
+            () -> CursorClientEvents.getLeftClickAction() == UnitAction.THROW_HEALING_POTION || isAutocasting(unit),
             () -> !ResearchClient.hasResearch(ProductionItems.RESEARCH_HEALING_POTIONS),
             () -> true,
             () -> CursorClientEvents.setLeftClickAction(UnitAction.THROW_HEALING_POTION),
-            this::toggleAutocast,
+            () -> toggleAutocast(unit),
             List.of(
                 fcs(I18n.get("abilities.reignofnether.healing_potion"), true),
                 fcsIcons(I18n.get("abilities.reignofnether.healing_potion.tooltip1", CD_MAX_SECONDS, witchUnit.getPotionThrowRange())),
                 fcs(I18n.get("abilities.reignofnether.healing_potion.tooltip2")),
                 fcs(I18n.get("abilities.reignofnether.autocast"))
             ),
-            this
+            this,
+            unit
         );
     }
 

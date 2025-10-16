@@ -8,6 +8,7 @@ import com.solegendary.reignofnether.building.buildings.placements.ProductionPla
 import com.solegendary.reignofnether.building.production.ProdDupeRule;
 import com.solegendary.reignofnether.building.production.ProductionItem;
 import com.solegendary.reignofnether.building.production.ProductionItems;
+import com.solegendary.reignofnether.building.production.StopProductionButton;
 import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.registrars.EntityRegistrar;
@@ -15,6 +16,7 @@ import com.solegendary.reignofnether.research.ResearchClient;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
+import com.solegendary.reignofnether.building.production.StartProductionButton;
 import com.solegendary.reignofnether.unit.UnitServerEvents;
 import com.solegendary.reignofnether.unit.units.monsters.ZombieUnit;
 import net.minecraft.client.resources.language.I18n;
@@ -56,18 +58,14 @@ public class ResearchHusks extends ProductionItem {
         return ResearchHusks.itemName;
     }
 
-    public Button getStartButton(ProductionPlacement prodBuilding, Keybinding hotkey) {
-        return new Button(ResearchHusks.itemName,
-            14,
-            new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/husk.png"),
-            new ResourceLocation(ReignOfNether.MOD_ID, "textures/hud/icon_frame_bronze.png"),
+    public StartProductionButton getStartButton(ProductionPlacement prodBuilding, Keybinding hotkey) {
+        return new StartProductionButton(ResearchHusks.itemName,
+            ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/mobheads/husk.png"),
+            ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/hud/icon_frame_bronze.png"),
             hotkey,
-            () -> false,
             () -> ProductionItems.RESEARCH_HUSKS.itemIsBeingProduced(prodBuilding.ownerName)
                 || ResearchClient.hasResearch(ProductionItems.RESEARCH_HUSKS),
             () -> BuildingClientEvents.hasFinishedBuilding(Buildings.GRAVEYARD),
-            () -> BuildingServerboundPacket.startProduction(ProductionItems.RESEARCH_HUSKS),
-            null,
             List.of(
                 FormattedCharSequence.forward(I18n.get("research.reignofnether.research_husks"), Style.EMPTY.withBold(true)),
                 ResourceCosts.getFormattedCost(cost),
@@ -77,22 +75,18 @@ public class ResearchHusks extends ProductionItem {
                 FormattedCharSequence.forward(I18n.get("research.reignofnether.research_husks.tooltip2"), Style.EMPTY),
                 FormattedCharSequence.forward("", Style.EMPTY),
                 FormattedCharSequence.forward(I18n.get("research.reignofnether.research_husks.tooltip3"), Style.EMPTY)
-            )
+            ),
+            this
         );
     }
 
-    public Button getCancelButton(ProductionPlacement prodBuilding, boolean first) {
-        return new Button(ResearchHusks.itemName,
-            14,
-            new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/husk.png"),
-            new ResourceLocation(ReignOfNether.MOD_ID, "textures/hud/icon_frame_bronze.png"),
-            null,
-            () -> false,
-            () -> false,
-            () -> true,
-            () -> BuildingServerboundPacket.cancelProduction(prodBuilding.minCorner, ProductionItems.RESEARCH_HUSKS, first),
-            null,
-            null
+    public StopProductionButton getCancelButton(ProductionPlacement prodBuilding, boolean first) {
+        return new StopProductionButton(ResearchHusks.itemName,
+            ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/mobheads/husk.png"),
+            ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/hud/icon_frame_bronze.png"),
+            prodBuilding,
+            this,
+            first
         );
     }
 }

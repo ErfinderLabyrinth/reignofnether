@@ -34,7 +34,7 @@ public class SculkCatalystPlacement extends BuildingPlacement implements RangeIn
     private final BlockPos sculkFixBp = null;
     public SculkCatalystPlacement(Building building, Level level, BlockPos originPos, Rotation rotation, String ownerName, ArrayList<BuildingBlock> blocks, boolean isCapitol) {
         super(building, level, originPos, rotation, ownerName, blocks, isCapitol);
-        Ability sacrifice = new Sacrifice(level);
+        Ability sacrifice = new Sacrifice();
         abilities.add(sacrifice);
     }
 
@@ -102,7 +102,7 @@ public class SculkCatalystPlacement extends BuildingPlacement implements RangeIn
             if (tickAgeAfterBuilt % 30 == 0) {
                 for (Ability ability : abilities) {
                     if (ability instanceof Sacrifice sacrifice &&
-                        sacrifice.isAutocasting() &&
+                        sacrifice.isAutocasting(this) &&
                         getNightRange() < SculkCatalyst.nightRangeMax) {
                         sacrifice.autoSacrifice(this);
                     }

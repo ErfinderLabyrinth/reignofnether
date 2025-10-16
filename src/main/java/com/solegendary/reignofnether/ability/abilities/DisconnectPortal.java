@@ -23,42 +23,46 @@ public class DisconnectPortal extends Ability {
     private static final int CD_MAX = 0;
     private static final int RANGE = 0;
 
-    PortalPlacement portalPlacement;
-
-    public DisconnectPortal(PortalPlacement portalPlacement) {
+    public DisconnectPortal() {
         super(
             UnitAction.DISCONNECT_PORTAL,
-            portalPlacement.getLevel(),
             CD_MAX,
             RANGE,
             0,
             true
         );
-        this.portalPlacement = portalPlacement;
         this.defaultHotkey = Keybindings.keyE;
     }
 
     @Override
-    public AbilityButton getButton(Keybinding hotkey) {
+    public AbilityButton getButton(Keybinding hotkey, BuildingPlacement placement) {
+        if (!(placement instanceof PortalPlacement)) return null;
+        PortalPlacement portal = (PortalPlacement) placement;
         return new AbilityButton(
             "Sever Connection",
-            new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/barrier.png"),
+            ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/icons/items/barrier.png"),
             hotkey,
             () -> false,
-            () -> !portalPlacement.hasDestination(),
+            () -> {
+                // hidden if the portal does not have a connection Or isn't a transport portal
+                if (portal.getPortalType() != PortalPlacement.PortalType.TRANSPORT)
+                    return true;
+                return !portal.hasDestination();
+            },
             () -> true,
             () -> UnitClientEvents.sendUnitCommand(UnitAction.DISCONNECT_PORTAL),
             null,
             List.of(
                     FormattedCharSequence.forward(I18n.get("abilities.reignofnether.disconnect_portal"), Style.EMPTY.withBold(true))
             ),
-            this
+            this,
+            placement
         );
     }
 
     @Override
-    public void use(Level level, BuildingPlacement buildingUsing, BlockPos targetBp) {
-        if (buildingUsing == portalPlacement)
+    public void use(Level level, BuildingPlacement building, BlockPos targetBp) {
+        if (building instanceof PortalPlacement portalPlacement)
             portalPlacement.disconnectPortal();
     }
 }

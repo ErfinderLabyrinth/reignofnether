@@ -23,23 +23,20 @@ public class SetFangsLine extends Ability {
 
     public static final int CD_MAX_SECONDS = 7;
 
-    private final EvokerUnit evokerUnit;
-
-    public SetFangsLine(EvokerUnit evokerUnit) {
+    public SetFangsLine() {
         super(UnitAction.SET_FANGS_LINE,
-            evokerUnit.level(),
             CD_MAX_SECONDS * ResourceCost.TICKS_PER_SECOND,
             EvokerUnit.FANGS_RANGE_LINE,
             0,
             true
         );
-        this.evokerUnit = evokerUnit;
     }
 
     @Override
-    public AbilityButton getButton(Keybinding hotkey) {
+    public AbilityButton getButton(Keybinding hotkey, Unit unit) {
+        EvokerUnit evokerUnit = (EvokerUnit) unit;
         return new AbilityButton("Evoker Fangs (Line)",
-            new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/shears.png"),
+            ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/icons/items/shears.png"),
             hotkey,
             () -> evokerUnit.isUsingLineFangs,
             () -> false,
@@ -63,33 +60,36 @@ public class SetFangsLine extends Ability {
                     Style.EMPTY
                 )
             ),
-            this
+            this,
+            unit
         );
     }
 
-    public void setCooldownSingle(float cooldown) {
-        super.setCooldown(cooldown);
+    public void setCooldownSingle(float cooldown, Unit unit) {
+        super.setCooldown(cooldown, unit);
     }
 
     @Override
-    public void setCooldown(float cooldown) {
+    public void setCooldown(float cooldown, Unit unit) {
+        EvokerUnit evokerUnit = (EvokerUnit) unit;
         if (evokerUnit.hasVigorEnchant())
             cooldown *= EnchantVigor.cooldownMultiplier;
 
-        super.setCooldown(cooldown);
-        for (Ability ability : this.evokerUnit.getAbilities())
+        super.setCooldown(cooldown, unit);
+        for (Ability ability : evokerUnit.getAbilities().get())
             if (ability instanceof SetFangsCircle ab) {
-                ab.setCooldownSingle(cooldown);
+                ab.setCooldownSingle(cooldown, unit);
             }
     }
 
     @Override
     public void use(Level level, Unit unitUsing, BlockPos targetBp) {
+        EvokerUnit evokerUnit = (EvokerUnit) unitUsing;
         evokerUnit.isUsingLineFangs = true;
     }
 
     @Override
-    public boolean canBypassCooldown() {
+    public boolean canBypassCooldown(Unit unit) {
         return true;
     }
 

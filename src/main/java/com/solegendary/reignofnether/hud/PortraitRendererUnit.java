@@ -391,7 +391,7 @@ public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<
                 atkStr += "+" + (int) passenger.getUnitAttackDamage();
             }
             renderedStats.add(new RenderedStat(
-                    new ResourceLocation("reignofnether", "textures/icons/items/sword.png"),
+                    ResourceLocation.fromNamespaceAndPath("reignofnether", "textures/icons/items/sword.png"),
                     atkStr,
                     UnitStatType.ATTACK_DAMAGE,
                     unit.hasBonusDamage() ? 0xFF2BFF2B : 0xFFFFFFFF,
@@ -399,7 +399,7 @@ public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<
             ));
             DecimalFormat df2 = new DecimalFormat("###.##");
             renderedStats.add(new RenderedStat(
-                    new ResourceLocation("reignofnether","textures/icons/items/sparkler.png"),
+                    ResourceLocation.fromNamespaceAndPath("reignofnether","textures/icons/items/sparkler.png"),
                     String.valueOf(df2.format(attackerUnit.getAttacksPerSecond())),
                     UnitStatType.ATTACK_SPEED,
                     unit.hasBonusAttackSpeed() ? 0xFF2BFF2B : 0xFFFFFFFF,
@@ -413,7 +413,7 @@ public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<
                 rangeStr = String.valueOf((int) (attackerUnit.getAttackRange()));
             }
             renderedStats.add(new RenderedStat(
-                    new ResourceLocation("reignofnether","textures/icons/items/bow.png"),
+                    ResourceLocation.fromNamespaceAndPath("reignofnether","textures/icons/items/bow.png"),
                     rangeStr,
                     UnitStatType.RANGE
             ));
@@ -457,9 +457,9 @@ public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<
             armourStr = "~" + (int) ((1 - avgArmourInv) * 100) + "%";
             armourColor = 0xFF42DDDD;
         }
-        
+
         renderedStats.add(new RenderedStat(
-                new ResourceLocation("reignofnether", "textures/icons/items/chestplate.png"),
+                ResourceLocation.fromNamespaceAndPath("reignofnether", "textures/icons/items/chestplate.png"),
                 armourStr,
                 UnitStatType.ARMOUR,
                 armourColor,
@@ -481,7 +481,7 @@ public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<
             msColour = 0xFF2BFF2B;
         }
         renderedStats.add(new RenderedStat(
-                new ResourceLocation("reignofnether","textures/icons/items/boots.png"),
+                ResourceLocation.fromNamespaceAndPath("reignofnether","textures/icons/items/boots.png"),
                 String.valueOf(msInt),
                 UnitStatType.MOVEMENT_SPEED,
                 msColour,
@@ -539,7 +539,7 @@ public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<
 
         y -= HERO_Y_OFFSET;
 
-        ResourceLocation expBarEmptyRl = new ResourceLocation(ReignOfNether.MOD_ID, "textures/hud/experience_bar_empty.png");
+        ResourceLocation expBarEmptyRl = ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/hud/experience_bar_empty.png");
         RenderSystem.setShaderTexture(0, expBarEmptyRl);
         guiGraphics.blit(expBarEmptyRl,
                 x, y, 0,
@@ -547,7 +547,7 @@ public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<
                 width, height, // dimensions of blit texture
                 width, height // size of texture itself (if < dimensions, texture is repeated)
         );
-        ResourceLocation expBarFullRl = new ResourceLocation(ReignOfNether.MOD_ID, "textures/hud/experience_bar_full.png");
+        ResourceLocation expBarFullRl = ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/hud/experience_bar_full.png");
         RenderSystem.setShaderTexture(0, expBarFullRl);
         float expPercent = (float) heroUnit.getExpOnCurrentLevel() / heroUnit.getExpToNextlevel();
         if (heroUnit.getHeroLevel() >= HeroUnit.MAX_LEVEL)
@@ -584,11 +584,11 @@ public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<
         int blitYIcon = y + 7;
 
         // prep strings/icons to render
-        List<ResourceLocation> textureStatIcons = List.of(new ResourceLocation("reignofnether",
+        List<ResourceLocation> textureStatIcons = List.of(ResourceLocation.fromNamespaceAndPath("reignofnether",
                 "textures/icons/items/wheat.png"
             ),
-            new ResourceLocation("reignofnether", "textures/icons/items/wood.png"),
-            new ResourceLocation("reignofnether", "textures/icons/items/iron_ore.png")
+            ResourceLocation.fromNamespaceAndPath("reignofnether", "textures/icons/items/wood.png"),
+            ResourceLocation.fromNamespaceAndPath("reignofnether", "textures/icons/items/iron_ore.png")
         );
 
         List<String> statStrings = List.of(String.valueOf(resources.food),

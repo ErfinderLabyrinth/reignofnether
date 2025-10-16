@@ -321,7 +321,7 @@ public class BuildingClientEvents {
         if (minY < 0) {
             minY -= 1;
         }
-        ResourceLocation rl = new ResourceLocation("forge:textures/white.png");
+        ResourceLocation rl = ResourceLocation.parse("forge:textures/white.png");
         AABB aabb = new AABB(minX, minY, minZ, maxX, minY, maxZ);
         MyRenderer.drawLineBox(matrix, aabb, r, g, 0, 0.5f);
         MyRenderer.drawSolidBox(matrix, aabb, Direction.UP, r, g, 0, 0.5f, rl);
@@ -658,7 +658,7 @@ public class BuildingClientEvents {
                             AABB aabb = new AABB(bp);
                             aabb = aabb.setMaxY(aabb.maxY + 0.13f);
                             MyRenderer.drawSolidBox(evt.getPoseStack(), aabb, Direction.UP, 0, 1, 0, a,
-                                    new ResourceLocation("forge:textures/white.png"));
+                                    ResourceLocation.fromNamespaceAndPath("forge", "textures/white.png"));
                         } else {
                             MyRenderer.drawBlockFace(evt.getPoseStack(), Direction.UP, bp, 0, 1, 0, a);
                         }

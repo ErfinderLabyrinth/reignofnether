@@ -3,7 +3,7 @@ package com.solegendary.reignofnether.ability.abilities;
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.building.BuildingPlacement;
-import com.solegendary.reignofnether.building.buildings.villagers.Castle;
+import com.solegendary.reignofnether.building.buildings.placements.CastlePlacement;
 import com.solegendary.reignofnether.cursor.CursorClientEvents;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.hud.HudClientEvents;
@@ -41,11 +41,9 @@ public class PromoteIllager extends Ability {
     private static final int BUFF_RANGE = 10;
 
     LivingEntity promotedIllager = null;
-    BuildingPlacement buildingPlacement;
 
-    public PromoteIllager(BuildingPlacement buildingPlacement) {
-        super(UnitAction.PROMOTE_ILLAGER, buildingPlacement.getLevel(), CD_MAX, RANGE, 0, true, true);
-        this.buildingPlacement = buildingPlacement;
+    public PromoteIllager() {
+        super(UnitAction.PROMOTE_ILLAGER, CD_MAX, RANGE, 0, true, true);
         this.defaultHotkey = Keybindings.keyW;
     }
 
@@ -70,14 +68,14 @@ public class PromoteIllager extends Ability {
     }
 
     @Override
-    public AbilityButton getButton(Keybinding hotkey) {
+    public AbilityButton getButton(Keybinding hotkey, BuildingPlacement placement) {
         return new AbilityButton("Promote Illager",
-            new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/ominous_banner.png"),
+            ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/icons/items/ominous_banner.png"),
             hotkey,
             () -> false,
             () -> {
-                if (buildingPlacement.getBuilding() instanceof Castle castle) {
-                    return buildingPlacement.getUpgradeLevel() == 0;
+                if (placement instanceof CastlePlacement castle) {
+                    return castle.getUpgradeLevel() == 0;
                 }
                 return true;
             },
@@ -102,7 +100,8 @@ public class PromoteIllager extends Ability {
                 FormattedCharSequence.forward("", Style.EMPTY),
                 FormattedCharSequence.forward(I18n.get("abilities.reignofnether.promote_illager.tooltip4"), Style.EMPTY)
             ),
-            this
+            this,
+            placement
         );
     }
 
@@ -124,7 +123,7 @@ public class PromoteIllager extends Ability {
                 }
                 return;
             }
-            if (!unit.getOwnerName().equals(this.buildingPlacement.ownerName)) {
+            if (!unit.getOwnerName().equals(buildingUsing.ownerName)) {
                 if (level.isClientSide()) {
                     HudClientEvents.showTemporaryMessage(I18n.get("abilities.reignofnether.promote_illager.error3"));
                 }
@@ -142,7 +141,7 @@ public class PromoteIllager extends Ability {
             if (!level.isClientSide()) {
                 MiscUtil.shootFirework(level, promotedIllager.getEyePosition());
             }
-            this.setToMaxCooldown();
+            this.setToMaxCooldown(buildingUsing);
         } else {
             if (level.isClientSide()) {
                 HudClientEvents.showTemporaryMessage(I18n.get("abilities.reignofnether.promote_illager.error4"));

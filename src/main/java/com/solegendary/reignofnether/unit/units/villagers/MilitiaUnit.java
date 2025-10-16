@@ -1,5 +1,6 @@
 package com.solegendary.reignofnether.unit.units.villagers;
 
+import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.BackToWorkUnit;
 import com.solegendary.reignofnether.ability.abilities.PromoteIllager;
@@ -25,6 +26,7 @@ import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.packets.UnitAnimationClientboundPacket;
 import com.solegendary.reignofnether.unit.packets.UnitConvertClientboundPacket;
 import com.solegendary.reignofnether.util.Faction;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -59,6 +61,15 @@ import java.util.UUID;
 import static com.solegendary.reignofnether.survival.SurvivalServerEvents.ENEMY_OWNER_NAME;
 
 public class MilitiaUnit extends Vindicator implements Unit, AttackerUnit, RangedAttackerUnit, VillagerDataHolder, ConvertableUnit {
+    public static final Abilities ABILITIES = new Abilities();
+    static {
+        ABILITIES.add(new BackToWorkUnit(), Keybindings.build);
+    }
+
+    Object2ObjectArrayMap<Ability, Float> cooldowns = Unit.createCooldownMap();
+    Object2ObjectArrayMap<Ability, Integer> charges = new Object2ObjectArrayMap<>();
+
+    Ability autocast;
     // region
     private int eatingTicksLeft = 0;
     public void setEatingTicksLeft(int amount) { eatingTicksLeft = amount; }
@@ -79,8 +90,7 @@ public class MilitiaUnit extends Vindicator implements Unit, AttackerUnit, Range
     public boolean canUsePortal() { return getUsePortalGoal() != null; }
 
     public Faction getFaction() {return Faction.VILLAGERS;}
-    public List<AbilityButton> getAbilityButtons() {return abilityButtons;};
-    public List<Ability> getAbilities() {return abilities;}
+    public Abilities getAbilities() {return abilities;}
     public List<ItemStack> getItems() {return items;};
     public MoveToTargetBlockGoal getMoveGoal() {return moveGoal;}
     public SelectedTargetGoal<? extends LivingEntity> getTargetGoal() {return targetGoal;}
@@ -171,15 +181,15 @@ public class MilitiaUnit extends Vindicator implements Unit, AttackerUnit, Range
 
     public boolean isCaptain = false;
 
-    private final List<AbilityButton> abilityButtons = new ArrayList<>();
-    private final List<Ability> abilities = new ArrayList<>();
+    private List<AbilityButton> abilityButtons;
+    private Abilities abilities;
     private final List<ItemStack> items = new ArrayList<>();
 
     public MilitiaUnit(EntityType<? extends Vindicator> entityType, Level level) {
         super(entityType, level);
-        this.abilities.add(new BackToWorkUnit(this));
-        this.abilities.add(new WeaponSwapBow(this));
-        this.abilities.add(new WeaponSwapSword(this));
+        this.abilities.add(new BackToWorkUnit());
+        this.abilities.add(new WeaponSwapBow());
+        this.abilities.add(new WeaponSwapSword());
         updateAbilityButtons();
     }
 
@@ -212,15 +222,6 @@ public class MilitiaUnit extends Vindicator implements Unit, AttackerUnit, Range
                 this.goalSelector.removeGoal(rangedAttackGoal);
                 this.goalSelector.addGoal(2, attackGoal);
             }
-        }
-    }
-
-    public void updateAbilityButtons() {
-        if (level().isClientSide()) {
-            this.abilityButtons.clear();
-            this.abilityButtons.add(this.abilities.get(0).getButton(Keybindings.build));
-            this.abilityButtons.add(this.abilities.get(1).getButton(Keybindings.keyW));
-            this.abilityButtons.add(this.abilities.get(2).getButton(Keybindings.keyW));
         }
     }
 
@@ -426,6 +427,32 @@ public class MilitiaUnit extends Vindicator implements Unit, AttackerUnit, Range
     public void setVillagerData(VillagerData p_35437_) {
         VillagerData villagerdata = this.getVillagerData();
         this.entityData.set(VILLAGER_DATA, p_35437_);
+    }
+
+    @Override
+    public void updateAbilityButtons() {
+        abilities = ABILITIES.clone();
+        autocast = ABILITIES.getDefaultAutocast();
+    }
+
+    @Override
+    public Object2ObjectArrayMap<Ability, Float> getCooldowns() {
+        return cooldowns;
+    }
+
+    @Override
+    public boolean hasAutocast(Ability ability) {
+        return autocast == ability;
+    }
+
+    @Override
+    public void setAutocast(Ability autocast) {
+        this.autocast = autocast;
+    }
+
+    @Override
+    public Object2ObjectArrayMap<Ability, Integer> getCharges() {
+        return charges;
     }
 
     static {

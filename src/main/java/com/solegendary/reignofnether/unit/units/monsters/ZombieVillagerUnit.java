@@ -1,10 +1,15 @@
 package com.solegendary.reignofnether.unit.units.monsters;
 
+import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.ability.Ability;
-import com.solegendary.reignofnether.building.Buildings;
+import com.solegendary.reignofnether.api.ReignOfNetherRegistries;
+import com.solegendary.reignofnether.building.Building;
+import com.solegendary.reignofnether.building.BuildingPlaceButton;
+import com.solegendary.reignofnether.building.BuildingUtils;
 import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.hud.AbilityButton;
-import com.solegendary.reignofnether.keybinds.Keybindings;
+import com.solegendary.reignofnether.hud.Button;
+import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.research.ResearchClient;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
 import com.solegendary.reignofnether.resources.ResourceCost;
@@ -18,6 +23,7 @@ import com.solegendary.reignofnether.unit.interfaces.WorkerUnit;
 import com.solegendary.reignofnether.unit.modelling.models.VillagerUnitModel;
 import com.solegendary.reignofnether.unit.units.villagers.VillagerUnit;
 import com.solegendary.reignofnether.util.Faction;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -40,6 +46,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -47,6 +55,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ZombieVillagerUnit extends Vindicator implements Unit, WorkerUnit, AttackerUnit, ArmSwingingUnit {
+    public static final Abilities ABILITIES = new Abilities();
+
+    Object2ObjectArrayMap<Ability, Float> cooldowns = Unit.createCooldownMap();
+    Object2ObjectArrayMap<Ability, Integer> charges = new Object2ObjectArrayMap<>();
+
+    Ability autocast;
+
     // region
     private int eatingTicksLeft = 0;
     public void setEatingTicksLeft(int amount) { eatingTicksLeft = amount; }
@@ -67,8 +82,7 @@ public class ZombieVillagerUnit extends Vindicator implements Unit, WorkerUnit, 
     public boolean canUsePortal() { return getUsePortalGoal() != null; }
 
     public Faction getFaction() {return Faction.MONSTERS;}
-    public List<AbilityButton> getAbilityButtons() {return abilityButtons;}
-    public List<Ability> getAbilities() {return abilities;}
+    public Abilities getAbilities() {return abilities;}
     public List<ItemStack> getItems() {return items;};
     public MoveToTargetBlockGoal getMoveGoal() {return moveGoal;}
     public SelectedTargetGoal<? extends LivingEntity> getTargetGoal() {return targetGoal;}
@@ -144,8 +158,7 @@ public class ZombieVillagerUnit extends Vindicator implements Unit, WorkerUnit, 
     final static public float movementSpeed = 0.25f;
     public int maxResources = 100;
 
-    private final List<AbilityButton> abilityButtons = new ArrayList<>();
-    private final List<Ability> abilities = new ArrayList<>();
+    private Abilities abilities = ABILITIES.clone();
     private final List<ItemStack> items = new ArrayList<>();
 
     private boolean isSwingingArmOnce = false;
@@ -172,36 +185,28 @@ public class ZombieVillagerUnit extends Vindicator implements Unit, WorkerUnit, 
                 (this.getBuildRepairGoal() != null && this.getBuildRepairGoal().isBuilding()));
     }
 
-    public static List<AbilityButton> getBuildingButtons() {
-        return List.of(
-                Buildings.MAUSOLEUM.getBuildButton(Keybindings.keyQ),
-                Buildings.SPRUCE_STOCKPILE.getBuildButton(Keybindings.keyW),
-                Buildings.HAUNTED_HOUSE.getBuildButton(Keybindings.keyE),
-                Buildings.PUMPKIN_FARM.getBuildButton(Keybindings.keyR),
-                Buildings.DARK_WATCHTOWER.getBuildButton(Keybindings.keyT),
-                Buildings.GRAVEYARD.getBuildButton(Keybindings.keyY),
-                Buildings.DUNGEON.getBuildButton(Keybindings.keyU),
-                Buildings.SPIDER_LAIR.getBuildButton(Keybindings.keyI),
-                Buildings.SLIME_PIT.getBuildButton(Keybindings.keyO),
-                Buildings.LABORATORY.getBuildButton(Keybindings.keyP),
-                Buildings.STRONGHOLD.getBuildButton(Keybindings.keyL),
-                Buildings.ALTAR_OF_DARKNESS.getBuildButton(Keybindings.keyF),
-                Buildings.SPRUCE_BRIDGE.getBuildButton(Keybindings.keyC),
-                Buildings.SCULK_CATALYST.getBuildButton(Keybindings.keyV),
-                Buildings.BEACON.getBuildButton(null)
-        );
+    public static List<BuildingPlaceButton> getBuildingButtons() {
+        List<BuildingPlaceButton> buildingButtons = new ArrayList<>();
+
+        List<Keybinding> keybindings = BuildingUtils.keybindings;
+        int index = 0;
+
+        for (Building building : ReignOfNetherRegistries.BUILDING) {
+            if (building.isBuildableBuildingForFaction(Faction.MONSTERS)) {
+                BuildingPlaceButton button = building.getBuildButton(index >= keybindings.size() ? null : keybindings.get(index));
+                if (button != null) {
+                    buildingButtons.add(button);
+                    index++;
+                }
+            }
+        }
+        return buildingButtons;
     }
 
     public ZombieVillagerUnit(EntityType<? extends Vindicator> entityType, Level level) {
         super(entityType, level);
-        updateAbilityButtons();
-    }
 
-    public void updateAbilityButtons() {
-        if (level().isClientSide()) {
-            this.abilityButtons.clear();
-            this.abilityButtons.addAll(getBuildingButtons());
-        }
+        updateAbilityButtons();
     }
 
     @Override
@@ -314,5 +319,41 @@ public class ZombieVillagerUnit extends Vindicator implements Unit, WorkerUnit, 
     public void setupEquipmentAndUpgradesServer() {
         if (ResearchServerEvents.playerHasResearch(this.getOwnerName(), ProductionItems.RESEARCH_RESOURCE_CAPACITY))
             this.maxResources = 200;
+    }
+
+    @Override
+    public void updateAbilityButtons() {
+        this.abilities = ABILITIES.clone();
+        autocast = ABILITIES.getDefaultAutocast();
+    }
+
+    @Override
+    public Object2ObjectArrayMap<Ability, Float> getCooldowns() {
+        return cooldowns;
+    }
+
+    @Override
+    public boolean hasAutocast(Ability ability) {
+        return autocast == ability;
+    }
+
+    @Override
+    public void setAutocast(Ability autocast) {
+        this.autocast = autocast;
+    }
+
+    @Override
+    public Object2ObjectArrayMap<Ability, Integer> getCharges() {
+        return charges;
+    }
+
+    @Override
+    public List<Button> getAbilityButtons() {
+        List<Button> abilities = new ArrayList<>(getAbilities().getButtons(this));
+        //TODO Remove need for I18n
+        if (FMLEnvironment.dist == Dist.CLIENT) {
+            abilities.addAll(getBuildingButtons());
+        }
+        return abilities;
     }
 }

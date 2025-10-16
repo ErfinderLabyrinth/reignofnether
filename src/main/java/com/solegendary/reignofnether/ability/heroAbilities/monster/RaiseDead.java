@@ -34,13 +34,13 @@ public class RaiseDead extends HeroAbility {
     private static final int CD_MAX_SECONDS = 75 * ResourceCost.TICKS_PER_SECOND;
     public static final int ZOMBIE_TICKS_BEFORE_DECAY = 60 * ResourceCost.TICKS_PER_SECOND;
 
-    public RaiseDead(HeroUnit hero) {
-        super(hero, 3, 75, UnitAction.RAISE_DEAD, CD_MAX_SECONDS, 0, 0, false);
+    public RaiseDead() {
+        super(3, 75, UnitAction.RAISE_DEAD, CD_MAX_SECONDS, 0, 0, false);
     }
 
     @Override
-    public boolean isCasting() {
-        if (this.hero instanceof NecromancerUnit necromancerUnit) {
+    public boolean isCasting(Unit unit) {
+        if (unit instanceof NecromancerUnit necromancerUnit) {
             GenericUntargetedSpellGoal goal = necromancerUnit.getCastRaiseDeadGoal();
             if (goal != null)
                 return goal.isCasting();
@@ -49,31 +49,34 @@ public class RaiseDead extends HeroAbility {
     }
 
     @Override
-    public AbilityButton getButton(Keybinding hotkey) {
+    public AbilityButton getButton(Keybinding hotkey, Unit unit) {
+        if (!(unit instanceof HeroUnit hero)) return null;
         return new AbilityButton("Raise Dead",
-                new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/zombie.png"),
+                ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/mobheads/zombie.png"),
                 hotkey,
                 () -> false,
-                () -> rank <= 0,
+                () -> getRank(hero) <= 0,
                 () -> true,
                 () -> sendUnitCommand(UnitAction.RAISE_DEAD),
                 null,
-                getTooltipLines(),
-                this
+                getTooltipLines(hero),
+                this,
+                hero
         );
     }
 
     @Override
-    public Button getRankUpButton() {
+    public Button getRankUpButton(HeroUnit hero) {
         return super.getRankUpButtonProtected(
-            "Raise Dead",
-            new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/zombie.png")
+                "Raise Dead",
+                ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/mobheads/zombie.png"),
+                hero
         );
     }
 
-    public List<FormattedCharSequence> getTooltipLines() {
+    public List<FormattedCharSequence> getTooltipLines(HeroUnit hero) {
         return List.of(
-                fcs(I18n.get("abilities.reignofnether.raise_dead") + " " + rankString(), true),
+                fcs(I18n.get("abilities.reignofnether.raise_dead") + " " + rankString(hero), true),
                 fcsIcons(I18n.get("abilities.reignofnether.raise_dead.stats", CD_MAX_SECONDS / 20, manaCost)),
                 fcs(""),
                 fcs(I18n.get("abilities.reignofnether.raise_dead.tooltip1")),
@@ -82,17 +85,17 @@ public class RaiseDead extends HeroAbility {
         );
     }
 
-    public List<FormattedCharSequence> getRankUpTooltipLines() {
+    public List<FormattedCharSequence> getRankUpTooltipLines(HeroUnit hero) {
         return List.of(
                 fcs(I18n.get("abilities.reignofnether.raise_dead"), true),
-                fcs(I18n.get("abilities.reignofnether.level_req", getLevelRequirement()), getLevelReqStyle()),
+                fcs(I18n.get("abilities.reignofnether.level_req", getLevelRequirement(hero)), getLevelReqStyle(hero)),
                 fcs(""),
                 fcs(I18n.get("abilities.reignofnether.raise_dead.tooltip1")),
                 fcs(I18n.get("abilities.reignofnether.raise_dead.tooltip2")),
                 fcs(""),
-                fcs(I18n.get("abilities.reignofnether.raise_dead.rank1"), rank == 0),
-                fcs(I18n.get("abilities.reignofnether.raise_dead.rank2"), rank == 1),
-                fcs(I18n.get("abilities.reignofnether.raise_dead.rank3"), rank == 2)
+                fcs(I18n.get("abilities.reignofnether.raise_dead.rank1"), getRank(hero) == 0),
+                fcs(I18n.get("abilities.reignofnether.raise_dead.rank2"), getRank(hero) == 1),
+                fcs(I18n.get("abilities.reignofnether.raise_dead.rank3"), getRank(hero) == 2)
         );
     }
 

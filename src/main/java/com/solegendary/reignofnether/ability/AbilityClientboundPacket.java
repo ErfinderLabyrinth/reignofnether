@@ -28,9 +28,9 @@ public class AbilityClientboundPacket {
     private static void setServersideCooldown(int unitId, UnitAction unitAction, float cooldown) {
         for (LivingEntity entity : UnitServerEvents.getAllUnits())
             if (entity.getId() == unitId && entity instanceof Unit unit)
-                for (Ability ability : unit.getAbilities())
+                for (Ability ability : unit.getAbilities().get())
                     if (ability.action == unitAction) {
-                        ability.setCooldown(cooldown);
+                        ability.setCooldown(cooldown, unit);
                         return;
                     }
     }
@@ -89,9 +89,9 @@ public class AbilityClientboundPacket {
                         }
                     }
                     if (isSettingCooldown && unit != null) {
-                        for (Ability ability : unit.getAbilities()) {
+                        for (Ability ability : unit.getAbilities().get()) {
                             if (ability.action == this.unitAction) {
-                                ability.setCooldown(this.value);
+                                ability.setCooldown(this.value, unit);
                                 return;
                             }
                         }

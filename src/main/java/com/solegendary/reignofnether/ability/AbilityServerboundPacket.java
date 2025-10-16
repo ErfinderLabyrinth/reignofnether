@@ -4,6 +4,7 @@ import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.registrars.PacketHandler;
 import com.solegendary.reignofnether.unit.UnitAction;
 import com.solegendary.reignofnether.unit.UnitServerEvents;
+import com.solegendary.reignofnether.unit.interfaces.HeroUnit;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -60,9 +61,9 @@ public class AbilityServerboundPacket {
                         return;
                     }
 
-                    for (Ability ability : unit.getAbilities()) {
-                        if (ability.action == this.unitAction && ability instanceof HeroAbility heroAbility) {
-                            heroAbility.rankUp();
+                    for (Ability ability : unit.getAbilities().get()) {
+                        if (ability.action == this.unitAction && ability instanceof HeroAbility heroAbility && unit instanceof HeroUnit hero) {
+                            heroAbility.rankUp(hero);
                         }
                     }
                 }

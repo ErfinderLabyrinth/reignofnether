@@ -1,6 +1,5 @@
 package com.solegendary.reignofnether.building.buildings.placements;
 
-import com.solegendary.reignofnether.ability.abilities.*;
 import com.solegendary.reignofnether.alliance.AlliancesServerEvents;
 import com.solegendary.reignofnether.building.*;
 import com.solegendary.reignofnether.building.buildings.neutral.Beacon;
@@ -50,12 +49,6 @@ public class BeaconPlacement extends ProductionPlacement implements RangeIndicat
         for (BuildingBlock bb : blocks)
             if (bb.getBlockState().getBlock() == Blocks.BEACON)
                 beaconPos = bb.getBlockPos();
-
-        this.abilities.add(new BeaconWealth(this));
-        this.abilities.add(new BeaconHaste(this));
-        this.abilities.add(new BeaconRegeneration(this));
-        this.abilities.add(new BeaconResistance(this));
-        this.abilities.add(new BeaconStrength(this));
     }
 
     @Override

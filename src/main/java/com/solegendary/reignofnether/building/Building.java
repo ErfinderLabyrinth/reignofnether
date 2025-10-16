@@ -1,5 +1,6 @@
 package com.solegendary.reignofnether.building;
 
+import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.resources.ResourceCost;
@@ -45,6 +46,12 @@ public abstract class Building {
     public final ArrayList<Block> startingBlockTypes = new ArrayList();
 
     public int foundationYLayers = 1; // how many Y layers from the bottom are part of the foundation
+
+    protected final Abilities abilities = new Abilities();
+
+    public Abilities getAbilities() {
+        return this.abilities;
+    }
 
     public Building(String structureName, ResourceCost cost, boolean isCapitol) {
         this.structureName = structureName;
@@ -105,9 +112,11 @@ public abstract class Building {
         return 0;
     }
 
-    public abstract AbilityButton getBuildButton(Keybinding var1);
+    public abstract BuildingPlaceButton getBuildButton(Keybinding var1);
 
     public boolean isTypeOf(Building building) {
         return this == building;
     }
+
+    public abstract boolean isBuildableBuildingForFaction(Faction faction);
 }

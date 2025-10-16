@@ -1,8 +1,12 @@
 package com.solegendary.reignofnether.hud;
 
-import com.solegendary.reignofnether.ability.HeroAbility;
-import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.ability.Ability;
+import com.solegendary.reignofnether.ability.HeroAbility;
+import com.solegendary.reignofnether.ability.abilities.Sacrifice;
+import com.solegendary.reignofnether.building.BuildingPlacement;
+import com.solegendary.reignofnether.keybinds.Keybinding;
+import com.solegendary.reignofnether.unit.interfaces.HeroUnit;
+import com.solegendary.reignofnether.unit.interfaces.Unit;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.resources.ResourceLocation;
@@ -19,10 +23,12 @@ public class AbilityButton extends Button {
     public Ability ability;
     public String extraLabel = "";
     public int extraLabelColour = 0xFFFFFF;
+    @Nullable private Unit unit;
+    @Nullable private BuildingPlacement placement;
 
     public AbilityButton(String name, ResourceLocation rl, Keybinding hotkey, Supplier<Boolean> isSelected,
                          Supplier<Boolean> isHidden, Supplier<Boolean> isEnabled, Runnable onLeftClick, Runnable onRightClick,
-                         List<FormattedCharSequence> tooltipLines, @Nullable Ability ability) {
+                         List<FormattedCharSequence> tooltipLines, @Nullable Ability ability, Unit unit) {
 
         // generate x/y based on given position (starting at 0 which is bottom left 1 row above generic action buttons)
         super(name, Button.itemIconSize, rl, hotkey, isSelected, isHidden, isEnabled, onLeftClick, onRightClick, tooltipLines);
@@ -31,13 +37,34 @@ public class AbilityButton extends Button {
 
         Runnable originalOnLeftClick = this.onLeftClick;
         this.onLeftClick = () -> {
-            if (this.ability != null && (this.ability.getCooldown() > 0 && !this.ability.canBypassCooldown()))
+            if (this.ability != null && (this.ability.getCooldown(unit) > 0 && !this.ability.canBypassCooldown(unit)))
                 HudClientEvents.showTemporaryMessage(I18n.get("hud.buttons.reignofnether.on_cooldown"));
-            if (this.ability instanceof HeroAbility heroAbility && heroAbility.manaCost > 0 && heroAbility.hero.getMana() < heroAbility.manaCost)
+            else if (this.ability instanceof HeroAbility heroAbility && heroAbility.manaCost > 0 && unit instanceof HeroUnit hero && hero.getMana() < heroAbility.manaCost)
                 HudClientEvents.showTemporaryMessage(I18n.get("hud.buttons.reignofnether.not_enough_mana"));
             else if (originalOnLeftClick != null)
                 originalOnLeftClick.run();
         };
+        this.unit = unit;
+    }
+
+    public AbilityButton(String name, ResourceLocation rl, Keybinding hotkey, Supplier<Boolean> isSelected,
+                         Supplier<Boolean> isHidden, Supplier<Boolean> isEnabled, Runnable onLeftClick, Runnable onRightClick,
+                         List<FormattedCharSequence> tooltipLines, @Nullable Ability ability, BuildingPlacement placement) {
+
+        // generate x/y based on given position (starting at 0 which is bottom left 1 row above generic action buttons)
+        super(name, Button.itemIconSize, rl, hotkey, isSelected, isHidden, isEnabled, onLeftClick, onRightClick, tooltipLines);
+
+        this.ability = ability;
+
+        Runnable originalOnLeftClick = this.onLeftClick;
+        this.onLeftClick = () -> {
+            if (this.ability != null && (this.ability.getCooldown(placement) > 0 && !this.ability.canBypassCooldown(building)))
+                HudClientEvents.showTemporaryMessage(I18n.get("hud.buttons.reignofnether.on_cooldown"));
+            else if (originalOnLeftClick != null)
+                originalOnLeftClick.run();
+        };
+
+        this.placement = placement;
     }
 
     @Override
@@ -48,21 +75,29 @@ public class AbilityButton extends Button {
 
     @Override
     public void render(GuiGraphics guiGraphics, int x, int y, int mouseX, int mouseY) {
-        if (this.ability != null && ability.cooldownMax > 0)
-            this.greyPercent = 1.0f - ((float) ability.getCooldown() / (float) ability.cooldownMax);
+        float cooldown;
+
+        if (this.ability != null && ability.cooldownMax > 0) {
+            if (unit != null) {
+                cooldown = ability.getCooldown(unit);
+            }else {
+                cooldown = ability.getCooldown(placement);
+            }
+            this.greyPercent = 1.0f - (cooldown / (float) ability.cooldownMax);
+        }
         super.render(guiGraphics, x, y, mouseX, mouseY);
 
         // charges remaining number
         if (this.ability != null && this.ability.usesCharges()) {
-            String chargeStr = String.valueOf(this.ability.charges);
+            String chargeStr = String.valueOf(unit != null ? unit.getCharges(ability) : building.getCharges(ability));
             guiGraphics.pose().translate(0,0,2);
 
             int colour = 0xFFFFFF;
-            if (this.ability.charges >= this.ability.maxCharges)
+            if ((unit != null ? unit.getCharges(ability) : building.getCharges(ability)) >= this.ability.maxCharges)
                 colour = 0x00FF00;
-            else if (this.ability.charges <= 0)
+            else if ((unit != null ? unit.getCharges(ability) : building.getCharges(ability)) <= 0)
                 colour = 0xFF0000;
-            else if (this.ability.charges == 1)
+            else if ((unit != null ? unit.getCharges(ability) : building.getCharges(ability)) == 1)
                 colour = 0xFFFF00;
 
             guiGraphics.drawCenteredString(MC.font,

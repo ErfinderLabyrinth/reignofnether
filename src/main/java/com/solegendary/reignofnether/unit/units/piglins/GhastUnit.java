@@ -1,9 +1,11 @@
 package com.solegendary.reignofnether.unit.units.piglins;
 
+import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.AttackGround;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientboundPacket;
 import com.solegendary.reignofnether.hud.AbilityButton;
+import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.unit.Checkpoint;
@@ -15,6 +17,7 @@ import com.solegendary.reignofnether.unit.interfaces.RangedAttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.packets.UnitAnimationClientboundPacket;
 import com.solegendary.reignofnether.util.Faction;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -56,6 +59,18 @@ import java.util.List;
 import static com.solegendary.reignofnether.util.MiscUtil.fcs;
 
 public class GhastUnit extends Ghast implements Unit, AttackerUnit, RangedAttackerUnit {
+    final static public float attackRange = 30; // only used by ranged units or melee building attackers
+
+    public static final Abilities ABILITIES = new Abilities();
+    static {
+        ABILITIES.add(new AttackGround(attackRange), Keybindings.keyQ);
+    }
+
+    Object2ObjectArrayMap<Ability, Float> cooldowns = Unit.createCooldownMap();
+    Object2ObjectArrayMap<Ability, Integer> charges = new Object2ObjectArrayMap<>();
+
+    Ability autocast;
+
     // region
     private int eatingTicksLeft = 0;
     public void setEatingTicksLeft(int amount) { eatingTicksLeft = amount; }
@@ -75,8 +90,7 @@ public class GhastUnit extends Ghast implements Unit, AttackerUnit, RangedAttack
     public boolean canUsePortal() { return getUsePortalGoal() != null; }
 
     public Faction getFaction() {return Faction.PIGLINS;}
-    public List<AbilityButton> getAbilityButtons() {return abilityButtons;};
-    public List<Ability> getAbilities() {return abilities;}
+    public Abilities getAbilities() {return abilities;}
     public List<ItemStack> getItems() {return items;};
     public MoveToTargetBlockGoal getMoveGoal() {return moveGoal;}
     public SelectedTargetGoal<? extends LivingEntity> getTargetGoal() {return targetGoal;}
@@ -137,7 +151,6 @@ public class GhastUnit extends Ghast implements Unit, AttackerUnit, RangedAttack
 
     final static public float attackDamage = 8.0f;
     final static public float attacksPerSecond = 0.15f;
-    final static public float attackRange = 30; // only used by ranged units or melee building attackers
     final static public float aggroRange = 30;
     final static public boolean willRetaliate = true; // will attack when hurt by an enemy
     final static public boolean aggressiveWhenIdle = true;
@@ -151,8 +164,7 @@ public class GhastUnit extends Ghast implements Unit, AttackerUnit, RangedAttack
     public int getFogRevealDuration() { return fogRevealDuration; }
     public void setFogRevealDuration(int duration) { fogRevealDuration = duration; }
 
-    private final List<AbilityButton> abilityButtons = new ArrayList<>();
-    private final List<Ability> abilities = new ArrayList<>();
+    private Abilities abilities;
     private final List<ItemStack> items = new ArrayList<>();
 
     public static final int EXPLOSION_POWER = 2;
@@ -172,7 +184,7 @@ public class GhastUnit extends Ghast implements Unit, AttackerUnit, RangedAttack
     public GhastUnit(EntityType<? extends Ghast> entityType, Level level) {
         super(entityType, level);
         this.moveControl = new GhastUnitMoveControl(this);
-        this.abilities.add(new AttackGround(this));
+
         updateAbilityButtons();
     }
 
@@ -365,5 +377,31 @@ public class GhastUnit extends Ghast implements Unit, AttackerUnit, RangedAttack
     @Override
     public boolean hasBonusDamage() {
         return true;
+    }
+
+    @Override
+    public void updateAbilityButtons() {
+        abilities = ABILITIES.clone();
+        autocast = ABILITIES.getDefaultAutocast();
+    }
+
+    @Override
+    public Object2ObjectArrayMap<Ability, Float> getCooldowns() {
+        return cooldowns;
+    }
+
+    @Override
+    public boolean hasAutocast(Ability ability) {
+        return autocast == ability;
+    }
+
+    @Override
+    public void setAutocast(Ability autocast) {
+        this.autocast = autocast;
+    }
+
+    @Override
+    public Object2ObjectArrayMap<Ability, Integer> getCharges() {
+        return charges;
     }
 }

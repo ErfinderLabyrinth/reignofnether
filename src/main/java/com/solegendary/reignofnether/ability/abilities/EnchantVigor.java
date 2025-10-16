@@ -2,6 +2,7 @@ package com.solegendary.reignofnether.ability.abilities;
 
 import com.solegendary.reignofnether.ability.EnchantAbility;
 import com.solegendary.reignofnether.ability.EnchantAbilityServerboundPacket;
+import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.buildings.placements.LibraryPlacement;
 import com.solegendary.reignofnether.cursor.CursorClientEvents;
 import com.solegendary.reignofnether.hud.AbilityButton;
@@ -32,16 +33,18 @@ public class EnchantVigor extends EnchantAbility {
     public static final int enchantLevel = 1;
     public static final float cooldownMultiplier = 0.70f;
 
-    public EnchantVigor(LibraryPlacement library) {
-        super(ENCHANT_ACTION, library, ResourceCosts.ENCHANT_VIGOR);
+    public EnchantVigor() {
+        super(ENCHANT_ACTION, ResourceCosts.ENCHANT_VIGOR);
         this.defaultHotkey = Keybindings.keyT;
     }
 
     @Override
-    public AbilityButton getButton(Keybinding hotkey) {
+    public AbilityButton getButton(Keybinding hotkey, BuildingPlacement placement) {
+        if (!(placement instanceof LibraryPlacement)) return null;
+        LibraryPlacement library = (LibraryPlacement) placement;
         return new AbilityButton(
                 "Vigor Enchantment",
-                new ResourceLocation("minecraft", "textures/item/stick.png"),
+                ResourceLocation.fromNamespaceAndPath("minecraft", "textures/item/stick.png"),
                 hotkey,
                 () -> CursorClientEvents.getLeftClickAction() == ENCHANT_ACTION || library.autoCastEnchant == this,
                 () -> false,
@@ -64,7 +67,8 @@ public class EnchantVigor extends EnchantAbility {
                         FormattedCharSequence.forward(I18n.get("ability.reignofnether.enchant.vigor.tooltip3"), Style.EMPTY),
                         FormattedCharSequence.forward(I18n.get("abilities.reignofnether.autocast"), Style.EMPTY)
                 ),
-                this
+                this,
+                placement
         );
     }
 

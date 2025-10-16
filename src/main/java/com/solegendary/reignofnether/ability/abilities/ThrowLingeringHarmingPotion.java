@@ -26,42 +26,41 @@ public class ThrowLingeringHarmingPotion extends Ability {
 
     public static final int CD_MAX_SECONDS = 10;
 
-    private final WitchUnit witchUnit;
-
     public final Potion potion = Potions.STRONG_HARMING;
 
-    public ThrowLingeringHarmingPotion(WitchUnit witchUnit) {
+    //TODO Fix potionThrowRange for Witches gathering on a building
+    public ThrowLingeringHarmingPotion(int potionThrowRange) {
         super(UnitAction.THROW_LINGERING_HARMING_POTION,
-            witchUnit.level(),
             CD_MAX_SECONDS * ResourceCost.TICKS_PER_SECOND,
-            witchUnit.getPotionThrowRange(),
+            potionThrowRange,
             0,
             true,
             true
         );
-        this.witchUnit = witchUnit;
         this.autocastEnableAction = UnitAction.THROW_LINGERING_HARMING_POTION_AUTOCAST_ENABLE;
         this.autocastDisableAction = UnitAction.THROW_LINGERING_HARMING_POTION_AUTOCAST_DISABLE;
     }
 
     @Override
-    public AbilityButton getButton(Keybinding hotkey) {
+    public AbilityButton getButton(Keybinding hotkey, Unit unit) {
+        WitchUnit witchUnit = (WitchUnit) unit;
         return new AbilityButton("Lingering Harming Potion",
-            new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/lingering_potion_harming.png"),
+            ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/icons/items/lingering_potion_harming.png"),
             hotkey,
-            () -> CursorClientEvents.getLeftClickAction() == UnitAction.THROW_LINGERING_HARMING_POTION || isAutocasting(),
+            () -> CursorClientEvents.getLeftClickAction() == UnitAction.THROW_LINGERING_HARMING_POTION || isAutocasting(unit),
             () -> false,
             //!ResearchClient.hasResearch(ResearchLingeringPotions.itemName),
             () -> true,
             () -> CursorClientEvents.setLeftClickAction(UnitAction.THROW_LINGERING_HARMING_POTION),
-            this::toggleAutocast,
+            () -> toggleAutocast(unit),
             List.of(
                 fcs(I18n.get("abilities.reignofnether.lingering_harming_potion"), true),
                 fcsIcons(I18n.get("abilities.reignofnether.lingering_harming_potion.tooltip1", CD_MAX_SECONDS, witchUnit.getPotionThrowRange())),
                 fcs(I18n.get("abilities.reignofnether.lingering_harming_potion.tooltip2")),
                 fcs(I18n.get("abilities.reignofnether.autocast"))
             ),
-            this
+            this,
+            unit
         );
     }
 

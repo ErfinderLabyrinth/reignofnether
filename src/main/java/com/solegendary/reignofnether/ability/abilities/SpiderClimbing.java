@@ -5,6 +5,7 @@ import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.unit.UnitAction;
+import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.units.monsters.SpiderUnit;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.resources.ResourceLocation;
@@ -15,27 +16,24 @@ import static com.solegendary.reignofnether.util.MiscUtil.fcs;
 
 public class SpiderClimbing extends Ability {
 
-    private final SpiderUnit spiderUnit;
-
-    public SpiderClimbing(SpiderUnit unit) {
+    public SpiderClimbing() {
         super(
             UnitAction.NONE,
-            unit.level(),
             0,
             0,
             0,
             false,
             false
         );
-        this.spiderUnit = unit;
         this.autocastEnableAction = UnitAction.ENABLE_SPIDER_CLIMBING;
         this.autocastDisableAction = UnitAction.DISABLE_SPIDER_CLIMBING;
     }
 
     @Override
-    public AbilityButton getButton(Keybinding hotkey) {
-        ResourceLocation rlLadder = new ResourceLocation("minecraft", "textures/block/ladder.png");
-        ResourceLocation rlBarrier = new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/barrier.png");
+    public AbilityButton getButton(Keybinding hotkey, Unit unit) {
+        SpiderUnit spiderUnit = (SpiderUnit) unit;
+        ResourceLocation rlLadder = ResourceLocation.fromNamespaceAndPath("minecraft", "textures/block/ladder.png");
+        ResourceLocation rlBarrier = ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/icons/items/barrier.png");
 
         AbilityButton ab = new AbilityButton(
                 "Toggle Wall Climbing",
@@ -44,14 +42,15 @@ public class SpiderClimbing extends Ability {
                 () -> false,
                 () -> false,
                 () -> true,
-                this::toggleAutocast,
+                () -> toggleAutocast(unit),
                 null,
                 List.of(
-                    spiderUnit.isWallClimbing() ?
+                        spiderUnit.isWallClimbing() ?
                         fcs(I18n.get("abilities.reignofnether.spider_climbing_on")) :
                         fcs(I18n.get("abilities.reignofnether.spider_climbing_off"))
                 ),
-                this
+                this,
+                unit
         );
         if (!spiderUnit.isWallClimbing())
             ab.bgIconResource = rlLadder;
@@ -60,13 +59,13 @@ public class SpiderClimbing extends Ability {
     }
 
     @Override
-    public void setAutocast(boolean value) {
-        super.setAutocast(value);
-        if ((isAutocasting() && !spiderUnit.isWallClimbing()) ||
-            (!isAutocasting() && spiderUnit.isWallClimbing()))
+    public void setAutocast(boolean value, Unit unit) {
+        super.setAutocast(value, unit);
+        SpiderUnit spiderUnit = (SpiderUnit) unit;
+        if ((isAutocasting(unit) && !spiderUnit.isWallClimbing()) ||
+            (!isAutocasting(unit) && spiderUnit.isWallClimbing()))
             spiderUnit.toggleWallClimbing();
-        if (level.isClientSide())
-            spiderUnit.updateAbilityButtons();
+        spiderUnit.updateAbilityButtons();
     }
 
     @Override

@@ -20,15 +20,15 @@ public class LibraryPlacement extends ProductionPlacement {
     public LibraryPlacement(Building building, Level level, BlockPos originPos, Rotation rotation, String ownerName, ArrayList<BuildingBlock> blocks, boolean isCapitol) {
         super(building, level, originPos, rotation, ownerName, blocks, isCapitol);
 
-        Ability enchantMaiming = new EnchantMaiming(this);
+        Ability enchantMaiming = new EnchantMaiming();
         getAbilities().add(enchantMaiming);
-        Ability enchantQuickCharge = new EnchantQuickCharge(this);
+        Ability enchantQuickCharge = new EnchantQuickCharge();
         getAbilities().add(enchantQuickCharge);
-        Ability enchantSharpness = new EnchantSharpness(this);
+        Ability enchantSharpness = new EnchantSharpness();
         getAbilities().add(enchantSharpness);
-        Ability enchantMultishot = new EnchantMultishot(this);
+        Ability enchantMultishot = new EnchantMultishot();
         getAbilities().add(enchantMultishot);
-        Ability enchantVigor = new EnchantVigor(this);
+        Ability enchantVigor = new EnchantVigor();
         getAbilities().add(enchantVigor);
     }
 
@@ -37,7 +37,7 @@ public class LibraryPlacement extends ProductionPlacement {
         super.tick(tickLevel);
 
         if (tickAgeAfterBuilt > 0 && tickAgeAfterBuilt % 15 == 0 && isBuilt && autoCastEnchant != null
-                && autoCastEnchant.isOffCooldown()) {
+                && autoCastEnchant.isOffCooldown(this)) {
 
             List<Mob> mobs = MiscUtil.getEntitiesWithinRange(new Vector3d(
                             this.centrePos.getX(),

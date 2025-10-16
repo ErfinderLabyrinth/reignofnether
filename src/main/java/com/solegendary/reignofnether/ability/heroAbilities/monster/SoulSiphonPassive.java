@@ -36,46 +36,48 @@ public class SoulSiphonPassive extends HeroAbility {
     public float soulsConsumedForHealth = 10;
     public float healthPerSoul = 1.5f;
 
-    public SoulSiphonPassive(HeroUnit hero) {
-        super(hero, 3, 0, UnitAction.SOUL_SIPHON_HEAL, 0, 0, 0, false);
+    public SoulSiphonPassive() {
+        super(3, 0, UnitAction.SOUL_SIPHON_HEAL, 0, 0, 0, false);
         this.autocastEnableAction = UnitAction.ENABLE_SOUL_SIPHON_PASSIVE;
         this.autocastDisableAction = UnitAction.DISBLE_SOUL_SIPHON_PASSIVE;
-        this.setAutocast(true);
+        this.setDefaultAutocast(true);
     }
 
-    public boolean rankUp() {
-        if (super.rankUp()) {
+    public boolean rankUp(HeroUnit hero) {
+        if (super.rankUp(hero)) {
             updateStatsForRank();
             return true;
         }
         return false;
     }
 
-    public void updateStatsForRank() {
-        if (rank == 1) {
+    public void updateStatsForRank(HeroUnit hero) {
+        if (getRank(hero) == 1) {
             soulsPerCast = 4;
             soulsMax = 20;
-        } else if (rank == 2) {
+        } else if (getRank(hero) == 2) {
             soulsPerCast = 7;
             soulsMax = 30;
-        } else if (rank == 3) {
+        } else if (getRank(hero) == 3) {
             soulsPerCast = 10;
             soulsMax = 40;
         }
     }
 
     @Override
-    public AbilityButton getButton(Keybinding hotkey) {
+    public AbilityButton getButton(Keybinding hotkey, Unit unit) {
+        if (!(unit instanceof HeroUnit hero)) return null;
         AbilityButton button = new AbilityButton("Soul Siphon",
-            new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/blocks/portal.png"),
+            ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/icons/blocks/portal.png"),
             hotkey,
-            this::isAutocasting,
-            () -> rank == 0,
+            () -> this.isAutocasting(hero),
+            () -> getRank(hero) == 0,
             () -> true,
-            this::toggleAutocast,
+            () -> toggleAutocast(hero),
             () -> UnitClientEvents.sendUnitCommand(UnitAction.SOUL_SIPHON_HEAL),
-            getTooltipLines(),
-            this
+            getTooltipLines((HeroUnit) hero),
+            this,
+            hero
         );
         button.extraLabel = String.valueOf((int) souls);
         if (((int) souls) <= 0)
@@ -88,16 +90,17 @@ public class SoulSiphonPassive extends HeroAbility {
     }
 
     @Override
-    public Button getRankUpButton() {
+    public Button getRankUpButton(HeroUnit hero) {
         return super.getRankUpButtonProtected(
             "Soul Siphon",
-            new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/blocks/portal.png")
+            ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/icons/blocks/portal.png"),
+            hero
         );
     }
 
-    public List<FormattedCharSequence> getTooltipLines() {
+    public List<FormattedCharSequence> getTooltipLines(HeroUnit hero) {
         return List.of(
-                fcs(I18n.get("abilities.reignofnether.soul_siphon") + " " + rankString(), true),
+                fcs(I18n.get("abilities.reignofnether.soul_siphon") + " " + rankString(hero), true),
                 fcs(""),
                 fcs(I18n.get("abilities.reignofnether.soul_siphon.tooltip1")),
                 fcs(I18n.get("abilities.reignofnether.soul_siphon.tooltip2")),
@@ -108,10 +111,10 @@ public class SoulSiphonPassive extends HeroAbility {
         );
     }
 
-    public List<FormattedCharSequence> getRankUpTooltipLines() {
+    public List<FormattedCharSequence> getRankUpTooltipLines(HeroUnit hero) {
         return List.of(
                 fcs(I18n.get("abilities.reignofnether.soul_siphon"), true),
-                fcs(I18n.get("abilities.reignofnether.level_req", getLevelRequirement()), getLevelReqStyle()),
+                fcs(I18n.get("abilities.reignofnether.level_req", getLevelRequirement(hero)), getLevelReqStyle(hero)),
                 fcs(""),
                 fcs(I18n.get("abilities.reignofnether.soul_siphon.tooltip1")),
                 fcs(I18n.get("abilities.reignofnether.soul_siphon.tooltip2")),
@@ -119,19 +122,19 @@ public class SoulSiphonPassive extends HeroAbility {
                 fcs(""),
                 fcs(I18n.get("abilities.reignofnether.can_be_toggled")),
                 fcs(""),
-                fcs(I18n.get("abilities.reignofnether.soul_siphon.rank1"), rank == 0),
-                fcs(I18n.get("abilities.reignofnether.soul_siphon.rank2"), rank == 1),
-                fcs(I18n.get("abilities.reignofnether.soul_siphon.rank3"), rank == 2)
+                fcs(I18n.get("abilities.reignofnether.soul_siphon.rank1"), getRank(hero) == 0),
+                fcs(I18n.get("abilities.reignofnether.soul_siphon.rank2"), getRank(hero) == 1),
+                fcs(I18n.get("abilities.reignofnether.soul_siphon.rank3"), getRank(hero) == 2)
         );
     }
 
     // returns whether the consumption was successful
-    public boolean consumeSoulsForCast() {
-        if (isAutocasting() && souls >= soulsPerCast) {
+    public boolean consumeSoulsForCast(HeroUnit hero) {
+        if (isAutocasting(hero) && souls >= soulsPerCast) {
             souls -= soulsPerCast;
-            if (!level.isClientSide())
+            if (!hero.level().isClientSide())
                 AbilityClientboundPacket.doAbility(((LivingEntity) hero).getId(), UnitAction.SOUL_SIPHON_UPDATE, souls);
-            addUnitPoofs((int) (soulsPerCast * 2));
+            addUnitPoofs((int) (soulsPerCast * 2), hero);
             return true;
         }
         return false;
@@ -139,7 +142,7 @@ public class SoulSiphonPassive extends HeroAbility {
 
     // consume souls for health
     @Override
-    public void use(Level level, Unit unitUsing, BlockPos targetBp) {
+    public void use(Level level, Unit hero, BlockPos targetBp) {
         int soulsConsumed = (int) Math.min(souls, soulsConsumedForHealth);
         if (soulsConsumed > 0) {
             LivingEntity entity = (LivingEntity) hero;
@@ -149,32 +152,32 @@ public class SoulSiphonPassive extends HeroAbility {
                 UnitAnimationClientboundPacket.sendBasicPacket(UnitAnimationAction.CAST_SPELL, entity);
             }
             entity.heal(soulsConsumed * healthPerSoul);
-            addUnitPoofs(soulsConsumed * 2);
+            addUnitPoofs(soulsConsumed * 2, hero);
         }
     }
 
-    private void addUnitPoofs(int amount) {
+    private void addUnitPoofs(int amount, Unit hero) {
         RandomSource rand = RandomSource.create();
         LivingEntity entity = (LivingEntity) hero;
         for(int j = 0; j < amount; ++j) {
             double d0 = rand.nextGaussian() * 0.2;
             double d1 = rand.nextGaussian() * 0.2;
             double d2 = rand.nextGaussian() * 0.2;
-            level.addParticle(ParticleTypes.POOF, entity.getX(), entity.getY(), entity.getZ(), d0, d1, d2);
+            hero.level().addParticle(ParticleTypes.POOF, entity.getX(), entity.getY(), entity.getZ(), d0, d1, d2);
         }
     }
 
     private int lastEntityKilledId = -1; // LivingDeathEvent sometimes fires twice
 
-    public void checkAndGainSouls(LivingEntity entityKilled, int splitAmount) {
+    public void checkAndGainSouls(LivingEntity entityKilled, int splitAmount, HeroUnit hero) {
         if (soulsMax > 0 && entityKilled.getId() != lastEntityKilledId) {
-            if (entityKilled instanceof Unit unit && !unit.getOwnerName().equals(((Unit) hero).getOwnerName()))
+            if (entityKilled instanceof Unit unit && !unit.getOwnerName().equals(hero.getOwnerName()))
                 souls += unit.getCost().population;
             lastEntityKilledId = entityKilled.getId();
         }
         if (souls > soulsMax)
             souls = soulsMax;
         if (((LivingEntity) hero).level().isClientSide())
-            ((Unit) hero).updateAbilityButtons();
+            hero.updateAbilityButtons();
     }
 }

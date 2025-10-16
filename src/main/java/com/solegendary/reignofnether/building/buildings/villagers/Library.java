@@ -1,10 +1,9 @@
 package com.solegendary.reignofnether.building.buildings.villagers;
 
+import com.solegendary.reignofnether.ability.Ability;
+import com.solegendary.reignofnether.ability.abilities.*;
 import com.solegendary.reignofnether.api.ReignOfNetherRegistries;
-import com.solegendary.reignofnether.building.BuildingBlock;
-import com.solegendary.reignofnether.building.BuildingClientEvents;
-import com.solegendary.reignofnether.building.BuildingPlacement;
-import com.solegendary.reignofnether.building.Buildings;
+import com.solegendary.reignofnether.building.*;
 import com.solegendary.reignofnether.building.buildings.placements.LibraryPlacement;
 import com.solegendary.reignofnether.building.production.ProductionBuilding;
 import com.solegendary.reignofnether.building.production.ProductionItems;
@@ -40,7 +39,7 @@ public class Library extends ProductionBuilding {
         super(structureName, cost, false);
         this.name = buildingName;
         this.portraitBlock = Blocks.ENCHANTING_TABLE;
-        this.icon = new ResourceLocation("minecraft", "textures/block/enchanting_table_top.png");
+        this.icon = ResourceLocation.fromNamespaceAndPath("minecraft", "textures/block/enchanting_table_top.png");
 
         this.buildTimeModifier = 1.1f;
 
@@ -51,11 +50,20 @@ public class Library extends ProductionBuilding {
 
         this.explodeChance = 0.2f;
 
+        Ability enchantSharpness = new EnchantSharpness();
+        this.abilities.add(enchantSharpness, Keybindings.keyE);
+        Ability enchantQuickCharge = new EnchantQuickCharge();
+        this.abilities.add(enchantQuickCharge, Keybindings.keyW);
+        Ability enchantMaiming = new EnchantMaiming();
+        this.abilities.add(enchantMaiming, Keybindings.keyQ);
+        Ability enchantMultishot = new EnchantMultishot();
+        this.abilities.add(enchantMultishot, Keybindings.keyR);
+        Ability enchantVigor = new EnchantVigor();
+        this.abilities.add(enchantVigor, Keybindings.keyT);
+
         this.productions.add(ProductionItems.RESEARCH_LINGERING_POTIONS, Keybindings.keyY);
-        this.productions.add(ProductionItems.RESEARCH_HEALING_POTIONS, Keybindings.keyU);
-        this.productions.add(ProductionItems.RESEARCH_WATER_POTIONS, Keybindings.keyI);
-        this.productions.add(ProductionItems.RESEARCH_EVOKER_VEXES, Keybindings.keyO);
-        this.productions.add(ProductionItems.RESEARCH_GRAND_LIBRARY, Keybindings.keyP);
+        this.productions.add(ProductionItems.RESEARCH_EVOKER_VEXES, Keybindings.keyU);
+        this.productions.add(ProductionItems.RESEARCH_GRAND_LIBRARY, Keybindings.keyI);
     }
 
     public Faction getFaction() {
@@ -67,18 +75,16 @@ public class Library extends ProductionBuilding {
         return new LibraryPlacement(this, level, pos, rotation, ownerName, getAbsoluteBlockData(getRelativeBlockData(level), level, pos, rotation), false);
     }
 
-    public AbilityButton getBuildButton(Keybinding hotkey) {
+    public BuildingPlaceButton getBuildButton(Keybinding hotkey) {
         ResourceLocation key = ReignOfNetherRegistries.BUILDING.getKey(this);
         String name = I18n.get("buildings." + getFaction().name().toLowerCase() + "." + key.getNamespace() + "." + key.getPath());
-        return new AbilityButton(name,
-            new ResourceLocation("minecraft", "textures/block/enchanting_table_top.png"),
+        return new BuildingPlaceButton(name,
+            ResourceLocation.fromNamespaceAndPath("minecraft", "textures/block/enchanting_table_top.png"),
             hotkey,
             () -> BuildingClientEvents.getBuildingToPlace() == Buildings.LIBRARY,
             TutorialClientEvents::isEnabled,
             () -> BuildingClientEvents.hasFinishedBuilding(Buildings.BARRACKS) ||
                     ResearchClient.hasCheat("modifythephasevariance"),
-            () -> BuildingClientEvents.setBuildingToPlace(Buildings.LIBRARY),
-            null,
             List.of(FormattedCharSequence.forward(I18n.get("buildings.villagers.reignofnether.library"),
                     Style.EMPTY.withBold(true)
                 ),
@@ -95,7 +101,7 @@ public class Library extends ProductionBuilding {
                     Style.EMPTY
                 )
             ),
-            null
+            this
         );
     }
 
@@ -107,5 +113,10 @@ public class Library extends ProductionBuilding {
                 return 1;
             }
         return 0;
+    }
+
+    @Override
+    public boolean isBuildableBuildingForFaction(Faction faction) {
+        return faction == Faction.VILLAGERS;
     }
 }

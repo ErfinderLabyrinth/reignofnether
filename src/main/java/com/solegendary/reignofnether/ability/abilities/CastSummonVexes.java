@@ -27,64 +27,64 @@ public class CastSummonVexes extends Ability {
     public static final int CD_MAX_SECONDS = 60;
     public static final int VEX_DURATION_SECONDS = 30;
 
-    private final EvokerUnit evokerUnit;
-
-    public CastSummonVexes(EvokerUnit evokerUnit) {
+    public CastSummonVexes() {
         super(
-            UnitAction.CAST_SUMMON_VEXES,
-            evokerUnit.level(),
-            CD_MAX_SECONDS * ResourceCost.TICKS_PER_SECOND,
-            0,
-            0,
-            true,
-            false
+                UnitAction.CAST_SUMMON_VEXES,
+                CD_MAX_SECONDS * ResourceCost.TICKS_PER_SECOND,
+                0,
+                0,
+                true,
+                false
         );
-        this.evokerUnit = evokerUnit;
         this.autocastEnableAction = UnitAction.CAST_SUMMON_VEXES_AUTOCAST_ENABLE;
         this.autocastDisableAction = UnitAction.CAST_SUMMON_VEXES_AUTOCAST_DISABLE;
     }
 
     @Override
-    public AbilityButton getButton(Keybinding hotkey) {
+    public AbilityButton getButton(Keybinding hotkey, Unit unit) {
+        EvokerUnit evokerUnit = (EvokerUnit) unit;
         return new AbilityButton(
-            "Summon Vexes",
-            new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/vex.png"),
-            hotkey,
-            () -> {
-                if (this.evokerUnit.getCastSummonVexesGoal() != null)
-                    return this.evokerUnit.getCastSummonVexesGoal().isCasting() || isAutocasting();
-                return false;
-            },
-            () -> !ResearchClient.hasResearch(ProductionItems.RESEARCH_EVOKER_VEXES),
-            () -> true,
-            () -> UnitClientEvents.sendUnitCommand(UnitAction.CAST_SUMMON_VEXES),
-            this::toggleAutocast,
-            List.of(
-                FormattedCharSequence.forward(I18n.get("abilities.reignofnether.summon_vexes"), Style.EMPTY.withBold(true)),
-                FormattedCharSequence.forward(I18n.get("abilities.reignofnether.summon_vexes.tooltip1", CD_MAX_SECONDS), MyRenderer.iconStyle),
-                FormattedCharSequence.forward(I18n.get("abilities.reignofnether.summon_vexes.tooltip2", EvokerUnit.SUMMON_VEXES_AMOUNT), Style.EMPTY),
-                FormattedCharSequence.forward(I18n.get("abilities.reignofnether.summon_vexes.tooltip3", VEX_DURATION_SECONDS), Style.EMPTY),
+                "Summon Vexes",
+                ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/mobheads/vex.png"),
+                hotkey,
+                () -> {
+                    if (evokerUnit.getCastSummonVexesGoal() != null)
+                        return evokerUnit.getCastSummonVexesGoal().isCasting()|| isAutocasting(unit);
+                    return false;
+                },
+                () -> !ResearchClient.hasResearch(ProductionItems.RESEARCH_EVOKER_VEXES),
+                () -> true,
+                () -> UnitClientEvents.sendUnitCommand(UnitAction.CAST_SUMMON_VEXES),
+                () -> toggleAutocast(unit),
+                List.of(
+                        FormattedCharSequence.forward(I18n.get("abilities.reignofnether.summon_vexes"), Style.EMPTY.withBold(true)),
+                        FormattedCharSequence.forward(I18n.get("abilities.reignofnether.summon_vexes.tooltip1", CD_MAX_SECONDS), MyRenderer.iconStyle),
+                        FormattedCharSequence.forward(I18n.get("abilities.reignofnether.summon_vexes.tooltip2", EvokerUnit.SUMMON_VEXES_AMOUNT), Style.EMPTY),
+                        FormattedCharSequence.forward(I18n.get("abilities.reignofnether.summon_vexes.tooltip3", VEX_DURATION_SECONDS), Style.EMPTY),
                 FormattedCharSequence.forward("", Style.EMPTY),
-                FormattedCharSequence.forward(I18n.get("abilities.reignofnether.autocast"), Style.EMPTY)
-            ),
-            this
+                FormattedCharSequence.forward(I18n.get("abilities.reignofnether.autocast"),Style.EMPTY)
+                ),
+                this,
+                unit
         );
     }
 
     @Override
-    public void setCooldown(float cooldown) {
+    public void setCooldown(float cooldown, Unit unit) {
+        EvokerUnit evokerUnit = (EvokerUnit) unit;
         if (evokerUnit.hasVigorEnchant())
             cooldown *= EnchantVigor.cooldownMultiplier;
-        super.setCooldown(cooldown);
+        super.setCooldown(cooldown, unit);
     }
 
 
     @Override
-    public void setToMaxCooldown() {
+    public void setToMaxCooldown(Unit unit) {
+        EvokerUnit evokerUnit = (EvokerUnit) unit;
         if (evokerUnit.hasVigorEnchant())
-            setCooldown((int) (cooldownMax * EnchantVigor.cooldownMultiplier));
+            setCooldown((int) (cooldownMax * EnchantVigor.cooldownMultiplier), unit);
         else
-            setCooldown(cooldownMax);
+            setCooldown(cooldownMax, unit);
     }
 
     @Override

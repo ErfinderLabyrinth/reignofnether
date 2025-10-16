@@ -136,9 +136,9 @@ public class HudClientEvents {
         List<Pair<LivingEntity, Float>> pairs = UnitClientEvents.getSelectedUnits().stream().map((le) -> {
             float totalCd = 0;
             if (le instanceof Unit unit) {
-                for (Ability ability : unit.getAbilities()) {
-                    totalCd += ability.getCooldown();
-                    if (ability.isCasting())
+                for (Ability ability : unit.getAbilities().get()) {
+                    totalCd += ability.getCooldown(unit);
+                    if (ability.isCasting(unit))
                         totalCd += 10;
                 }
             }
@@ -635,7 +635,7 @@ public class HudClientEvents {
                         AlliancesClient.canControlAlly(hudSelectedEntity)) {
                         Button returnButton = new Button("Return resources",
                             Button.itemIconSize,
-                            new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/chest.png"),
+                            ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/icons/items/chest.png"),
                             Keybindings.keyD,
                             () -> unit.getReturnResourcesGoal().getBuildingTarget() != null,
                             () -> false,
@@ -686,7 +686,7 @@ public class HudClientEvents {
 
                 Button button = new Button(unitName,
                     iconSize,
-                    unit instanceof Unit ? new ResourceLocation(ReignOfNether.MOD_ID, buttonImagePath) : null,
+                    unit instanceof Unit ? ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, buttonImagePath) : null,
                     unit,
                     () -> hudSelectedEntity == null || getModifiedEntityName(hudSelectedEntity).equals(
                         getModifiedEntityName(unit)),
@@ -708,7 +708,7 @@ public class HudClientEvents {
                 );
                 if (unit.isVehicle() && unit instanceof Unit) {
                     String passengerName = MiscUtil.getSimpleEntityName(unit.getFirstPassenger());
-                    button.bgIconResource = new ResourceLocation(ReignOfNether.MOD_ID,
+                    button.bgIconResource = ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID,
                         "textures/mobheads/" + passengerName + ".png"
                     );
                 }
@@ -855,9 +855,9 @@ public class HudClientEvents {
             actionButtons.add(ActionButtons.stop);
 
             if (hudSelectedEntity instanceof VillagerUnit vUnit)
-                for (Ability ability : vUnit.getAbilities())
+                for (Ability ability : vUnit.getAbilities().get())
                     if (ability instanceof CallToArmsUnit callToArmsUnit)
-                        actionButtons.add(callToArmsUnit.getButton(Keybindings.keyV));
+                        actionButtons.add(callToArmsUnit.getButton(Keybindings.keyV, vUnit));
 
             if (SandboxClientEvents.isSandboxPlayer()) {
                 actionButtons.add(SandboxActionButtons.getSetRelationshipButton());
@@ -867,16 +867,16 @@ public class HudClientEvents {
                 // GATHER button does not have a static icon
                 if (actionButton == ActionButtons.gather && hudSelectedEntity instanceof WorkerUnit workerUnit) {
                     switch (workerUnit.getGatherResourceGoal().getTargetResourceName()) {
-                        case NONE -> actionButton.iconResource = new ResourceLocation(ReignOfNether.MOD_ID,
+                        case NONE -> actionButton.iconResource = ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID,
                                 "textures/icons/items/no_gather.png"
                         );
-                        case FOOD -> actionButton.iconResource = new ResourceLocation(ReignOfNether.MOD_ID,
+                        case FOOD -> actionButton.iconResource = ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID,
                                 "textures/icons/items/hoe.png"
                         );
-                        case WOOD -> actionButton.iconResource = new ResourceLocation(ReignOfNether.MOD_ID,
+                        case WOOD -> actionButton.iconResource = ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID,
                                 "textures/icons/items/axe.png"
                         );
-                        case ORE -> actionButton.iconResource = new ResourceLocation(ReignOfNether.MOD_ID,
+                        case ORE -> actionButton.iconResource = ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID,
                                 "textures/icons/items/pickaxe.png"
                         );
                     }
@@ -900,15 +900,15 @@ public class HudClientEvents {
             if (TutorialClientEvents.isAtOrPastStage(TutorialStage.BUILD_INTRO) &&
                     (getPlayerToEntityRelationship(selUnits.get(0)) == Relationship.OWNED || !PlayerClientEvents.isRTSPlayer()) ||
                     AlliancesClient.canControlAlly(selUnits.get(0))) {
-                List<AbilityButton> abilityButtons = List.of();
+                List<Button> abilityButtons = List.of();
                 for (LivingEntity livingEntity : selUnits) {
                     if (livingEntity == hudSelectedEntity) {
                         abilityButtons = unit.getAbilityButtons(); // unit == hudSelectedEntity
                         break;
                     }
                 }
-                List<AbilityButton> unitAbilities = abilityButtons.stream()
-                        .filter(ab -> ab != null && !(ab.ability instanceof CallToArmsUnit))
+                List<Button> unitAbilities = abilityButtons.stream()
+                        .filter(b -> !(b instanceof AbilityButton ab) || !(ab.ability instanceof CallToArmsUnit))
                         .toList();
 
                 int rowsUp = (int) Math.floor((float) (unitAbilities.size() - 1) / MAX_BUTTONS_PER_ROW);
@@ -916,11 +916,11 @@ public class HudClientEvents {
                 blitY -= iconFrameSize * rowsUp;
 
                 int i = 0;
-                for (AbilityButton abilityButton : unitAbilities) {
+                for (Button button : unitAbilities) {
 
-                    if (abilityButton.ability instanceof HeroAbility heroAbility &&
+                    if (button instanceof AbilityButton abilityButton && abilityButton.ability instanceof HeroAbility heroAbility &&
                             ((HeroUnit)unit).isRankUpMenuOpen() && !HeroAbility.allSkillsLearnt((HeroUnit) unit)) {
-                        Button rankUpButton = heroAbility.getRankUpButton();
+                        Button rankUpButton = heroAbility.getRankUpButton((HeroUnit)unit);
                         if (!rankUpButton.isHidden.get()) {
                             i += 1;
                             rankUpButton.render(evt.getGuiGraphics(), blitX, blitY, mouseX, mouseY);
@@ -931,10 +931,10 @@ public class HudClientEvents {
                                 blitY += iconFrameSize;
                             }
                         }
-                    } else if (!abilityButton.isHidden.get()) {
+                    } else if (!button.isHidden.get()) {
                         i += 1;
-                        abilityButton.render(evt.getGuiGraphics(), blitX, blitY, mouseX, mouseY);
-                        renderedButtons.add(abilityButton);
+                        button.render(evt.getGuiGraphics(), blitX, blitY, mouseX, mouseY);
+                        renderedButtons.add(button);
                         blitX += iconFrameSize;
                         if (i % MAX_BUTTONS_PER_ROW == 0) {
                             blitX = 0;
@@ -975,13 +975,13 @@ public class HudClientEvents {
             blitX = 0;
             blitY = screenHeight - (iconFrameSize * 2) - 4;
 
-            List<AbilityButton> abilityButtons = switch(SandboxClientEvents.sandboxMenuType) {
-                case BUILDINGS -> SandboxClientEvents.getBuildingButtons();
-                default -> SandboxClientEvents.getUnitButtons();
+            List<Button> abilityButtons = switch(SandboxClientEvents.sandboxMenuType) {
+                case BUILDINGS -> List.copyOf(SandboxClientEvents.getBuildingButtons());
+                default -> List.copyOf(SandboxClientEvents.getUnitButtons());
             };
 
-            List<AbilityButton> shownAbilities = abilityButtons.stream()
-                    .filter(ab -> !ab.isHidden.get() && !(ab.ability instanceof CallToArmsUnit))
+            List<Button> shownAbilities = abilityButtons.stream()
+                    .filter(b -> !b.isHidden.get() && !(b instanceof AbilityButton ab && ab.ability instanceof CallToArmsUnit))
                     .toList();
 
             int rowsUp = (int) Math.floor((float) (shownAbilities.size() - 1) / MAX_BUTTONS_PER_ROW);
@@ -989,11 +989,11 @@ public class HudClientEvents {
             blitY -= iconFrameSize * rowsUp;
 
             int i = 0;
-            for (AbilityButton abilityButton : shownAbilities) {
-                if (!abilityButton.isHidden.get()) {
+            for (Button button : shownAbilities) {
+                if (!button.isHidden.get()) {
                     i += 1;
-                    abilityButton.render(evt.getGuiGraphics(), blitX, blitY, mouseX, mouseY);
-                    renderedButtons.add(abilityButton);
+                    button.render(evt.getGuiGraphics(), blitX, blitY, mouseX, mouseY);
+                    renderedButtons.add(button);
                     blitX += iconFrameSize;
                     if (i % MAX_BUTTONS_PER_ROW == 0) {
                         blitX = 0;
@@ -1088,17 +1088,17 @@ public class HudClientEvents {
 
                 switch (resourceName) {
                     case "food" -> {
-                        rl = new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/wheat.png");
+                        rl = ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/icons/items/wheat.png");
                         resValueStr = String.valueOf(resources.food);
                         resName = ResourceName.FOOD;
                     }
                     case "wood" -> {
-                        rl = new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/wood.png");
+                        rl = ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/icons/items/wood.png");
                         resValueStr = String.valueOf(resources.wood);
                         resName = ResourceName.WOOD;
                     }
                     case "ore" -> {
-                        rl = new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/iron_ore.png");
+                        rl = ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/icons/items/iron_ore.png");
                         resValueStr = String.valueOf(resources.ore);
                         resName = ResourceName.ORE;
                     }
@@ -1118,7 +1118,7 @@ public class HudClientEvents {
                 ));
 
                 hudZones.add(MyRenderer.renderIconFrameWithBg(evt.getGuiGraphics(),
-                    new ResourceLocation(ReignOfNether.MOD_ID, "textures/hud/icon_frame.png"),
+                    ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/hud/icon_frame.png"),
                     blitX,
                     blitY,
                     iconFrameSize,
@@ -1187,7 +1187,7 @@ public class HudClientEvents {
                 }
 
                 hudZones.add(MyRenderer.renderIconFrameWithBg(evt.getGuiGraphics(),
-                        new ResourceLocation(ReignOfNether.MOD_ID, "textures/hud/icon_frame.png"),
+                        ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/hud/icon_frame.png"),
                         blitX + 69,
                         blitY,
                         iconFrameSize,

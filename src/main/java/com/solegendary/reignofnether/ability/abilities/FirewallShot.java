@@ -28,17 +28,14 @@ public class FirewallShot extends Ability {
     public static final int CD_MAX_SECONDS = 20;
     public static final int RANGE = 15;
 
-    private final BlazeUnit blazeUnit;
-
-    public FirewallShot(BlazeUnit blazeUnit) {
-        super(UnitAction.SHOOT_FIREWALL, blazeUnit.level(),CD_MAX_SECONDS * ResourceCost.TICKS_PER_SECOND, RANGE, 0, true, true);
-        this.blazeUnit = blazeUnit;
+    public FirewallShot() {
+        super(UnitAction.SHOOT_FIREWALL, CD_MAX_SECONDS * ResourceCost.TICKS_PER_SECOND, RANGE, 0, true, true);
     }
 
     @Override
-    public AbilityButton getButton(Keybinding hotkey) {
+    public AbilityButton getButton(Keybinding hotkey, Unit unit) {
         return new AbilityButton("Fire Wall Shot",
-            new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/blocks/fire.png"),
+            ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/icons/blocks/fire.png"),
             hotkey,
             () -> CursorClientEvents.getLeftClickAction() == UnitAction.SHOOT_FIREWALL,
             () -> !ResearchClient.hasResearch(ProductionItems.RESEARCH_BLAZE_FIREWALL),
@@ -56,7 +53,8 @@ public class FirewallShot extends Ability {
                 FormattedCharSequence.forward(I18n.get("abilities.reignofnether.fire_wall_shot.tooltip2"), Style.EMPTY),
                 FormattedCharSequence.forward(I18n.get("abilities.reignofnether.fire_wall_shot.tooltip3"), Style.EMPTY)
             ),
-            this
+            this,
+            unit
         );
     }
 
@@ -68,10 +66,11 @@ public class FirewallShot extends Ability {
 
     @Override
     public void use(Level level, Unit unitUsing, BlockPos targetBp) {
-        this.blazeUnit.shootFirewallShot(targetBp);
-        this.setToMaxCooldown();
+        BlazeUnit blazeUnit = (BlazeUnit) unitUsing;
+        blazeUnit.shootFirewallShot(targetBp);
+        this.setToMaxCooldown(unitUsing);
         if (!level.isClientSide()) {
-            AbilityClientboundPacket.sendSetCooldownPacket(this.blazeUnit.getId(), this.action, this.cooldownMax);
+            AbilityClientboundPacket.sendSetCooldownPacket(blazeUnit.getId(), this.action, this.cooldownMax);
         }
     }
 }

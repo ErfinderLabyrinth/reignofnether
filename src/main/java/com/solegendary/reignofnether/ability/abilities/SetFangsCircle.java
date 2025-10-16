@@ -23,73 +23,73 @@ public class SetFangsCircle extends Ability {
 
     public static final int CD_MAX_SECONDS = 7;
 
-    private final EvokerUnit evokerUnit;
-
-    public SetFangsCircle(EvokerUnit evokerUnit) {
+    public SetFangsCircle() {
         super(UnitAction.SET_FANGS_CIRCLE,
-            evokerUnit.level(),
-            CD_MAX_SECONDS * ResourceCost.TICKS_PER_SECOND,
-            EvokerUnit.FANGS_RANGE_CIRCLE,
-            0,
-            true
+                CD_MAX_SECONDS * ResourceCost.TICKS_PER_SECOND,
+                EvokerUnit.FANGS_RANGE_CIRCLE,
+                0,
+                true
         );
-        this.evokerUnit = evokerUnit;
     }
 
     @Override
-    public AbilityButton getButton(Keybinding hotkey) {
+    public AbilityButton getButton(Keybinding hotkey, Unit unit) {
+        EvokerUnit evokerUnit = (EvokerUnit) unit;
         return new AbilityButton("Evoker Fangs (Circular)",
-            new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/shears.png"),
-            hotkey,
-            () -> !evokerUnit.isUsingLineFangs,
-            () -> false,
-            () -> true,
-            () -> UnitClientEvents.sendUnitCommand(UnitAction.SET_FANGS_CIRCLE),
-            null,
-            List.of(FormattedCharSequence.forward(
-                    I18n.get("abilities.reignofnether.evoker_fangs_circular"),
-                    Style.EMPTY.withBold(true)
+                ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/icons/items/shears.png"),
+                hotkey,
+                () -> !evokerUnit.isUsingLineFangs,
+                () -> false,
+                () -> true,
+                () -> UnitClientEvents.sendUnitCommand(UnitAction.SET_FANGS_CIRCLE),
+                null,
+                List.of(FormattedCharSequence.forward(
+                                I18n.get("abilities.reignofnether.evoker_fangs_circular"),
+                                Style.EMPTY.withBold(true)
+                        ),
+                        FormattedCharSequence.forward(I18n.get("abilities.reignofnether.evoker_fangs_circular.tooltip1",
+                                EvokerUnit.FANGS_DAMAGE * 2,
+                                CD_MAX_SECONDS
+                        ) + EvokerUnit.FANGS_RANGE_CIRCLE, MyRenderer.iconStyle),
+                        FormattedCharSequence.forward(
+                                I18n.get("abilities.reignofnether.evoker_fangs_circular.tooltip2"),
+                                Style.EMPTY
+                        ),
+                        FormattedCharSequence.forward(
+                                I18n.get("abilities.reignofnether.evoker_fangs_circular.tooltip3"),
+                                Style.EMPTY
+                        )
                 ),
-                FormattedCharSequence.forward(I18n.get("abilities.reignofnether.evoker_fangs_circular.tooltip1",
-                    EvokerUnit.FANGS_DAMAGE * 2,
-                    CD_MAX_SECONDS
-                ) + EvokerUnit.FANGS_RANGE_CIRCLE, MyRenderer.iconStyle),
-                FormattedCharSequence.forward(
-                    I18n.get("abilities.reignofnether.evoker_fangs_circular.tooltip2"),
-                    Style.EMPTY
-                ),
-                FormattedCharSequence.forward(
-                    I18n.get("abilities.reignofnether.evoker_fangs_circular.tooltip3"),
-                    Style.EMPTY
-                )
-            ),
-            this
+                this,
+                unit
         );
     }
 
-    public void setCooldownSingle(float cooldown) {
-        super.setCooldown(cooldown);
+    public void setCooldownSingle(float cooldown, Unit unit) {
+        super.setCooldown(cooldown, unit);
     }
 
     @Override
-    public void setCooldown(float cooldown) {
+    public void setCooldown(float cooldown, Unit unit) {
+        EvokerUnit evokerUnit = (EvokerUnit) unit;
         if (evokerUnit.hasVigorEnchant())
             cooldown *= EnchantVigor.cooldownMultiplier;
 
-        super.setCooldown(cooldown);
-        for (Ability ability : this.evokerUnit.getAbilities())
+        super.setCooldown(cooldown, unit);
+        for (Ability ability : evokerUnit.getAbilities().get())
             if (ability instanceof SetFangsLine ab) {
-                ab.setCooldownSingle(cooldown);
+                ab.setCooldownSingle(cooldown, unit);
             }
     }
 
     @Override
     public void use(Level level, Unit unitUsing, BlockPos targetBp) {
+        EvokerUnit evokerUnit = (EvokerUnit) unitUsing;
         evokerUnit.isUsingLineFangs = false;
     }
 
     @Override
-    public boolean canBypassCooldown() {
+    public boolean canBypassCooldown(Unit unit) {
         return true;
     }
 

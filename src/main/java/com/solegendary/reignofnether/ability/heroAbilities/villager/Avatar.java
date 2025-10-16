@@ -40,13 +40,13 @@ public class Avatar extends HeroAbility {
     public static final float ATTACK_SPLASH_MULT = 0.5f;
     public static final float BONUS_HEALTH = 100;
 
-    public Avatar(HeroUnit hero) {
-        super(hero, 1, 100, UnitAction.AVATAR, CD_MAX_SECONDS, 0, 0, false);
+    public Avatar() {
+        super(1, 100, UnitAction.AVATAR, CD_MAX_SECONDS, 0, 0, false);
     }
 
     @Override
-    public boolean isCasting() {
-        if (this.hero instanceof RoyalGuardUnit royalGuardUnit) {
+    public boolean isCasting(Unit unit) {
+        if (unit instanceof RoyalGuardUnit royalGuardUnit) {
             GenericUntargetedSpellGoal goal = royalGuardUnit.getCastAvatarGoal();
             if (goal != null)
                 return goal.isCasting();
@@ -55,29 +55,32 @@ public class Avatar extends HeroAbility {
     }
 
     @Override
-    public AbilityButton getButton(Keybinding hotkey) {
+    public AbilityButton getButton(Keybinding hotkey, Unit unit) {
+        if (!(unit instanceof HeroUnit hero)) return null;
         return new AbilityButton("Avatar",
-                new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/vindicator.png"),
+                ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/mobheads/vindicator.png"),
                 hotkey,
                 () -> false,
-                () -> rank == 0,
+                () -> getRank(hero) == 0,
                 () -> true,
                 () -> sendUnitCommand(UnitAction.AVATAR),
                 null,
-                getTooltipLines(),
-                this
+                getTooltipLines((HeroUnit) hero),
+                this,
+                hero
         );
     }
 
     @Override
-    public Button getRankUpButton() {
+    public Button getRankUpButton(HeroUnit hero) {
         return super.getRankUpButtonProtected(
                 "Avatar",
-                new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/vindicator.png")
+                ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/mobheads/vindicator.png"),
+                hero
         );
     }
 
-    public List<FormattedCharSequence> getTooltipLines() {
+    public List<FormattedCharSequence> getTooltipLines(HeroUnit hero) {
         return List.of(
                 fcs(I18n.get("abilities.reignofnether.avatar"), true),
                 fcsIcons(I18n.get("abilities.reignofnether.avatar.stats", CD_MAX_SECONDS / 20, manaCost)),
@@ -88,10 +91,10 @@ public class Avatar extends HeroAbility {
         );
     }
 
-    public List<FormattedCharSequence> getRankUpTooltipLines() {
+    public List<FormattedCharSequence> getRankUpTooltipLines(HeroUnit hero) {
         return List.of(
                 fcs(I18n.get("abilities.reignofnether.avatar"), true),
-                fcs(I18n.get("abilities.reignofnether.level_req", getLevelRequirement()), getLevelReqStyle()),
+                fcs(I18n.get("abilities.reignofnether.level_req", getLevelRequirement(hero)), getLevelReqStyle(hero)),
                 fcs(""),
                 fcs(I18n.get("abilities.reignofnether.avatar.tooltip1")),
                 fcs(I18n.get("abilities.reignofnether.avatar.tooltip2", BONUS_HEALTH)),

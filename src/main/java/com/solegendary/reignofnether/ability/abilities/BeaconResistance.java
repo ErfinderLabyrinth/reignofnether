@@ -1,10 +1,10 @@
 package com.solegendary.reignofnether.ability.abilities;
 
 import com.solegendary.reignofnether.ability.BeaconAbility;
+import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.buildings.placements.BeaconPlacement;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybinding;
-import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.unit.UnitAction;
 import com.solegendary.reignofnether.unit.UnitClientEvents;
 import net.minecraft.client.resources.language.I18n;
@@ -20,16 +20,17 @@ public class BeaconResistance extends BeaconAbility {
 
     public final static MobEffect AURA_EFFECT = MobEffects.DAMAGE_RESISTANCE;
 
-    public BeaconResistance(BeaconPlacement beacon) {
-        super(UnitAction.BEACON_RESISTANCE, AURA_EFFECT, beacon);
-        this.defaultHotkey = Keybindings.keyR;
+    public BeaconResistance() {
+        super(UnitAction.BEACON_RESISTANCE, AURA_EFFECT);
     }
 
     @Override
-    public AbilityButton getButton(Keybinding hotkey) {
+    public AbilityButton getButton(Keybinding hotkey, BuildingPlacement placement) {
+        if (!(placement instanceof BeaconPlacement beacon)) return null;
+
         return new AbilityButton(
                 "Resistance Aura",
-                new ResourceLocation("minecraft", "textures/mob_effect/resistance.png"),
+                ResourceLocation.fromNamespaceAndPath("minecraft", "textures/mob_effect/resistance.png"),
                 hotkey,
                 () -> beacon.getAuraEffect() == AURA_EFFECT,
                 () -> false,
@@ -42,7 +43,8 @@ public class BeaconResistance extends BeaconAbility {
                         fcs(I18n.get("ability.reignofnether.beacon_aura.resistance.tooltip1")),
                         fcs(I18n.get("ability.reignofnether.beacon_aura.one_aura"))
                 ),
-                this
+                this,
+                placement
         );
     }
 }

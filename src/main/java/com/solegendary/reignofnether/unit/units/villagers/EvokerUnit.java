@@ -1,5 +1,6 @@
 package com.solegendary.reignofnether.unit.units.villagers;
 
+import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.AbilityClientboundPacket;
 import com.solegendary.reignofnether.ability.abilities.*;
@@ -7,6 +8,7 @@ import com.solegendary.reignofnether.building.GarrisonableBuilding;
 import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientboundPacket;
 import com.solegendary.reignofnether.hud.AbilityButton;
+import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
@@ -19,6 +21,7 @@ import com.solegendary.reignofnether.unit.interfaces.RangedAttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.modelling.models.VillagerUnitModel;
 import com.solegendary.reignofnether.util.Faction;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -51,6 +54,18 @@ import java.util.List;
 import java.util.Optional;
 
 public class EvokerUnit extends Evoker implements Unit, AttackerUnit, RangedAttackerUnit {
+    public static final Abilities ABILITIES = new Abilities();
+    static {
+        ABILITIES.add(new SetFangsLine());
+        ABILITIES.add(new SetFangsCircle());
+        ABILITIES.add(new CastSummonVexes(), Keybindings.keyQ);
+    }
+
+    Object2ObjectArrayMap<Ability, Float> cooldowns = Unit.createCooldownMap();
+    Object2ObjectArrayMap<Ability, Integer> charges = new Object2ObjectArrayMap<>();
+
+    Ability autocast;
+
     // region
     private int eatingTicksLeft = 0;
     public void setEatingTicksLeft(int amount) { eatingTicksLeft = amount; }
@@ -71,8 +86,7 @@ public class EvokerUnit extends Evoker implements Unit, AttackerUnit, RangedAtta
     public boolean canUsePortal() { return getUsePortalGoal() != null; }
 
     public Faction getFaction() {return Faction.VILLAGERS;}
-    public List<AbilityButton> getAbilityButtons() {return abilityButtons;}
-    public List<Ability> getAbilities() {return abilities;}
+    public Abilities getAbilities() {return abilities;}
     public List<ItemStack> getItems() {return items;}
     public MoveToTargetBlockGoal getMoveGoal() {return moveGoal;}
     public SelectedTargetGoal<? extends LivingEntity> getTargetGoal() {return targetGoal;}
@@ -176,15 +190,12 @@ public class EvokerUnit extends Evoker implements Unit, AttackerUnit, RangedAtta
     private UnitBowAttackGoal<? extends LivingEntity> attackGoal;
     private MeleeAttackBuildingGoal attackBuildingGoal;
 
-    private final List<AbilityButton> abilityButtons = new ArrayList<>();
-    private final List<Ability> abilities = new ArrayList<>();
+    private Abilities abilities = ABILITIES.clone();
     private final List<ItemStack> items = new ArrayList<>();
 
     public EvokerUnit(EntityType<? extends Evoker> entityType, Level level) {
         super(entityType, level);
-        this.abilities.add(new SetFangsLine(this));
-        this.abilities.add(new SetFangsCircle(this));
-        this.abilities.add(new CastSummonVexes(this));
+
         updateAbilityButtons();
     }
 
@@ -203,7 +214,7 @@ public class EvokerUnit extends Evoker implements Unit, AttackerUnit, RangedAtta
     public void resetBehaviours() {
         this.castFangsGoal.stop();
         this.castSummonVexesGoal.stop();
-        if (attackGoal != null && this.abilities.size() > 0 && this.abilities.get(0).isOffCooldown())
+        if (attackGoal != null && !this.abilities.get().isEmpty() && this.abilities.get().get(0).isOffCooldown(this))
             this.attackGoal.resetCooldown();
     }
 
@@ -216,9 +227,9 @@ public class EvokerUnit extends Evoker implements Unit, AttackerUnit, RangedAtta
         this.castSummonVexesGoal.tick();
         PromoteIllager.checkAndApplyBuff(this);
 
-        for (Ability ability : getAbilities()) {
+        for (Ability ability : getAbilities().get()) {
             if (ability instanceof CastSummonVexes castSummonVexes) {
-                if (castSummonVexes.isAutocasting() && !isCastingSpell() && castSummonVexes.isOffCooldown() && !level().isClientSide() && isIdle() &&
+                if (castSummonVexes.isAutocasting(this) && !isCastingSpell() && castSummonVexes.isOffCooldown(this) && !level().isClientSide() && isIdle() &&
                     tickCount % 4 == 0 && ResearchServerEvents.playerHasResearch(getOwnerName(), ProductionItems.RESEARCH_EVOKER_VEXES)) {
                     this.castSummonVexesGoal.startCasting();
                 }
@@ -275,12 +286,12 @@ public class EvokerUnit extends Evoker implements Unit, AttackerUnit, RangedAtta
     // controls whether the evoker's arms are up or not
     @Override
     public boolean isCastingSpell() {
-        for (Ability ability : getAbilities())
+        for (Ability ability : getAbilities().get())
             if (ability instanceof SetFangsCircle || ability instanceof SetFangsLine) {
-                if (ability.isOffCooldown() && this.getCastFangsGoal() != null && this.getCastFangsGoal().isCasting())
+                if (ability.isOffCooldown(this) && this.getCastFangsGoal() != null && this.getCastFangsGoal().isCasting())
                     return true;
             } else if (ability instanceof CastSummonVexes) {
-                if (ability.isOffCooldown() && this.getCastSummonVexesGoal() != null && this.getCastSummonVexesGoal().isCasting())
+                if (ability.isOffCooldown(this) && this.getCastSummonVexesGoal() != null && this.getCastSummonVexesGoal().isCasting())
                     return true;
             }
         return false;
@@ -291,11 +302,11 @@ public class EvokerUnit extends Evoker implements Unit, AttackerUnit, RangedAtta
     public void performUnitRangedAttack(LivingEntity pTarget, float velocity) {
         if (isUsingLineFangs) {
             this.getCastFangsGoal().startCasting();
-            this.getCastFangsGoal().setAbility(this.abilities.get(0));
+            this.getCastFangsGoal().setAbility(this.abilities.get().get(0));
             this.getCastFangsGoal().setTarget(pTarget);
         } else {
             this.getCastFangsGoal().startCasting();
-            this.getCastFangsGoal().setAbility(this.abilities.get(1));
+            this.getCastFangsGoal().setAbility(this.abilities.get().get(1));
             this.getCastFangsGoal().setTarget(pTarget);
         }
         if (!level().isClientSide() && pTarget instanceof Unit unit)
@@ -389,7 +400,7 @@ public class EvokerUnit extends Evoker implements Unit, AttackerUnit, RangedAtta
                 ((ServerLevel) this.level()).addFreshEntityWithPassengers(vex);
             }
         }
-        for (Ability ability : getAbilities())
+        for (Ability ability : getAbilities().get())
             if (ability instanceof CastSummonVexes)
                 AbilityClientboundPacket.sendSetCooldownPacket(getId(), UnitAction.CAST_SUMMON_VEXES, CastSummonVexes.CD_MAX_SECONDS * 20);
 
@@ -401,7 +412,7 @@ public class EvokerUnit extends Evoker implements Unit, AttackerUnit, RangedAtta
         Entity targetEntity = getTargetGoal().getTarget();
         if (this.isCastingSpell() || (targetEntity != null &&
             this.distanceTo(targetEntity) <= getAttackRange()) &&
-            this.getAbilities().get(0).isOffCooldown()) {
+            this.getAbilities().get().get(0).isOffCooldown(this)) {
             return VillagerUnitModel.ArmPose.SPELLCASTING;
         }
         return VillagerUnitModel.ArmPose.CROSSED;
@@ -445,5 +456,31 @@ public class EvokerUnit extends Evoker implements Unit, AttackerUnit, RangedAtta
     @Override
     public boolean hasBonusAttackSpeed() {
         return hasVigorEnchant();
+    }
+
+    @Override
+    public void updateAbilityButtons() {
+        abilities = ABILITIES.clone();
+        autocast = ABILITIES.getDefaultAutocast();
+    }
+
+    @Override
+    public Object2ObjectArrayMap<Ability, Float> getCooldowns() {
+        return cooldowns;
+    }
+
+    @Override
+    public boolean hasAutocast(Ability ability) {
+        return autocast == ability;
+    }
+
+    @Override
+    public void setAutocast(Ability autocast) {
+        this.autocast = autocast;
+    }
+
+    @Override
+    public Object2ObjectArrayMap<Ability, Integer> getCharges() {
+        return charges;
     }
 }

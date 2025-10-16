@@ -177,7 +177,7 @@ public class ItemRegistrar {
     public static final RegistryObject<Item> THROWN_HERO_EXPERIENCE_BOTTLE =
             ITEMS.register("thrown_hero_experience_bottle", () -> new HeroExperienceBottleItem(new Item.Properties()));
 
-    public static void init() {
-        ITEMS.register(FMLJavaModLoadingContext.get().getModEventBus());
+    public static void init(FMLJavaModLoadingContext context) {
+        ITEMS.register(context.getModEventBus());
     }
 }

@@ -132,25 +132,6 @@ public class PortalPlacement extends ProductionPlacement implements NetherConver
         }
     }
 
-    @Override
-    public void updateButtons() {
-        if (level.isClientSide()) {
-            super.updateButtons();
-            switch (this.getPortalType()) {
-                case CIVILIAN -> this.productionButtons = List.of(ProductionItems.RESEARCH_RESOURCE_CAPACITY.getStartButton(this, Keybindings.keyQ));
-                case MILITARY -> this.productionButtons = Arrays.asList(ProductionItems.BRUTE.getStartButton(this, Keybindings.keyQ),
-                        ProductionItems.HEADHUNTER.getStartButton(this, Keybindings.keyW),
-                        ProductionItems.HOGLIN.getStartButton(this, Keybindings.keyE),
-                        ProductionItems.BLAZE.getStartButton(this, Keybindings.keyR),
-                        ProductionItems.WITHER_SKELETON.getStartButton(this, Keybindings.keyT),
-                        ProductionItems.MAGMA_CUBE.getStartButton(this, Keybindings.keyY),
-                        ProductionItems.GHAST.getStartButton(this, Keybindings.keyU)
-                );
-                case TRANSPORT -> this.productionButtons = List.of();
-            }
-        }
-    }
-
     public double getMaxRange() { return 20; }
 
     public double getStartingRange() {

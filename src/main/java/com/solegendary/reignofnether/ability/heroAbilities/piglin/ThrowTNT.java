@@ -37,13 +37,13 @@ public class ThrowTNT extends HeroAbility {
     public static int LESS_COOLDOWN_PER_100_RESOURCES = 6 * (ResourceCost.TICKS_PER_SECOND + 2);
     public static int LESS_MANA_PER_100_RESOURCES = 5;
 
-    public ThrowTNT(HeroUnit hero) {
-        super(hero, 3, 40, UnitAction.THROW_TNT, 20 * ResourceCost.TICKS_PER_SECOND, RANGE, 0, true);
+    public ThrowTNT() {
+        super(3, 40, UnitAction.THROW_TNT, 20 * ResourceCost.TICKS_PER_SECOND, RANGE, 0, true);
     }
 
     @Override
-    public boolean isCasting() {
-        if (this.hero instanceof PiglinMerchantUnit piglinMerchantUnit) {
+    public boolean isCasting(Unit unit) {
+        if (unit instanceof PiglinMerchantUnit piglinMerchantUnit) {
             GenericTargetedSpellGoal goal = piglinMerchantUnit.getCastTNTGoal();
             if (goal != null)
                 return goal.isCasting();
@@ -52,50 +52,53 @@ public class ThrowTNT extends HeroAbility {
     }
 
     @Override
-    public boolean rankUp() {
-        if (super.rankUp()) {
+    public boolean rankUp(HeroUnit hero) {
+        if (super.rankUp(hero)) {
             updateStatsForRank();
             return true;
         }
         return false;
     }
 
-    public void updateStatsForRank() {
-        if (rank == 1) {
+    public void updateStatsForRank(HeroUnit hero) {
+        if (getRank(hero) == 1) {
             explosionPower = 2;
-        } else if (rank == 2) {
+        } else if (getRank(hero) == 2) {
             explosionPower = 3;
-        } else if (rank == 3) {
+        } else if (getRank(hero) == 3) {
             explosionPower = 4;
         }
     }
 
     @Override
-    public AbilityButton getButton(Keybinding hotkey) {
+    public AbilityButton getButton(Keybinding hotkey, Unit unit) {
+        if (!(unit instanceof HeroUnit hero)) return null;
         return new AbilityButton("Throw TNT",
-                new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/blocks/tnt.png"),
+                ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/icons/blocks/tnt.png"),
                 hotkey,
                 () -> CursorClientEvents.getLeftClickAction() == UnitAction.THROW_TNT,
-                () -> rank == 0,
+                () -> getRank(hero) == 0,
                 () -> true,
                 () -> CursorClientEvents.setLeftClickAction(UnitAction.THROW_TNT),
                 null,
-                getTooltipLines(),
-                this
+                getTooltipLines((HeroUnit) hero),
+                this,
+                hero
         );
     }
 
     @Override
-    public Button getRankUpButton() {
+    public Button getRankUpButton(HeroUnit hero) {
         return super.getRankUpButtonProtected(
                 "Throw TNT",
-                new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/blocks/tnt.png")
+                ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/icons/blocks/tnt.png"),
+                hero
         );
     }
 
-    public List<FormattedCharSequence> getTooltipLines() {
+    public List<FormattedCharSequence> getTooltipLines(HeroUnit hero) {
         return List.of(
-                fcs(I18n.get("abilities.reignofnether.throw_tnt") + " " + rankString(), true),
+                fcs(I18n.get("abilities.reignofnether.throw_tnt") + " " + rankString(hero), true),
                 fcsIcons(I18n.get("abilities.reignofnether.throw_tnt.stats", Math.round(explosionPower * 6.67f), cooldownMax / 20, RANGE, manaCost)),
                 fcs(""),
                 fcs(I18n.get("abilities.reignofnether.throw_tnt.tooltip1")),
@@ -103,17 +106,17 @@ public class ThrowTNT extends HeroAbility {
         );
     }
 
-    public List<FormattedCharSequence> getRankUpTooltipLines() {
+    public List<FormattedCharSequence> getRankUpTooltipLines(HeroUnit hero) {
         return List.of(
                 fcs(I18n.get("abilities.reignofnether.throw_tnt"), true),
-                fcs(I18n.get("abilities.reignofnether.level_req", getLevelRequirement()), getLevelReqStyle()),
+                fcs(I18n.get("abilities.reignofnether.level_req", getLevelRequirement(hero)), getLevelReqStyle(hero)),
                 fcs(""),
                 fcs(I18n.get("abilities.reignofnether.throw_tnt.tooltip1")),
                 fcs(I18n.get("abilities.reignofnether.throw_tnt.tooltip2", LESS_COOLDOWN_PER_100_RESOURCES / 20, LESS_MANA_PER_100_RESOURCES)),
                 fcs(""),
-                fcs(I18n.get("abilities.reignofnether.throw_tnt.rank1"), rank == 0),
-                fcs(I18n.get("abilities.reignofnether.throw_tnt.rank2"), rank == 1),
-                fcs(I18n.get("abilities.reignofnether.throw_tnt.rank3"), rank == 2)
+                fcs(I18n.get("abilities.reignofnether.throw_tnt.rank1"), getRank(hero) == 0),
+                fcs(I18n.get("abilities.reignofnether.throw_tnt.rank2"), getRank(hero) == 1),
+                fcs(I18n.get("abilities.reignofnether.throw_tnt.rank3"), getRank(hero) == 2)
         );
     }
 

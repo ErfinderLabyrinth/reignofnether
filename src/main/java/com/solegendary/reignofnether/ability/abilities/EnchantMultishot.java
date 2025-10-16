@@ -2,11 +2,11 @@ package com.solegendary.reignofnether.ability.abilities;
 
 import com.solegendary.reignofnether.ability.EnchantAbility;
 import com.solegendary.reignofnether.ability.EnchantAbilityServerboundPacket;
+import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.buildings.placements.LibraryPlacement;
 import com.solegendary.reignofnether.cursor.CursorClientEvents;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybinding;
-import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.unit.UnitAction;
 import com.solegendary.reignofnether.unit.units.villagers.PillagerUnit;
@@ -31,16 +31,17 @@ public class EnchantMultishot extends EnchantAbility {
     public static final Enchantment actualEnchantment = Enchantments.MULTISHOT;
     public static final int enchantLevel = 1;
 
-    public EnchantMultishot(LibraryPlacement library) {
-        super(ENCHANT_ACTION, library, ResourceCosts.ENCHANT_MULTISHOT);
-        this.defaultHotkey = Keybindings.keyR;
+    public EnchantMultishot() {
+        super(ENCHANT_ACTION, ResourceCosts.ENCHANT_MULTISHOT);
     }
 
     @Override
-    public AbilityButton getButton(Keybinding hotkey) {
+    public AbilityButton getButton(Keybinding hotkey, BuildingPlacement placement) {
+        if (!(placement instanceof LibraryPlacement)) return null;
+        LibraryPlacement library = (LibraryPlacement) placement;
         return new AbilityButton(
                 "Multishot Enchantment",
-                new ResourceLocation("minecraft", "textures/item/crossbow_arrow.png"),
+                ResourceLocation.fromNamespaceAndPath("minecraft", "textures/item/crossbow_arrow.png"),
                 hotkey,
                 () -> CursorClientEvents.getLeftClickAction() == ENCHANT_ACTION || library.autoCastEnchant == this,
                 () -> false,
@@ -63,7 +64,8 @@ public class EnchantMultishot extends EnchantAbility {
                         FormattedCharSequence.forward(I18n.get("ability.reignofnether.enchant.multishot.tooltip3"), Style.EMPTY),
                         FormattedCharSequence.forward(I18n.get("abilities.reignofnether.autocast"), Style.EMPTY)
                 ),
-                this
+                this,
+                placement
         );
     }
 

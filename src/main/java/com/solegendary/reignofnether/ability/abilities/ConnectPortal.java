@@ -25,20 +25,19 @@ public class ConnectPortal extends Ability {
     private static final int CD_MAX = 0;
     private static final int RANGE = 0;
 
-    PortalPlacement portalPlacement;
-
-    public ConnectPortal(PortalPlacement portalPlacement) {
-        super(UnitAction.CONNECT_PORTAL, portalPlacement.getLevel(), CD_MAX, RANGE, 0, true);
-        this.portalPlacement = portalPlacement;
+    public ConnectPortal() {
+        super(UnitAction.CONNECT_PORTAL, CD_MAX, RANGE, 0, true);
     }
 
     @Override
-    public AbilityButton getButton(Keybinding hotkey) {
+    public AbilityButton getButton(Keybinding hotkey, BuildingPlacement placement) {
+        if (!(placement instanceof PortalPlacement)) return null;
+        PortalPlacement portal = (PortalPlacement) placement;
         return new AbilityButton("Connect Portal",
-            new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/blocks/portal.png"),
+            ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/icons/blocks/portal.png"),
             hotkey,
             () -> false,
-            () -> portalPlacement.getPortalType() != PortalPlacement.PortalType.TRANSPORT,
+            () -> portal.getPortalType() != PortalPlacement.PortalType.TRANSPORT,
             () -> true,
             () -> CursorClientEvents.setLeftClickAction(UnitAction.CONNECT_PORTAL),
             null,
@@ -50,14 +49,14 @@ public class ConnectPortal extends Ability {
                 FormattedCharSequence.forward(I18n.get("abilities.reignofnether.connect_portal.tooltip1"), Style.EMPTY),
                 FormattedCharSequence.forward(I18n.get("abilities.reignofnether.connect_portal.tooltip2"), Style.EMPTY)
             ),
-            this
+            this,
+            placement
         );
     }
 
     @Override
     public void use(Level level, BuildingPlacement buildingUsing, BlockPos targetBp) {
-
-        if (buildingUsing == portalPlacement) {
+        if (buildingUsing instanceof PortalPlacement portalPlacement && portalPlacement.getPortalType() == PortalPlacement.PortalType.TRANSPORT) {
             portalPlacement.disconnectPortal();
 
             BuildingPlacement targetBuilding = BuildingUtils.findBuilding(level.isClientSide(), targetBp);

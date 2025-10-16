@@ -51,7 +51,7 @@ public class HelperButtons {
         chatButton = new Button(
                 "Chat",
                 ICON_SIZE,
-                new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/book.png"),
+                ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/icons/items/book.png"),
                 (Keybinding) null,
                 () -> false,
                 () -> false,
@@ -107,7 +107,7 @@ public class HelperButtons {
         buildingCancelButton = new Button(
                 "Cancel",
                 ICON_SIZE,
-                new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/barrier.png"),
+                ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/icons/items/barrier.png"),
                 Keybindings.cancelBuild,
                 () -> false,
                 () -> {
@@ -129,7 +129,7 @@ public class HelperButtons {
         armyButton = new Button(
                 "Select all military units",
                 ICON_SIZE,
-                new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/sword_and_bow.png"),
+                ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/icons/items/sword_and_bow.png"),
                 Keybindings.keyK,
                 () -> false,
                 () -> {
@@ -166,9 +166,9 @@ public class HelperButtons {
 
     private static ResourceLocation getIdleWorkerIcon() {
         return switch (PlayerClientEvents.getFaction()) {
-            case MONSTERS -> new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/zombie_villager.png");
-            case PIGLINS -> new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/grunt.png");
-            default -> new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/villager.png");
+            case MONSTERS -> ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/mobheads/zombie_villager.png");
+            case PIGLINS -> ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/mobheads/grunt.png");
+            default -> ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/mobheads/villager.png");
         };
     }
 
@@ -213,7 +213,7 @@ public class HelperButtons {
         return new Button(
                 "Beacon",
                 14,
-                new ResourceLocation("minecraft", "textures/item/nether_star.png"),
+                ResourceLocation.fromNamespaceAndPath("minecraft", "textures/item/nether_star.png"),
                 (Keybinding) null,
                 () -> false,
                 () -> BuildingUtils.getBeacon(true) == null,

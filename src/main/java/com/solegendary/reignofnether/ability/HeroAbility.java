@@ -26,36 +26,32 @@ public abstract class HeroAbility extends Ability {
     // can be ranked up when the hero levels up
     // requires a HeroUnit to be passed
 
-    public final HeroUnit hero;
-    public int rank = 0; // 0 == not learnt
     public final int maxRank;
     public int manaCost = 0;
 
-    public HeroAbility(HeroUnit hero, int maxRank, UnitAction action, int cooldownMax, float range, float radius, boolean canTargetEntities) {
-        super(action, ((Entity) hero).level(), cooldownMax, range, radius, canTargetEntities);
-        this.hero = hero;
+    public HeroAbility(int maxRank, UnitAction action, int cooldownMax, float range, float radius, boolean canTargetEntities) {
+        super(action, cooldownMax, range, radius, canTargetEntities);
         this.maxRank = maxRank;
         this.manaCost = 0;
     }
 
-    public HeroAbility(HeroUnit hero, int maxRank, int manaCost, UnitAction action, int cooldownMax, float range, float radius, boolean canTargetEntities) {
-        super(action, ((Entity) hero).level(), cooldownMax, range, radius, canTargetEntities);
-        this.hero = hero;
+    public HeroAbility(int maxRank, int manaCost, UnitAction action, int cooldownMax, float range, float radius, boolean canTargetEntities) {
+        super(action, cooldownMax, range, radius, canTargetEntities);
         this.maxRank = maxRank;
         this.manaCost = manaCost;
     }
 
-    public int getLevelRequirement() {
+    public int getLevelRequirement(HeroUnit hero) {
         if (maxRank <= 1) {
            return 6;
         } else {
-            return (rank * 2) + 1;
+            return (getRank(hero) * 2) + 1;
         }
     }
 
-    public boolean rankUp() {
-        if (rank < maxRank && hero.getSkillPoints() > 0 && hero.getHeroLevel() >= getLevelRequirement()) {
-            rank += 1;
+    public boolean rankUp(HeroUnit hero) {
+        if (getRank(hero) < maxRank && hero.getSkillPoints() > 0 && hero.getHeroLevel() >= getLevelRequirement(hero)) {
+            setRank(hero, getRank(hero) + 1);
             hero.setSkillPoints(hero.getSkillPoints() - 1);
             if (((LivingEntity) hero).level().isClientSide)
                 hero.updateAbilityButtons();
@@ -68,45 +64,45 @@ public abstract class HeroAbility extends Ability {
 
     public void updateStatsForRank() { }
 
-    protected String rankString() {
-        return rank > 0 ? I18n.get("abilities.reignofnether.rank", rank) : I18n.get("abilities.reignofnether.unlearnt");
+    protected String rankString(HeroUnit hero) {
+        return getRank(hero) > 0 ? I18n.get("abilities.reignofnether.rank", getRank(hero)) : I18n.get("abilities.reignofnether.unlearnt");
     }
 
-    public List<FormattedCharSequence> getRankUpTooltipLines() {
+    public List<FormattedCharSequence> getRankUpTooltipLines(HeroUnit hero) {
         return List.of();
     }
 
-    public List<FormattedCharSequence> getTooltipLines() {
+    public List<FormattedCharSequence> getTooltipLines(HeroUnit hero) {
         return List.of();
     }
 
-    public AbilityButton getButton(Keybinding hotkey) {
+    public AbilityButton getButton(Keybinding hotkey, Unit hero) {
         return null;
     }
 
     // rank up button for this specific ability
-    public Button getRankUpButton() {
+    public Button getRankUpButton(HeroUnit hero) {
         return null;
     }
 
-    protected Button getRankUpButtonProtected(String name, ResourceLocation resourceLocation) {
+    protected Button getRankUpButtonProtected(String name, ResourceLocation resourceLocation, HeroUnit hero) {
         Button button = new Button(name,
             14,
-            new ResourceLocation(ReignOfNether.MOD_ID, "textures/hud/corner_plus.png"),
+            ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/hud/corner_plus.png"),
             (Keybinding) null,
             () -> false,
-            () -> !hero.isRankUpMenuOpen() || rank >= maxRank,
-            () -> hero.getSkillPoints() > 0 && hero.getHeroLevel() >= getLevelRequirement(),
+            () -> !hero.isRankUpMenuOpen() || getRank(hero) >= maxRank,
+            () -> hero.getSkillPoints() > 0 && hero.getHeroLevel() >= getLevelRequirement(hero),
             () -> {
-                if (rankUp()) {
+                if (rankUp(hero)) {
                     AbilityServerboundPacket.rankUpAbility(((Entity) hero).getId(), action);
-                    ((Unit) hero).updateAbilityButtons();
+                    hero.updateAbilityButtons();
                 }
                 if (hero.getSkillPoints() <= 0)
                     hero.showRankUpMenu(false);
             },
             null,
-            getRankUpTooltipLines()
+            getRankUpTooltipLines(hero)
         );
         button.bgIconResource = resourceLocation;
         return button;
@@ -117,7 +113,7 @@ public abstract class HeroAbility extends Ability {
             return true;
         int totalSkillRanks = 0;
         for (HeroAbility ability : hero.getHeroAbilities()) {
-            totalSkillRanks += ability.rank;
+            totalSkillRanks += ability.getRank(hero);
         }
         return totalSkillRanks >= 10;
     }
@@ -127,8 +123,8 @@ public abstract class HeroAbility extends Ability {
         Button menuButton = new Button("Rank up abilities",
             14,
             hero.isRankUpMenuOpen() ?
-                new ResourceLocation(ReignOfNether.MOD_ID, "textures/hud/cross.png") :
-                new ResourceLocation(ReignOfNether.MOD_ID, "textures/hud/tick.png"),
+                ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/hud/cross.png") :
+                ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/hud/tick.png"),
             Keybindings.keyU,
             () -> false,
             () -> allSkillsLearnt(hero) || !PlayerClientEvents.isRTSPlayer(),
@@ -141,7 +137,15 @@ public abstract class HeroAbility extends Ability {
         return menuButton;
     }
 
-    public Style getLevelReqStyle() {
-        return Style.EMPTY.withColor(hero.getHeroLevel() >= getLevelRequirement() ? 0x00FF00 : 0xFF0000);
+    public Style getLevelReqStyle(HeroUnit hero) {
+        return Style.EMPTY.withColor(hero.getHeroLevel() >= getLevelRequirement(hero) ? 0x00FF00 : 0xFF0000);
+    }
+
+    public int getRank(HeroUnit hero) {
+        return hero.getHeroAbilityRank(this);
+    }
+
+    public void setRank(HeroUnit hero, int rank) {
+        hero.setHeroAbilityRank(this, rank);
     }
 }

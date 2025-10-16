@@ -6,6 +6,7 @@ import com.solegendary.reignofnether.building.buildings.monsters.SculkCatalyst;
 import com.solegendary.reignofnether.building.buildings.placements.BeaconPlacement;
 import com.solegendary.reignofnether.building.buildings.placements.SculkCatalystPlacement;
 import com.solegendary.reignofnether.building.buildings.shared.AbstractBridge;
+import com.solegendary.reignofnether.keybinds.Keybinding;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.entity.LivingEntity;
@@ -18,10 +19,13 @@ import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
 
 public class BuildingUtils {
+
+    public static List<Keybinding> keybindings = Arrays.asList();
 
     public static int getTotalCompletedBuildingsOwned(boolean isClientSide, String ownerName) {
         List<BuildingPlacement> buildings;

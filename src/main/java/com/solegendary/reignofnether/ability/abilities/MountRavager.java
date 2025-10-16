@@ -8,7 +8,6 @@ import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.hud.HudClientEvents;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.research.ResearchClient;
-import com.solegendary.reignofnether.research.researchItems.ResearchRavagerCavalry;
 import com.solegendary.reignofnether.unit.UnitAction;
 import com.solegendary.reignofnether.unit.UnitClientEvents;
 import com.solegendary.reignofnether.unit.goals.MountGoal;
@@ -23,24 +22,22 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 
 import java.util.List;
 
 public class MountRavager extends Ability {
-
-    private final LivingEntity entity;
-
-    public MountRavager(LivingEntity entity) {
-        super(UnitAction.MOUNT_RAVAGER, entity.level(), 0, 0, 0, true);
-        this.entity = entity;
+    public MountRavager() {
+        super(UnitAction.MOUNT_RAVAGER, 0, 0, 0, true);
     }
 
     @Override
-    public AbilityButton getButton(Keybinding hotkey) {
+    public AbilityButton getButton(Keybinding hotkey, Unit unit) {
+        Entity entity = (Entity) unit;
         return new AbilityButton("Mount Ravager",
-            new ResourceLocation(ReignOfNether.MOD_ID, "textures/mobheads/ravager.png"),
+            ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/mobheads/ravager.png"),
             hotkey,
             () -> CursorClientEvents.getLeftClickAction() == UnitAction.MOUNT_RAVAGER,
             () -> entity.isPassenger() || !ResearchClient.hasResearch(ProductionItems.RESEARCH_RAVAGER_CAVALRY),
@@ -51,11 +48,12 @@ public class MountRavager extends Ability {
                 FormattedCharSequence.forward(I18n.get("abilities.reignofnether.mount_ravager"), Style.EMPTY),
                 FormattedCharSequence.forward(I18n.get("abilities.reignofnether.mount_ravager.tooltip1"), Style.EMPTY)
             ),
-            this
+            this,
+            unit
         );
     }
 
-    private MountGoal getMountGoal() {
+    private MountGoal getMountGoal(Entity entity) {
         if (entity instanceof PillagerUnit pillagerUnit) {
             return pillagerUnit.getMountGoal();
         }
@@ -74,14 +72,14 @@ public class MountRavager extends Ability {
     // right click
     @Override
     public void use(Level level, Unit unitUsing, BlockPos targetBp) {
-        MountGoal mountGoal = getMountGoal();
+        MountGoal mountGoal = getMountGoal((Entity) unitUsing);
         if (mountGoal != null)
             mountGoal.autofind = true;
     }
 
     @Override
     public void use(Level level, Unit unitUsing, LivingEntity targetEntity) {
-        MountGoal mountGoal = getMountGoal();
+        MountGoal mountGoal = getMountGoal((Entity) unitUsing);
         if (mountGoal != null && targetEntity instanceof RavagerUnit) {
             mountGoal.setTarget(targetEntity);
         } else if (level.isClientSide()) {

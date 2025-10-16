@@ -22,7 +22,10 @@ import com.solegendary.reignofnether.registrars.MobEffectRegistrar;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
 import com.solegendary.reignofnether.resources.*;
 import com.solegendary.reignofnether.sandbox.SandboxServer;
-import com.solegendary.reignofnether.unit.interfaces.*;
+import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
+import com.solegendary.reignofnether.unit.interfaces.ConvertableUnit;
+import com.solegendary.reignofnether.unit.interfaces.Unit;
+import com.solegendary.reignofnether.unit.interfaces.WorkerUnit;
 import com.solegendary.reignofnether.unit.packets.*;
 import com.solegendary.reignofnether.unit.units.monsters.CreeperUnit;
 import com.solegendary.reignofnether.unit.units.monsters.DrownedUnit;
@@ -529,7 +532,7 @@ public class UnitServerEvents {
             for (NecromancerUnit necromancerUnit : necromancers) {
                 SoulSiphonPassive soulSiphon = necromancerUnit.getSoulSiphon();
                 if (soulSiphon != null) {
-                    soulSiphon.checkAndGainSouls(evt.getEntity(), necromancers.size());
+                    soulSiphon.checkAndGainSouls(evt.getEntity(), necromancers.size(), necromancerUnit);
                     AbilityClientboundPacket.doAbility(necromancerUnit.getId(), UnitAction.SOUL_SIPHON_UPDATE, soulSiphon.souls);
                 }
             }
@@ -885,7 +888,7 @@ public class UnitServerEvents {
         //  instead just relying on splash damage and fire creation
         if (owner instanceof GhastUnit && hit != null) {
             if (!(hit instanceof GhastUnit)) {
-                evt.setCanceled(true);
+                evt.setImpactResult(ProjectileImpactEvent.ImpactResult.SKIP_ENTITY);
             }
         }
 
@@ -896,7 +899,7 @@ public class UnitServerEvents {
                 if (evt.getProjectile() instanceof AbstractArrow arrow && arrow.getPierceLevel() > 0) {
                     return;
                 }
-                evt.setCanceled(true);
+                evt.setImpactResult(ProjectileImpactEvent.ImpactResult.SKIP_ENTITY);
             }
         }
     }

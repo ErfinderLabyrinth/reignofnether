@@ -31,7 +31,7 @@ public class MobEffectRegistrar {
     public static final RegistryObject<MobEffect> MINOR_MOVEMENT_SLOWDOWN = MOB_EFFECTS.register("minor_slowdown", () -> new InstantenousMobEffect(MobEffectCategory.HARMFUL, 3402751)
             .addAttributeModifier(Attributes.MOVEMENT_SPEED, "eb256076-43e6-470e-a907-434a389da860", -0.05, AttributeModifier.Operation.MULTIPLY_BASE));
 
-    public static void init() {
-        MOB_EFFECTS.register(FMLJavaModLoadingContext.get().getModEventBus());
+    public static void init(FMLJavaModLoadingContext context) {
+        MOB_EFFECTS.register(context.getModEventBus());
     }
 }

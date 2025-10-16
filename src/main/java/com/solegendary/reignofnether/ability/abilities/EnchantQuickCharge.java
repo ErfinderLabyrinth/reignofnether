@@ -2,6 +2,7 @@ package com.solegendary.reignofnether.ability.abilities;
 
 import com.solegendary.reignofnether.ability.EnchantAbility;
 import com.solegendary.reignofnether.ability.EnchantAbilityServerboundPacket;
+import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.buildings.placements.LibraryPlacement;
 import com.solegendary.reignofnether.cursor.CursorClientEvents;
 import com.solegendary.reignofnether.hud.AbilityButton;
@@ -31,16 +32,18 @@ public class EnchantQuickCharge extends EnchantAbility {
     public static final Enchantment actualEnchantment = Enchantments.QUICK_CHARGE;
     public static final int enchantLevel = 2;
 
-    public EnchantQuickCharge(LibraryPlacement library) {
-        super(ENCHANT_ACTION, library, ResourceCosts.ENCHANT_QUICK_CHARGE);
+    public EnchantQuickCharge() {
+        super(ENCHANT_ACTION, ResourceCosts.ENCHANT_QUICK_CHARGE);
         this.defaultHotkey = Keybindings.keyW;
     }
 
     @Override
-    public AbilityButton getButton(Keybinding hotkey) {
+    public AbilityButton getButton(Keybinding hotkey, BuildingPlacement placement) {
+        if (!(placement instanceof LibraryPlacement)) return null;
+        LibraryPlacement library = (LibraryPlacement) placement;
         return new AbilityButton(
                 "Quick Charge Enchantment",
-                new ResourceLocation("minecraft", "textures/item/crossbow_standby.png"),
+                ResourceLocation.fromNamespaceAndPath("minecraft", "textures/item/crossbow_standby.png"),
                 hotkey,
                 () -> CursorClientEvents.getLeftClickAction() == ENCHANT_ACTION || library.autoCastEnchant == this,
                 () -> false,
@@ -63,7 +66,8 @@ public class EnchantQuickCharge extends EnchantAbility {
                         FormattedCharSequence.forward(I18n.get("ability.reignofnether.enchant.quickshot.tooltip3"), Style.EMPTY),
                         FormattedCharSequence.forward(I18n.get("abilities.reignofnether.autocast"), Style.EMPTY)
                 ),
-                this
+                this,
+                placement
         );
     }
 

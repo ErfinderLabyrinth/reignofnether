@@ -43,17 +43,17 @@ public class ObserverPlayerDisplay extends AbstractPlayerDisplay {
         int color = 0xFFFFFF;
         switch (resource) {
             case FOOD -> {
-                icon = new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/wheat.png");
+                icon = ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/icons/items/wheat.png");
                 value = String.valueOf(resources.food);
                 color = 0xE8BC5F;
             }
             case WOOD -> {
-                icon = new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/wood.png");
+                icon = ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/icons/items/wood.png");
                 value = String.valueOf(resources.wood);
                 color = 0xA3753B;
             }
             case ORE -> {
-                icon = new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/iron_ore.png");
+                icon = ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/icons/items/iron_ore.png");
                 value = String.valueOf(resources.ore);
                 color = 0xFFF4ED;
             }
@@ -126,7 +126,7 @@ public class ObserverPlayerDisplay extends AbstractPlayerDisplay {
         MyRenderer.renderIcon(guiGraphics,
                 //new ResourceLocation(ReignOfNether.MOD_ID, "textures/cursors/customcursor_shovel.png"),
                 //new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/pickaxe.png"),
-                new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/shovel.png"),
+                ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/icons/items/shovel.png"),
                 x + 4,
                 y + 4,
                 Button.DEFAULT_ICON_SIZE
@@ -139,7 +139,7 @@ public class ObserverPlayerDisplay extends AbstractPlayerDisplay {
                 0xFFFFFF
         );
         MyRenderer.renderIcon(guiGraphics,
-                new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/sword_and_bow.png"),
+                ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/icons/items/sword_and_bow.png"),
                 x + SUPPLY_DETAIL_FRAME_WIDTH / 2 + 4,
                 y + 4,
                 Button.DEFAULT_ICON_SIZE

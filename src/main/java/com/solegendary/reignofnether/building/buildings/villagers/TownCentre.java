@@ -5,6 +5,7 @@ import com.solegendary.reignofnether.ability.abilities.BackToWorkBuilding;
 import com.solegendary.reignofnether.ability.abilities.CallToArmsBuilding;
 import com.solegendary.reignofnether.api.ReignOfNetherRegistries;
 import com.solegendary.reignofnether.building.BuildingClientEvents;
+import com.solegendary.reignofnether.building.BuildingPlaceButton;
 import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.Buildings;
 import com.solegendary.reignofnether.building.buildings.placements.RangeIndicatorProductionPlacement;
@@ -45,7 +46,7 @@ public class TownCentre extends ProductionBuilding {
         super(structureName, cost, true);
         this.name = buildingName;
         this.portraitBlock = Blocks.POLISHED_GRANITE;
-        this.icon = new ResourceLocation("minecraft", "textures/block/polished_granite.png");
+        this.icon = ResourceLocation.fromNamespaceAndPath("minecraft", "textures/block/polished_granite.png");
 
         this.buildTimeModifier = 0.331f; // 60s total build time with 3 villagers
         this.canAcceptResources = true;
@@ -54,6 +55,11 @@ public class TownCentre extends ProductionBuilding {
         this.startingBlockTypes.add(Blocks.GRASS_BLOCK);
         this.startingBlockTypes.add(Blocks.POLISHED_ANDESITE_STAIRS);
 
+        Ability callToArms = new CallToArmsBuilding();
+        this.abilities.add(callToArms, Keybindings.keyV);
+        BackToWorkBuilding backToWork = new BackToWorkBuilding();
+        this.abilities.add(backToWork, Keybindings.build);
+
         this.productions.add(ProductionItems.VILLAGER, Keybindings.keyQ);
     }
 
@@ -61,26 +67,19 @@ public class TownCentre extends ProductionBuilding {
 
     @Override
     public BuildingPlacement createBuildingPlacement(Level level, BlockPos pos, Rotation rotation, String ownerName) {
-        BuildingPlacement bp = new RangeIndicatorProductionPlacement(this, level, pos, rotation, ownerName, getAbsoluteBlockData(getRelativeBlockData(level), level, pos, rotation), true, MILITIA_RANGE, true, false);
-        Ability callToArms = new CallToArmsBuilding(level);
-        bp.getAbilities().add(callToArms);
-        BackToWorkBuilding backToWork = new BackToWorkBuilding(level);
-        bp.getAbilities().add(backToWork);
-        return bp;
+        return new RangeIndicatorProductionPlacement(this, level, pos, rotation, ownerName, getAbsoluteBlockData(getRelativeBlockData(level), level, pos, rotation), true, MILITIA_RANGE, true, false);
     }
 
-    public AbilityButton getBuildButton(Keybinding hotkey) {
+    public BuildingPlaceButton getBuildButton(Keybinding hotkey) {
         ResourceLocation key = ReignOfNetherRegistries.BUILDING.getKey(this);
         String name = I18n.get("buildings." + getFaction().name().toLowerCase() + "." + key.getNamespace() + "." + key.getPath());
-        return new AbilityButton(
+        return new BuildingPlaceButton(
                name,
-                new ResourceLocation("minecraft", "textures/block/polished_granite.png"),
+                ResourceLocation.fromNamespaceAndPath("minecraft", "textures/block/polished_granite.png"),
                 hotkey,
                 () -> BuildingClientEvents.getBuildingToPlace() == Buildings.TOWN_CENTRE,
                 () -> false,
                 () -> true,
-                () -> BuildingClientEvents.setBuildingToPlace(Buildings.TOWN_CENTRE),
-                null,
                 List.of(
                         FormattedCharSequence.forward(I18n.get("buildings.villagers.reignofnether.town_centre"), Style.EMPTY.withBold(true)),
                         ResourceCosts.getFormattedCost(cost),
@@ -88,7 +87,12 @@ public class TownCentre extends ProductionBuilding {
                         FormattedCharSequence.forward("", Style.EMPTY),
                         FormattedCharSequence.forward(I18n.get("buildings.villagers.reignofnether.town_centre.tooltip1"), Style.EMPTY)
                 ),
-                null
+                this
         );
+    }
+
+    @Override
+    public boolean isBuildableBuildingForFaction(Faction faction) {
+        return faction == Faction.VILLAGERS;
     }
 }

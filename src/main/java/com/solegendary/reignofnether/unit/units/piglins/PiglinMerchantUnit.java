@@ -1,7 +1,9 @@
 package com.solegendary.reignofnether.unit.units.piglins;
 
+import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.AbilityClientboundPacket;
+import com.solegendary.reignofnether.ability.HeroAbility;
 import com.solegendary.reignofnether.ability.heroAbilities.piglin.FancyFeast;
 import com.solegendary.reignofnether.ability.heroAbilities.piglin.GreedIsGoodPassive;
 import com.solegendary.reignofnether.ability.heroAbilities.piglin.LootExplosion;
@@ -23,6 +25,7 @@ import com.solegendary.reignofnether.unit.interfaces.KeyframeAnimated;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.modelling.animations.PiglinMerchantAnimations;
 import com.solegendary.reignofnether.util.Faction;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import net.minecraft.client.animation.AnimationDefinition;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -61,6 +64,20 @@ import java.util.Iterator;
 import java.util.List;
 
 public class PiglinMerchantUnit extends Piglin implements Unit, AttackerUnit, HeroUnit, KeyframeAnimated {
+    public static final Abilities ABILITIES = new Abilities();
+    static {
+        ABILITIES.add(new ThrowTNT());
+        ABILITIES.add(new FancyFeast());
+        ABILITIES.add(new GreedIsGoodPassive());
+        ABILITIES.add(new LootExplosion());
+    }
+
+    Object2ObjectArrayMap<Ability, Float> cooldowns = Unit.createCooldownMap();
+    Object2ObjectArrayMap<Ability, Integer> charges = new Object2ObjectArrayMap<>();
+    Object2ObjectArrayMap<HeroAbility, Integer> heroAbilityRanks = new Object2ObjectArrayMap<>();
+
+    Ability autocast;
+
     // region
     private int eatingTicksLeft = 0;
     public void setEatingTicksLeft(int amount) { eatingTicksLeft = amount; }
@@ -80,8 +97,7 @@ public class PiglinMerchantUnit extends Piglin implements Unit, AttackerUnit, He
     public boolean canUsePortal() { return getUsePortalGoal() != null; }
 
     public Faction getFaction() {return Faction.PIGLINS;}
-    public List<AbilityButton> getAbilityButtons() {return abilityButtons;};
-    public List<Ability> getAbilities() {return abilities;}
+    public Abilities getAbilities() {return abilities;}
     public List<ItemStack> getItems() {return items;};
     public MoveToTargetBlockGoal getMoveGoal() {return moveGoal;}
     public SelectedTargetGoal<? extends LivingEntity> getTargetGoal() {return targetGoal;}
@@ -202,8 +218,7 @@ public class PiglinMerchantUnit extends Piglin implements Unit, AttackerUnit, He
     @Override public float getBaseHealth() { return maxHealth; };
     @Override public float getBaseAttack() { return attackDamage; };
 
-    private final List<AbilityButton> abilityButtons = new ArrayList<>();
-    private final List<Ability> abilities = new ArrayList<>();
+    private Abilities abilities = ABILITIES.clone();
     private final List<ItemStack> items = new ArrayList<>();
 
     public final AnimationState idleAnimState = new AnimationState();
@@ -252,10 +267,7 @@ public class PiglinMerchantUnit extends Piglin implements Unit, AttackerUnit, He
 
     public PiglinMerchantUnit(EntityType<? extends Piglin> entityType, Level level) {
         super(entityType, level);
-        this.abilities.add(new ThrowTNT(this));
-        this.abilities.add(new FancyFeast(this));
-        this.abilities.add(new GreedIsGoodPassive(this));
-        this.abilities.add(new LootExplosion(this));
+
         updateAbilityButtons();
         setStatsForLevel();
     }
@@ -406,28 +418,28 @@ public class PiglinMerchantUnit extends Piglin implements Unit, AttackerUnit, He
     }
 
     public ThrowTNT getThrowTNT() {
-        for (Ability ability : abilities)
+        for (Ability ability : abilities.get())
             if (ability instanceof ThrowTNT)
                 return (ThrowTNT) ability;
         return null;
     }
 
     public FancyFeast getFancyFeast() {
-        for (Ability ability : abilities)
+        for (Ability ability : abilities.get())
             if (ability instanceof FancyFeast)
                 return (FancyFeast) ability;
         return null;
     }
 
     public GreedIsGoodPassive getGreedIsGood() {
-        for (Ability ability : abilities)
+        for (Ability ability : abilities.get())
             if (ability instanceof GreedIsGoodPassive)
                 return (GreedIsGoodPassive) ability;
         return null;
     }
 
     public LootExplosion getLootExplosion() {
-        for (Ability ability : abilities)
+        for (Ability ability : abilities.get())
             if (ability instanceof LootExplosion)
                 return (LootExplosion) ability;
         return null;
@@ -450,13 +462,13 @@ public class PiglinMerchantUnit extends Piglin implements Unit, AttackerUnit, He
 
         GreedIsGoodPassive greedIsGood = getGreedIsGood();
         int resourceBonus = 0;
-        if (greedIsGood.isAutocasting())
-            resourceBonus = greedIsGood.spendResourcesAndGet100sSpent(ResourceName.WOOD);
+        if (greedIsGood.isAutocasting(this))
+            resourceBonus = greedIsGood.spendResourcesAndGet100sSpent(ResourceName.WOOD, this);
 
         ThrowTNT throwTNT = getThrowTNT();
         float cooldown = Math.max(0, throwTNT.cooldownMax - (resourceBonus * ThrowTNT.LESS_COOLDOWN_PER_100_RESOURCES));
-        throwTNT.setCooldown(cooldown);
-        AbilityClientboundPacket.sendSetCooldownPacket(getId(), throwTNT.action, throwTNT.getCooldown());
+        throwTNT.setCooldown(cooldown, this);
+        AbilityClientboundPacket.sendSetCooldownPacket(getId(), throwTNT.action, throwTNT.getCooldown(this));
         setMana(getMana() + (resourceBonus * ThrowTNT.LESS_MANA_PER_100_RESOURCES));
     }
 
@@ -465,13 +477,13 @@ public class PiglinMerchantUnit extends Piglin implements Unit, AttackerUnit, He
 
         GreedIsGoodPassive greedIsGood = getGreedIsGood();
         int resourceBonus = 0;
-        if (greedIsGood.isAutocasting())
-            resourceBonus = greedIsGood.spendResourcesAndGet100sSpent(ResourceName.FOOD);
+        if (greedIsGood.isAutocasting(this))
+            resourceBonus = greedIsGood.spendResourcesAndGet100sSpent(ResourceName.FOOD, this);
 
         int numItems = FancyFeast.BASE_ITEMS + (FancyFeast.BONUS_ITEMS_PER_100_RESOURCES * resourceBonus);
 
         for (int i = 0; i < numItems; i++) {
-            ItemEntity foodEntity = new ItemEntity(level(), pos.x, pos.y, pos.z, new ItemStack(getFancyFeast().getFoodItem()));
+            ItemEntity foodEntity = new ItemEntity(level(), pos.x, pos.y, pos.z, new ItemStack(getFancyFeast().getFoodItem(this)));
             foodEntity.setThrower(getUUID());
             Vec3 dMove = Vec3.atCenterOf(targetBp).subtract(pos)
                     .multiply(1,0,1)
@@ -545,8 +557,8 @@ public class PiglinMerchantUnit extends Piglin implements Unit, AttackerUnit, He
 
         GreedIsGoodPassive greedIsGood = getGreedIsGood();
         int resourceBonus = 0;
-        if (greedIsGood.isAutocasting())
-            resourceBonus = greedIsGood.spendResourcesAndGet100sSpent(ResourceName.ORE);
+        if (greedIsGood.isAutocasting(this))
+            resourceBonus = greedIsGood.spendResourcesAndGet100sSpent(ResourceName.ORE, this);
 
         int numItems = LootExplosion.BASE_ITEMS + (LootExplosion.BONUS_ITEMS_PER_100_RESOURCES * resourceBonus);
         List<ItemStack> items = getRandomLoot(numItems);
@@ -564,5 +576,36 @@ public class PiglinMerchantUnit extends Piglin implements Unit, AttackerUnit, He
         }
         level().explode(null, null, null, getX(), getY(), getZ(),
                 2.0f, false, Level.ExplosionInteraction.NONE);
+    }
+
+    @Override
+    public void updateAbilityButtons() {
+        abilities = ABILITIES.clone();
+        autocast = ABILITIES.getDefaultAutocast();
+    }
+
+    @Override
+    public Object2ObjectArrayMap<Ability, Float> getCooldowns() {
+        return cooldowns;
+    }
+
+    @Override
+    public boolean hasAutocast(Ability ability) {
+        return autocast == ability;
+    }
+
+    @Override
+    public void setAutocast(Ability autocast) {
+        this.autocast = autocast;
+    }
+
+    @Override
+    public Object2ObjectArrayMap<Ability, Integer> getCharges() {
+        return charges;
+    }
+
+    @Override
+    public Object2ObjectArrayMap<HeroAbility, Integer> getHeroAbilityRanks() {
+        return heroAbilityRanks;
     }
 }

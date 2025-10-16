@@ -312,8 +312,8 @@ public class UnitClientEvents {
             int[] selUnits = selectedUnits.stream()
                     .filter(u -> {
                         if (u instanceof Unit unit)
-                            for (Ability ability : unit.getAbilities())
-                                if (ability.isCasting() && ability.oneClickOneUse && ability.action == action)
+                            for (Ability ability : unit.getAbilities().get())
+                                if (ability.isCasting(unit) && ability.oneClickOneUse && ability.action == action)
                                     return false;
                         return true;
                     })
@@ -867,7 +867,7 @@ public class UnitClientEvents {
                                 AABB aabb = new AABB(cp.bp);
                                 aabb = aabb.setMaxY(aabb.maxY + 0.13f);
                                 MyRenderer.drawSolidBox(evt.getPoseStack(), aabb, Direction.UP, cp.isGreen ? 0 : 1, cp.isGreen ? 1 : 0, 0, a,
-                                        new ResourceLocation("forge:textures/white.png"));
+                                        ResourceLocation.parse("forge:textures/white.png"));
                             } else {
                                 MyRenderer.drawBlockFace(evt.getPoseStack(), Direction.UP, cp.bp, cp.isGreen ? 0 : 1, cp.isGreen ? 1 : 0, 0, a);
                             }
@@ -886,7 +886,7 @@ public class UnitClientEvents {
                             AABB aabb = new AABB(ap);
                             aabb = aabb.setMaxY(aabb.maxY + 0.13f);
                             MyRenderer.drawSolidBox(evt.getPoseStack(), aabb, Direction.UP, 1, 1, 0, a,
-                                    new ResourceLocation("forge:textures/white.png"));
+                                    ResourceLocation.parse("forge:textures/white.png"));
                         } else {
                             MyRenderer.drawBlockFace(evt.getPoseStack(), Direction.UP, ap, 1, 1, 0, a);
                         }

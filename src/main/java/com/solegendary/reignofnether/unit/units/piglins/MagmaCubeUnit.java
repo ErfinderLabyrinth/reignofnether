@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class MagmaCubeUnit extends SlimeUnit implements Unit, AttackerUnit {
-
     final static private int SET_FIRE_TICKS_MAX = 20;
     private int setFireTicks = 0;
     private static final int FIRE_DURATION_PER_SIZE = 40;

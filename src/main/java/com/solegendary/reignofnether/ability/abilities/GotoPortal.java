@@ -25,42 +25,48 @@ public class GotoPortal extends Ability {
     private static final int CD_MAX = 0;
     private static final int RANGE = 0;
 
-    PortalPlacement portalPlacement;
 
-    public GotoPortal(PortalPlacement portalPlacement) {
+    public GotoPortal() {
         super(
             UnitAction.GOTO_PORTAL,
-            portalPlacement.getLevel(),
             CD_MAX,
             RANGE,
             0,
             true
         );
-        this.portalPlacement = portalPlacement;
         this.defaultHotkey = Keybindings.keyW;
     }
 
     @Override
-    public AbilityButton getButton(Keybinding hotkey) {
+    public AbilityButton getButton(Keybinding hotkey, BuildingPlacement placement) {
+        if (!(placement instanceof PortalPlacement)) return null;
+        PortalPlacement portal = (PortalPlacement) placement;
         return new AbilityButton(
                 "Go to connected portal",
-                new ResourceLocation(ReignOfNether.MOD_ID, "textures/icons/items/map.png"),
+                ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/icons/items/map.png"),
                 hotkey,
                 () -> false,
-                () -> !portalPlacement.hasDestination(),
+                () -> {
+                    // hidden if the portal does not have a connection Or isn't a transport portal
+                    if (portal.getPortalType() != PortalPlacement.PortalType.TRANSPORT)
+                        return true;
+                    return !portal.hasDestination();
+                },
                 () -> true,
                 () -> UnitClientEvents.sendUnitCommand(UnitAction.GOTO_PORTAL),
                 null,
                 List.of(
                         FormattedCharSequence.forward(I18n.get("abilities.reignofnether.go_to_portal"), Style.EMPTY.withBold(true))
                 ),
-                this
+                this,
+                placement
         );
     }
 
     @Override
     public void use(Level level, BuildingPlacement buildingUsing, BlockPos targetBp) {
-        if (level.isClientSide() && buildingUsing == portalPlacement && portalPlacement.hasDestination()) {
+        if (level.isClientSide() && buildingUsing instanceof PortalPlacement portalPlacement &&
+            portalPlacement.hasDestination()) {
             BuildingPlacement targetBuilding = BuildingUtils.findBuilding(level.isClientSide(), portalPlacement.destination);
             if (targetBuilding instanceof PortalPlacement targetPortal && targetPortal.getPortalType() == PortalPlacement.PortalType.TRANSPORT)
                 OrthoviewClientEvents.centreCameraOnPos(targetPortal.centrePos);

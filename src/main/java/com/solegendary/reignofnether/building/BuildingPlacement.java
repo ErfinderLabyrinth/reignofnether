@@ -30,6 +30,7 @@ import com.solegendary.reignofnether.sandbox.SandboxClientEvents;
 import com.solegendary.reignofnether.sandbox.SandboxServer;
 import com.solegendary.reignofnether.sounds.SoundClientEvents;
 import com.solegendary.reignofnether.survival.SurvivalServerEvents;
+import com.solegendary.reignofnether.tps.TPSClientEvents;
 import com.solegendary.reignofnether.tutorial.TutorialClientEvents;
 import com.solegendary.reignofnether.tutorial.TutorialServerEvents;
 import com.solegendary.reignofnether.unit.UnitAction;
@@ -42,6 +43,7 @@ import com.solegendary.reignofnether.unit.units.villagers.VillagerUnit;
 import com.solegendary.reignofnether.unit.units.villagers.VillagerUnitProfession;
 import com.solegendary.reignofnether.util.Faction;
 import com.solegendary.reignofnether.util.MiscUtil;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
@@ -132,12 +134,16 @@ public class BuildingPlacement {
 
     public boolean selfBuilding = false; // if set to true, will build itself quickly without workers (but not repair)
 
-    protected List<AbilityButton> abilityButtons = new ArrayList<>();
-    protected List<Ability> abilities = new ArrayList<>();
+    protected List<AbilityButton> abilityButtons;
+    protected List<Ability> abilities;
+
+    Object2ObjectArrayMap<Ability, Float> cooldowns = new Object2ObjectArrayMap<>();
+    Object2ObjectArrayMap<Ability, Integer> charges = new Object2ObjectArrayMap<>();
 
     public List<AbilityButton> getAbilityButtons() {
         return abilityButtons;
     }
+
     public List<Ability> getAbilities() {
         return abilities;
     }
@@ -157,6 +163,8 @@ public class BuildingPlacement {
     public Mob lastAttacker = null;
 
     public boolean allowProdWhileBuilding = false;
+
+    public Ability autocast;
 
     private ArmorStand targetStand = null;
     public ArmorStand getTargetStand() {
@@ -182,6 +190,8 @@ public class BuildingPlacement {
         this.ownerName = ownerName;
         this.blocks = blocks;
         this.isCapitol = isCapitol;
+
+        cooldowns.defaultReturnValue(0F);
 
         // get min/max/centre positions
         this.minCorner = new BlockPos(
@@ -662,7 +672,7 @@ public class BuildingPlacement {
 
     public boolean isAbilityOffCooldown(UnitAction action) {
         for (Ability ability : abilities)
-            if (ability.action == action && ability.getCooldown() <= 0) {
+            if (ability.action == action && ability.getCooldown(this) <= 0) {
                 return true;
             }
         return false;
@@ -738,8 +748,24 @@ public class BuildingPlacement {
     }
 
     public void tick(Level tickLevel) {
-        for (Ability ability : getAbilities())
-            ability.tickCooldown();
+        for (Map.Entry<Ability, Float> cooldownEntry : cooldowns.entrySet()) {
+            Ability ability = cooldownEntry.getKey();
+            float cooldown = cooldownEntry.getValue();
+            if (cooldown > 0 || getCharges(ability) < ability.maxCharges) {
+                if (level.isClientSide())
+                    cooldowns.put(ability, (float) (cooldown - (TPSClientEvents.getCappedTPS() / 20D)));
+                else
+                    cooldowns.put(ability, cooldown - 1);
+
+                if (cooldown <= 0 && ability.usesCharges() && getCharges(ability) < ability.maxCharges) {
+                    setCharges(ability, getCharges(ability) + 1);
+                    if (getCharges(ability) < ability.maxCharges)
+                        cooldowns.put(ability, ability.cooldownMax);
+                    if (getCharges(ability) > ability.maxCharges)
+                        setCharges(ability, ability.maxCharges);
+                }
+            }
+        }
 
         for (BuildingBlock block : blocks) {
             BlockPos bp = block.getBlockPos();
@@ -1126,11 +1152,16 @@ public class BuildingPlacement {
     }
 
     public void updateButtons() {
-        if (level.isClientSide()) {
-            abilityButtons.clear();
-            for (Ability ability : abilities)
-                abilityButtons.add(ability.getButton());
-        }
+        abilities = building.getAbilities().get();
+        abilityButtons = building.getAbilities().getButtons(this);
+    }
+
+    public void setCooldown(Ability abilityClass, float cooldown) {
+        cooldowns.put(abilityClass, cooldown);
+    }
+
+    public float getCooldown(Ability abilityClass) {
+        return cooldowns.get(abilityClass);
     }
 
     // creates an invisible armour stand that be attacked by non-units to damage the building
@@ -1161,5 +1192,23 @@ public class BuildingPlacement {
     public void setBuilding(Building building) {
         Objects.requireNonNull(building, "Building can't be null");
         this.building = building;
+    }
+
+    public void setCharges(Ability ability, int cooldown) {
+        charges.put(ability, cooldown);
+    }
+
+    public int getCharges(Ability ability) {
+        if (!charges.containsKey(ability))
+            charges.put(ability, ability.maxCharges);
+        return charges.get(ability);
+    }
+
+    public boolean hasAutocast(Ability ability) {
+        return autocast == ability;
+    }
+
+    public void setAutocast(Ability autocast) {
+        this.autocast = autocast;
     }
 }
