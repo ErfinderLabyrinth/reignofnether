@@ -70,7 +70,7 @@ public class GameRuleRegistrar {
         );
         // enable heroes in all gamemodes
         ALLOW_HEROES = GameRules.register("allowHeroes", GameRules.Category.PLAYER,
-                GameRules.BooleanValue.create(false)
+                GameRules.BooleanValue.create(true)
         );
     }
 }

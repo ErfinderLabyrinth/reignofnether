@@ -67,8 +67,9 @@ public class ToggleShield extends Ability {
 
     @Override
     public void setAutocast(boolean value, Unit unit) {
+        if (!(unit instanceof BruteUnit bruteUnit))
+            return;
         super.setAutocast(value, unit);
-        BruteUnit bruteUnit = (BruteUnit) unit;
         if ((isAutocasting(unit) && !bruteUnit.isHoldingUpShield) ||
             (!isAutocasting(unit) && bruteUnit.isHoldingUpShield))
             bruteUnit.toggleShield();

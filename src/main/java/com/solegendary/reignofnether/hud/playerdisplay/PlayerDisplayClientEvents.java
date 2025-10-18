@@ -25,7 +25,9 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class PlayerDisplayClientEvents {
@@ -191,19 +193,24 @@ public class PlayerDisplayClientEvents {
         rtsDiplomacyPlayerDisplays.removeIf(d -> !PlayerClientEvents.rtsPlayers.stream().map(rtsp -> rtsp.name).toList().contains(d.playerName));
         fpvDiplomacyPlayerDisplays.removeIf(d -> !MC.level.players().stream().map(p -> p.getName().getString()).toList().contains(d.playerName));
 
-        List<String> trackedRtsPlayers = rtsDiplomacyPlayerDisplays.stream().map(d -> d.playerName).collect(Collectors.toCollection(ArrayList::new));
-        List<String> trackedFpvPlayers = fpvDiplomacyPlayerDisplays.stream().map(d -> d.playerName).collect(Collectors.toCollection(ArrayList::new));
+        Set<String> trackedRtsPlayers = rtsDiplomacyPlayerDisplays.stream().map(d -> d.playerName).collect(Collectors.toSet());
+        Set<String> trackedFpvPlayers = fpvDiplomacyPlayerDisplays.stream().map(d -> d.playerName).collect(Collectors.toSet());
         for (AbstractClientPlayer player : MC.level.players()) {
             if (player != MC.player) {
                 RTSPlayer rtsPlayer = PlayerClientEvents.getRTSPlayer(player.getName().getString());
-                if (rtsPlayer == null && !trackedFpvPlayers.contains(player.getName().getString()))
+                if (rtsPlayer == null && !trackedFpvPlayers.contains(player.getName().getString()) &&
+                        !player.isSpectator() && !player.isCreative()) {
                     fpvDiplomacyPlayerDisplays.add(new DiplomacyPlayerDisplay(player));
+                    rtsDiplomacyPlayerDisplays.removeIf(d -> d.playerName.equals(player.getName().getString()));
+                }
             }
         }
         for (RTSPlayer rtsPlayer : PlayerClientEvents.rtsPlayers) {
             if (!rtsPlayer.name.equals(MC.player.getName().getString())) {
-                if (!trackedRtsPlayers.contains(rtsPlayer.name))
+                if (!trackedRtsPlayers.contains(rtsPlayer.name)) {
                     rtsDiplomacyPlayerDisplays.add(new DiplomacyPlayerDisplay(rtsPlayer));
+                    fpvDiplomacyPlayerDisplays.removeIf(d -> d.playerName.equals(rtsPlayer.name));
+                }
             }
         }
         boolean canShareUnitControl = !rtsDiplomacyPlayerDisplays.isEmpty() && !shareUnitControlButton.isHidden.get();

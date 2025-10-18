@@ -34,6 +34,7 @@ Bugfixes
 
 Quality of Life
 ---------------
+[✔] /gamerule allowHeroes is now enabled by default
 [✔] The Necromancer now fires a magical projectile instead of an arrow
 [✔] Added support for survival/adventure players to the diplomacy menu
 [✔] Added a grey background to the observer and diplomacy menus for a cleaner look

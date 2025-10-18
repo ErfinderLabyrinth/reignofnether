@@ -7,6 +7,7 @@ import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.unit.UnitAction;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.units.monsters.SpiderUnit;
+import com.solegendary.reignofnether.unit.units.piglins.BruteUnit;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.resources.ResourceLocation;
 
@@ -60,8 +61,9 @@ public class SpiderClimbing extends Ability {
 
     @Override
     public void setAutocast(boolean value, Unit unit) {
+        if (!(unit instanceof SpiderUnit spiderUnit))
+            return;
         super.setAutocast(value, unit);
-        SpiderUnit spiderUnit = (SpiderUnit) unit;
         if ((isAutocasting(unit) && !spiderUnit.isWallClimbing()) ||
             (!isAutocasting(unit) && spiderUnit.isWallClimbing()))
             spiderUnit.toggleWallClimbing();
