@@ -42,8 +42,6 @@ public class Blacksmith extends ProductionBuilding {
         this.startingBlockTypes.add(Blocks.COBBLESTONE);
 
         this.productions.add(ProductionItems.IRON_GOLEM, Keybindings.keyQ);
-        //this.productions.add(new ResearchVindicatorAxes(), Keybindings.keyW);
-        //this.productions.add(new ResearchPillagerCrossbows(), Keybindings.keyE);
         this.productions.add(ProductionItems.RESEARCH_GOLEM_SMITHING, Keybindings.keyW);
         this.productions.add(ProductionItems.RESEARCH_MILITIA_BOWS, Keybindings.keyE);
     }

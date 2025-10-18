@@ -201,7 +201,7 @@ public interface Unit {
             Ability ability = cooldownEntry.getKey();
             float cooldown = cooldownEntry.getValue();
             if (cooldown > 0 || unit.getCharges(ability) < ability.maxCharges) {
-                if (unit.level().isClientSide())
+                if (((Entity) unit).level().isClientSide())
                     unit.getCooldowns().put(ability, (float) (cooldown - (TPSClientEvents.getCappedTPS() / 20D)));
                 else
                     unit.getCooldowns().put(ability, cooldown - 1);
@@ -621,7 +621,6 @@ public interface Unit {
     }
 
     void updateAbilityButtons();
-    Level level();
 
     default boolean isCasting() {
         for (Ability ability : getAbilities().get())

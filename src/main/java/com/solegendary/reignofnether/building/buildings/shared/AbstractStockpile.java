@@ -4,6 +4,7 @@ import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.buildings.placements.StockpilePlacement;
 import com.solegendary.reignofnether.building.production.ProductionBuilding;
+import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.research.researchItems.ResearchResourceCapacity;
 import com.solegendary.reignofnether.resources.ResourceCost;
@@ -27,7 +28,7 @@ public abstract class AbstractStockpile extends ProductionBuilding {
         this.canAcceptResources = true;
         this.canSetRallyPoint = false;
 
-        this.productions.add(new ResearchResourceCapacity(), Keybindings.keyQ);
+        this.productions.add(ProductionItems.RESEARCH_RESOURCE_CAPACITY, Keybindings.keyQ);
     }
 
     @Override

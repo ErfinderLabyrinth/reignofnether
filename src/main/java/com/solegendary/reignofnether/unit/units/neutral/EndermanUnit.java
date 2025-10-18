@@ -24,6 +24,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
@@ -156,6 +157,15 @@ public class EndermanUnit extends EnderMan implements Unit, AttackerUnit {
         super(entityType, level);
 
         updateAbilityButtons();
+    }
+
+    @Override
+    public void setTarget(@Nullable LivingEntity pLivingEntity) {
+        super.setTarget(pLivingEntity);
+        AttributeInstance attributeinstance = this.getAttribute(Attributes.MOVEMENT_SPEED);
+        if (attributeinstance != null && pLivingEntity != null && distanceToSqr(pLivingEntity) > 64) {
+            attributeinstance.removeModifier(SPEED_MODIFIER_ATTACKING);
+        }
     }
 
     @Override

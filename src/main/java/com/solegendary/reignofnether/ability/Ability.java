@@ -8,6 +8,7 @@ import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.unit.UnitAction;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 
@@ -53,7 +54,7 @@ public class Ability {
     }
 
     protected void toggleAutocast(Unit unit) {
-        if (!unit.level().isClientSide())
+        if (!((Entity) unit).level().isClientSide())
             return;
 
         if (isAutocasting(unit) && autocastDisableAction != null) {
@@ -99,7 +100,7 @@ public class Ability {
     }
 
     public void setCooldown(float cooldown, boolean useCharge, Unit unit) {
-        if (unit.level().isClientSide() && cooldown > 0) {
+        if (((Entity) unit).level().isClientSide() && cooldown > 0) {
             HudClientEvents.setLowestCdHudEntity();
         }
         unit.setCooldown(this, Math.min(cooldown, cooldownMax));

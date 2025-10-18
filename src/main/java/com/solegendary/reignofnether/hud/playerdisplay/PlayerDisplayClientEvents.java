@@ -178,7 +178,7 @@ public class PlayerDisplayClientEvents {
     }
 
     private static void renderDiplomacyPlayerDisplays(ScreenEvent.Render.Post evt) {
-        if (MC.level == null)
+        if (MC.level == null || MC.player == null)
             return;
 
         int screenWidth = MC.getWindow().getGuiScaledWidth();
@@ -196,13 +196,16 @@ public class PlayerDisplayClientEvents {
         for (AbstractClientPlayer player : MC.level.players()) {
             if (player != MC.player) {
                 RTSPlayer rtsPlayer = PlayerClientEvents.getRTSPlayer(player.getName().getString());
-                if (rtsPlayer != null && !trackedRtsPlayers.contains(player.getName().getString()))
-                    rtsDiplomacyPlayerDisplays.add(new DiplomacyPlayerDisplay(rtsPlayer));
-                else if (rtsPlayer == null && !trackedFpvPlayers.contains(player.getName().getString()))
+                if (rtsPlayer == null && !trackedFpvPlayers.contains(player.getName().getString()))
                     fpvDiplomacyPlayerDisplays.add(new DiplomacyPlayerDisplay(player));
             }
         }
-
+        for (RTSPlayer rtsPlayer : PlayerClientEvents.rtsPlayers) {
+            if (!rtsPlayer.name.equals(MC.player.getName().getString())) {
+                if (!trackedRtsPlayers.contains(rtsPlayer.name))
+                    rtsDiplomacyPlayerDisplays.add(new DiplomacyPlayerDisplay(rtsPlayer));
+            }
+        }
         boolean canShareUnitControl = !rtsDiplomacyPlayerDisplays.isEmpty() && !shareUnitControlButton.isHidden.get();
         int x1 = blitX - BG_BORDER_WIDTH;
         int y1 = blitY - BG_BORDER_WIDTH;

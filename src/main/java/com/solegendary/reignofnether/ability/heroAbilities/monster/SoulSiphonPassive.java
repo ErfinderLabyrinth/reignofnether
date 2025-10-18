@@ -20,6 +20,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 
@@ -166,7 +167,7 @@ public class SoulSiphonPassive extends HeroAbility {
             double d0 = rand.nextGaussian() * 0.2;
             double d1 = rand.nextGaussian() * 0.2;
             double d2 = rand.nextGaussian() * 0.2;
-            hero.level().addParticle(ParticleTypes.WITCH, entity.getX(), entity.getEyeY(), entity.getZ(), d0, d1, d2);
+            ((Entity) hero).level().addParticle(ParticleTypes.WITCH, entity.getX(), entity.getEyeY(), entity.getZ(), d0, d1, d2);
         }
     }
 

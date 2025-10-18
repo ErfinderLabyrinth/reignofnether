@@ -65,7 +65,7 @@ public class Sacrifice extends Ability {
         if (placement instanceof SculkCatalystPlacement sculkCat)
             unitType = sculkCat.autoSacrificeUnitType;
 
-        return !unitType.isBlank() && isAutocasting(placement) ?
+        return unitType != null && !unitType.isBlank() && isAutocasting(placement) ?
                 FormattedCharSequence.forward(I18n.get("abilities.reignofnether.sacrifice.tooltip4", unitType), Style.EMPTY) :
                 FormattedCharSequence.forward(I18n.get("abilities.reignofnether.sacrifice.tooltip3"), Style.EMPTY);
     }
