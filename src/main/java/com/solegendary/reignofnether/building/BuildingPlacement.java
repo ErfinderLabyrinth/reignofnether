@@ -5,10 +5,7 @@ import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.api.ReignOfNetherRegistries;
 import com.solegendary.reignofnether.attackwarnings.AttackWarningClientboundPacket;
 import com.solegendary.reignofnether.building.buildings.monsters.DarkWatchtower;
-import com.solegendary.reignofnether.building.buildings.piglins.Bastion;
-import com.solegendary.reignofnether.building.buildings.piglins.FlameSanctuary;
-import com.solegendary.reignofnether.building.buildings.piglins.Fortress;
-import com.solegendary.reignofnether.building.buildings.piglins.PortalBasic;
+import com.solegendary.reignofnether.building.buildings.piglins.*;
 import com.solegendary.reignofnether.building.buildings.placements.BeaconPlacement;
 import com.solegendary.reignofnether.building.buildings.placements.BridgePlacement;
 import com.solegendary.reignofnether.building.buildings.placements.PortalPlacement;
@@ -172,6 +169,8 @@ public class BuildingPlacement {
             createArmourStandTarget();
         return targetStand;
     }
+
+    private EntityType<? extends Animal> lastAnimalType = null;
 
     public BuildingPlacement(
             Building building,
@@ -768,12 +767,6 @@ public class BuildingPlacement {
                 }
             }
         }
-
-        for (BuildingBlock block : blocks) {
-            BlockPos bp = block.getBlockPos();
-            BlockState bs = block.getBlockState();
-            BlockState bsWorld = tickLevel.getBlockState(bp);
-        }
         float blocksPlaced = getBlocksPlaced();
         float blocksTotal = getBlocksTotal();
 
@@ -992,26 +985,29 @@ public class BuildingPlacement {
                 || Math.abs(spawnBp.getY() - minCorner.getY()) >= 4
                 || BuildingUtils.isPosInsideAnyBuilding(level.isClientSide(), spawnBp)
                 || BuildingUtils.isPosInsideAnyBuilding(level.isClientSide(), spawnBp.above())
-                || !level.getWorldBorder().isWithinBounds(spawnBp));
+                || !level.getWorldBorder().isWithinBounds(spawnBp)
+                || spawnBs.is(BlockTags.FENCES)
+                || BlockUtils.isBottomSlab(spawnBs));
 
         EntityType<? extends Animal> animalType = null;
+
         int spawnQty = 1;
-        switch (random.nextInt(4)) {
-            case 0 -> {
-                animalType = EntityType.COW;
-            }
-            case 1 -> {
-                animalType = EntityType.PIG;
-            }
-            case 2 -> {
-                animalType = EntityType.SHEEP;
-            }
-            case 3 -> {
-                animalType = EntityType.CHICKEN;
-                spawnQty = 2;
+        if (getBuilding() instanceof CentralPortal && lastAnimalType != EntityType.MOOSHROOM) {
+            animalType = EntityType.MOOSHROOM;
+        } else {
+            switch (random.nextInt(4)) {
+                case 0 -> animalType = EntityType.COW;
+                case 1 -> animalType = EntityType.PIG;
+                case 2 -> animalType = EntityType.SHEEP;
+                case 3 -> {
+                    animalType = EntityType.CHICKEN;
+                    spawnQty = 2;
+                }
             }
         }
         UnitServerEvents.spawnMobs(animalType, (ServerLevel) level, spawnBp.above(), spawnQty, "");
+
+        lastAnimalType = animalType;
     }
 
     // returns each blockpos origin of 16x16x16 renderchunks that this building overlaps

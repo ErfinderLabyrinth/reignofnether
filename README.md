@@ -1,52 +1,36 @@
-# Reign of Nether: Minecraft as an RTS
+# Reign of Nether: RTS in Minecraft
 
 Inspired the classic Real Time Strategy games of the early 2000s including Starcraft, Warcraft and Age of Empires, Reign of Nether is trying to transform Minecraft into a experience just like one of them using all the same assets and models you find in the vanilla game.
 
 Reign of Nether doesn't try to imitate one of these games exactly, but instead aims to have uniquely-minecraft features. For example, buildings health is proportional to their blocks placed and all units are based on vanilla Minecraft mobs like Illagers, Creepers, and Piglins.
 
-# Features
-
-| Feature | Status | Notes |  
-|--|--|--|  
-| Top down isometric camera | ✔️ |  |  
-| Top down mouse controls | ✔️ |  |  
-| Multiplayer | ✔️ |  |  
-| Unit controls | ✔️ |  |  
-| Building construction | ✔️ |  |  
-| Building unit production | ✔️ |  |  
-| Bridge building | ✔ |  |  
-| Unit and building upgrades | ✔️ |  |  
-| Minimap | ✔️ |  |  
-| Resources and population | ✔️ |  |  
-| RTS-friendly world generation | ✔️ | Flatter world, simpler biomes and added surface ores |  
-| Unit abilities | ✔ | Cooldowns, range, channeling, etc. |
-| Resource collection | ✔ | Including drop offs and animations |
-| Building garrisoning | ✔ |  |
-| Villagers Race | ✔ |  |  
-| Monsters Race | ✔ |  |  
-| Piglins Race | ✔ |  |  
-| Fog of war | 🟡 | Still has performance issues and some bugs |  
-| Singleplayer modes | ❌ | Planning a wave survival mode! |  
-| Improved vanilla player features | ❌ | Give vanilla-mode players more interaction with their RTS teammates |
-| Teams | 🟡 | Including resource trading, shared unit control, etc. | Implemented Basic Team Functionality |
-
-And many more that I've yet to think of...
-
-# Datapack
-https://github.com/SoLegendary/reignofnether_datapack
-
-Use this datapack for generating RTS-friendly worlds (see the curseforge page for more details)
+# Soft roadmap
+These plans are not set in stone but are roughly what I plan to look at next in order of priority:
+1. Custom building customisation menu
+2. Improved API for command blocks
+3. New set of heroes for each faction
+4. Walls
+5. Fog of war rework
+6. Hero equippable items
 
 # Release
-The Curseforge mod page and release files are available here:
-
+Download release files here:
 https://www.curseforge.com/minecraft/mc-mods/reign-of-nether-rts-in-minecraft
+https://modrinth.com/mod/reign-of-nether-rts
+
+🏗️ Installation
+
+1. Install Forge 1.20.1: https://files.minecraftforge.net/net/minecraftforge/forge/index_1.20.1.html
+2. Download and add the Reign of Nether mod jar file to your Minecraft mods folder
+3. Launch Minecraft, selecting your installation as Forge 1.20.1
+For mod versions 1.1.3 and below, use Forge 1.19.2 instead
 
 # License
 GNU General Public License v3.0
 See License.txt for the full text
 
 # Other stuff
-I am just working on this on and off in my free time so I don't have a strict dev schedule or roadmap. If you want to contact me directly for suggestions, advice or just to have a chat, feel free to DM me at /u/SoLegendary on Reddit.
+Please join the discord if you want to discuss the mod: https://discord.gg/erBen9CzbD
+I also look at bug reports there much more than here in Github unless you have an actual PR fix
 
 

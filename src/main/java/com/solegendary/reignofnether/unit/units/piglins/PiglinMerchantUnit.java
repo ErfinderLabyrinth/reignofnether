@@ -10,7 +10,6 @@ import com.solegendary.reignofnether.ability.heroAbilities.piglin.LootExplosion;
 import com.solegendary.reignofnether.ability.heroAbilities.piglin.ThrowTNT;
 import com.solegendary.reignofnether.entities.ThrowableTntProjectile;
 import com.solegendary.reignofnether.hero.HeroClientboundPacket;
-import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.registrars.ItemRegistrar;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
@@ -101,7 +100,7 @@ public class PiglinMerchantUnit extends Piglin implements Unit, AttackerUnit, He
     public BlockPos getAnchor() { return anchorPos; }
 
     private final ArrayList<Checkpoint> checkpoints = new ArrayList<>();
-    public ArrayList<Checkpoint> getCheckpoints() { return checkpoints; };
+    public ArrayList<Checkpoint> getCheckpoints() { return checkpoints; }
 
     public GarrisonGoal getGarrisonGoal() { return null; }
     public boolean canGarrison() { return getGarrisonGoal() != null; }
@@ -483,7 +482,7 @@ public class PiglinMerchantUnit extends Piglin implements Unit, AttackerUnit, He
         float cooldown = Math.max(0, throwTNT.cooldownMax - (resourceBonus * ThrowTNT.LESS_COOLDOWN_PER_100_RESOURCES));
         throwTNT.setCooldown(cooldown, this);
         AbilityClientboundPacket.sendSetCooldownPacket(getId(), throwTNT.action, throwTNT.getCooldown(this));
-        setMana(getMana() + (resourceBonus * ThrowTNT.LESS_MANA_PER_100_RESOURCES));
+        setMana(getMana() + (resourceBonus * ThrowTNT.MANA_REFUND_PER_100_RESOURCES));
     }
 
     public void fancyFeast(BlockPos targetBp) {
@@ -512,6 +511,7 @@ public class PiglinMerchantUnit extends Piglin implements Unit, AttackerUnit, He
             level().playSound(null, getX(), getY(), getZ(), SoundEvents.EGG_THROW,
                     SoundSource.NEUTRAL, 0.5F, 0.4F / (random.nextFloat() * 0.4F + 0.8F));
         }
+        setMana(getMana() + (resourceBonus * FancyFeast.MANA_REFUND_PER_100_RESOURCES));
     }
 
     // give at least one rare item per unit
@@ -521,7 +521,7 @@ public class PiglinMerchantUnit extends Piglin implements Unit, AttackerUnit, He
                 .stream()
                 .filter(u -> u instanceof Unit unit &&
                         unit.getOwnerName().equals(this.getOwnerName()) &&
-                        unit instanceof AttackerUnit attackerUnit &&
+                        unit instanceof AttackerUnit &&
                         !(unit instanceof GhastUnit))
                 .toList());
         Collections.shuffle(units);
@@ -531,27 +531,31 @@ public class PiglinMerchantUnit extends Piglin implements Unit, AttackerUnit, He
                 int i = random.nextInt(100);
                 LivingEntity unit = units.get(n);
 
-                if (unit instanceof BruteUnit) {
-                    if (i >= 50)
-                        items.add( new ItemStack(Items.NETHERITE_CHESTPLATE));
-                    else if (i > 0) {
+                if (unit instanceof BruteUnit bruteUnit) {
+                    if (i >= 50 && !bruteUnit.hasNetheriteChestplate())
+                        items.add(new ItemStack(Items.NETHERITE_CHESTPLATE));
+                    else if (i > 0 && !bruteUnit.hasEnchantedNetheriteSword()) {
                         ItemStack itemStack = new ItemStack(Items.NETHERITE_SWORD);
                         itemStack.enchant(Enchantments.FIRE_ASPECT, 1);
                         items.add(itemStack);
+                    } else {
+                        items.add(new ItemStack(Items.ENCHANTED_GOLDEN_APPLE));
                     }
                 }
-                else if (unit instanceof HeadhunterUnit) {
-                    if (i >= 50)
+                else if (unit instanceof HeadhunterUnit headhunterUnit) {
+                    if (i >= 50 && !headhunterUnit.hasNetheriteChestplate())
                         items.add(new ItemStack(Items.NETHERITE_CHESTPLATE));
-                    else if (i > 0) {
+                    else if (i > 0 && !headhunterUnit.hasFireAspectTrident()) {
                         ItemStack itemStack = new ItemStack(Items.TRIDENT);
                         itemStack.enchant(Enchantments.FIRE_ASPECT, 1);
                         itemStack.enchant(Enchantments.UNBREAKING, 1);
                         items.add(itemStack);
+                    } else {
+                        items.add(new ItemStack(Items.ENCHANTED_GOLDEN_APPLE));
                     }
                 }
-                else if (unit instanceof HoglinUnit ||
-                        unit instanceof WitherSkeletonUnit) {
+                else if ((unit instanceof HoglinUnit && !(unit instanceof ArmouredHoglinUnit)) ||
+                        (unit instanceof WitherSkeletonUnit wither && !wither.hasNetheriteChestplate())) {
                     items.add(new ItemStack(Items.NETHERITE_CHESTPLATE));
                 } else {
                     items.add(new ItemStack(Items.ENCHANTED_GOLDEN_APPLE));
@@ -590,6 +594,7 @@ public class PiglinMerchantUnit extends Piglin implements Unit, AttackerUnit, He
         }
         level().explode(null, null, null, getX(), getY(), getZ(),
                 2.0f, false, Level.ExplosionInteraction.NONE);
+        setMana(getMana() + (resourceBonus * LootExplosion.MANA_REFUND_PER_100_RESOURCES));
     }
 
 

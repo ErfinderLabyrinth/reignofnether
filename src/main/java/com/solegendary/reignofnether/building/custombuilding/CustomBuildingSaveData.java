@@ -43,25 +43,15 @@ public class CustomBuildingSaveData extends SavedData {
         if (ltag != null) {
             for (Tag ctag : ltag) {
                 CompoundTag btag = (CompoundTag) ctag;
-
-                BlockPos pos = new BlockPos(btag.getInt("originPosX"), btag.getInt("originPosY"), btag.getInt("originPosZ"));
-                Level level = ServerLifecycleHooks.getCurrentServer().getLevel(Level.OVERWORLD);
-                String ownerName = btag.getString("ownerName");
-                String structureName = btag.getString("structureName");
                 String buildingName = btag.getString("buildingName");
-                BlockPos structurePos = new BlockPos(btag.getInt("structurePosX"), btag.getInt("structurePosY"), btag.getInt("structurePosZ"));
                 Vec3i structureSize = new Vec3i(btag.getInt("structureSizeX"), btag.getInt("structureSizeY"), btag.getInt("structureSizeZ"));
-
+                CompoundTag structureNbt = btag.getCompound("structureNbt");
                 data.customBuildings.add(new CustomBuildingSave(
-                    pos,
-                    level,
-                    ownerName,
-                    structureName,
-                    buildingName,
-                    structurePos,
-                    structureSize
+                        structureNbt,
+                        buildingName,
+                        structureSize
                 ));
-                ReignOfNether.LOGGER.info("CustomBuildingSaveData.load: " + ownerName + "|" + structureName);
+                ReignOfNether.LOGGER.info("CustomBuildingSaveData.load: " + buildingName);
             }
         }
         return data;
@@ -72,18 +62,11 @@ public class CustomBuildingSaveData extends SavedData {
         ListTag list = new ListTag();
         this.customBuildings.forEach(b -> {
             CompoundTag cTag = new CompoundTag();
-            cTag.putInt("originPosX", b.originPos.getX());
-            cTag.putInt("originPosY", b.originPos.getY());
-            cTag.putInt("originPosZ", b.originPos.getZ());
-            cTag.putString("ownerName", b.ownerName);
-            cTag.putString("structureName", b.structureName);
             cTag.putString("buildingName", b.buildingName);
-            cTag.putInt("structurePosX", b.structurePos.getX());
-            cTag.putInt("structurePosY", b.structurePos.getY());
-            cTag.putInt("structurePosZ", b.structurePos.getZ());
             cTag.putInt("structureSizeX", b.structureSize.getX());
             cTag.putInt("structureSizeY", b.structureSize.getY());
             cTag.putInt("structureSizeZ", b.structureSize.getZ());
+            cTag.put("structureNbt", b.structureNbt);
             list.add(cTag);
         });
         tag.put("custombuildings", list);

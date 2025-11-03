@@ -36,6 +36,7 @@ public class FancyFeast extends HeroAbility {
     private static final int CD_MAX_SECONDS = 45 * ResourceCost.TICKS_PER_SECOND;
     public static final int BASE_ITEMS = 6;
     public static final int BONUS_ITEMS_PER_100_RESOURCES = 2;
+    public static int MANA_REFUND_PER_100_RESOURCES = 10;
 
     private static final float HEALTH_PER_BREAD = 10;
     private static final float HEALTH_PER_CHICKEN = 15;
@@ -114,7 +115,7 @@ public class FancyFeast extends HeroAbility {
                 fcsIcons(I18n.get("abilities.reignofnether.fancy_feast.stats", getHealAmount(hero), CD_MAX_SECONDS / 20, manaCost)),
                 fcs(""),
                 fcs(I18n.get("abilities.reignofnether.fancy_feast.tooltip1")),
-                fcs(I18n.get("abilities.reignofnether.fancy_feast.tooltip2", BASE_ITEMS, BONUS_ITEMS_PER_100_RESOURCES))
+                fcs(I18n.get("abilities.reignofnether.fancy_feast.tooltip2", BASE_ITEMS, BONUS_ITEMS_PER_100_RESOURCES, MANA_REFUND_PER_100_RESOURCES))
         );
     }
 
@@ -124,7 +125,7 @@ public class FancyFeast extends HeroAbility {
                 fcs(I18n.get("abilities.reignofnether.level_req", getLevelRequirement(hero)), getLevelReqStyle(hero)),
                 fcs(""),
                 fcs(I18n.get("abilities.reignofnether.fancy_feast.tooltip1")),
-                fcs(I18n.get("abilities.reignofnether.fancy_feast.tooltip2", BASE_ITEMS, BONUS_ITEMS_PER_100_RESOURCES)),
+                fcs(I18n.get("abilities.reignofnether.fancy_feast.tooltip2", BASE_ITEMS, BONUS_ITEMS_PER_100_RESOURCES, MANA_REFUND_PER_100_RESOURCES)),
                 fcs(""),
                 fcs(I18n.get("abilities.reignofnether.fancy_feast.rank1"), getRank(hero) == 0),
                 fcs(I18n.get("abilities.reignofnether.fancy_feast.rank2"), getRank(hero) == 1),

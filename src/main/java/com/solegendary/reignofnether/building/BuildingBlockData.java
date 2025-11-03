@@ -1,5 +1,6 @@
 package com.solegendary.reignofnether.building;
 
+import com.solegendary.reignofnether.resources.BlockUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
@@ -33,10 +34,6 @@ public class BuildingBlockData {
             resourceManager = level.getServer().getResourceManager();
 
         CompoundTag nbt = getBuildingNbt(structureName, resourceManager);
-        ArrayList<BuildingBlock> blocks = new ArrayList<>();
-
-        // load in blocks (list of blockPos and their palette index)
-        ListTag blocksNbt = nbt.getList("blocks", 10);
 
         return getBuildingBlocksFromNbt(nbt);
     }
@@ -59,6 +56,9 @@ public class BuildingBlockData {
                     blockPosNbt.getInt(2)
             );
             BlockState bs = palette.get(blockNbt.getInt("state"));
+
+            if (BlockUtils.isFallingLogBlock(bs))
+                bs = BlockUtils.getNonFallingLog(bs);
 
             if (bs.getBlock() != Blocks.WATER || bs.getFluidState().isSource())
                 blocks.add(new BuildingBlock(bp, bs));

@@ -25,6 +25,8 @@ import com.solegendary.reignofnether.unit.units.piglins.GhastUnit;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.ParticleTypes;
@@ -33,6 +35,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntArrayTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Style;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -64,6 +67,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.text.WordUtils;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3d;
 import org.lwjgl.glfw.GLFW;
 
@@ -705,5 +709,13 @@ public class MiscUtil {
             double d2 = rand.nextGaussian() * 0.2;
             level.addParticle(particleType, pos.x, pos.y, pos.z, d0, d1, d2);
         }
+    }
+
+    public static ResourceLocation getTextureForBlock(@NotNull Block block) {
+        BlockState defaultState = block.defaultBlockState();
+        BakedModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
+        TextureAtlasSprite sprite = model.getParticleIcon();
+        String path = sprite.contents().name().getPath();
+        return ResourceLocation.fromNamespaceAndPath("minecraft", "textures/" + path + ".png");
     }
 }

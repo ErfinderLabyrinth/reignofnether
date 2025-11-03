@@ -311,6 +311,11 @@ public class BruteUnit extends PiglinBrute implements Unit, AttackerUnit {
         return super.fireImmune() || (bpl != null && (bpl.getBuilding() instanceof FlameSanctuary || bpl.getBuilding() instanceof BasaltSprings));
     }
 
+    public boolean hasNetheriteChestplate() {
+        ItemStack itemStack = this.getItemBySlot(EquipmentSlot.CHEST);
+        return itemStack.getItem() == Items.NETHERITE_CHESTPLATE;
+    }
+
     public boolean hasEnchantedNetheriteSword() {
         ItemStack itemStack = this.getItemBySlot(EquipmentSlot.MAINHAND);
         return itemStack.getItem() == Items.NETHERITE_SWORD && itemStack.isEnchanted();

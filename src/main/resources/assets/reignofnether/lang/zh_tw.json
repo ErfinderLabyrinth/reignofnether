@@ -274,7 +274,7 @@
   "abilities.reignofnether.avatar.tooltip1": "體型和力量增長，成爲戰爭的化身。",
   "abilities.reignofnether.avatar.tooltip2": "獲得 +  %d 最大生命值、更快的移動速度、爆炸性範圍",
   "abilities.reignofnether.avatar.tooltip3": "攻擊和緩慢免疫，持續 %d 秒",
-
+  
   "abilities.reignofnether.can_be_toggled": "可開啓或關閉",
   "abilities.reignofnether.level_req": "[需要等級 %d]",
   "abilities.reignofnether.rank_up_menu": "升級（%d）",
@@ -379,10 +379,10 @@
   "buildings.monsters.reignofnether.sculk_catalyst.tooltip2": "將 %d 方塊範圍內的時間扭曲爲午夜。",
   "buildings.monsters.reignofnether.sculk_catalyst.tooltip3": "附近的幽匿塊將範圍擴展至 %d ，幷",
   "buildings.monsters.reignofnether.sculk_catalyst.tooltip4": "爲催發體提供吸收生命值。",
-  "buildings.monsters.reignofnether.altar_of_darkness": "黑暗祭壇",
+  "buildings.monsters.reignofnether.altar_of_darkness": "英雄 - 黑暗祭壇",
   "buildings.monsters.reignofnether.altar_of_darkness.tooltip1": "一座黑暗能量的泉源，可顯現恐怖生物。",
   "buildings.monsters.reignofnether.altar_of_darkness.tooltip2": "訓練新的幷復活陣亡的怪獸英雄。",
-
+  
   "buildings.piglins.reignofnether.bastion": "堡壘",
   "buildings.piglins.reignofnether.bastion.tooltip1": "一座堅固的軍營，容納獵頭者豬布林，",
   "buildings.piglins.reignofnether.bastion.tooltip2": "使其可在軍事傳送門生產。",
@@ -426,7 +426,7 @@
   "buildings.piglins.reignofnether.wither_shrine.tooltip1": "一座奉獻給凋零力量的黑暗聖殿。",
   "buildings.piglins.reignofnether.wither_shrine.tooltip2": "使軍事傳送門可生產凋零骷髏。",
   "buildings.piglins.reignofnether.wither_shrine.tooltip3": "需要堡壘。",
-  "buildings.piglins.reignofnether.infernal_portal": "地獄傳送門",
+  "buildings.piglins.reignofnether.infernal_portal": "英雄 - 地獄傳送門",
   "buildings.piglins.reignofnether.infernal_portal.tooltip1": "一座專爲地獄冠軍保留的裝飾傳送門。",
   "buildings.piglins.reignofnether.infernal_portal.tooltip2": "訓練新的幷復活陣亡的豬布林英雄。",
 
@@ -470,7 +470,7 @@
   "buildings.villagers.reignofnether.wheat_farm.tooltip1": "\uE001 %d + %d / \uE000",
   "buildings.villagers.reignofnether.wheat_farm.tooltip2": "一片可耕種小麥以收集食物的農場。",
   "buildings.villagers.reignofnether.wheat_farm.tooltip3": "工人在工作時會自動使用木材重新種植種子。",
-  "buildings.villagers.reignofnether.shrine_of_prosperity": "繁榮聖殿",
+  "buildings.villagers.reignofnether.shrine_of_prosperity": "英雄 - 繁榮聖殿",
   "buildings.villagers.reignofnether.shrine_of_prosperity.tooltip1": "一座象徵村民與掠奪者聯盟的聖殿。",
   "buildings.villagers.reignofnether.shrine_of_prosperity.tooltip2": "訓練新的幷復活陣亡的村民英雄。",
 
@@ -1093,7 +1093,7 @@
   "units.piglins.reignofnether.piglin_merchant.tooltip1": "一位擁有無限食物、",
   "units.piglins.reignofnether.piglin_merchant.tooltip2": "戰利品和爆炸物的快樂豬布林商人，只要你有錢。",
   "units.piglins.reignofnether.piglin_merchant.revive": "復活豬布靈商隊（等級 %d）",
-
+  
   "units.villagers.reignofnether.evoker": "喚魔者",
   "units.villagers.reignofnether.evoker.tooltip1": "一位可施放戰鬥魔法的學識淵博的巫師。",
   "units.villagers.reignofnether.evoker.tooltip2": "需要圖書館。",
@@ -1223,7 +1223,7 @@
   "sandbox.reignofnether.faction_button2": "（點擊更改）",
   "sandbox.reignofnether.menu_type_button_buildings": "選單：建築",
   "sandbox.reignofnether.menu_type_button_units": "選單：單位",
-  "sandbox.reignofnether.menu_type_button_other": "選單：其他",
+  "sandbox.reignofnether.menu_type_button_custom_buildings": "選單：其他",
   "sandbox.reignofnether.menu_type_button1": "（點擊更改）",
   "sandbox.reignofnether.building_cheats_on": "建築作弊：開啓",
   "sandbox.reignofnether.building_cheats_off": "建築作弊：關閉",

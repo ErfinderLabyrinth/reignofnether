@@ -7,6 +7,8 @@ import com.solegendary.reignofnether.building.buildings.neutral.*;
 import com.solegendary.reignofnether.building.buildings.piglins.*;
 import com.solegendary.reignofnether.building.buildings.placements.PortalPlacement;
 import com.solegendary.reignofnether.building.buildings.villagers.*;
+import com.solegendary.reignofnether.building.custombuilding.CustomBuilding;
+import com.solegendary.reignofnether.building.custombuilding.CustomBuildingServerEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -53,12 +55,14 @@ public class BuildingSaveData extends SavedData {
                 BlockPos pos = new BlockPos(btag.getInt("x"), btag.getInt("y"), btag.getInt("z"));
                 Level level = ServerLifecycleHooks.getCurrentServer().getLevel(Level.OVERWORLD);
                 Building building;
-                if (btag.contains("buildingKey")) {
+                if (btag.contains("customStructureName")) {
+                    building = CustomBuildingServerEvents.getCustomBuilding(btag.getString("customStructureName"));
+                }
+                else if (btag.contains("buildingKey")) {
                     building = ReignOfNetherRegistries.BUILDING.get(ResourceLocation.tryParse(btag.getString("buildingKey")));
-                }else {
+                } else {
                     building = getOldBuilding(btag.getString("buildingName"));
                 }
-
                 String ownerName = btag.getString("ownerName");
                 Rotation rotation = Rotation.valueOf(btag.getString("rotation"));
                 BlockPos rallyPoint = new BlockPos(btag.getInt("rallyX"), btag.getInt("rallyY"), btag.getInt("rallyZ"));
@@ -68,19 +72,21 @@ public class BuildingSaveData extends SavedData {
                 PortalPlacement.PortalType portalType = PortalPlacement.PortalType.valueOf(btag.getString("portalType"));
                 BlockPos portalDestination = new BlockPos(btag.getInt("xp"), btag.getInt("yp"), btag.getInt("zp"));
 
-                data.buildings.add(new BuildingSave(pos,
-                    level,
-                    building,
-                    ownerName,
-                    rotation,
-                    rallyPoint,
-                    isDiagonalBridge,
-                    isBuilt,
-                    upgradeLevel,
-                    portalType,
-                    portalDestination
-                ));
-                ReignOfNether.LOGGER.info("BuildingSaveData.load: " + ownerName + "|" + ReignOfNetherRegistries.BUILDING.getKey(building).toString());
+                if (building != null) {
+                    data.buildings.add(new BuildingSave(pos,
+                            level,
+                            building,
+                            ownerName,
+                            rotation,
+                            rallyPoint,
+                            isDiagonalBridge,
+                            isBuilt,
+                            upgradeLevel,
+                            portalType,
+                            portalDestination
+                    ));
+                    ReignOfNether.LOGGER.info("BuildingSaveData.load: " + ownerName + "|" + building.name);
+                }
             }
         }
         return data;
@@ -92,9 +98,13 @@ public class BuildingSaveData extends SavedData {
 
         ListTag list = new ListTag();
         this.buildings.forEach(b -> {
-            String buildingName = ReignOfNetherRegistries.BUILDING.getKey(b.building).toString();
             CompoundTag cTag = new CompoundTag();
-            cTag.putString("buildingKey", buildingName);
+            if (b.building instanceof CustomBuilding) {
+                cTag.putString("customStructureName", b.building.structureName);
+            }
+            if (!(b.building instanceof CustomBuilding)) {
+                cTag.putString("buildingKey", ReignOfNetherRegistries.BUILDING.getKey(b.building).toString());
+            }
             cTag.putInt("x", b.originPos.getX());
             cTag.putInt("y", b.originPos.getY());
             cTag.putInt("z", b.originPos.getZ());

@@ -56,7 +56,7 @@ public class ResourcesClientEvents {
     public static void onClientTick(ScreenEvent.Render evt) {
         if (HudClientEvents.hudSelectedEntity instanceof WorkerUnit workerUnit &&
             UnitClientEvents.getPlayerToEntityRelationship((LivingEntity) workerUnit) == Relationship.OWNED &&
-            MC.level != null) {
+            MC.level != null && !HudClientEvents.isMouseOverAnyButtonOrHud()) {
 
             BlockPos preSelBp = CursorClientEvents.getPreselectedBlockPos();
             ResourceSource res = ResourceSources.getFromBlockPos(preSelBp, MC.level);

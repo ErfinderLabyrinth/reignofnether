@@ -5,7 +5,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.SlabType;
+import net.minecraft.world.level.block.state.properties.StairsShape;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,17 +23,32 @@ public class BlockUtils {
     }
     public static boolean isFallingLogBlock(BlockState bs) {
         return List.of(
-                BlockRegistrar.FALLING_OAK_LOG.get(),
-                BlockRegistrar.FALLING_BIRCH_LOG.get(),
-                BlockRegistrar.FALLING_ACACIA_LOG.get(),
-                BlockRegistrar.FALLING_DARK_OAK_LOG.get(),
-                BlockRegistrar.FALLING_JUNGLE_LOG.get(),
-                BlockRegistrar.FALLING_MANGROVE_LOG.get(),
-                BlockRegistrar.FALLING_SPRUCE_LOG.get(),
-                BlockRegistrar.FALLING_CRIMSON_STEM.get(),
-                BlockRegistrar.FALLING_WARPED_STEM.get())
-            .contains(bs.getBlock());
+                        BlockRegistrar.FALLING_OAK_LOG.get(),
+                        BlockRegistrar.FALLING_BIRCH_LOG.get(),
+                        BlockRegistrar.FALLING_ACACIA_LOG.get(),
+                        BlockRegistrar.FALLING_DARK_OAK_LOG.get(),
+                        BlockRegistrar.FALLING_JUNGLE_LOG.get(),
+                        BlockRegistrar.FALLING_MANGROVE_LOG.get(),
+                        BlockRegistrar.FALLING_SPRUCE_LOG.get(),
+                        BlockRegistrar.FALLING_CRIMSON_STEM.get(),
+                        BlockRegistrar.FALLING_WARPED_STEM.get())
+                .contains(bs.getBlock());
     }
+
+    public static BlockState getNonFallingLog(BlockState bs) {
+        BlockState nonFallingLogBlock = bs;
+        if (bs.getBlock() == BlockRegistrar.FALLING_OAK_LOG.get()) nonFallingLogBlock = Blocks.OAK_LOG.defaultBlockState();
+        else if (bs.getBlock() == BlockRegistrar.FALLING_BIRCH_LOG.get()) nonFallingLogBlock = Blocks.BIRCH_LOG.defaultBlockState();
+        else if (bs.getBlock() == BlockRegistrar.FALLING_ACACIA_LOG.get()) nonFallingLogBlock = Blocks.ACACIA_LOG.defaultBlockState();
+        else if (bs.getBlock() == BlockRegistrar.FALLING_DARK_OAK_LOG.get()) nonFallingLogBlock = Blocks.DARK_OAK_LOG.defaultBlockState();
+        else if (bs.getBlock() == BlockRegistrar.FALLING_JUNGLE_LOG.get()) nonFallingLogBlock = Blocks.JUNGLE_LOG.defaultBlockState();
+        else if (bs.getBlock() == BlockRegistrar.FALLING_MANGROVE_LOG.get()) nonFallingLogBlock = Blocks.MANGROVE_LOG.defaultBlockState();
+        else if (bs.getBlock() == BlockRegistrar.FALLING_SPRUCE_LOG.get()) nonFallingLogBlock = Blocks.SPRUCE_LOG.defaultBlockState();
+        else if (bs.getBlock() == BlockRegistrar.FALLING_CRIMSON_STEM.get()) nonFallingLogBlock = Blocks.CRIMSON_STEM.defaultBlockState();
+        else if (bs.getBlock() == BlockRegistrar.FALLING_WARPED_STEM.get()) nonFallingLogBlock = Blocks.WARPED_STEM.defaultBlockState();
+        return nonFallingLogBlock;
+    }
+
     public static boolean isLeafBlock(BlockState bs) {
         if (bs.is(BlockTags.LEAVES))
             return true;
@@ -38,6 +56,14 @@ public class BlockUtils {
                         BlockRegistrar.DECAYABLE_NETHER_WART_BLOCK.get(), BlockRegistrar.DECAYABLE_WARPED_WART_BLOCK.get(),
                         Blocks.RED_MUSHROOM_BLOCK, Blocks.BROWN_MUSHROOM_BLOCK)
                 .contains(bs.getBlock());
+    }
+
+    public static boolean isBottomSlab(BlockState bs) {
+        if (bs.getBlock() instanceof SlabBlock) {
+            SlabType type = bs.getValue(SlabBlock.TYPE);
+            return type == SlabType.BOTTOM;
+        }
+        return false;
     }
 
     public static int numAirOrLeafBlocksBelow(BlockPos bp, Level level) {

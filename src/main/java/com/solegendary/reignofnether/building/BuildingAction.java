@@ -4,6 +4,8 @@ package com.solegendary.reignofnether.building;
 public enum BuildingAction {
     PLACE, // provide serverside building data to client (on new placement and sync existing buildings for new logins)
     PLACE_AND_QUEUE, // PLACE but add to the worker's queue action
+    PLACE_CUSTOM, // custom building; itemName == structure name instead of a building registry key
+    PLACE_AND_QUEUE_CUSTOM,
     DESTROY, // WIP building cancelled by owner or destroyed by someone
     SYNC_BLOCKS_AND_OWNER, // sync client building health with server (client doesn't always have the blocks loaded to check natively)
     SET_RALLY_POINT,

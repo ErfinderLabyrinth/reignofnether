@@ -29,6 +29,7 @@ public abstract class AbstractPortal extends ProductionBuilding {
 
     public AbstractPortal(String structureName, ResourceCost cost) {
         super(structureName, cost, false);
+        this.name = buildingName;
         this.buildTimeModifier = 1.2f;
         this.startingBlockTypes.add(Blocks.NETHER_BRICKS);
         this.canSetRallyPoint = false;

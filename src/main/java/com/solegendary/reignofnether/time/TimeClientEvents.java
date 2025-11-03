@@ -17,7 +17,6 @@ import com.solegendary.reignofnether.sounds.SoundClientEvents;
 import com.solegendary.reignofnether.survival.SurvivalClientEvents;
 import com.solegendary.reignofnether.tutorial.TutorialClientEvents;
 import com.solegendary.reignofnether.tutorial.TutorialStage;
-import com.solegendary.reignofnether.util.MiscUtil;
 import com.solegendary.reignofnether.util.MyRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.ItemRenderer;
@@ -58,7 +57,7 @@ public class TimeClientEvents {
 
     public static boolean showClockTooltip = false;
 
-    private static final Button CLOCK_BUTTON = new Button("Clock",
+    private static final Button clockButton = new Button("Clock",
             10,
             null,
             null,
@@ -70,12 +69,14 @@ public class TimeClientEvents {
             null,
             null
     );
+    private static Button bloodMoonButton = getBloodMoonButton();
+
     private static int bloodMoonTicksLeft = 0;
-    private static String bloodMoonOwner = "";
+    private static BlockPos bloodMoonPos = null;
 
     public static void resetBloodMoon() {
         bloodMoonTicksLeft = 0;
-        bloodMoonOwner = "";
+        bloodMoonPos = null;
     }
 
     public static boolean isBloodMoonActive() {
@@ -92,19 +93,22 @@ public class TimeClientEvents {
                 () -> !OrthoviewClientEvents.isEnabled() || !isBloodMoonActive(),
                 () -> true,
                 null,
-                null,
+                () -> {
+                    if (bloodMoonPos != null)
+                        OrthoviewClientEvents.centreCameraOnPos(bloodMoonPos);
+                },
                 List.of(
                         fcs(I18n.get("abilities.reignofnether.blood_moon.clock_warning1"), Style.EMPTY.withColor(0xFF0000)),
                         fcs(I18n.get("abilities.reignofnether.blood_moon.clock_warning2", getTimeStrFromTicks(bloodMoonTicksLeft))),
-                        fcs(I18n.get("abilities.reignofnether.blood_moon.clock_warning3", bloodMoonOwner.isBlank() ? "Nobody!" : bloodMoonOwner))
+                        fcs(I18n.get("abilities.reignofnether.blood_moon.clock_warning3"))
                 )
         );
     }
 
-    public static void setBloodMoonTicks(int tickDuration, String ownerName) {
+    public static void setBloodMoonTicks(int tickDuration, BlockPos pos) {
         boolean newBloodMoon = tickDuration > 0 && bloodMoonTicksLeft <= 0;
         bloodMoonTicksLeft = tickDuration;
-        bloodMoonOwner = ownerName;
+        bloodMoonPos = pos;
         if (newBloodMoon) {
             SoundClientEvents.playFadeableMusicInstance(new FadeableMusicInstance(SoundRegistrar.BLOOD_MOON_SONG.get()));
         } else if (tickDuration <= 0) {
@@ -128,8 +132,6 @@ public class TimeClientEvents {
                     MinimapClientEvents.CORNER_OFFSET * 2
             ) - 6;
 
-            ItemRenderer itemrenderer = MC.getItemRenderer();
-
             evt.getGuiGraphics().renderItem(new ItemStack(Items.CLOCK), xPos, yPos);
             evt.getGuiGraphics().renderItemDecorations(MC.font, new ItemStack(Items.CLOCK), xPos, yPos);
         }
@@ -149,22 +151,26 @@ public class TimeClientEvents {
             MinimapClientEvents.CORNER_OFFSET * 2
         ) - 6;
 
-        Button bloodMoonButton = getBloodMoonButton();
+        bloodMoonButton = getBloodMoonButton();
         if (!bloodMoonButton.isHidden.get() && evt.getScreen() instanceof TopdownGui) {
             bloodMoonButton.render(evt.getGuiGraphics(), xPos - 3, yPos - 3, evt.getMouseX(), evt.getMouseY());
             if (bloodMoonButton.isMouseOver(evt.getMouseX(), evt.getMouseY()))
                 bloodMoonButton.renderTooltip(evt.getGuiGraphics(), evt.getMouseX(), evt.getMouseY());
         }
-        else if (!CLOCK_BUTTON.isHidden.get() && evt.getScreen() instanceof TopdownGui)
-            CLOCK_BUTTON.render(evt.getGuiGraphics(), xPos - 3, yPos - 3, evt.getMouseX(), evt.getMouseY());
+        else if (!clockButton.isHidden.get() && evt.getScreen() instanceof TopdownGui)
+            clockButton.render(evt.getGuiGraphics(), xPos - 3, yPos - 3, evt.getMouseX(), evt.getMouseY());
     }
 
     @SubscribeEvent
     public static void onMousePress(ScreenEvent.MouseButtonPressed.Post evt) {
-        if (evt.getButton() == GLFW.GLFW_MOUSE_BUTTON_1)
-            CLOCK_BUTTON.checkClicked((int) evt.getMouseX(), (int) evt.getMouseY(), true);
-        else if (evt.getButton() == GLFW.GLFW_MOUSE_BUTTON_2)
-            CLOCK_BUTTON.checkClicked((int) evt.getMouseX(), (int) evt.getMouseY(), false);
+        if (evt.getButton() == GLFW.GLFW_MOUSE_BUTTON_1) {
+            clockButton.checkClicked((int) evt.getMouseX(), (int) evt.getMouseY(), true);
+            bloodMoonButton.checkClicked((int) evt.getMouseX(), (int) evt.getMouseY(), true);
+        }
+        else if (evt.getButton() == GLFW.GLFW_MOUSE_BUTTON_2) {
+            clockButton.checkClicked((int) evt.getMouseX(), (int) evt.getMouseY(), false);
+            bloodMoonButton.checkClicked((int) evt.getMouseX(), (int) evt.getMouseY(), false);
+        }
     }
 
     @SubscribeEvent
@@ -186,8 +192,7 @@ public class TimeClientEvents {
             // 'day' is when undead start burning, ~500
             // 'night' is when undead stop burning, ~12500
             boolean isDay = isDay(serverTime);
-            String dayStr = " (%s)".formatted(I18n.get(isDay ? "time.reignofnether.day" : "time.reignofnether.night"));
-            String timeStr = get12HourTimeStr(serverTime) + dayStr;
+            String timeStr = get12HourTimeStr(serverTime);
 
             FormattedCharSequence timeUntilStr =
                 FormattedCharSequence.forward(
@@ -287,14 +292,6 @@ public class TimeClientEvents {
                 nightSourceOrigins.add(new Pair<>(building.centrePos, ns.getNightRange() - VISIBLE_BORDER_ADJ));
             }
         }
-    }
-
-    public static String getNightCircleModeName() {
-        return switch (nightCircleMode) {
-            case ALL -> I18n.get("time.reignofnether.night_circle_mode_all");
-            case NO_OVERLAPS -> I18n.get("time.reignofnether.night_circle_mode_no_overlaps");
-            case OFF -> I18n.get("time.reignofnether.night_circle_mode_off");
-        };
     }
 }
 

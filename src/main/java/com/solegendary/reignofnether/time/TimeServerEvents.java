@@ -96,7 +96,7 @@ public class TimeServerEvents {
                 doRandomBloodMoonSpawn(evt.level);
             }
             if (bloodMoonTicksLeft % 20 == 0) {
-                AbilityClientboundPacket.doAbility(bloodMoonOwner.getId(), UnitAction.BLOOD_MOON, bloodMoonTicksLeft);
+                AbilityClientboundPacket.doAbility(bloodMoonOwner.getId(), UnitAction.BLOOD_MOON, bloodMoonTicksLeft, bloodMoonTarget);
             }
         }
     }

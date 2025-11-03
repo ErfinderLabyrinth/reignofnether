@@ -65,7 +65,6 @@ import java.util.List;
 import java.util.Set;
 
 import static com.solegendary.reignofnether.hud.HudClientEvents.isMouseOverAnyButton;
-import static com.solegendary.reignofnether.time.TimeClientEvents.getNightCircleModeName;
 import static com.solegendary.reignofnether.time.TimeClientEvents.nightCircleMode;
 import static com.solegendary.reignofnether.util.MiscUtil.fcs;
 
@@ -239,8 +238,9 @@ public class MinimapClientEvents {
                 },
                 null,
                 List.of(
-                        FormattedCharSequence.forward(I18n.get("time.reignofnether.night_circles", getNightCircleModeName()), Style.EMPTY),
-                        FormattedCharSequence.forward(I18n.get("time.reignofnether.night_circle_change"), Style.EMPTY)
+                    fcs(I18n.get("time.reignofnether.night_circle_mode_all"), nightCircleMode == NightCircleMode.ALL),
+                    fcs(I18n.get("time.reignofnether.night_circle_mode_no_overlaps"), nightCircleMode == NightCircleMode.NO_OVERLAPS),
+                    fcs(I18n.get("time.reignofnether.night_circle_mode_off"), nightCircleMode == NightCircleMode.OFF)
                 )
         );
     }
@@ -248,7 +248,9 @@ public class MinimapClientEvents {
     public static Button getMapLockButton() {
         return new Button("Lock Map",
                 14,
-                ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/icons/blocks/chain_command_block_front.png"),
+                lockedMap ?
+                        ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/icons/blocks/chain_command_block_front.png") :
+                        ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/icons/blocks/chain_command_block_front_dark.png"),
                 ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/hud/icon_frame.png"),
                 null,
                 () -> false,
@@ -262,8 +264,7 @@ public class MinimapClientEvents {
                 null,
                 List.of(FormattedCharSequence.forward(lockedMap
                                 ? I18n.get("hud.map.reignofnether.lock_map.tooltip1.enabled")
-                                : I18n.get("hud.map.reignofnether.lock_map.tooltip1.disabled"), Style.EMPTY),
-                        FormattedCharSequence.forward(I18n.get("hud.map.reignofnether.lock_map.tooltip2"), Style.EMPTY)
+                                : I18n.get("hud.map.reignofnether.lock_map.tooltip1.disabled"), Style.EMPTY)
                 )
         );
     }

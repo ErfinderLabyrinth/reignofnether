@@ -38,7 +38,7 @@ public class AbilityButton extends Button {
         Runnable originalOnLeftClick = this.onLeftClick;
         this.onLeftClick = () -> {
             if (this.ability != null && (this.ability.getCooldown(unit) > 0 && !this.ability.canBypassCooldown(unit)))
-                HudClientEvents.showTemporaryMessage(I18n.get("hud.buttons.reignofnether.on_cooldown"));
+                HudClientEvents.showTemporaryMessage(I18n.get("hud.buttons.reignofnether.on_cooldown", Math.round(this.ability.getCooldown(unit) / 20)));
             else if (this.ability instanceof HeroAbility heroAbility && heroAbility.manaCost > 0 && unit instanceof HeroUnit hero && hero.getMana() < heroAbility.manaCost)
                 HudClientEvents.showTemporaryMessage(I18n.get("hud.buttons.reignofnether.not_enough_mana"));
             else if (originalOnLeftClick != null)
@@ -59,7 +59,7 @@ public class AbilityButton extends Button {
         Runnable originalOnLeftClick = this.onLeftClick;
         this.onLeftClick = () -> {
             if (this.ability != null && (this.ability.getCooldown(placement) > 0 && !this.ability.canBypassCooldown(building)))
-                HudClientEvents.showTemporaryMessage(I18n.get("hud.buttons.reignofnether.on_cooldown"));
+                HudClientEvents.showTemporaryMessage(I18n.get("hud.buttons.reignofnether.on_cooldown", Math.round(this.ability.getCooldown(placement) / 20)));
             else if (originalOnLeftClick != null)
                 originalOnLeftClick.run();
         };

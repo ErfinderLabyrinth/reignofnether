@@ -27,7 +27,6 @@ public abstract class ProductionItem {
     public static String itemName;
 
     public ResourceCost defaultCost;
-    public boolean canDuplicate; // is building allowed to build more than one of these? eg. tech upgrades can't be duplicated
     public BiConsumer<Level, ProductionPlacement> onComplete;
     public ProdDupeRule dupeRule;
 

@@ -28,6 +28,7 @@ public class SpruceStockpile extends AbstractStockpile {
     public final static ResourceCost cost = ResourceCosts.STOCKPILE;
     public SpruceStockpile() {
         super(structureName);
+        this.name = buildingName;
         this.startingBlockTypes.add(Blocks.SPRUCE_LOG);
     }
 

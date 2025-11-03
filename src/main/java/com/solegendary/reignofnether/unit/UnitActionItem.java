@@ -195,7 +195,7 @@ public class UnitActionItem {
                     //if (unit instanceof MagmaCubeUnit && unit.getMoveGoal().getMoveTarget() != null) {
                     //    shouldResetBehaviours = false;
                     //}
-                    if (shouldResetBehaviours && (nonAbilityActions.contains(action) || foundAbility)) {
+                    if (shouldResetBehaviours && (nonAbilityActions.contains(action) || foundAbility) && action != UnitAction.RETURN_RESOURCES_TO_CLOSEST) {
                         Unit.fullResetBehaviours(unit);
                     }
                 }
@@ -340,17 +340,12 @@ public class UnitActionItem {
                         returnResourcesGoal.setBuildingTarget(building);
                     }
                 }
-                case RETURN_RESOURCES_TO_CLOSEST -> {
-                    if (unit instanceof WorkerUnit workerUnit) { // if we manually did this, ignore automated return
-                        // to gather
+                case RETURN_RESOURCES_TO_CLOSEST -> { // drop resources off early and return to work
+                    if (unit instanceof WorkerUnit workerUnit) {
                         GatherResourcesGoal goal = workerUnit.getGatherResourceGoal();
                         if (goal != null) {
-                            goal.saveData.delete();
+                            goal.saveAndReturnResources();
                         }
-                    }
-                    ReturnResourcesGoal returnResourcesGoal = unit.getReturnResourcesGoal();
-                    if (returnResourcesGoal != null) {
-                        returnResourcesGoal.returnToClosestBuilding();
                     }
                 }
                 case DELETE -> {

@@ -297,10 +297,7 @@ public class OrthoviewClientEvents {
             MC.player.move(MoverType.SELF, new Vec3(xDiff, 0, zDiff));
             forcePanTicksLeft -= 1;
         }
-
-        if (evt.phase == TickEvent.Phase.END) {
-            updateOrthoviewY();
-        }
+        updateOrthoviewY();
     }
 
     @SubscribeEvent

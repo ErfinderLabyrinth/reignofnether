@@ -3,11 +3,14 @@ package com.solegendary.reignofnether.building.custombuilding;
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.blocks.RTSStructureBlockEntity;
 import com.solegendary.reignofnether.building.*;
+import com.solegendary.reignofnether.player.PlayerServerEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Rotation;
@@ -15,32 +18,38 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.server.ServerStoppingEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 public class CustomBuildingServerEvents {
 
     // since every custom building has a different structure, we need to maintain a list of them here
     private static final ArrayList<CustomBuilding> customBuildings = new ArrayList<>();
 
-    public static Building getCustomBuilding(String structureName) {
+    public static Building getCustomBuilding(String name) {
         for (CustomBuilding building : customBuildings)
-            if (building.structureName.equals(structureName))
+            if (building.name.equals(name))
                 return building;
         return null;
     }
 
-    public static boolean createNewCustomBuilding(ResourceLocation structureRL, String structureName, ServerLevel level, BlockPos pos) {
+    public static boolean createAndRegisterNewCustomBuilding(ResourceLocation structureRL, String structureName, ServerLevel level, BlockPos pos) {
         BlockEntity be = level.getBlockEntity(pos);
         if (be instanceof RTSStructureBlockEntity rtsBe) {
-            return createNewCustomBuilding(structureRL, structureName, level, pos, rtsBe.getStructurePos(), rtsBe.getStructureSize(), true);
+            return createAndRegisterNewCustomBuilding(structureRL, structureName, level, pos.offset(1,0,1), rtsBe.getStructureSize());
         }
         return true;
     }
 
-    public static boolean createNewCustomBuilding(ResourceLocation structureRL, String structureName, ServerLevel level,
-                                                  BlockPos pos, BlockPos structurePos, Vec3i structureSize, boolean save) {
+    // registers and places a new custom building on server and client
+    public static boolean createAndRegisterNewCustomBuilding(ResourceLocation structureRL, String structureName, ServerLevel level,
+                                                             BlockPos pos, Vec3i structureSize) {
         StructureTemplateManager manager = level.getStructureManager();
         Optional<StructureTemplate> template = manager.get(structureRL);
         CompoundTag structureNbt = null;
@@ -70,25 +79,32 @@ public class CustomBuildingServerEvents {
                     }
                 }
                 if (numSolidBlocks == 0) {
-                    ReignOfNether.LOGGER.error("ERROR (server): cannot register custom building with no solid blocks");
+                    PlayerServerEvents.sendMessageToAllPlayers("ERROR (server): cannot register custom building with no solid blocks");
                 } else {
-                    CustomBuilding building = new CustomBuilding(structureName, structurePos, structureSize, portraitBlock);
+                    CustomBuilding building = new CustomBuilding(structureName, structureSize, portraitBlock, structureNbt);
+                    for (CustomBuilding customBuilding : customBuildings) {
+                        if (customBuilding.name.equals(building.name)) {
+                            PlayerServerEvents.sendMessageToAllPlayers("ERROR (server): custom building " + building.name + " already exists");
+                            return false;
+                        }
+                    }
                     customBuildings.add(building);
                     BuildingPlacement placement = new BuildingPlacement(building, level, pos, Rotation.NONE, "", blocks, false);
                     BuildingServerEvents.getBuildings().add(placement);
-                    CustomBuildingClientboundPacket.registerCustomBuilding(structureName, pos, structurePos, structureSize);
-                    //if (save)
-                    //    saveBuildings(level);
+                    CustomBuildingClientboundPacket.registerCustomBuilding(building);
+                    saveBuildings(level);
+                    BuildingServerEvents.saveBuildings(level);
                     return true;
                 }
             } else {
-                ReignOfNether.LOGGER.error("ERROR (server): cannot register custom building at same origin as another building");
+                PlayerServerEvents.sendMessageToAllPlayers("ERROR (server): cannot register custom building at same origin as another building");
             }
         }
         return false;
     }
 
-    /*
+
+
     @SubscribeEvent
     public static void onServerStopping(ServerStoppingEvent evt) {
         ServerLevel level = evt.getServer().getLevel(Level.OVERWORLD);
@@ -100,46 +116,43 @@ public class CustomBuildingServerEvents {
     public static void saveBuildings(ServerLevel level) {
         CustomBuildingSaveData customBuildingData = CustomBuildingSaveData.getInstance(level);
         customBuildingData.customBuildings.clear();
-
-        BuildingServerEvents.getBuildings().stream()
-                .filter(b -> b.getBuilding() instanceof CustomBuilding)
-                .toList()
-                .forEach(b -> {
+        customBuildings.forEach(b -> {
             customBuildingData.customBuildings.add(new CustomBuildingSave(
-                    b.originPos,
-                    level,
-                    b.ownerName,
-                    b.getBuilding().structureName,
-                    b.getBuilding().name,
-                    ((CustomBuilding) b.getBuilding()).structurePos,
-                    ((CustomBuilding) b.getBuilding()).structureSize
+                    b.structureNbt,
+                    b.name,
+                    b.structureSize
             ));
         });
         customBuildingData.save();
         level.getDataStorage().save();
     }
 
-    @SubscribeEvent
-    public static void loadBuildings(ServerStartedEvent evt) {
-        ServerLevel level = evt.getServer().getLevel(Level.OVERWORLD);
+    public static void loadBuildings(ServerLevel level) {
+        CustomBuildingSaveData customBuildingData = CustomBuildingSaveData.getInstance(level);
+        customBuildingData.customBuildings.forEach(b -> {
+            CustomBuilding building = new CustomBuilding(b.buildingName, b.structureSize, Blocks.COMMAND_BLOCK, b.structureNbt);
+            customBuildings.add(building);
+            ReignOfNether.LOGGER.info("loaded custom building in serverevents: " + "" + "|" + b.buildingName);
+        });
+    }
 
-        if (level != null) {
-            CustomBuildingSaveData customBuildingData = CustomBuildingSaveData.getInstance(level);
-            customBuildingData.customBuildings.forEach(b -> {
-                boolean result = createNewCustomBuilding(
-                        new ResourceLocation(b.structureName.toLowerCase()),
-                        b.buildingName,
-                        level,
-                        b.originPos,
-                        b.structurePos,
-                        b.structureSize,
-                        false
-                );
-                if (result) {
-                    ReignOfNether.LOGGER.info("loaded custom building in serverevents: " + "" + "|" + b.originPos);
-                }
-            });
+    @SubscribeEvent
+    public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent evt) {
+        if (!PlayerServerEvents.rtsSyncingEnabled) {
+            return;
+        }
+        MinecraftServer server = evt.getEntity().level().getServer();
+        if (server == null || !server.isDedicatedServer()) {
+            CompletableFuture.delayedExecutor(1000,  TimeUnit.MILLISECONDS).execute(() -> syncCustomBuildings(evt.getEntity().getName().getString()));
+        } else {
+            syncCustomBuildings(evt.getEntity().getName().getString());
+        }
+        //ReignOfNether.LOGGER.info("Synced " + buildings.size() + " custom buildings with player logged in");
+    }
+
+    private static void syncCustomBuildings(String playerName) {
+        for (CustomBuilding customBuilding : customBuildings) {
+            CustomBuildingClientboundPacket.registerCustomBuilding(playerName, customBuilding);
         }
     }
-     */
 }

@@ -261,6 +261,8 @@ public class ResourcesServerEvents {
     // if a tree is touched, destroy any adjacent logs that are above the ground after some time to avoid leaving
     // tall trees behind
     public static void fellAdjacentLogs(BlockPos bp, ArrayList<BlockPos> bpsExcluded, Level level) {
+        if (SandboxServer.isAnyoneASandboxPlayer())
+            return;
 
         if (!level.getGameRules().getRule(GameRuleRegistrar.LOG_FALLING).get())
             return;

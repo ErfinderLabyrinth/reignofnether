@@ -17,7 +17,11 @@ public class BuildingBlock {
     private BlockPos blockPos;
     private BlockState blockState; // ideal blockstate when placed, not actual world state
 
-    private List<Predicate<BlockState>> materialsThatIgnoreState = List.of((s)-> SculkCatalystPlacement.isSculk(s.getBlock()), (s)->s.is(Tags.Blocks.GLASS),(s)->s.is(BlockTags.LEAVES));
+    private List<Predicate<BlockState>> materialsThatIgnoreState = List.of(
+            (s)-> SculkCatalystPlacement.isSculk(s.getBlock()),
+            (s)->s.is(Tags.Blocks.GLASS),
+            (s)->s.is(BlockTags.LEAVES)
+    );
 
     private boolean isIgnored(BlockState state){
         for(Predicate<BlockState> predicate : materialsThatIgnoreState){
@@ -74,7 +78,8 @@ public class BuildingBlock {
         if ((block1 instanceof StairBlock && block2 instanceof StairBlock) ||
             (block1 instanceof FenceBlock && block2 instanceof FenceBlock) ||
             (block1 instanceof WallBlock && block2 instanceof WallBlock) ||
-            (block1 instanceof IronBarsBlock && block2 instanceof IronBarsBlock))
+            (block1 instanceof IronBarsBlock && block2 instanceof IronBarsBlock) ||
+            (block1 instanceof TallGrassBlock && block2 instanceof TallGrassBlock))
             return true;
 
         return !this.blockState.isAir() && (bs == this.blockState || isMatchingWallBlock);

@@ -1,5 +1,6 @@
 package com.solegendary.reignofnether.sandbox;
 
+import com.solegendary.reignofnether.building.*;
 import com.solegendary.reignofnether.player.PlayerServerEvents;
 import com.solegendary.reignofnether.player.RTSPlayer;
 import com.solegendary.reignofnether.registrars.EntityRegistrar;
@@ -46,56 +47,70 @@ public class SandboxServer {
         }
     }
 
-    public static void setAnchor(int entityId, BlockPos blockPos) {
+    public static void setAnchor(int[] entityIds, BlockPos blockPos) {
         for (LivingEntity entity : UnitServerEvents.getAllUnits()) {
-            if (entity.getId() == entityId && entity instanceof Unit unit) {
-                unit.setAnchor(blockPos);
-                UnitSyncClientboundPacket.sendSyncAnchorPosPacket(entity, unit.getAnchor());
+            for (int entityId : entityIds) {
+                if (entity.getId() == entityId && entity instanceof Unit unit) {
+                    unit.setAnchor(blockPos);
+                    UnitSyncClientboundPacket.sendSyncAnchorPosPacket(entity, unit.getAnchor());
+                }
             }
         }
     }
 
-    public static void resetToAnchor(int entityId) {
+    public static void resetToAnchor(int[] entityIds) {
         for (LivingEntity entity : UnitServerEvents.getAllUnits()) {
-            if (entity.getId() == entityId && entity instanceof Unit unit && Unit.hasAnchor(unit)) {
-                entity.moveTo(Vec3.atCenterOf(unit.getAnchor()).add(0, 0.5d, 0));
-                entity.setHealth(entity.getMaxHealth());
-                entity.removeAllEffects();
-                Unit.fullResetBehaviours(unit);
+            for (int entityId : entityIds) {
+                if (entity.getId() == entityId && entity instanceof Unit unit && Unit.hasAnchor(unit)) {
+                    entity.moveTo(Vec3.atCenterOf(unit.getAnchor()).add(0, 0.5d, 0));
+                    entity.setHealth(entity.getMaxHealth());
+                    entity.removeAllEffects();
+                    Unit.fullResetBehaviours(unit);
+                }
             }
         }
     }
 
-    public static void removeAnchor(int entityId) {
+    public static void removeAnchor(int[] entityIds) {
         for (LivingEntity entity : UnitServerEvents.getAllUnits()) {
-            if (entity.getId() == entityId && entity instanceof Unit unit) {
-                unit.setAnchor(null);
-                UnitSyncClientboundPacket.sendRemoveAnchorPosPacket(entity);
+            for (int entityId : entityIds) {
+                if (entity.getId() == entityId && entity instanceof Unit unit) {
+                    unit.setAnchor(null);
+                    UnitSyncClientboundPacket.sendRemoveAnchorPosPacket(entity);
+                }
             }
         }
     }
 
-    public static void setOwner(int entityId, String ownerName) {
+    public static void setUnitOwner(int[] entityIds, String ownerName) {
         for (LivingEntity entity : UnitServerEvents.getAllUnits()) {
-            if (entity.getId() == entityId && entity instanceof Unit unit) {
-                unit.setOwnerName(ownerName);
-                UnitSyncClientboundPacket.sendSyncOwnerNamePacket(unit);
+            for (int entityId : entityIds) {
+                if (entity.getId() == entityId && entity instanceof Unit unit) {
+                    unit.setOwnerName(ownerName);
+                    UnitSyncClientboundPacket.sendSyncOwnerNamePacket(unit);
+                }
             }
         }
+    }
+
+    public static void setBuildingOwner(BlockPos pos, String ownerName) {
+        for (BuildingPlacement bpl : BuildingServerEvents.getBuildings()) {
+            if (bpl.originPos.equals(pos)) {
+                bpl.ownerName = ownerName;
+                BuildingServerEvents.syncBuildingPlacement(pos);
+            }
+        }
+    }
+
+    public static void removeBuilding(BlockPos pos) {
+        BuildingServerEvents.getBuildings().removeIf(b -> {
+            if (b.originPos.equals(pos)) {
+                BuildingServerEvents.syncBuildingPlacement(pos);
+                if (b instanceof NetherConvertingBuilding ncb)
+                    ncb.getZone().startRestoring();
+                return true;
+            }
+            return false;
+        });
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

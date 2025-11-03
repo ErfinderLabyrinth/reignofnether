@@ -8,6 +8,7 @@ import com.solegendary.reignofnether.building.production.ActiveProduction;
 import com.solegendary.reignofnether.building.production.ProductionBuilding;
 import com.solegendary.reignofnether.building.production.ProductionItem;
 import com.solegendary.reignofnether.hud.Button;
+import com.solegendary.reignofnether.hud.HudClientEvents;
 import com.solegendary.reignofnether.registrars.EntityRegistrar;
 import com.solegendary.reignofnether.resources.*;
 import com.solegendary.reignofnether.unit.UnitAction;
@@ -196,6 +197,10 @@ public class ProductionPlacement extends BuildingPlacement {
     public boolean startProductionItem(ProductionItem prodItem) {
         boolean success = false;
 
+        if (getBuilding() instanceof ProductionBuilding pb && !pb.productions.get().contains(prodItem)) {
+            return false;
+        }
+
         if (prodItem != null) {
             // only worry about checking affordability on serverside
             if (getLevel().isClientSide()) {
@@ -238,7 +243,7 @@ public class ProductionPlacement extends BuildingPlacement {
         return success;
     }
 
-    public boolean cancelProductionItem(ProductionItem item, BlockPos pos, boolean frontItem) {
+    public boolean cancelProductionItem(ProductionItem item, boolean frontItem) {
         boolean success = false;
 
         if (!productionQueue.isEmpty()) {
@@ -278,6 +283,14 @@ public class ProductionPlacement extends BuildingPlacement {
             }
         }
         return success;
+    }
+
+    @Override
+    public void destroy(ServerLevel serverLevel) {
+        super.destroy(serverLevel);
+        while (!productionQueue.isEmpty()) {
+            cancelProductionItem(productionQueue.get(0).item, true);
+        }
     }
 
     public void tick(Level tickLevel) {

@@ -18,6 +18,7 @@ public abstract class HeroProductionItem extends ProductionItem {
 
     public HeroProductionItem(ResourceCost cost, String itemName, ResourceLocation iconRl) {
         super(cost);
+        this.dupeRule = ProdDupeRule.DISALLOW;
         this.onComplete = (Level level, ProductionPlacement placement) -> {
             boolean notClientSide = !level.isClientSide();
             boolean noHeroOwned = !heroOwned(level.isClientSide(), placement.ownerName);

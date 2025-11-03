@@ -34,7 +34,7 @@ public class RTSStructureBlock extends BaseEntityBlock implements GameMasterBloc
 
     public RTSStructureBlock(BlockBehaviour.Properties pProperties) {
         super(pProperties);
-        this.registerDefaultState(this.stateDefinition.any().setValue(MODE, StructureMode.LOAD));
+        this.registerDefaultState(this.stateDefinition.any().setValue(MODE, StructureMode.SAVE));
     }
 
     public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
@@ -79,7 +79,7 @@ public class RTSStructureBlock extends BaseEntityBlock implements GameMasterBloc
                 boolean $$9 = $$7.isPowered();
                 if ($$8 && !$$9) {
                     $$7.setPowered(true);
-                    this.trigger((ServerLevel)pLevel, $$7);
+                    this.trigger($$7);
                 } else if (!$$8 && $$9) {
                     $$7.setPowered(false);
                 }
@@ -88,19 +88,11 @@ public class RTSStructureBlock extends BaseEntityBlock implements GameMasterBloc
         }
     }
 
-    private void trigger(ServerLevel pLevel, RTSStructureBlockEntity pBlockEntity) {
+    private void trigger(RTSStructureBlockEntity pBlockEntity) {
         switch (pBlockEntity.getMode()) {
-            case SAVE:
-                pBlockEntity.saveStructure(false);
-                break;
-            case LOAD:
-                pBlockEntity.loadStructure(pLevel, false);
-                break;
-            case CORNER:
-                pBlockEntity.unloadStructure();
-            case DATA:
+            case SAVE -> pBlockEntity.saveStructure(false);
+            case CORNER -> pBlockEntity.unloadStructure();
         }
-
     }
 
     static {

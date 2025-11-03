@@ -9,5 +9,7 @@ public enum SandboxAction {
     SET_ANCHOR,
     RESET_TO_ANCHOR,
     REMOVE_ANCHOR,
-    SET_OWNER
+    SET_UNIT_OWNER,
+    SET_BUILDING_OWNER,
+    REMOVE_BUILDING
 }

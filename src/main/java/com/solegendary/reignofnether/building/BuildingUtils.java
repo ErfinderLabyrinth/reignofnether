@@ -75,9 +75,7 @@ public class BuildingUtils {
         return bps;
     }
 
-
-    @Deprecated
-    public static BuildingPlacement getNewBuilding(Building building, Level level, BlockPos pos, Rotation rotation, String ownerName, boolean isDiagonalBridge) {
+    public static BuildingPlacement getNewBuildingPlacement(Building building, Level level, BlockPos pos, Rotation rotation, String ownerName, boolean isDiagonalBridge) {
         BuildingPlacement buildingPlacement = null;
         if (building instanceof AbstractBridge bridge) {
             buildingPlacement = bridge.createBuildingPlacement(level, pos, rotation, ownerName, isDiagonalBridge);

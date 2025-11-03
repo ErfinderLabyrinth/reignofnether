@@ -14,8 +14,6 @@ public class PortalCivilian extends AbstractPortal {
     public final static String buildingName = "Civilian Portal";
     public final static String structureName = "portal_civilian";
 
-    public final static int CIVILIIAN_PORTAL_POPULATION_SUPPLY = 15;
-
     public final static ResourceCost cost = ResourceCosts.CIVILIAN_PORTAL;
 
     public PortalCivilian() {

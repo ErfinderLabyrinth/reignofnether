@@ -1,10 +1,7 @@
 package com.solegendary.reignofnether.building.buildings.monsters;
 
 import com.solegendary.reignofnether.api.ReignOfNetherRegistries;
-import com.solegendary.reignofnether.building.BuildingClientEvents;
-import com.solegendary.reignofnether.building.BuildingPlaceButton;
-import com.solegendary.reignofnether.building.BuildingPlacement;
-import com.solegendary.reignofnether.building.Buildings;
+import com.solegendary.reignofnether.building.*;
 import com.solegendary.reignofnether.building.buildings.placements.DarknessProductionBuilding;
 import com.solegendary.reignofnether.building.production.ProductionBuilding;
 import com.solegendary.reignofnether.building.production.ProductionItems;
@@ -35,6 +32,7 @@ public class Mausoleum extends ProductionBuilding {
     public final static String structureName = "mausoleum";
     public final static ResourceCost cost = ResourceCosts.MAUSOLEUM;
     public final static int nightRange = 80;
+    public final static int nightRangeReduced = 60;
 
     private final Set<BlockPos> nightBorderBps = new HashSet<>();
 
@@ -62,7 +60,12 @@ public class Mausoleum extends ProductionBuilding {
 
     @Override
     public BuildingPlacement createBuildingPlacement(Level level, BlockPos pos, Rotation rotation, String ownerName) {
-        return new DarknessProductionBuilding(this, level, pos, rotation, ownerName, getAbsoluteBlockData(getRelativeBlockData(level), level, pos, rotation), true, nightRange,false, true);
+        int nRange = nightRange;
+        if ((level.isClientSide() && BuildingClientEvents.hasFinishedBuilding(this)) ||
+            (!level.isClientSide() && BuildingServerEvents.hasFinishedBuilding(this, ownerName))) {
+            nRange = nightRangeReduced;
+        }
+        return new DarknessProductionBuilding(this, level, pos, rotation, ownerName, getAbsoluteBlockData(getRelativeBlockData(level), level, pos, rotation), true, nRange,false, true);
     }
 
     public BuildingPlaceButton getBuildButton(Keybinding hotkey) {
@@ -86,11 +89,8 @@ public class Mausoleum extends ProductionBuilding {
                     Style.EMPTY
                 ),
                 FormattedCharSequence.forward("", Style.EMPTY),
-                FormattedCharSequence.forward(I18n.get(
-                    "buildings.monsters.reignofnether.mausoleum.tooltip2",
-                    nightRange
-                ), Style.EMPTY),
-                FormattedCharSequence.forward("", Style.EMPTY)
+                FormattedCharSequence.forward(I18n.get("buildings.monsters.reignofnether.mausoleum.tooltip2",  nightRange), Style.EMPTY),
+                FormattedCharSequence.forward(I18n.get("buildings.monsters.reignofnether.mausoleum.tooltip4",  nightRangeReduced), Style.EMPTY)
             ),
             this
         );

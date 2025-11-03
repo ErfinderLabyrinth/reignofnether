@@ -43,8 +43,10 @@ import net.minecraft.client.model.Model;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackResources;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -52,6 +54,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.monster.AbstractIllager;
 import net.minecraft.world.entity.monster.Slime;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BannerItem;
@@ -69,6 +72,8 @@ import static com.solegendary.reignofnether.util.MiscUtil.fcs;
 // Renders a Unit's portrait including its animated head, name, healthbar, list of stats and UI frames for these
 
 public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<T>, R extends LivingEntityRenderer<T, M>> {
+    private static final Minecraft MC = Minecraft.getInstance();
+
     public R renderer;
     public Model model;
 
@@ -115,6 +120,20 @@ public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<
             lookTargetX = MyMath.randRangeInt(-lookRangeX, lookRangeX);
         while (Math.abs(lookTargetY - lookY) < lookRangeY / 2)
             lookTargetY = MyMath.randRangeInt(-lookRangeY, lookRangeY);
+    }
+
+    private static boolean checkedFreshAnimations = false;
+    private static boolean isFreshAnimationsInstalled = false;
+
+    private static boolean shouldAnimate() {
+        if (!checkedFreshAnimations && HudClientEvents.hudSelectedEntity != null) {
+            isFreshAnimationsInstalled = MC.getResourceManager().listPacks().map(PackResources::packId)
+                    .toList().stream().anyMatch(s -> s.toLowerCase().contains("freshanimations"));
+            checkedFreshAnimations = true;
+        }
+        return !isFreshAnimationsInstalled ||
+                HudClientEvents.hudSelectedEntity instanceof AbstractIllager ||
+                HudClientEvents.hudSelectedEntity instanceof HeroUnit;
     }
 
     public void tickAnimation() {
@@ -627,25 +646,26 @@ public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<
         poseStack.pushPose();
         poseStack.translate(0.0D, 0.0D, 10.0D);
         poseStack.scale((float) size, (float) size, (float) size);
-        Quaternionf quaternion = Axis.ZP.rotationDegrees(180.0F);
-        Quaternionf quaternion2 = Axis.XP.rotationDegrees(g * 20.0F);
-        quaternion.mul(quaternion2);
-        poseStack.mulPose(quaternion);
         float h = entity.yBodyRot; // bodyYaw;
         float i = entity.getYRot(); // getYaw();
         float j = entity.getXRot(); // getPitch();
         float k = entity.yHeadRotO; // prevHeadYaw;
         float l = entity.yHeadRot; // headYaw;
-        entity.yBodyRot = 180.0F + f * 20.0F;
-        entity.setYRot(180.0F + f * 40.0F);
-        entity.setXRot(-g * 20.0F);
-        entity.yHeadRot = entity.getYRot();
-        entity.yHeadRotO = entity.getYRot();
-
+        Quaternionf quaternion = Axis.ZP.rotationDegrees(180.0F);
+        Quaternionf quaternion2 = Axis.XP.rotationDegrees(g * 20.0F);
+        quaternion.mul(quaternion2);
+        poseStack.mulPose(quaternion);
+        if (shouldAnimate()) {
+            entity.yBodyRot = 180.0F + f * 20.0F;
+            entity.setYRot(180.0F + f * 40.0F);
+            entity.setXRot(-g * 20.0F);
+            entity.yHeadRot = entity.getYRot();
+            entity.yHeadRotO = entity.getYRot();
+        }
         Lighting.setupForEntityInInventory();
         EntityRenderDispatcher entityrenderdispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
-        quaternion2.conjugate();
         entityrenderdispatcher.setRenderShadow(false);
+        quaternion2.conjugate();
         entityrenderdispatcher.overrideCameraOrientation(quaternion2);
 
         // for some reason this snippet causes drawLineBox to draw lines in completely wrong locations while in
@@ -660,11 +680,14 @@ public class PortraitRendererUnit<T extends LivingEntity, M extends EntityModel<
             }
         });
         entityrenderdispatcher.setRenderShadow(true);
-        entity.yBodyRot = h;
-        entity.setYRot(i);
-        entity.setXRot(j);
-        entity.yHeadRotO = k;
-        entity.yHeadRot = l;
+
+        if (shouldAnimate()) {
+            entity.yBodyRot = h;
+            entity.setYRot(i);
+            entity.setXRot(j);
+            entity.yHeadRotO = k;
+            entity.yHeadRot = l;
+        }
         poseStackModel.popPose();
         poseStack.popPose();
         RenderSystem.applyModelViewMatrix();

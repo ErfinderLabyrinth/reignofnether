@@ -44,7 +44,7 @@ public class DiplomacyPlayerDisplay extends AbstractPlayerDisplay {
     }
 
     private static final int RESOURCE_FRAME_WIDTH = Button.DEFAULT_ICON_FRAME_SIZE * 2; // frame containing a resource value + icon
-    private static final int ALLIANCE_FRAME_WIDTH = Button.DEFAULT_ICON_FRAME_SIZE * 4; // frame containing a resource value + icon
+    private static final int ALLIANCE_FRAME_WIDTH = (Button.DEFAULT_ICON_FRAME_SIZE * 5); // frame containing a resource value + icon
     public static final int DISPLAY_WIDTH = // total width of a player display
             PLAYER_FRAME_WIDTH +
             RESOURCE_FRAME_WIDTH * 4 +

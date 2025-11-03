@@ -8,8 +8,7 @@ import com.solegendary.reignofnether.building.buildings.neutral.NeutralTransport
 import com.solegendary.reignofnether.building.buildings.placements.*;
 import com.solegendary.reignofnether.building.buildings.villagers.Castle;
 import com.solegendary.reignofnether.building.buildings.villagers.Library;
-import com.solegendary.reignofnether.building.custombuilding.CustomBuilding;
-import com.solegendary.reignofnether.building.custombuilding.CustomBuildingClientboundPacket;
+import com.solegendary.reignofnether.building.custombuilding.CustomBuildingServerEvents;
 import com.solegendary.reignofnether.fogofwar.FrozenChunkClientboundPacket;
 import com.solegendary.reignofnether.nether.NetherBlocks;
 import com.solegendary.reignofnether.player.PlayerServerEvents;
@@ -102,25 +101,23 @@ public class BuildingServerEvents {
         buildingData.buildings.clear();
 
         getBuildings().forEach(b -> {
-            if (!(b.getBuilding() instanceof CustomBuilding)) {
-                PortalPlacement.PortalType portalType = null;
-                if (b instanceof PortalPlacement portal) {
-                    portalType = portal.getPortalType();
-                }
-                buildingData.buildings.add(new BuildingSave(b.originPos,
-                        level,
-                        b.getBuilding(),
-                        b.ownerName,
-                        b.rotation,
-                        b instanceof ProductionPlacement pb ? pb.getFinalRallyPoint() : b.originPos,
-                        b.isDiagonalBridge,
-                        b.isBuilt,
-                        b.getUpgradeLevel(),
-                        portalType,
-                        b instanceof PortalPlacement portal && portal.hasDestination() ? portal.destination : new BlockPos(0,0,0)
-                ));
-                //ReignOfNether.LOGGER.info("saved buildings/nether in serverevents: " + b.originPos);
+            PortalPlacement.PortalType portalType = null;
+            if (b instanceof PortalPlacement portal) {
+                portalType = portal.getPortalType();
             }
+            buildingData.buildings.add(new BuildingSave(b.originPos,
+                    level,
+                    b.getBuilding(),
+                    b.ownerName,
+                    b.rotation,
+                    b instanceof ProductionPlacement pb ? pb.getFinalRallyPoint() : b.originPos,
+                    b.isDiagonalBridge,
+                    b.isBuilt,
+                    b.getUpgradeLevel(),
+                    portalType,
+                    b instanceof PortalPlacement portal && portal.hasDestination() ? portal.destination : new BlockPos(0,0,0)
+            ));
+            //ReignOfNether.LOGGER.info("saved buildings/nether in serverevents: " + b.originPos);
         });
         buildingData.save();
         level.getDataStorage().save();
@@ -141,12 +138,13 @@ public class BuildingServerEvents {
         ServerLevel level = evt.getServer().getLevel(Level.OVERWORLD);
 
         if (level != null) {
+            CustomBuildingServerEvents.loadBuildings(level);
             BuildingSaveData buildingData = BuildingSaveData.getInstance(level);
             NetherZoneSaveData netherData = NetherZoneSaveData.getInstance(level);
             ArrayList<BlockPos> placedNZs = new ArrayList<>();
             BuildingServerEvents.getBuildings().clear();
             buildingData.buildings.forEach(b -> {
-                BuildingPlacement building = BuildingUtils.getNewBuilding(b.building,
+                BuildingPlacement building = BuildingUtils.getNewBuildingPlacement(b.building,
                     level,
                     b.originPos,
                     b.rotation,
@@ -186,11 +184,11 @@ public class BuildingServerEvents {
                             if (building.isPosInsideBuilding(nz.getOrigin())) {
                                 ncb.setNetherZone(nz);
                                 placedNZs.add(nz.getOrigin());
-                                ReignOfNether.LOGGER.info("loaded netherzone for: " + ReignOfNetherRegistries.BUILDING.getKey(b.building).toString() + "|" + b.originPos);
+                                ReignOfNether.LOGGER.info("loaded netherzone for: " + b.building.name + "|" + b.originPos);
                                 break;
                             }
                     }
-                    ReignOfNether.LOGGER.info("loaded building in serverevents: " + ReignOfNetherRegistries.BUILDING.getKey(b.building).toString() + "|" + b.originPos);
+                    ReignOfNether.LOGGER.info("loaded building in serverevents: " + b.building.name + "|" + b.originPos);
                 }
             });
             netherData.netherZones.forEach(nz -> {
@@ -221,7 +219,7 @@ public class BuildingServerEvents {
         boolean queue,
         boolean isDiagonalBridge
     ) {
-        BuildingPlacement newBuilding = BuildingUtils.getNewBuilding(building,
+        BuildingPlacement newBuilding = BuildingUtils.getNewBuildingPlacement(building,
             serverLevel,
             pos,
             rotation,
@@ -441,16 +439,7 @@ public class BuildingServerEvents {
         }
     }
 
-    // does the player own one of these buildings?
-    public static boolean playerHasFinishedBuilding(String playerName, Building building2) {
-        for (BuildingPlacement building : buildings)
-            if (building.getBuilding().equals(building2) && building.isBuilt && building.ownerName.equals(playerName)) {
-                return true;
-            }
-        return false;
-    }
-
-    private static void syncBuildings() {
+    private static void syncBuildingPlacements() {
         for (BuildingPlacement building : buildings) {
             BuildingClientboundPacket.placeBuilding(building.originPos,
                     building.getBuilding(),
@@ -467,6 +456,26 @@ public class BuildingServerEvents {
         }
     }
 
+    public static void syncBuildingPlacement(BlockPos pos) {
+        for (BuildingPlacement building : buildings) {
+            if (building.originPos.equals(pos)) {
+                BuildingClientboundPacket.placeBuilding(building.originPos,
+                        building.getBuilding(),
+                        building.rotation,
+                        building.ownerName,
+                        building.blockPlaceQueue.size(),
+                        building instanceof BridgePlacement bridge && bridge.isDiagonalBridge,
+                        building.getUpgradeLevel(),
+                        building.isBuilt,
+                        building instanceof PortalPlacement p ? p.getPortalType() : PortalPlacement.PortalType.BASIC,
+                        building instanceof PortalPlacement p && p.hasDestination() ? p.destination : new BlockPos(0, 0, 0),
+                        true
+                );
+            }
+            break;
+        }
+    }
+
     @SubscribeEvent
     public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent evt) {
         if (!PlayerServerEvents.rtsSyncingEnabled) {
@@ -474,9 +483,9 @@ public class BuildingServerEvents {
         }
         MinecraftServer server = evt.getEntity().level().getServer();
         if (server == null || !server.isDedicatedServer()) {
-            CompletableFuture.delayedExecutor(1000, TimeUnit.MILLISECONDS).execute(BuildingServerEvents::syncBuildings);
+            CompletableFuture.delayedExecutor(1000, TimeUnit.MILLISECONDS).execute(BuildingServerEvents::syncBuildingPlacements);
         } else {
-            syncBuildings();
+            syncBuildingPlacements();
         }
         //ReignOfNether.LOGGER.info("Synced " + buildings.size() + " buildings with player logged in");
     }
@@ -673,22 +682,19 @@ public class BuildingServerEvents {
         }
         for (BuildingPlacement building : buildings) {
             if (building.originPos.equals(buildingPos)) {
-                if (building.getBuilding() instanceof CustomBuilding customBuilding) {
-                    CustomBuildingClientboundPacket.registerCustomBuilding(customBuilding.name, buildingPos, customBuilding.structurePos, customBuilding.structureSize);
-                } else {
-                    BuildingClientboundPacket.placeBuilding(building.originPos,
-                            building.getBuilding(),
-                            building.rotation,
-                            building.ownerName,
-                            building.blockPlaceQueue.size(),
-                            building instanceof BridgePlacement bridge && bridge.isDiagonalBridge,
-                            building.getUpgradeLevel(),
-                            building.isBuilt,
-                            building instanceof PortalPlacement p ? p.getPortalType() : PortalPlacement.PortalType.BASIC,
-                            building instanceof PortalPlacement p && p.getPortalType() == PortalPlacement.PortalType.TRANSPORT ? p.destination : new BlockPos(0,0,0),
-                            false
-                    );
-                }
+                BuildingClientboundPacket.placeBuilding(
+                        building.originPos,
+                        building.getBuilding(),
+                        building.rotation,
+                        building.ownerName,
+                        building.blockPlaceQueue.size(),
+                        building instanceof BridgePlacement bridge && bridge.isDiagonalBridge,
+                        building.getUpgradeLevel(),
+                        building.isBuilt,
+                        building instanceof PortalPlacement p ? p.getPortalType() : PortalPlacement.PortalType.BASIC,
+                        building instanceof PortalPlacement p && p.getPortalType() == PortalPlacement.PortalType.TRANSPORT ? p.destination : new BlockPos(0,0,0),
+                        false
+                );
                 return;
             }
         }
@@ -718,4 +724,14 @@ public class BuildingServerEvents {
         return ((float) netherBlocksBelow / (float) blocksBelow) > MIN_NETHER_BLOCKS_PERCENT;
     }
 
+    // does the player own one of these buildings?
+    public static boolean hasFinishedBuilding(Building building, String playerName) {
+        for (BuildingPlacement bpl : buildings) {
+            if (bpl.getBuilding().isTypeOf(building) && bpl.isBuilt &&
+                    (bpl.ownerName.equals(playerName))) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

@@ -40,7 +40,6 @@ public class TownCentre extends ProductionBuilding {
 
     // distance you can move away from a town centre before being turned back into a villager
     public static final int MILITIA_RANGE = 60;
-    private final Set<BlockPos> militiaBorderBps = new HashSet<>();
 
     public TownCentre() {
         super(structureName, cost, true);

@@ -45,6 +45,7 @@ public class MagmaCubeUnit extends SlimeUnit implements Unit, AttackerUnit {
 
     public MagmaCubeUnit(EntityType<? extends SlimeUnit> entityType, Level level) {
         super(entityType, level);
+        this.shouldSpawnSlimes = false;
     }
 
     protected SoundEvent getHurtSound(DamageSource pDamageSource) {

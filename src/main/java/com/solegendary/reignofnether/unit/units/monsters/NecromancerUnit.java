@@ -565,6 +565,6 @@ public class NecromancerUnit extends Skeleton implements Unit, AttackerUnit, Ran
         int bonusDuration = BloodMoon.BONUS_DURATION_PER_SOUL_RANK * soulRank;
 
         TimeServerEvents.startBloodMoon(BloodMoon.DURATION + bonusDuration, this, bpl.centrePos);
-        AbilityClientboundPacket.doAbility(this.getId(), UnitAction.BLOOD_MOON, BloodMoon.DURATION + bonusDuration);
+        AbilityClientboundPacket.doAbility(this.getId(), UnitAction.BLOOD_MOON, BloodMoon.DURATION + bonusDuration, bpl.centrePos);
     }
 }

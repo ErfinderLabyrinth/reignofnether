@@ -1,6 +1,5 @@
 package com.solegendary.reignofnether.ability;
 
-import com.solegendary.reignofnether.ability.heroAbilities.monster.SoulSiphonPassive;
 import com.solegendary.reignofnether.registrars.PacketHandler;
 import com.solegendary.reignofnether.time.TimeClientEvents;
 import com.solegendary.reignofnether.unit.UnitAction;
@@ -8,6 +7,7 @@ import com.solegendary.reignofnether.unit.UnitClientEvents;
 import com.solegendary.reignofnether.unit.UnitServerEvents;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.units.monsters.NecromancerUnit;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.api.distmarker.Dist;
@@ -24,6 +24,7 @@ public class AbilityClientboundPacket {
     private final boolean isSettingCooldown;
     private final UnitAction unitAction;
     private final float value;
+    private final BlockPos pos;
 
     private static void setServersideCooldown(int unitId, UnitAction unitAction, float cooldown) {
         for (LivingEntity entity : UnitServerEvents.getAllUnits())
@@ -38,13 +39,19 @@ public class AbilityClientboundPacket {
     public static void sendSetCooldownPacket(int unitId, UnitAction unitAction, float cooldown) {
         setServersideCooldown(unitId, unitAction, cooldown);
         PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(),
-                new AbilityClientboundPacket(unitId, true, unitAction, cooldown)
+                new AbilityClientboundPacket(unitId, true, unitAction, cooldown, new BlockPos(0,0,0))
         );
     }
 
     public static void doAbility(int unitId, UnitAction unitAction, float value) {
         PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(),
-                new AbilityClientboundPacket(unitId, false, unitAction, value)
+                new AbilityClientboundPacket(unitId, false, unitAction, value, new BlockPos(0,0,0))
+        );
+    }
+
+    public static void doAbility(int unitId, UnitAction unitAction, float value, BlockPos pos) {
+        PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(),
+                new AbilityClientboundPacket(unitId, false, unitAction, value, pos)
         );
     }
 
@@ -52,12 +59,14 @@ public class AbilityClientboundPacket {
         int unitId,
         boolean isSettingCooldown,
         UnitAction unitAction,
-        float value
+        float value,
+        BlockPos pos
     ) {
         this.unitId = unitId;
         this.isSettingCooldown = isSettingCooldown;
         this.unitAction = unitAction;
         this.value = value;
+        this.pos = pos;
     }
 
     public AbilityClientboundPacket(FriendlyByteBuf buffer) {
@@ -65,6 +74,7 @@ public class AbilityClientboundPacket {
         this.isSettingCooldown = buffer.readBoolean();
         this.unitAction = buffer.readEnum(UnitAction.class);
         this.value = buffer.readFloat();
+        this.pos = buffer.readBlockPos();
     }
 
     public void encode(FriendlyByteBuf buffer) {
@@ -72,6 +82,7 @@ public class AbilityClientboundPacket {
         buffer.writeBoolean(this.isSettingCooldown);
         buffer.writeEnum(this.unitAction);
         buffer.writeFloat(this.value);
+        buffer.writeBlockPos(this.pos);
     }
 
     // client-side packet-consuming functions
@@ -97,7 +108,7 @@ public class AbilityClientboundPacket {
                         }
                     }
                     if (this.unitAction == UnitAction.BLOOD_MOON) {
-                        TimeClientEvents.setBloodMoonTicks((int) value, unit == null ? "" : unit.getOwnerName());
+                        TimeClientEvents.setBloodMoonTicks((int) value, this.pos);
                     }
                     else if (this.unitAction == UnitAction.SOUL_SIPHON_UPDATE) {
                         if (unit instanceof NecromancerUnit necromancer) {

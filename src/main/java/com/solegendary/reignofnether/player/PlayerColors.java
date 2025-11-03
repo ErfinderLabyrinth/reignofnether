@@ -234,7 +234,8 @@ public class PlayerColors {
     }
 
     public static Button getToggleTeamColorsButton() {
-        return new Button(I18n.get("hud.orthoview.reignofnether.toggle_team_colors"),
+        return new Button(
+                "Toggle alliance colours",
                 14,
                 isUsingPlayerColors()
                         ? ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/icons/items/toggle_color_mode_players.png")
@@ -248,10 +249,7 @@ public class PlayerColors {
                 null,
                 List.of(
                         fcs(I18n.get("hud.orthoview.reignofnether.using_player_team_color"), isUsingPlayerColors()),
-                        fcs(I18n.get("hud.orthoview.reignofnether.using_relation_color"), !isUsingPlayerColors()),
-                        PlayerClientEvents.isRTSPlayer() ?
-                            fcs(I18n.get("hud.orthoview.reignofnether.color_type_toggle")) :
-                            fcs(I18n.get("hud.orthoview.reignofnether.locked_for_observers"))
+                        fcs(I18n.get("hud.orthoview.reignofnether.using_relation_color"), !isUsingPlayerColors())
                 )
         );
     }

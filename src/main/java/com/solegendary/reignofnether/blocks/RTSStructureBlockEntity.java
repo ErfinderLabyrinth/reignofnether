@@ -11,6 +11,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.StructureBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.StructureMode;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -19,7 +20,6 @@ public class RTSStructureBlockEntity extends StructureBlockEntity {
 
     public RTSStructureBlockEntity(BlockPos pPos, BlockState pBlockState) {
         super(pPos, pBlockState);
-
         this.type = BlockEntityRegistrar.RTS_STRUCTURE_BLOCK_ENTITY.get();
     }
 
@@ -35,7 +35,16 @@ public class RTSStructureBlockEntity extends StructureBlockEntity {
     }
 
     @Override
-    public void setMode(StructureMode pMode) {
+    public @NotNull StructureMode getMode() {
+        if (this.mode == StructureMode.LOAD)
+            return StructureMode.SAVE;
+        return this.mode;
+    }
+
+    @Override
+    public void setMode(@NotNull StructureMode pMode) {
+        if (pMode == StructureMode.LOAD)
+            pMode = StructureMode.CORNER; // don't allow loading by block, only by building placement menu
         this.mode = pMode;
         BlockState $$1 = this.level.getBlockState(this.getBlockPos());
         if ($$1.is(BlockRegistrar.RTS_STRUCTURE_BLOCK.get())) {
@@ -59,8 +68,8 @@ public class RTSStructureBlockEntity extends StructureBlockEntity {
     @Override
     public boolean detectSize() {
         boolean result = super.detectSize();
-        if (result) {
-            if (this.getShowBoundingBox()) {
+        if (result && level != null && level.getServer() != null) { // this function only runs serverside but we can only render clientside unless in singleplayer
+            if (this.getShowBoundingBox() && (!level.isClientSide() && !level.getServer().isDedicatedServer())) {
                 CustomBuildingClientEvents.rtsStructuresToRenderBB.add(this.getBlockPos());
             }
         }
@@ -72,7 +81,7 @@ public class RTSStructureBlockEntity extends StructureBlockEntity {
         boolean result = super.saveStructure(pWriteToDisk);
         if (result && level != null) {
             if (!level.isClientSide()) {
-                CustomBuildingServerEvents.createNewCustomBuilding(structureName, getStructureName(), (ServerLevel) this.level, getBlockPos());
+                CustomBuildingServerEvents.createAndRegisterNewCustomBuilding(structureName, getStructureName(), (ServerLevel) this.level, getBlockPos());
             }
         }
         return result;

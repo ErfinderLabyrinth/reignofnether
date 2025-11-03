@@ -33,7 +33,7 @@ public class OakStockpile extends AbstractStockpile {
 
     public OakStockpile() {
         super(structureName);
-
+        this.name = buildingName;
         this.startingBlockTypes.add(Blocks.OAK_LOG);
     }
 

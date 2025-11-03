@@ -145,7 +145,7 @@ public class HeadhunterUnit extends PiglinBrute implements Unit, AttackerUnit, R
     public float getAggroRange() {return aggroRange;}
     public boolean getAggressiveWhenIdle() {return aggressiveWhenIdle && !isVehicle();}
     public float getAttackRange() {return attackRange;}
-    public float getUnitAttackDamage() {return attackDamage;}
+    public float getUnitAttackDamage() {return attackDamage + (hasFireAspectTrident() ? 1 : 0);}
     public BlockPos getAttackMoveTarget() { return attackMoveTarget; }
     public boolean canAttackBuildings() {return getAttackBuildingGoal() != null;}
     public Goal getAttackGoal() { return attackGoal; }
@@ -310,9 +310,10 @@ public class HeadhunterUnit extends PiglinBrute implements Unit, AttackerUnit, R
         return super.fireImmune() || (bpl != null && (bpl.getBuilding() instanceof FlameSanctuary || bpl.getBuilding() instanceof BasaltSprings));
     }
 
-
-
-
+    public boolean hasNetheriteChestplate() {
+        ItemStack itemStack = this.getItemBySlot(EquipmentSlot.CHEST);
+        return itemStack.getItem() == Items.NETHERITE_CHESTPLATE;
+    }
 
     public boolean hasFireAspectTrident() {
         ItemStack itemStack = this.getItemBySlot(EquipmentSlot.MAINHAND);
@@ -348,5 +349,10 @@ public class HeadhunterUnit extends PiglinBrute implements Unit, AttackerUnit, R
     @Override
     public boolean hasBonusAttackSpeed() {
         return bloodlustTicks > 0;
+    }
+
+    @Override
+    public boolean hasBonusDamage() {
+        return hasFireAspectTrident();
     }
 }

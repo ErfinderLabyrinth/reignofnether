@@ -16,6 +16,7 @@ import com.solegendary.reignofnether.building.buildings.shared.AbstractBridge;
 import com.solegendary.reignofnether.building.buildings.villagers.Castle;
 import com.solegendary.reignofnether.building.buildings.villagers.Library;
 import com.solegendary.reignofnether.building.buildings.villagers.TownCentre;
+import com.solegendary.reignofnether.building.custombuilding.CustomBuilding;
 import com.solegendary.reignofnether.cursor.CursorClientEvents;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientEvents;
 import com.solegendary.reignofnether.gamerules.GameruleClient;
@@ -144,7 +145,14 @@ public class BuildingClientEvents {
         }
 
         selectedBuildings.add(building);
-        selectedBuildings.sort(Comparator.comparing(b -> ReignOfNetherRegistries.BUILDING.getKey(b.getBuilding()).toString()));
+        selectedBuildings.sort(Comparator.comparing(b -> {
+            if (b.getBuilding() instanceof CustomBuilding) {
+                return b.getBuilding().name;
+            } else {
+                ReignOfNetherRegistries.BUILDING.getKey(b.getBuilding()).toString();
+            }
+            return "";
+        }));
         UnitClientEvents.clearSelectedUnits();
     }
 
@@ -727,8 +735,7 @@ public class BuildingClientEvents {
     }
 
     @SubscribeEvent
-    public static void onMouseClick(ScreenEvent.MouseButtonPressed.Pre evt) throws NoSuchFieldException,
-        IllegalAccessException {
+    public static void onMouseClick(ScreenEvent.MouseButtonPressed.Pre evt) {
         if (!OrthoviewClientEvents.isEnabled()) {
             return;
         }
@@ -1003,19 +1010,16 @@ public class BuildingClientEvents {
         BlockPos portalDestination,
         boolean forPlayerLoggingIn
     ) {
-
-        BuildingPlacement newBuilding = BuildingUtils.getNewBuilding(building,
+        BuildingPlacement newBuilding = BuildingUtils.getNewBuildingPlacement(building,
             MC.level,
             pos,
             rotation,
             ownerName,
             isDiagonalBridge
         );
-
         for (BuildingPlacement placement : buildings)
-            if (newBuilding.originPos.equals(placement.originPos)) {
+            if (newBuilding.originPos.equals(placement.originPos))
                 return; // skip, building already exists clientside
-            }
 
         // add a bunch of dummy blocks so clients know not to remove buildings before the first blocks get placed
         while (numBlocksToPlace > 0) {

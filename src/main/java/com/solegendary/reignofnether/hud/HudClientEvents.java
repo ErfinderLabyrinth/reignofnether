@@ -12,6 +12,7 @@ import com.solegendary.reignofnether.building.*;
 import com.solegendary.reignofnether.building.buildings.placements.BeaconPlacement;
 import com.solegendary.reignofnether.building.buildings.placements.ProductionPlacement;
 import com.solegendary.reignofnether.building.custombuilding.CustomBuilding;
+import com.solegendary.reignofnether.building.custombuilding.CustomBuildingClientEvents;
 import com.solegendary.reignofnether.building.production.ActiveProduction;
 import com.solegendary.reignofnether.config.ConfigClientEvents;
 import com.solegendary.reignofnether.gamemode.ClientGameModeHelper;
@@ -28,6 +29,7 @@ import com.solegendary.reignofnether.minimap.MinimapClientEvents;
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
 import com.solegendary.reignofnether.player.PlayerClientEvents;
 import com.solegendary.reignofnether.player.PlayerColors;
+import com.solegendary.reignofnether.research.ResearchClient;
 import com.solegendary.reignofnether.resources.ResourceName;
 import com.solegendary.reignofnether.resources.ResourceSources;
 import com.solegendary.reignofnether.resources.Resources;
@@ -61,14 +63,17 @@ import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackResources;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.monster.AbstractIllager;
 import net.minecraft.world.item.BannerItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.event.RenderLivingEvent;
@@ -799,16 +804,19 @@ public class HudClientEvents {
             }
         }
 
+
         // ---------------------------
-        // Unit sandbox action buttons
+        // Unit sandbox buttons
         // ---------------------------
-        if (selUnits.size() > 0 && SandboxClientEvents.isSandboxPlayer() && hudSelectedEntity instanceof Unit &&
-            (getPlayerToEntityRelationship(selUnits.get(0)) != Relationship.OWNED &&
-                    !AlliancesClient.canControlAlly(selUnits.get(0)))) {
+        if (SandboxClientEvents.isSandboxPlayer() && (hudSelectedEntity != null || hudSelectedPlacement != null)) {
             blitX = 0;
             blitY = screenHeight - (iconFrameSize * 2);
             ArrayList<Button> actionButtons = new ArrayList<>();
 
+            actionButtons.add(SandboxActionButtons.getSetRelationshipButton());
+            if (hudSelectedPlacement != null) {
+                actionButtons.add(SandboxActionButtons.removeBuildingPlacement);
+            }
             if (hudSelectedEntity instanceof AttackerUnit) {
                 actionButtons.add(SandboxActionButtons.setAnchor);
                 actionButtons.add(SandboxActionButtons.resetToAnchor);
@@ -860,10 +868,6 @@ public class HudClientEvents {
                     if (ability instanceof CallToArmsUnit callToArmsUnit)
                         actionButtons.add(callToArmsUnit.getButton(Keybindings.keyV, vUnit));
 
-            if (SandboxClientEvents.isSandboxPlayer()) {
-                actionButtons.add(SandboxActionButtons.getSetRelationshipButton());
-            }
-
             for (Button actionButton : actionButtons) {
                 // GATHER button does not have a static icon
                 if (actionButton == ActionButtons.gather && hudSelectedEntity instanceof WorkerUnit workerUnit) {
@@ -899,7 +903,7 @@ public class HudClientEvents {
 
             // includes worker building buttons
             if (TutorialClientEvents.isAtOrPastStage(TutorialStage.BUILD_INTRO) &&
-                    (getPlayerToEntityRelationship(selUnits.get(0)) == Relationship.OWNED || !PlayerClientEvents.isRTSPlayer()) ||
+                    (getPlayerToEntityRelationship(selUnits.get(0)) == Relationship.OWNED || !PlayerClientEvents.isRTSPlayer() || ResearchClient.hasCheat("wouldyoukindly")) ||
                     AlliancesClient.canControlAlly(selUnits.get(0))) {
                 List<Button> abilityButtons = List.of();
                 for (LivingEntity livingEntity : selUnits) {
@@ -914,6 +918,9 @@ public class HudClientEvents {
 
                 int rowsUp = (int) Math.floor((float) (unitAbilities.size() - 1) / MAX_BUTTONS_PER_ROW);
                 rowsUp = Math.max(0, rowsUp);
+                if (SandboxClientEvents.isSandboxPlayer() && (hudSelectedEntity != null || hudSelectedPlacement != null))
+                    rowsUp += 1;
+
                 blitY -= iconFrameSize * rowsUp;
 
                 int i = 0;
@@ -957,14 +964,14 @@ public class HudClientEvents {
             blitY = screenHeight - iconFrameSize;
 
             ArrayList<Button> actionButtons = new ArrayList<>();
-            actionButtons.add(SandboxClientEvents.getToggleBuildingOrUnitsButton());
+            actionButtons.add(SandboxClientEvents.getCycleBuildingOrUnitsButton());
             actionButtons.add(SandboxClientEvents.getToggleFactionButton());
             actionButtons.add(SandboxClientEvents.getToggleRelationshipButton());
 
-            if (SandboxClientEvents.sandboxMenuType == SandboxMenuType.BUILDINGS) {
-                actionButtons.add(SandboxClientEvents.getToggleBuildingCheatsButton());
-            } else {
+            if (SandboxClientEvents.sandboxMenuType == SandboxMenuType.UNITS) {
                 actionButtons.add(SandboxClientEvents.getToggleUnitCheatsButton());
+            } else {
+                actionButtons.add(SandboxClientEvents.getToggleBuildingCheatsButton());
             }
             actionButtons.add(SandboxClientEvents.getToggleNonUnitControlButton());
 
@@ -977,8 +984,9 @@ public class HudClientEvents {
             blitY = screenHeight - (iconFrameSize * 2) - 4;
 
             List<Button> abilityButtons = switch(SandboxClientEvents.sandboxMenuType) {
+                case UNITS -> List.copyOf(SandboxClientEvents.getUnitButtons());
                 case BUILDINGS -> List.copyOf(SandboxClientEvents.getBuildingButtons());
-                default -> List.copyOf(SandboxClientEvents.getUnitButtons());
+                case CUSTOM_BUILDINGS -> List.copyOf(SandboxClientEvents.getCustomBuildingButtons());
             };
 
             List<Button> shownAbilities = abilityButtons.stream()
@@ -987,6 +995,9 @@ public class HudClientEvents {
 
             int rowsUp = (int) Math.floor((float) (shownAbilities.size() - 1) / MAX_BUTTONS_PER_ROW);
             rowsUp = Math.max(0, rowsUp);
+            if (SandboxClientEvents.isSandboxPlayer() && (hudSelectedEntity != null || hudSelectedPlacement != null))
+                rowsUp += 1;
+
             blitY -= iconFrameSize * rowsUp;
 
             int i = 0;
@@ -1555,7 +1566,7 @@ public class HudClientEvents {
         if (beacon != null) {
             Button beaconButton = HelperButtons.getBeaconButton(beacon.ownerName);
             int xi = screenWidth - (StartButtons.ICON_SIZE * 2);
-            if (!observerButton.isHidden.get()) {
+            if (!observerButton.isHidden.get() || !diplomacyButton.isHidden.get()) {
                 xi = screenWidth - (StartButtons.ICON_SIZE * 4);
             }
             if (!beaconButton.isHidden.get()) {
@@ -1658,6 +1669,8 @@ public class HudClientEvents {
             return true;
         if (PlayerDisplayClientEvents.isMouseOverHud(mouseX, mouseY))
             return true;
+        if (CustomBuildingClientEvents.isMouseOverHud(mouseX, mouseY))
+            return true;
         return isMouseOverAnyButton();
     }
 
@@ -1686,6 +1699,8 @@ public class HudClientEvents {
         for (Button button : renderedButtons)
             button.checkPressed(evt.getKeyCode());
     }
+
+
 
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent evt) {

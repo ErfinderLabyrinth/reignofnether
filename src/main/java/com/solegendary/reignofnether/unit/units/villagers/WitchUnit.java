@@ -189,7 +189,7 @@ public class WitchUnit extends Witch implements Unit {
     }
 
     public void tick() {
-        this.setCanPickUpLoot(true);
+        this.setCanPickUpLoot(false);
         super.tick();
         Unit.tick(this);
         this.throwPotionGoal.tick();

@@ -35,20 +35,24 @@ Features
 
 Bugfixes
 --------
-[❌] Dying in survival puts you in a bugged survival mode
-
 [❌] [Code issue] ResearchHoglinCavalry doesn't overwrite the getItemName method of the base ProductionItem class,
         resulting in a null name when calling the method in the prod queue
     - Same with FireResistance, SoulFireball, LabLightningRod, WaterPotions, HealingPotions
 
 [❌] keyframe animations are cancelled upon being hit
 [❌] Avatar state is reset when unloaded
-[❌] When someone relogs, bridges revert to original rotations
-[❌] heroes are not resetting when switching worlds until /rts-reset is used
 
+[❌] Players logging in messes up the observer menu (and freezes resources?)
+[❌] bridge scroll bug (up and down vs left/right?)
 
 Quality of Life Features
 ------------------------
+
+[❌] Command to list end of game stats like:
+    - total resources gathered/spent
+    - average resources gathered/min
+    - total unit resource values lost
+    - total units produced (military and worker)
 
 [❌] Handicap command
     - Makes all resource costs some % higher than normal

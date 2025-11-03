@@ -270,6 +270,11 @@ public class WitherSkeletonUnit extends WitherSkeleton implements Unit, Attacker
         this.setItemSlot(EquipmentSlot.MAINHAND, swordStack);
     }
 
+    public boolean hasNetheriteChestplate() {
+        ItemStack itemStack = this.getItemBySlot(EquipmentSlot.CHEST);
+        return itemStack.getItem() == Items.NETHERITE_CHESTPLATE;
+    }
+
     public static final int WITHER_SECONDS = 6;
     public static final int WITHER_MAX_AMPLIFIER = 5; // amplifier starts at 0
     public static final int WITHER_MAX_AMPLIFIER_HERO = 3;
