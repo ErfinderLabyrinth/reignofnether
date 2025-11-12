@@ -276,7 +276,7 @@ public class BuildingClientboundPacket {
                         // if the client was missing a building, replace it
                         if (this.action == BuildingAction.SYNC_BLOCKS_AND_OWNER) {
                             BuildingServerboundPacket.requestReplacement(this.buildingPos);
-                            ReignOfNether.LOGGER.warn("Missing building");
+                            //ReignOfNether.LOGGER.warn("Missing building");
                         }
                         return;
                     }

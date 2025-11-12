@@ -5,7 +5,6 @@ import com.solegendary.reignofnether.building.*;
 import com.solegendary.reignofnether.building.buildings.placements.DarknessProductionBuilding;
 import com.solegendary.reignofnether.building.production.ProductionBuilding;
 import com.solegendary.reignofnether.building.production.ProductionItems;
-import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.resources.ResourceCost;
@@ -32,7 +31,7 @@ public class Mausoleum extends ProductionBuilding {
     public final static String structureName = "mausoleum";
     public final static ResourceCost cost = ResourceCosts.MAUSOLEUM;
     public final static int nightRange = 80;
-    public final static int nightRangeReduced = 60;
+    public final static int nightRangeReduced = 40;
 
     private final Set<BlockPos> nightBorderBps = new HashSet<>();
 
@@ -61,8 +60,8 @@ public class Mausoleum extends ProductionBuilding {
     @Override
     public BuildingPlacement createBuildingPlacement(Level level, BlockPos pos, Rotation rotation, String ownerName) {
         int nRange = nightRange;
-        if ((level.isClientSide() && BuildingClientEvents.hasFinishedBuilding(this)) ||
-            (!level.isClientSide() && BuildingServerEvents.hasFinishedBuilding(this, ownerName))) {
+        if ((level.isClientSide() && BuildingClientEvents.playerHasFinishedBuilding(this, ownerName)) ||
+            (!level.isClientSide() && BuildingServerEvents.playerHasFinishedBuilding(this, ownerName))) {
             nRange = nightRangeReduced;
         }
         return new DarknessProductionBuilding(this, level, pos, rotation, ownerName, getAbsoluteBlockData(getRelativeBlockData(level), level, pos, rotation), true, nRange,false, true);

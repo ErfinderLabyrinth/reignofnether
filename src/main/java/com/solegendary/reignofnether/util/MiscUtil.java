@@ -2,6 +2,7 @@ package com.solegendary.reignofnether.util;
 
 
 import com.mojang.datafixers.util.Pair;
+import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.ability.heroAbilities.monster.BloodMoon;
 import com.solegendary.reignofnether.alliance.AlliancesClient;
 import com.solegendary.reignofnether.building.*;
@@ -712,6 +713,8 @@ public class MiscUtil {
     }
 
     public static ResourceLocation getTextureForBlock(@NotNull Block block) {
+        if (block == Blocks.COMMAND_BLOCK)
+            return ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/icons/blocks/command_block_back.png");
         BlockState defaultState = block.defaultBlockState();
         BakedModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(defaultState);
         TextureAtlasSprite sprite = model.getParticleIcon();

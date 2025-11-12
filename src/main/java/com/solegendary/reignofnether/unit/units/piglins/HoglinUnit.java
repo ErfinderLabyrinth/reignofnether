@@ -2,6 +2,7 @@ package com.solegendary.reignofnether.unit.units.piglins;
 
 import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.ability.Ability;
+import com.solegendary.reignofnether.ability.abilities.Bloodlust;
 import com.solegendary.reignofnether.ability.abilities.Eject;
 import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.BuildingUtils;
@@ -52,12 +53,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import static com.solegendary.reignofnether.ability.abilities.Bloodlust.BLOODLUST_ATTACK_SPEED_MULTIPLIER;
 import static com.solegendary.reignofnether.util.MiscUtil.fcs;
 
 public class HoglinUnit extends Hoglin implements Unit, AttackerUnit, ConvertableUnit {
     public static final Abilities ABILITIES = new Abilities();
     static {
         ABILITIES.add(new Eject(), Keybindings.keyQ);
+        ABILITIES.add(new Bloodlust(), Keybindings.keyW);
     }
 
     //region
@@ -134,8 +137,11 @@ public class HoglinUnit extends Hoglin implements Unit, AttackerUnit, Convertabl
     @Nullable
     public ResourceCost getCost() {return ResourceCosts.HOGLIN;}
     public boolean getWillRetaliate() {return willRetaliate;}
-    public int getAttackCooldown() {return (int) (20 / attacksPerSecond);}
-    public float getAttacksPerSecond() {return attacksPerSecond;}
+    public float getAttacksPerSecond() {
+        if (bloodlustTicks > 0)
+            return attacksPerSecond * BLOODLUST_ATTACK_SPEED_MULTIPLIER;
+        return attacksPerSecond;
+    }
     public float getAggroRange() {return aggroRange;}
     public boolean getAggressiveWhenIdle() {return aggressiveWhenIdle && !isVehicle();}
     public float getAttackRange() {return attackRange;}
@@ -154,6 +160,12 @@ public class HoglinUnit extends Hoglin implements Unit, AttackerUnit, Convertabl
 
     // endregion
 
+    public int getAttackCooldown() {
+        if (bloodlustTicks > 0)
+            return (int) (20 / (attacksPerSecond * BLOODLUST_ATTACK_SPEED_MULTIPLIER));
+        return (int) (20 / attacksPerSecond);
+    }
+
     final static public float attackDamage = 6.0f;
     final static public float attacksPerSecond = 0.45f;
     final static public float attackRange = 2; // only used by ranged units or melee building attackers
@@ -165,6 +177,8 @@ public class HoglinUnit extends Hoglin implements Unit, AttackerUnit, Convertabl
     final static public float armorValue = 0.0f;
     final static public float movementSpeed = 0.31f;
     public int maxResources = 100;
+
+    public int bloodlustTicks = 0;
 
     final static public float BUILDING_DAMAGE_MULTIPLIER = 1.5f;
 
@@ -235,6 +249,8 @@ public class HoglinUnit extends Hoglin implements Unit, AttackerUnit, Convertabl
             super.tick();
             Unit.tick(this);
             AttackerUnit.tick(this);
+            if (bloodlustTicks > 0)
+                bloodlustTicks -= 1;
         }
     }
 
@@ -326,4 +342,10 @@ public class HoglinUnit extends Hoglin implements Unit, AttackerUnit, Convertabl
     public boolean hasBonusDamage() {
         return true;
     }
+
+    @Override
+    public boolean hasBonusAttackSpeed() {
+        return bloodlustTicks > 0;
+    }
+
 }

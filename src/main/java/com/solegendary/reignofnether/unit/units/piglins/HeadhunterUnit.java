@@ -165,8 +165,8 @@ public class HeadhunterUnit extends PiglinBrute implements Unit, AttackerUnit, R
 
     final static public float attackDamage = 6.0f;
     final static public float attacksPerSecond = 0.3f;
-    final static public float attackRange = 12; // only used by ranged units or melee building attackers
-    final static public float aggroRange = 12;
+    final static public float attackRange = 14; // only used by ranged units or melee building attackers
+    final static public float aggroRange = 14;
     final static public boolean willRetaliate = true; // will attack when hurt by an enemy
     final static public boolean aggressiveWhenIdle = true;
 

@@ -1,5 +1,6 @@
 package com.solegendary.reignofnether.building.buildings.neutral;
 
+import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingBlock;
 import com.solegendary.reignofnether.building.BuildingBlockData;
@@ -34,7 +35,7 @@ public class CapturableBeacon extends Beacon {
 
         this.name = buildingName;
         this.portraitBlock = Blocks.BEACON;
-        this.icon = ResourceLocation.fromNamespaceAndPath("minecraft", "textures/item/nether_star.png");
+        this.icon = ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/icons/blocks/netherite_beacon.png");
 
         this.buildTimeModifier = 1.0f;
 
@@ -61,7 +62,7 @@ public class CapturableBeacon extends Beacon {
     public BuildingPlaceButton getBuildButton(Keybinding hotkey) {
         return new BuildingPlaceButton(
                 buildingName,
-                ResourceLocation.fromNamespaceAndPath("minecraft", "textures/item/nether_star.png"),
+                ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/icons/blocks/netherite_beacon.png"),
                 hotkey,
                 () -> BuildingClientEvents.getBuildingToPlace() == this,
                 TutorialClientEvents::isEnabled,

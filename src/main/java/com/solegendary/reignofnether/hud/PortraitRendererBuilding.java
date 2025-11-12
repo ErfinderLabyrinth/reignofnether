@@ -5,6 +5,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import com.solegendary.reignofnether.api.ReignOfNetherRegistries;
+import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingClientEvents;
 import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.buildings.monsters.SculkCatalyst;
@@ -23,14 +24,14 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
 import org.joml.Quaternionf;
 
 // Renders a Building's portrait including an animated block, name, healthbar, list of stats and UI frames
 
-class PortraitRendererBuilding {
+public class PortraitRendererBuilding {
     public int frameWidth = 60;
     public int frameHeight = 60;
-    public float blockScale = 5.5f;
     public int xBlock = 31;
     public int yBlock = 25;
 
@@ -79,7 +80,7 @@ class PortraitRendererBuilding {
                 frameHeight,
                 bgCol);
 
-        drawBlockOnScreen(x, y, building);
+        drawBlockOnScreen(x, y, building.getBuilding().portraitBlock, 5.5f);
 
         // draw health bar and write min/max hp
         HealthBarClientEvents.renderForBuilding(guiGraphics.pose(), building,
@@ -96,8 +97,8 @@ class PortraitRendererBuilding {
         return RectZone.getZoneByLW(x, y, frameWidth, frameHeight);
     }
 
-    private void drawBlockOnScreen(int x, int y, BuildingPlacement building) {
-        ItemStack item = new ItemStack(building.getBuilding().portraitBlock);
+    public void drawBlockOnScreen(int x, int y, Block block, float blockScale) {
+        ItemStack item = new ItemStack(block);
 
         RenderSystem.enableBlend();
         RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);

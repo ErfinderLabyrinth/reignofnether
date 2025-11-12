@@ -27,12 +27,11 @@ public class FarmPlacement extends BuildingPlacement {
     private final ArrayList<FarmCropBlock> farmBlocks = new ArrayList<>();
     private static final int TICK_CROPS_INTERVAL = 10;
     private static final int TPS = ResourceCost.TICKS_PER_SECOND;
-    private static final int STEM_GROW_TICKS = 13 * TPS; // (90s maturity) ticks to grow 1/8 stages (includes pumpkins and melons)
+    private static final int STEM_GROW_TICKS = 13 * TPS; // (91s maturity) ticks to grow 1/8 stages (includes pumpkins and melons)
     private static final int GOURD_GROW_TICKS = 45 * TPS; // ticks to grow a gourd once we have a grown stem
-    private static final int CROP_GROW_TICKS = 13 * TPS; // (90s maturity) ticks to grow 1/8 stages (includes wheat, potato, beetroot, etc.)
-    private static final int NETHER_WART_GROW_TICKS = 40 * TPS; // (120s maturity) ticks to grow 1/4 stages
+    private static final int CROP_GROW_TICKS = 13 * TPS; // (91s maturity) ticks to grow 1/8 stages (includes wheat, potato, beetroot, etc.)
+    private static final int NETHER_WART_GROW_TICKS = 35 * TPS; // (105s maturity) ticks to grow 1/4 stages
 
-    private static final int TICKS_TO_GROW = 20;
     private static final int ICE_CHECK_TICKS_MAX = 100;
     private int ticksToNextIceCheck = ICE_CHECK_TICKS_MAX;
     public FarmPlacement(Building building, Level level, BlockPos originPos, Rotation rotation, String ownerName, ArrayList<BuildingBlock> blocks, boolean isCapitol) {
@@ -53,7 +52,7 @@ public class FarmPlacement extends BuildingPlacement {
             BlockState bs = level.getBlockState(farmBlock.bp);
             Block block = bs.getBlock();
 
-            if (block instanceof CropBlock) {
+            if (block instanceof CropBlock cropBlock && (cropBlock == Blocks.WHEAT || cropBlock == Blocks.CARROTS || cropBlock == Blocks.POTATOES)) {
                 farmBlock.tickAge += TICK_CROPS_INTERVAL;
                 int age = bs.getValue(BlockStateProperties.AGE_7);
                 if (farmBlock.tickAge >= CROP_GROW_TICKS) {

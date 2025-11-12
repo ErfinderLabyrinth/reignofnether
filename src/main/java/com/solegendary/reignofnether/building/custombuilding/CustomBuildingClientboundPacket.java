@@ -3,6 +3,7 @@ package com.solegendary.reignofnether.building.custombuilding;
 import com.solegendary.reignofnether.registrars.PacketHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
@@ -20,6 +21,9 @@ public class CustomBuildingClientboundPacket {
     public String name;
     public BlockPos structureSize;
     public CompoundTag structureNbt;
+    public String portraitBlockRegistryKey;
+    public boolean capturable;
+    public boolean invulnerable;
 
     public static void registerCustomBuilding(CustomBuilding building) {
         registerCustomBuilding("", building);
@@ -27,7 +31,8 @@ public class CustomBuildingClientboundPacket {
 
     public static void registerCustomBuilding(String playerName, CustomBuilding building) {
         PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(), new CustomBuildingClientboundPacket(
-                playerName, building.name, new BlockPos(building.structureSize), building.structureNbt
+                playerName, building.name, new BlockPos(building.structureSize), building.structureNbt,
+                building.getPortraitBlockRegistryKey(), building.capturable, building.invulnerable
         ));
     }
 
@@ -35,12 +40,18 @@ public class CustomBuildingClientboundPacket {
             String playerName,
             String name,
             BlockPos structureSize,
-            CompoundTag structureNbt
+            CompoundTag structureNbt,
+            String portraitBlockRegistryKey,
+            boolean capturable,
+            boolean invulnerable
     ) {
         this.playerName = playerName;
         this.name = name;
         this.structureSize = structureSize;
         this.structureNbt = structureNbt;
+        this.portraitBlockRegistryKey = portraitBlockRegistryKey;
+        this.capturable = capturable;
+        this.invulnerable = invulnerable;
     }
 
     public CustomBuildingClientboundPacket(FriendlyByteBuf buffer) {
@@ -48,6 +59,9 @@ public class CustomBuildingClientboundPacket {
         this.name = buffer.readUtf();
         this.structureSize = buffer.readBlockPos();
         this.structureNbt = buffer.readNbt();
+        this.portraitBlockRegistryKey = buffer.readUtf();
+        this.capturable = buffer.readBoolean();
+        this.invulnerable = buffer.readBoolean();
     }
 
     public void encode(FriendlyByteBuf buffer) {
@@ -55,6 +69,9 @@ public class CustomBuildingClientboundPacket {
         buffer.writeUtf(this.name);
         buffer.writeBlockPos(this.structureSize);
         buffer.writeNbt(this.structureNbt);
+        buffer.writeUtf(this.portraitBlockRegistryKey);
+        buffer.writeBoolean(this.capturable);
+        buffer.writeBoolean(this.invulnerable);
     }
 
     // server-side packet-consuming functions
@@ -62,7 +79,10 @@ public class CustomBuildingClientboundPacket {
         final var success = new AtomicBoolean(false);
         ctx.get().enqueueWork(() -> {
             DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-                CustomBuildingClientEvents.registerCustomBuilding(playerName, name, structureSize, structureNbt);
+                CustomBuildingClientEvents.registerCustomBuilding(
+                        playerName, name, structureSize, structureNbt,
+                        portraitBlockRegistryKey, capturable, invulnerable
+                );
                 success.set(true);
             });
         });

@@ -1017,10 +1017,14 @@ public class BuildingClientEvents {
             ownerName,
             isDiagonalBridge
         );
-        for (BuildingPlacement placement : buildings)
-            if (newBuilding.originPos.equals(placement.originPos))
-                return; // skip, building already exists clientside
-
+        // allow overrides for custom buildings
+        //if (building instanceof CustomBuilding) {
+        //    buildings.removeIf(b -> b.originPos.equals(pos));
+        //} else {
+            for (BuildingPlacement placement : buildings)
+                if (newBuilding.originPos.equals(placement.originPos))
+                    return; // skip, building already exists clientside
+        //}
         // add a bunch of dummy blocks so clients know not to remove buildings before the first blocks get placed
         while (numBlocksToPlace > 0) {
             newBuilding.addToBlockPlaceQueue(new BuildingBlock(new BlockPos(0, 0, 0), Blocks.AIR.defaultBlockState()));
@@ -1111,7 +1115,18 @@ public class BuildingClientEvents {
         for (BuildingPlacement bpl : buildings) {
             if (bpl.getBuilding().isTypeOf(building) && bpl.isBuilt &&
                     ((MC.player != null && bpl.ownerName.equals(MC.player.getName().getString())) ||
-                    allyHasFinishedBuilding(building))) {
+                            allyHasFinishedBuilding(building))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean playerHasFinishedBuilding(Building building, String playerName) {
+        for (BuildingPlacement bpl : buildings) {
+            if (bpl.getBuilding().isTypeOf(building) && bpl.isBuilt &&
+                    (bpl.ownerName.equals(playerName) ||
+                            allyHasFinishedBuilding(building))) {
                 return true;
             }
         }

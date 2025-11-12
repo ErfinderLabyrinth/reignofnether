@@ -18,6 +18,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
@@ -75,7 +76,8 @@ public class Sacrifice extends Ability {
                 !level.getBlockState(targetEntity.getOnPos()).isAir() &&
                 !BuildingUtils.isWithinRangeOfMaxedCatalyst(targetEntity) &&
                 !BuildingUtils.isPosInsideAnyBuilding(level.isClientSide(), targetEntity.getOnPos().above()) &&
-                targetEntity.distanceToSqr(Vec3.atCenterOf(buildingUsing.centrePos)) < RANGE * RANGE;
+                targetEntity.distanceToSqr(Vec3.atCenterOf(buildingUsing.centrePos)) < RANGE * RANGE &&
+                level.getBlockState(targetEntity.getOnPos()).getBlock() != Blocks.SCULK;
     }
 
     public String getGenericName(LivingEntity le) {
@@ -113,7 +115,8 @@ public class Sacrifice extends Ability {
                 HudClientEvents.showTemporaryMessage(I18n.get("abilities.reignofnether.sacrifice.in_air"));
             } else if (BuildingUtils.isWithinRangeOfMaxedCatalyst(targetEntity)) {
                 HudClientEvents.showTemporaryMessage(I18n.get("abilities.reignofnether.sacrifice.max_spread"));
-            } else if (BuildingUtils.isPosInsideAnyBuilding(level.isClientSide(), targetEntity.getOnPos().above())) {
+            } else if (BuildingUtils.isPosInsideAnyBuilding(level.isClientSide(), targetEntity.getOnPos().above()) ||
+                        level.getBlockState(targetEntity.getOnPos()).getBlock() == Blocks.SCULK) {
                 HudClientEvents.showTemporaryMessage(I18n.get("abilities.reignofnether.sacrifice.not_spreadable"));
             }
         }
@@ -125,7 +128,8 @@ public class Sacrifice extends Ability {
 
         List<LivingEntity> entities = MiscUtil.getEntitiesWithinRange(Vec3.atCenterOf(buildingUsing.centrePos), range, LivingEntity.class, buildingUsing.level);
         for (LivingEntity le : entities) {
-            if (le instanceof Unit && getGenericName(le).equals(((SculkCatalystPlacement) buildingUsing).autoSacrificeUnitType)) {
+            if (le instanceof Unit && getGenericName(le).equals(((SculkCatalystPlacement) buildingUsing).autoSacrificeUnitType) &&
+                isValidTarget(buildingUsing.level, buildingUsing, le)) {
                 le.kill();
                 return;
             }

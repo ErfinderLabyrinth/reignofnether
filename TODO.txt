@@ -1,5 +1,5 @@
 
-1.19.2-1.2.3
+1.19.2-1.2.3a
 
 [✔] Done and tested
 [🟡] Partially done and/or needs testing
@@ -8,63 +8,48 @@
 
 Features
 --------
-[✔] Structure block to register custom buildings
-    [❌] Right click sandbox buttons to show a menu for customising the original building
-        [❌] ability to add generic building features:
-            - garrisonable with special entry/exit blocks
-            - nether spread with adjustable range
-            - night warp with adjustable range
+Custom structures
+[✔] Added options to customise the portrait block, capturability and invulnerability
+[✔] Added an option to de-register a custom building (this also removes all placements of that building)
 
-    [❌] only works in singleplayer right now - test that you can at least import a map though
-
-    - Registering new custom buildings can currently only be done in singleplayer
-    - To export custom buildings into another map, copy the file world/data/saved-custom-building-data.dat
 
 Bugfixes
 --------
-[✔] Animals can no longer spawn on single bottom-slabs or fences
-[✔] Magma cubes no longer inherit slime abilities
-[✔] Fixed an exploit where multiple altars could sometimes train multiple heroes
-[✔] Fixed an exploit where you could queue the wrong kind of production at buildings
-[✔] Iron Golems and Witches can no longer pick up resources as they were not able to return them
+[✔] Fixed the minimap centering being off when the camera is rotated
+[✔] Hoglin riders ignore move commands when attacking a target
+[✔] Fixed custom buildings not immediately disappearing after being destroyed
+[✔] Fixed an issue with custom building saves duplicating
+[✔] Fixed a crash from planting the wrong crop type on a farm
+[✔] Fixed building buttons overlapping in sandbox
+
+[❌] Weapons and armour aren't saved on restart
 
 Quality of Life
 ---------------
-Lots of sandbox improvements:
-    [✔] You can now set anchors for groups of units at a time
-    [✔] Cleaned up a lot of button tooltips in and the bottom right menu
-    [✔] Added a button to change building allegiance
-    [✔] Added a button to remove a building without destroying its blocks
-    [✔] When cheats are enabled, enemy units' abilities can be used
-    [✔] /gamerule doLogFalling is treated as off while in sandbox
+[✔] You can now register a new custom building at an existing building's location
+[✔] Sculk catalyst sacrifices can no longer target units already standing on sculk to avoid wasted sacrifices
 
-[✔] When building is cancelled or destroyed any in-progress production is now fully refunded
-[✔] When pressing D to have workers return resources early, they will now go back to work automatically
-
-[❌] Cooked food is now worth food again for workers instead of being edible if it wasn't thrown by the Piglin Merchant
-
+[❌] Allow overlapping of custom structures (if possible, only with air blocks)
 
 Balance
 -------
-[✔] All hero ultimates are put on 50% cooldown when they respawn
 
 Monsters
 --------
-[✔] Reduced the night radius of additional mausoleums from 80 to 60
-[🟡] You can now right-click the clock during a blood moon to see where the spawns are happening
+[✔] Additional Mausoleum night range reduced from 60 to 40 (also fixed it not being visible to other players)
+    - If your last mausoleum is destroyed, your next one will have the full 80 block range
+[✔] Spiders no longer take fall damage
 
 Piglins
 -------
-[✔] Tridents that hit a target on the same frame as another trident now pierce through
-    - This is the same behaviour that arrows have and should improve headhunter damage output
-[✔] Piglin capitols now get a mooshroom (worth 175 food) on every odd spawn (1st, 3rd, 5th, etc.)
-[✔] The Piglin Merchant's Greed is Good now refunds mana for all abilities when used:
-    - 10 mana per 100 resources spent (max 30) for Fancy Feast
-    - 15 mana per 100 resources spent (max 45) for Loot Explosion
-[✔] The Piglin Merchant's Loot Explosion now spawns golden apples for units that are already equipped with netherite
-[✔] Headhunters' Fire Aspect Tridents now have +1 damage (previously 0)
+[✔] TNT fuse time reduced from 2.5s to 2s
+[✔] Headhunter range increased from 12 to 14
+[✔] Netherwart crops now mature 15s faster
+[✔] Dirt paths become regular dirt when fire walls are cast over it, to allow fire to spread
+[✔] Unmounted hoglins can now use bloodlust, but the health cost is 18 for the same duration
 
 Languages
 ---------
-[✔] Added Korean (ko_kr)
-[✔] Updated Vietnamese (vi_vn)
+[✔] Updated Traditional Chinese (zh_tw)
+[✔] Updated Simplified Chinese (zh_cn)
+[✔] Updated Korean (ko_kr)

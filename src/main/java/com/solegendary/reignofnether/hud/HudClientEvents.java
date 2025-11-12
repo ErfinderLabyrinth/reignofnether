@@ -289,6 +289,8 @@ public class HudClientEvents {
         buttonsPerRow = Math.min(buttonsPerRow, 8);
         buttonsPerRow = Math.max(buttonsPerRow, 4);
 
+        int buildingProdRows = 0;
+
         buildingButtons.clear();
         unitButtons.clear();
         productionButtons.clear();
@@ -557,6 +559,7 @@ public class HudClientEvents {
                         if (visibleProdButtons.size() > MAX_BUTTONS_PER_ROW) {
                             blitY -= Button.DEFAULT_ICON_FRAME_SIZE;
                         }
+                        buildingProdRows += 1;
 
                         int rowButtons = 0;
                         for (Button prodButton : visibleProdButtons) {
@@ -565,6 +568,7 @@ public class HudClientEvents {
                                 rowButtons = 0;
                                 blitX = 0;
                                 blitY += Button.DEFAULT_ICON_FRAME_SIZE;
+                                buildingProdRows += 1;
                             }
                             prodButton.render(evt.getGuiGraphics(), blitX, blitY, mouseX, mouseY);
                             productionButtons.add(prodButton);
@@ -810,7 +814,12 @@ public class HudClientEvents {
         // ---------------------------
         if (SandboxClientEvents.isSandboxPlayer() && (hudSelectedEntity != null || hudSelectedPlacement != null)) {
             blitX = 0;
-            blitY = screenHeight - (iconFrameSize * 2);
+            blitY = screenHeight - iconFrameSize;
+
+            blitY -= iconFrameSize * buildingProdRows;
+            if (hudSelectedEntity != null || (hudSelectedPlacement != null && !hudSelectedPlacement.getAbilities().isEmpty())) {
+                blitY -= iconFrameSize;
+            }
             ArrayList<Button> actionButtons = new ArrayList<>();
 
             actionButtons.add(SandboxActionButtons.getSetRelationshipButton());

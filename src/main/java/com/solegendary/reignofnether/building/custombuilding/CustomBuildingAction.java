@@ -1,0 +1,19 @@
+package com.solegendary.reignofnether.building.custombuilding;
+
+public enum CustomBuildingAction {
+    DEREGISTER,
+    SET_PORTRAIT_BLOCK,
+    SET_CAPTURABLE,
+    SET_INVULNERABLE,
+    SET_NIGHT_RADIUS,
+    SET_NETHER_RADIUS,
+    SET_BUILDABLE_BY_VILLAGERS,
+    SET_BUILDABLE_BY_MONSTERS,
+    SET_BUILDABLE_BY_PIGLINS,
+    SET_FOOD_COST,
+    SET_WOOD_COST,
+    SET_ORE_COST,
+    SET_FOOD_BOUNTY,
+    SET_WOOD_BOUNTY,
+    SET_ORE_BOUNTY
+}

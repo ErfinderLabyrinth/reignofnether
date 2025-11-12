@@ -46,10 +46,17 @@ public class CustomBuildingSaveData extends SavedData {
                 String buildingName = btag.getString("buildingName");
                 Vec3i structureSize = new Vec3i(btag.getInt("structureSizeX"), btag.getInt("structureSizeY"), btag.getInt("structureSizeZ"));
                 CompoundTag structureNbt = btag.getCompound("structureNbt");
+                String portraitBlockRegistryKey = btag.contains("portraitBlockRegistryKey") ? btag.getString("portraitBlockRegistryKey") : "";
+                boolean capturable = btag.contains("capturable") && btag.getBoolean("capturable");
+                boolean invulnerable = btag.contains("invulnerable") && btag.getBoolean("invulnerable");
+
                 data.customBuildings.add(new CustomBuildingSave(
                         structureNbt,
                         buildingName,
-                        structureSize
+                        structureSize,
+                        portraitBlockRegistryKey,
+                        capturable,
+                        invulnerable
                 ));
                 ReignOfNether.LOGGER.info("CustomBuildingSaveData.load: " + buildingName);
             }
@@ -67,6 +74,9 @@ public class CustomBuildingSaveData extends SavedData {
             cTag.putInt("structureSizeY", b.structureSize.getY());
             cTag.putInt("structureSizeZ", b.structureSize.getZ());
             cTag.put("structureNbt", b.structureNbt);
+            cTag.putString("portraitBlockRegistryKey", b.portraitBlockRegistryKey);
+            cTag.putBoolean("capturable", b.capturable);
+            cTag.putBoolean("invulnerable", b.invulnerable);
             list.add(cTag);
         });
         tag.put("custombuildings", list);

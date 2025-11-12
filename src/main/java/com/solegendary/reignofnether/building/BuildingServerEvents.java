@@ -2,7 +2,6 @@ package com.solegendary.reignofnether.building;
 
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.alliance.AlliancesServerEvents;
-import com.solegendary.reignofnether.api.ReignOfNetherRegistries;
 import com.solegendary.reignofnether.building.buildings.monsters.Laboratory;
 import com.solegendary.reignofnether.building.buildings.neutral.NeutralTransportPortal;
 import com.solegendary.reignofnether.building.buildings.placements.*;
@@ -68,6 +67,8 @@ public class BuildingServerEvents {
     private static final int MAX_SCAFFOLD_DEPTH = 5;
 
     private static ServerLevel serverLevel = null;
+
+    public static ServerLevel getServerLevel() { return serverLevel; }
 
     // buildings that currently exist serverside
     private static final ArrayList<BuildingPlacement> buildings = new ArrayList<>();
@@ -299,6 +300,7 @@ public class BuildingServerEvents {
             }
             if (SandboxServer.isAnyoneASandboxPlayer() && builderUnitIds.length == 0) {
                 newBuilding.getBuilding().shouldDestroyOnReset = false;
+                saveBuildings(getServerLevel());
             }
             return newBuilding;
         }
@@ -407,7 +409,6 @@ public class BuildingServerEvents {
                 ore = Math.round(building.getBuilding().cost.ore * 0.5f * buildPercent);
             }
             if (food > 0 || wood > 0 || ore > 0) {
-                ResourcesServerEvents.addSubtractResources(new Resources(building.ownerName, food, wood, ore));
                 Resources res = new Resources(building.ownerName, food, wood, ore);
                 ResourcesServerEvents.addSubtractResources(res);
                 ResourcesClientboundPacket.showFloatingText(res, building.centrePos);
@@ -725,7 +726,7 @@ public class BuildingServerEvents {
     }
 
     // does the player own one of these buildings?
-    public static boolean hasFinishedBuilding(Building building, String playerName) {
+    public static boolean playerHasFinishedBuilding(Building building, String playerName) {
         for (BuildingPlacement bpl : buildings) {
             if (bpl.getBuilding().isTypeOf(building) && bpl.isBuilt &&
                     (bpl.ownerName.equals(playerName))) {

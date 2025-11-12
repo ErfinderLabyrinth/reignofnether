@@ -821,11 +821,14 @@ public class MinimapClientEvents {
 
         float pixelsToBlocks = (float) worldRadius / (float) mapGuiRadius;
 
-        // offset y up so that user clicks the centre of the view quad instead of bottom border
+        // offset x,y so that user clicks the centre of the view quad instead of bottom border
         if (offsetForCamera) {
-            y += OrthoviewClientEvents.getZoom() * 0.5F / pixelsToBlocks;
+            float camRotX = OrthoviewClientEvents.getCamRotX();
+            double radius = OrthoviewClientEvents.getZoom() * 0.5F / pixelsToBlocks;
+            double angleRad = Math.toRadians(camRotX - 315.0);
+            x -= radius * Math.cos(angleRad);
+            y -= radius * Math.sin(angleRad);
         }
-
         Vec2 clicked = MyMath.rotateCoords(x - xc, y - yc, 45);
 
         double xWorld = xc_world + clicked.x * pixelsToBlocks * Math.sqrt(2);
@@ -917,7 +920,8 @@ public class MinimapClientEvents {
 
         renderMap(evt.getGuiGraphics());
 
-        //MiscUtil.drawDebugStrings(evt.getMatrixStack(), MC.font, new String[] {
+        //MiscUtil.drawDebugStrings(evt.getGuiGraphics(), MC.font, new String[] {
+        //        "camrotX: " + OrthoviewClientEvents.getCamRotX()
         //});
     }
 

@@ -38,17 +38,25 @@ public class BlazeUnitFireball extends SmallFireball {
             Block blockBelow2 = this.level().getBlockState(this.getOnPos().below().below()).getBlock();
 
             if (List.of(Blocks.AIR, Blocks.TALL_GRASS, Blocks.GRASS, Blocks.CRIMSON_ROOTS).contains(blockBelow2)) {
+                replacePathWithDirt(this.getOnPos().below().below().below());
                 this.level().setBlockAndUpdate(this.getOnPos().below().below(), Blocks.FIRE.defaultBlockState());
             }
             if (List.of(Blocks.AIR, Blocks.TALL_GRASS, Blocks.GRASS, Blocks.CRIMSON_ROOTS).contains(blockBelow)) {
+                replacePathWithDirt(this.getOnPos().below().below());
                 this.level().setBlockAndUpdate(this.getOnPos().below(), Blocks.FIRE.defaultBlockState());
             }
             else if (List.of(Blocks.AIR, Blocks.TALL_GRASS, Blocks.GRASS, Blocks.CRIMSON_ROOTS).contains(block)) {
+                replacePathWithDirt(this.getOnPos());
                 this.level().setBlockAndUpdate(this.getOnPos(), Blocks.FIRE.defaultBlockState());
             }
         }
         if (tickCount > MAX_TICKS || (tickCount > MAX_TICKS_FIREWALL && isFirewallShot))
             this.discard();
+    }
+
+    private void replacePathWithDirt(BlockPos bp) {
+        if (this.level().getBlockState(bp).getBlock() == Blocks.DIRT_PATH)
+            this.level().setBlockAndUpdate(bp, Blocks.DIRT.defaultBlockState());
     }
 
     // let fireballs pierce garrison blocks and entities that are on fire

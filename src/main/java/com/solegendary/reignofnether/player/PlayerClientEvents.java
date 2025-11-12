@@ -273,6 +273,7 @@ public class PlayerClientEvents {
             PlayerDisplayClientEvents.resetDisplay();
             PlayerColors.reset();
             CustomBuildingClientEvents.customBuildings.clear();
+            CustomBuildingClientEvents.setCustomBuildingToEdit(null);
         }
     }
 
@@ -376,6 +377,7 @@ public class PlayerClientEvents {
         PlayerColors.reset();
         PlayerDisplayClientEvents.resetDisplay();
         TimeClientEvents.resetBloodMoon();
+        CustomBuildingClientEvents.setCustomBuildingToEdit(null);
     }
 
     public static void setRTSLock(boolean lock) {

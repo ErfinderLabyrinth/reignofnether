@@ -220,7 +220,8 @@ public interface AttackerUnit {
             double distCurrentTarget =  ((Mob) this).distanceToSqr(currentTarget.position());
 
             if (distClosestTarget < distCurrentTarget) {
-                ((Unit) this).getMoveGoal().stopMoving();
+                if (!((LivingEntity) this).isPassenger())
+                    ((Unit) this).getMoveGoal().stopMoving();
                 setUnitAttackTarget(closestTarget);
             }
         }
@@ -234,7 +235,8 @@ public interface AttackerUnit {
 
         LivingEntity entity = MiscUtil.findClosestAttackableEntity((Mob) this, aggroRange, level);
         if (entity != null) {
-            ((Unit) this).getMoveGoal().stopMoving();
+            if (!((LivingEntity) this).isPassenger())
+                ((Unit) this).getMoveGoal().stopMoving();
             setUnitAttackTarget(entity);
             return;
         }
@@ -243,7 +245,8 @@ public interface AttackerUnit {
         {
             BuildingPlacement closestBuilding = MiscUtil.findClosestAttackableBuilding((Mob) this, aggroRange, level);
             if (closestBuilding != null) {
-                ((Unit) this).getMoveGoal().stopMoving();
+                if (!((LivingEntity) this).isPassenger())
+                    ((Unit) this).getMoveGoal().stopMoving();
                 setAttackBuildingTarget(closestBuilding.originPos);
             }
         }

@@ -504,9 +504,10 @@ public class BuildingPlacement {
         if (!this.level.getWorldBorder().isWithinBounds(centrePos)) {
             return true;
         }
-        if (this.level.isClientSide() && (
-                !FogOfWarClientEvents.isBuildingInBrightChunk(this) || !isDestroyedServerside
-        )) {
+        if (this.level.isClientSide() && (FogOfWarClientEvents.isBuildingInBrightChunk(this) && isDestroyedServerside)) {
+            return true;
+        }
+        if (this.level.isClientSide() && (!FogOfWarClientEvents.isBuildingInBrightChunk(this) || !isDestroyedServerside)) {
             return false;
         }
         if (!blockPlaceQueue.isEmpty()) {

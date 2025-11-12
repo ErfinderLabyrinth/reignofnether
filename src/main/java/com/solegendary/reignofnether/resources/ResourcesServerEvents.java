@@ -226,9 +226,7 @@ public class ResourcesServerEvents {
         ResourcesClientboundPacket.syncResources(resourcesList);
     }
 
-    private static final Random random = new Random();
-
-    // prevent vanilla growth mechanics because they're slow and random, see AbstractFarm instead
+    // prevent vanilla growth mechanics because they're slow and random, see FarmPlacement instead
     @SubscribeEvent
     public static void onCropGrow(BlockEvent.CropGrowEvent.Pre evt) {
         if (BuildingUtils.isPosInsideAnyBuilding(evt.getLevel().isClientSide(), evt.getPos()))
