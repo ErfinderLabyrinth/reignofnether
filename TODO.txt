@@ -1,5 +1,5 @@
 
-1.19.2-1.2.3a
+1.20.1-1.2.3b
 
 [✔] Done and tested
 [🟡] Partially done and/or needs testing
@@ -9,47 +9,19 @@
 Features
 --------
 Custom structures
-[✔] Added options to customise the portrait block, capturability and invulnerability
-[✔] Added an option to de-register a custom building (this also removes all placements of that building)
 
 
 Bugfixes
 --------
-[✔] Fixed the minimap centering being off when the camera is rotated
-[✔] Hoglin riders ignore move commands when attacking a target
-[✔] Fixed custom buildings not immediately disappearing after being destroyed
-[✔] Fixed an issue with custom building saves duplicating
-[✔] Fixed a crash from planting the wrong crop type on a farm
-[✔] Fixed building buttons overlapping in sandbox
-
 [❌] Weapons and armour aren't saved on restart
 
 Quality of Life
 ---------------
-[✔] You can now register a new custom building at an existing building's location
-[✔] Sculk catalyst sacrifices can no longer target units already standing on sculk to avoid wasted sacrifices
-
 [❌] Allow overlapping of custom structures (if possible, only with air blocks)
 
 Balance
 -------
 
-Monsters
---------
-[✔] Additional Mausoleum night range reduced from 60 to 40 (also fixed it not being visible to other players)
-    - If your last mausoleum is destroyed, your next one will have the full 80 block range
-[✔] Spiders no longer take fall damage
-
-Piglins
--------
-[✔] TNT fuse time reduced from 2.5s to 2s
-[✔] Headhunter range increased from 12 to 14
-[✔] Netherwart crops now mature 15s faster
-[✔] Dirt paths become regular dirt when fire walls are cast over it, to allow fire to spread
-[✔] Unmounted hoglins can now use bloodlust, but the health cost is 18 for the same duration
 
 Languages
 ---------
-[✔] Updated Traditional Chinese (zh_tw)
-[✔] Updated Simplified Chinese (zh_cn)
-[✔] Updated Korean (ko_kr)
