@@ -6,16 +6,12 @@ import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.CallToArmsUnit;
-import com.solegendary.reignofnether.api.ReignOfNetherRegistries;
-import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingPlaceButton;
-import com.solegendary.reignofnether.building.BuildingUtils;
 import com.solegendary.reignofnether.building.Buildings;
 import com.solegendary.reignofnether.building.custombuilding.CustomBuildingClientEvents;
 import com.solegendary.reignofnether.building.production.ProductionItems;
-import com.solegendary.reignofnether.hud.AbilityButton;
+import com.solegendary.reignofnether.faction.FactionRegistries;
 import com.solegendary.reignofnether.hud.Button;
-import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.registrars.EntityRegistrar;
 import com.solegendary.reignofnether.research.ResearchClient;
@@ -27,7 +23,7 @@ import com.solegendary.reignofnether.unit.goals.*;
 import com.solegendary.reignofnether.unit.interfaces.*;
 import com.solegendary.reignofnether.unit.packets.UnitConvertClientboundPacket;
 import com.solegendary.reignofnether.unit.packets.UnitSyncClientboundPacket;
-import com.solegendary.reignofnether.util.Faction;
+import com.solegendary.reignofnether.faction.Faction;
 import net.minecraft.client.resources.language.I18n;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import net.minecraft.core.BlockPos;
@@ -310,26 +306,15 @@ public class VillagerUnit extends Vindicator implements Unit, WorkerUnit, Attack
     }
 
     public static List<BuildingPlaceButton> getBuildingButtons() {
-        ArrayList<BuildingPlaceButton> buttons = new ArrayList<>(List.of(
-                Buildings.TOWN_CENTRE.getBuildButton(Keybindings.keyQ),
-                Buildings.OAK_STOCKPILE.getBuildButton(Keybindings.keyW),
-                Buildings.VILLAGER_HOUSE.getBuildButton(Keybindings.keyE),
-                Buildings.WHEAT_FARM.getBuildButton(Keybindings.keyR),
-                Buildings.WATCHTOWER.getBuildButton(Keybindings.keyT),
-                Buildings.BARRACKS.getBuildButton(Keybindings.keyY),
-                Buildings.BLACKSMITH.getBuildButton(Keybindings.keyU),
-                Buildings.ARCANE_TOWER.getBuildButton(Keybindings.keyI),
-                Buildings.LIBRARY.getBuildButton(Keybindings.keyO),
-                Buildings.CASTLE.getBuildButton(Keybindings.keyP),
-                Buildings.SHRINE_OF_PROSPERITY.getBuildButton(Keybindings.keyF),
-                Buildings.IRON_GOLEM_BUILDING.getBuildButton(Keybindings.keyL),
-                Buildings.OAK_BRIDGE.getBuildButton(Keybindings.keyC),
-                Buildings.BEACON.getBuildButton(null)
-        ));
+        List<BuildingPlaceButton> buttons = new ArrayList<>();
+        buttons.addAll(FactionRegistries.VILLAGERS.getBuildingButtons());
+
+        //TODO Add to register
         CustomBuildingClientEvents.customBuildings.forEach(cb -> {
             if (cb.buildableByVillagers)
                 buttons.add(cb.getWorkerBuildButton(null));
         });
+
         return buttons;
     }
 
