@@ -442,8 +442,10 @@ public class BuildingPlacement {
         if (validBlocks.size() > 0) {
             if (getBuilding() instanceof AbstractBridge) {
                 ArrayList<WorkerUnit> builders = getBuilders(this.level);
-                BlockPos builderPos = ((LivingEntity) builders.get(new Random().nextInt(builders.size()))).getOnPos();
-                validBlocks.sort(Comparator.comparing(bb -> bb.getBlockPos().distSqr(builderPos)));
+                if (!builders.isEmpty()) {
+                    BlockPos builderPos = ((LivingEntity) builders.get(new Random().nextInt(builders.size()))).getOnPos();
+                    validBlocks.sort(Comparator.comparing(bb -> bb.getBlockPos().distSqr(builderPos)));
+                }
             }
             this.blockPlaceQueue.add(validBlocks.get(0));
         }
@@ -492,12 +494,12 @@ public class BuildingPlacement {
         Collections.shuffle(placedBlocks);
         for (int i = 0; i < amount && i < placedBlocks.size(); i++) {
             BlockPos bp = placedBlocks.get(i).getBlockPos();
-            this.onBlockBreak((ServerLevel) getLevel(), bp, false);
             if (!getLevel().getBlockState(bp).getFluidState().isEmpty()) {
                 getLevel().setBlockAndUpdate(bp, Blocks.AIR.defaultBlockState());
             } else {
                 getLevel().destroyBlock(bp, false);
             }
+            this.onBlockBreak((ServerLevel) getLevel(), bp, false);
         }
         if (amount > 0) {
             AttackWarningClientboundPacket.sendWarning(ownerName, BuildingUtils.getCentrePos(getBlocks()));
@@ -709,10 +711,10 @@ public class BuildingPlacement {
                 for (int i = 0; i < 3; i++)
                     spawnHuntableAnimalsNearby(ANIMAL_SPAWN_BLOCK_RANGE / 2);
             }
-        } else {
             RTSPlayer rtsPlayer = PlayerServerEvents.getRTSPlayer(ownerName);
-            rtsPlayer.scores.addToScore(RTSPlayerScoresEnum.TOTAL_BUILDINGS_CONSTRUCTED);
-
+            if (rtsPlayer != null)
+                rtsPlayer.scores.addToScore(RTSPlayerScoresEnum.TOTAL_BUILDINGS_CONSTRUCTED);
+        } else {
             TutorialClientEvents.updateStage();
             if (this.isCapitol && !SandboxClientEvents.isSandboxPlayer() &&
                 getTotalCompletedBuildingsOwned(this.level.isClientSide(), ownerName) == 1)

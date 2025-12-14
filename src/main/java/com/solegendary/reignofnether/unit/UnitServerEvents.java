@@ -863,7 +863,7 @@ public class UnitServerEvents {
             UnitSyncClientboundPacket.sendSyncStatsPacket(evt.getEntity());
 
         if (evt.getSource().getEntity() instanceof HeadhunterUnit headhunterUnit &&
-                headhunterUnit.hasFireAspectTrident() &&
+                headhunterUnit.hasFlameTrident() &&
                 evt.getAmount() > 0)
             evt.getEntity().setSecondsOnFire(4);
     }

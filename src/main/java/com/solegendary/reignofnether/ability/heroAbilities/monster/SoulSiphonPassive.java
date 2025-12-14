@@ -71,7 +71,7 @@ public class SoulSiphonPassive extends HeroAbility {
     public AbilityButton getButton(Keybinding hotkey, Unit unit) {
         if (!(unit instanceof NecromancerUnit necro)) return null;
         AbilityButton button = new AbilityButton("Soul Siphon",
-            ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/icons/blocks/portal.png"),
+            ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/icons/abilities/soul_siphon.png"),
             hotkey,
             () -> this.isAutocasting(necro),
             () -> getRank(necro) == 0,
@@ -96,7 +96,7 @@ public class SoulSiphonPassive extends HeroAbility {
     public Button getRankUpButton(HeroUnit hero) {
         return super.getRankUpButtonProtected(
             "Soul Siphon",
-            ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/icons/blocks/portal.png"),
+            ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/icons/abilities/soul_siphon.png"),
             hero
         );
     }

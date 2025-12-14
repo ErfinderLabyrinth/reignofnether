@@ -38,12 +38,14 @@ public class BuildingUtils {
     }
 
     public static boolean isBuildingBuildable(boolean isClientSide, BuildingPlacement building) {
+        List<BuildingPlacement> buildings;
         if (isClientSide)
-            return BuildingClientEvents.getBuildings().stream().map(b -> b.originPos).toList().contains(building.originPos) &&
-                    building.getBlocksPlaced() < building.getBlocksTotal();
+            buildings = BuildingClientEvents.getBuildings();
         else
-            return BuildingServerEvents.getBuildings().stream().map(b -> b.originPos).toList().contains(building.originPos) &&
-                    building.getBlocksPlaced() < building.getBlocksTotal();
+            buildings = BuildingServerEvents.getBuildings();
+
+        return buildings.stream().map(b -> b.originPos).toList().contains(building.originPos) &&
+                building.getBlocksPlaced() < building.getBlocksTotal() && (!building.isBuilt || building.getBuilding().repairable);
     }
 
     // returns a list of BPs that may reside in unique chunks for fog of war calcs
