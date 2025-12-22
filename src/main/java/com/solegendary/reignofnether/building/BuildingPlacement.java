@@ -46,6 +46,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -71,10 +72,12 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.world.ForgeChunkManager;
 import org.joml.Vector3d;
+import org.stringtemplate.v4.misc.Misc;
 
 import java.util.*;
 
@@ -628,17 +631,21 @@ public class BuildingPlacement {
         // - roll explodeChance to cause explosion effects and destroy more blocks
         // - cause fire if < fireThreshold% blocksPercent
         if (rand.nextFloat(1.0f) < this.building.explodeChance) {
-            level.explode(null,
-                    level.damageSources().generic(),
-                    null,
-                    pos.getX(),
-                    pos.getY(),
-                    pos.getZ(),
-                    breakBlocks ? this.building.explodeRadius : 2.0f,
-                    this.getBlocksPlacedPercent() < this.building.fireThreshold,
-                    // fire
-                    breakBlocks ? Level.ExplosionInteraction.TNT : Level.ExplosionInteraction.NONE
-            );
+            if (!breakBlocks && MiscUtil.isNewYearsSeason()) {
+                MiscUtil.doRandomFireworkExplosion(level, Vec3.atCenterOf(pos));
+            } else {
+                level.explode(null,
+                        level.damageSources().generic(),
+                        null,
+                        pos.getX(),
+                        pos.getY(),
+                        pos.getZ(),
+                        breakBlocks ? this.building.explodeRadius : 2.0f,
+                        this.getBlocksPlacedPercent() < this.building.fireThreshold,
+                        // fire
+                        breakBlocks ? Level.ExplosionInteraction.TNT : Level.ExplosionInteraction.NONE
+                );
+            }
         }
     }
 

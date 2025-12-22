@@ -1,4 +1,4 @@
-package com.solegendary.reignofnether.ability.heroAbilities.piglin;
+package com.solegendary.reignofnether.ability.heroAbilities.piglinmerchant;
 
 //Throws out a huge amount of random weapons and armour that your units automatically equip upon pickup
 //All equipment has limited durability

@@ -1,5 +1,5 @@
 
-1.20.1-1.2.3d
+1.20.1-1.2.4
 
 [✔] Done and tested
 [🟡] Partially done and/or needs testing
@@ -7,44 +7,48 @@
 
 
 
+Christmas
+---------
+During christmas season, units spawn with santa hats, and the piglin merchant throws presents
+During new years, buildings explode with fireworks
+
+New Heroes
+----------
+[❌] Change /gamerule allowHeroes (bool) to /gamerule allowedHeroes (int) (default 1)
+
+Wretched Wraith
+    [❌] New snow layer block that doesn't interfere with vanilla snow
+        - Maybe with a subtle particle effect?
+
+Enchanter
+    [❌] Blacksmith armour upgrades
+
+Wildfire
+    [❌] Global toggle to turn all fire rendering into soulfires
 
 
-Custom Buildings
-----------------
-[✔] Added more options for custom buildings (both default on):
-    - Repairable (workers can repair the building)
-    - Destroy on reset (/rts-reset destroys the building)
-        - /rts-hard-reset will still destroy the building
+
+Seasons Greetings!
+[🟡] Between 19th and 26th December (inclusive), many units will spawn with Santa Hats
+[🟡] On 31st December and 1st January, buildings will create fireworks when damaged instead of explosions
+
 
 
 Bugfixes
 --------
-[✔] Fix max nbt size issue for custom buildings
-    - Nbts can only be 2MB large, but really big structures (1000+ blocks) can exceed that when sent over packets
-
-[✔] Fixed ravager artilleries shooting themselves when at negative Y values
-
-[✔] Fixed custom buildings 'buildable by monsters' option not saving correctly
-
-[✔] Destroyed bridge blocks adjacent to water or lava are replaced by matching source blocks
-
-[✔] Fixed a bug where buildings could be constructed overlapping on a laggy server
+[🟡] Fixed sculk catalysts not spreading any sculk
 
 
 Quality of Life
 ---------------
-[✔] Postgame stats from @ThatBusyBoi
-
-[✔] You can now overlap buildings while in sandbox mode (as long as there are no solid blocks clipping)
-
-[✔] Added a button to sort custom buildings (default alphabetically)
-
-[✔] Enchantments are now shown as icons with tooltips next to the unit names instead of letter codes
-
+[🟡] Illager models now show worn armour (this will be used in a later update)
 
 
 Balance
 -------
+[❌] Ghasts can no longer attack and move 20% slower while over void or structure void blocks
+[❌] Prevent friendly fire from wither skeleton clouds
+    - Might need to create a new AreaEffectCloud entity
 
 
 Languages

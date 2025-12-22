@@ -91,10 +91,19 @@ public class PassiveIcons {
     public static final EnchantmentIcon POWER = new EnchantmentIcon(
             Enchantments.POWER_ARROWS,
             EquipmentSlot.MAINHAND,
-            getEnchantedItemStack(Items.NETHER_STAR),
+            getEnchantedItemStack(Items.BOW),
             List.of(
                     fcs(I18n.get("hud.enchant.reignofnether.power"), true),
                     fcs(I18n.get("hud.enchant.reignofnether.power.tooltip"))
+            )
+    );
+    public static final EnchantmentIcon ZEAL = new EnchantmentIcon(
+            Enchantments.IMPALING,
+            EquipmentSlot.MAINHAND,
+            getEnchantedItemStack(Items.NETHER_STAR),
+            List.of(
+                    fcs(I18n.get("hud.enchant.reignofnether.zeal"), true),
+                    fcs(I18n.get("hud.enchant.reignofnether.zeal.tooltip"))
             )
     );
     public static final EnchantmentIcon PIERCING = new EnchantmentIcon(
