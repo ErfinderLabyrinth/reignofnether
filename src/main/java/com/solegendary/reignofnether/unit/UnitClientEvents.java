@@ -1,5 +1,6 @@
 package com.solegendary.reignofnether.unit;
 
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.alliance.AlliancesClient;
@@ -43,10 +44,12 @@ import com.solegendary.reignofnether.unit.units.monsters.ZoglinUnit;
 import com.solegendary.reignofnether.unit.units.piglins.*;
 import com.solegendary.reignofnether.unit.units.villagers.*;
 import com.solegendary.reignofnether.faction.Faction;
+import com.solegendary.reignofnether.util.ArrayUtil;
 import com.solegendary.reignofnether.util.MiscUtil;
 import com.solegendary.reignofnether.util.MyMath;
 import com.solegendary.reignofnether.util.MyRenderer;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -65,7 +68,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.SnowLayerBlock;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.event.TickEvent;
@@ -106,6 +108,8 @@ public class UnitClientEvents {
     private static final ArrayList<LivingEntity> preselectedUnits = new ArrayList<>();
     // units selected by click or box select
     private static final ArrayList<LivingEntity> selectedUnits = new ArrayList<>();
+    private static ArrayList<LivingEntity> sortedSelectedUnits = new ArrayList<>();
+    private static boolean sortedSelectedUnitsChanged = true;
     // tracking of all existing units
     private static final ArrayList<LivingEntity> allUnits = new ArrayList<>();
 
@@ -120,22 +124,26 @@ public class UnitClientEvents {
         return selectedUnits;
     }
 
+    private static void markSelectedUnitsChanged() {
+        sortedSelectedUnitsChanged = true;
+    }
+
+
+
     public static ArrayList<LivingEntity> getSortedSelectedUnits() {
-        ArrayList<LivingEntity> units = UnitClientEvents.getSelectedUnits();
-
-        units.sort(Comparator.comparing(HudClientEvents::getModifiedEntityName));
-
-        // always put heroes first
-        ArrayList<LivingEntity> heroUnits = new ArrayList<>();
-        units.removeIf(le -> {
-            if (le instanceof HeroUnit) {
-                heroUnits.add(le);
-                return true;
-            }
-            return false;
+        if (!sortedSelectedUnitsChanged) {
+            return sortedSelectedUnits;
+        }
+        ArrayList<LivingEntity> units = new ArrayList<>(UnitClientEvents.getSelectedUnits());
+        units.sort((a, b) -> {
+            var isHeroA = a instanceof HeroUnit;
+            var isHeroB = b instanceof HeroUnit;
+            if (isHeroA && !isHeroB) return -1;
+            if (!isHeroA && isHeroB) return 1;
+            return HudClientEvents.getModifiedEntityName(a).compareTo(HudClientEvents.getModifiedEntityName(b));
         });
-        for (LivingEntity heroUnit : heroUnits)
-            units.add(0, heroUnit);
+        sortedSelectedUnits = units;
+        sortedSelectedUnitsChanged = false;
         return units;
     }
 
@@ -151,6 +159,7 @@ public class UnitClientEvents {
         if (unit.isPassenger())
             return;
         preselectedUnits.add(unit);
+        markSelectedUnitsChanged();
     }
     public static void addSelectedUnit(LivingEntity unit) {
         CursorClientEvents.setLeftClickAction(null);
@@ -163,6 +172,7 @@ public class UnitClientEvents {
         selectedUnits.sort(Comparator.comparing(Entity::getId));
         BuildingClientEvents.clearSelectedBuildings();
         NonUnitClientEvents.isMoveCheckpointGreen = true;
+        markSelectedUnitsChanged();
     }
     public static void clearPreselectedUnits() {
         preselectedUnits.clear();
@@ -183,6 +193,7 @@ public class UnitClientEvents {
     public static void onEntityMount(EntityMountEvent evt) {
         if (evt.getLevel().isClientSide())
             selectedUnits.removeIf(e -> e.getId() == evt.getEntityMounting().getId());
+        markSelectedUnitsChanged();
     }
 
     public static int getCurrentPopulation(String playerName) {
@@ -309,25 +320,22 @@ public class UnitClientEvents {
         }
 
         if (MC.player != null) {
-            int[] selUnits = selectedUnits.stream()
-                    .filter(u -> {
-                        if (u instanceof Unit unit)
-                            for (Ability ability : unit.getAbilities().get())
-                                if (ability.isCasting(unit) && ability.oneClickOneUse && ability.action == action)
-                                    return false;
-                        return true;
-                    })
-                    .mapToInt(Entity::getId).toArray();
-
+            var selUnits = new LinkedList<LivingEntity>();
+            loop:
+            for (LivingEntity livingEntity : selectedUnits) {
+                if (!(livingEntity instanceof Unit unit)) continue;
+                for (Ability ability : unit.getAbilities().get()) {
+                    if (ability.isCasting(unit) && ability.oneClickOneUse && ability.action == action) continue loop;
+                }
+                selUnits.add(livingEntity);
+            }
             String playerName = MC.player.getName().getString();
-            //if (hudSelectedEntity instanceof Unit unit && AlliancesClient.canControlAlly(hudSelectedEntity))
-            //    playerName = unit.getOwnerName();
 
             UnitActionItem actionItem = new UnitActionItem(
                 playerName,
                 action,
-                preselectedUnits.size() > 0 ? preselectedUnits.get(0).getId() : -1,
-                selUnits,
+                    !preselectedUnits.isEmpty() ? preselectedUnits.get(0).getId() : -1,
+                    ArrayUtil.livingEntityListToIdArray(selUnits),
                 bp,
                 HudClientEvents.hudSelectedPlacement != null ? HudClientEvents.hudSelectedPlacement.originPos : new BlockPos(0,0,0)
             );
@@ -336,8 +344,8 @@ public class UnitClientEvents {
             PacketHandler.INSTANCE.sendToServer(new UnitActionServerboundPacket(
                 playerName,
                 action,
-                preselectedUnits.size() > 0 ? preselectedUnits.get(0).getId() : -1,
-                selUnits,
+                    !preselectedUnits.isEmpty() ? preselectedUnits.get(0).getId() : -1,
+                    ArrayUtil.livingEntityListToIdArray(selUnits),
                 bp,
                 HudClientEvents.hudSelectedPlacement != null ? HudClientEvents.hudSelectedPlacement.originPos : new BlockPos(0,0,0),
                 Keybindings.shiftMod.isDown()
@@ -511,6 +519,7 @@ public class UnitClientEvents {
                 unitWindowVecs.clear();
             }
         }
+        markSelectedUnitsChanged();
     }
 
     @SubscribeEvent
@@ -536,6 +545,7 @@ public class UnitClientEvents {
         allUnits.removeIf(e -> e.getId() == entityId);
         //System.out.println("allUnits removed entity: " + entityId);
         MinimapClientEvents.removeMinimapUnit(entityId);
+        markSelectedUnitsChanged();
     }
     /**
      * Add and update entities from clientside action
@@ -567,6 +577,7 @@ public class UnitClientEvents {
         }
         if (entity instanceof LivingEntity le && (ResourceSources.isHuntableAnimal(le) || le instanceof PhantomSummon))
             addUnitPoofs(evt.getLevel(), entity);
+        markSelectedUnitsChanged();
     }
 
     @SubscribeEvent
@@ -584,7 +595,7 @@ public class UnitClientEvents {
         // and consume in onWorldTick; we also can't add entities directly as they will not have goals populated
         if (evt.getButton() == GLFW.GLFW_MOUSE_BUTTON_1) {
 
-            if (selectedUnits.size() > 0 && isLeftClickAttack()) {
+            if (!selectedUnits.isEmpty() && isLeftClickAttack()) {
                 // A + left click -> force attack single unit (even if friendly)
                 if (preselectedUnits.size() == 1 && !targetingSelf()) {
                     sendUnitCommand(UnitAction.ATTACK);
@@ -601,7 +612,7 @@ public class UnitClientEvents {
             // only works for owned units
             else if (selectedUnits.size() == 1 && MC.level != null && !Keybindings.shiftMod.isDown() &&
                ((System.currentTimeMillis() - lastLeftClickTime) < DOUBLE_CLICK_TIME_MS || Keybindings.ctrlMod.isDown()) &&
-                preselectedUnits.size() > 0 && selectedUnits.contains(preselectedUnits.get(0))) {
+                     !preselectedUnits.isEmpty() && selectedUnits.contains(preselectedUnits.get(0))) {
 
                 lastLeftClickTime = 0;
                 LivingEntity selectedUnit = selectedUnits.get(0);
@@ -615,7 +626,6 @@ public class UnitClientEvents {
                         NonUnitClientEvents.canControlAllMobs() ||
                         AlliancesClient.canControlAlly(selectedUnit)) {
 
-                    clearSelectedUnits();
                     for (LivingEntity entity : nearbyEntities) {
                         boolean bothVillagers = entity instanceof VillagerUnit &&
                                                 selectedUnit instanceof VillagerUnit;
@@ -642,6 +652,13 @@ public class UnitClientEvents {
             // resolve any other abilities not explicitly covered here
             else if (CursorClientEvents.getLeftClickAction() != null && MC.player != null) {
                 sendUnitCommand(CursorClientEvents.getLeftClickAction());
+            } else if (
+                    !selectedUnits.isEmpty() &&
+                    BuildingClientEvents.getPreselectedBuilding() == null &&
+                    preselectedUnits.isEmpty() &&
+                    !BuildingClientEvents.isBuilt
+            ) {
+                clearSelectedUnits();
             }
 
             // left click -> select a single unit
@@ -671,7 +688,7 @@ public class UnitClientEvents {
                             e.getId() == MC.player.getId()
                 );
             }
-
+            BuildingClientEvents.isBuilt = false;
             lastLeftClickTime = System.currentTimeMillis();
         }
         else if (evt.getButton() == GLFW.GLFW_MOUSE_BUTTON_2) {
@@ -679,7 +696,7 @@ public class UnitClientEvents {
                 BuildingClientEvents.setBuildingToPlace(null);
                 return;
             }
-            if (selectedUnits.size() > 0) {
+            if (!selectedUnits.isEmpty()) {
                 BuildingPlacement preSelBuilding = BuildingClientEvents.getPreselectedBuilding();
 
                 // right click -> mount friendly unit
@@ -748,6 +765,7 @@ public class UnitClientEvents {
         }
         // clear all cursor actions
         CursorClientEvents.setLeftClickAction(null);
+        markSelectedUnitsChanged();
     }
 
     public static RenderLevelStageEvent.Stage stage = AFTER_ENTITIES;
@@ -756,7 +774,6 @@ public class UnitClientEvents {
     public static void onRenderLevel(RenderLevelStageEvent evt) {
         if (MC.level == null)
             return;
-
         if (evt.getStage() == stage) {
             ArrayList<LivingEntity> selectedUnits = getSelectedUnits();
             ArrayList<LivingEntity> preselectedUnits = getPreselectedUnits();
@@ -767,13 +784,13 @@ public class UnitClientEvents {
 
             // draw outlines on all (pre)selected units but only draw once per unit based on conditions
             // don't render preselection outlines if mousing over HUD
+            var vertexConsumer = MC.renderBuffers().bufferSource().getBuffer(MyRenderer.LINES_NO_DEPTH_TEST);
             if (OrthoviewClientEvents.isEnabled()) {
                 // evaluate conditions that will remain constant during the rendering stage
                 boolean isMouseOverAnyButtonOrHud = HudClientEvents.isMouseOverAnyButtonOrHud();
                 boolean isLeftClickAttack = isLeftClickAttack();
                 boolean targetingSelf = targetingSelf();
                 boolean isRightClickDown = MiscUtil.isRightClickDown(MC);
-
                 // render outline for each selected and preselected entities
                 for (Entity entity : unitsToDraw) {
                     if (!FogOfWarClientEvents.isInBrightChunk(entity))
@@ -789,15 +806,19 @@ public class UnitClientEvents {
                     boolean isSelected = selectedUnits.contains(entity);
 
                     if (isPreselected && isLeftClickAttack && !targetingSelf && !isMouseOverAnyButtonOrHud)
-                        MyRenderer.drawLineBoxOutlineOnly(evt.getPoseStack(), entityAABB, 1.0f, 0.3f, 0.3f, 1.0f, false);
+                        MyRenderer.drawLineBoxOutlineOnly(evt.getPoseStack(), vertexConsumer, entityAABB, 1.0f, 0.3f, 0.3f, 1.0f, false);
                     else if (isSelected)
-                        MyRenderer.drawLineBoxOutlineOnly(evt.getPoseStack(), entityAABB, 1.0f, 1.0f, 1.0f, 1.0f, false);
+                        MyRenderer.drawLineBoxOutlineOnly(evt.getPoseStack(), vertexConsumer, entityAABB, 1.0f, 1.0f, 1.0f, 1.0f, false);
                     else if (isPreselected && !isMouseOverAnyButtonOrHud)
-                        MyRenderer.drawLineBoxOutlineOnly(evt.getPoseStack(), entityAABB, 1.0f, 1.0f, 1.0f, isRightClickDown ? 1.0f : 0.5f, false);
+                        MyRenderer.drawLineBoxOutlineOnly(evt.getPoseStack(), vertexConsumer, entityAABB, 1.0f, 1.0f, 1.0f, isRightClickDown ? 1.0f : 0.5f, false);
                 }
             }
-            
-            var selectedEntityIds = selectedUnits.stream().map(u -> u.getId()).toList();
+
+            var selectedEntityIds = new HashSet<>();
+            for (LivingEntity selectedUnit : selectedUnits) {
+                Integer id = selectedUnit.getId();
+                selectedEntityIds.add(id);
+            }
             for (LivingEntity entity : allUnits) {
                 if (!FogOfWarClientEvents.isInBrightChunk(entity) ||
                         entity.isPassenger())
@@ -832,7 +853,7 @@ public class UnitClientEvents {
 
                 // always-shown highlights to indicate unit relationships
                 if (OrthoviewClientEvents.isEnabled()) {
-                    MyRenderer.drawLineBoxOutlineOnly(evt.getPoseStack(), entityAABB, 1.0f, 1.0f, 1.0f, alpha, excludeMaxY);
+                    MyRenderer.drawLineBoxOutlineOnly(evt.getPoseStack(), vertexConsumer, entityAABB, 1.0f, 1.0f, 1.0f, alpha, excludeMaxY);
                 }
 
                 MyRenderer.drawBoxBottom(evt.getPoseStack(), entityAABB, r, g, b, 0.5f);
@@ -848,6 +869,9 @@ public class UnitClientEvents {
 
         // AFTER_CUTOUT_BLOCKS lets us see checkpoints through leaves
         if (OrthoviewClientEvents.isEnabled() && evt.getStage() == stage) {
+            VertexConsumer vertexConsumerLine = MC.renderBuffers().bufferSource().getBuffer(RenderType.LINE_STRIP);
+            ResourceLocation rl = ResourceLocation.parse("forge:textures/white.png");
+            VertexConsumer vertexConsumerEntityTranslucent = MC.renderBuffers().bufferSource().getBuffer(RenderType.entityTranslucent(rl));
             // draw unit checkpoints
             for (LivingEntity entity : getSelectedUnits()) {
                 if (entity instanceof Unit unit) {
@@ -859,17 +883,26 @@ public class UnitClientEvents {
                         int ticksUnderFade = Math.min(cp.ticksLeft, CHECKPOINT_TICKS_FADE);
                         float a = ((float) ticksUnderFade / (float) CHECKPOINT_TICKS_FADE) * 0.5f;
                         if (cp.isForEntity()) {
-                            MyRenderer.drawLine(evt.getPoseStack(), lastPos, cp.getPos(), cp.isGreen ? 0 : 1, cp.isGreen ? 1 : 0, 0, a);
+                            MyRenderer.drawLine(evt.getPoseStack(), vertexConsumerLine, lastPos, cp.getPos(), cp.isGreen ? 0 : 1, cp.isGreen ? 1 : 0, 0, a);
                             lastPos = cp.getPos();
                         } else {
-                            MyRenderer.drawLine(evt.getPoseStack(), lastPos, cp.getPos(), cp.isGreen ? 0 : 1, cp.isGreen ? 1 : 0, 0, a);
+                            MyRenderer.drawLine(evt.getPoseStack(), vertexConsumerLine, lastPos, cp.getPos(), cp.isGreen ? 0 : 1, cp.isGreen ? 1 : 0, 0, a);
                             if (MC.level.getBlockState(cp.bp.offset(0,1,0)).getBlock() instanceof SnowLayerBlock) {
                                 AABB aabb = new AABB(cp.bp);
                                 aabb = aabb.setMaxY(aabb.maxY + 0.13f);
-                                MyRenderer.drawSolidBox(evt.getPoseStack(), aabb, Direction.UP, cp.isGreen ? 0 : 1, cp.isGreen ? 1 : 0, 0, a,
-                                        ResourceLocation.parse("forge:textures/white.png"));
+                                MyRenderer.drawSolidBox(
+                                        evt.getPoseStack(),
+                                        vertexConsumerEntityTranslucent,
+                                        aabb,
+                                        Direction.UP,
+                                        cp.isGreen ? 0 : 1,
+                                        cp.isGreen ? 1 : 0,
+                                        0,
+                                        a,
+                                        ResourceLocation.parse("forge:textures/white.png")
+                                );
                             } else {
-                                MyRenderer.drawBlockFace(evt.getPoseStack(), Direction.UP, cp.bp, cp.isGreen ? 0 : 1, cp.isGreen ? 1 : 0, 0, a);
+                                MyRenderer.drawBlockFace(evt.getPoseStack(), vertexConsumerEntityTranslucent, Direction.UP, cp.bp, cp.isGreen ? 0 : 1, cp.isGreen ? 1 : 0, 0, a);
                             }
                             lastPos = cp.getPos();
                         }
@@ -880,15 +913,24 @@ public class UnitClientEvents {
                         BlockPos ap = unit.getAnchor();
                         float a = MiscUtil.getOscillatingFloat(0.25f, 0.75f);
                         Vec3 apVec3 = new Vec3(ap.getX() + 0.5f, ap.getY() + 1.0f, ap.getZ() + 0.5f);
-                        MyRenderer.drawLine(evt.getPoseStack(), firstPos, apVec3, 1, 1, 0, a);
+                        MyRenderer.drawLine(evt.getPoseStack(), vertexConsumerLine, firstPos, apVec3, 1, 1, 0, a);
 
                         if (MC.level.getBlockState(ap.offset(0,1,0)).getBlock() instanceof SnowLayerBlock) {
                             AABB aabb = new AABB(ap);
                             aabb = aabb.setMaxY(aabb.maxY + 0.13f);
-                            MyRenderer.drawSolidBox(evt.getPoseStack(), aabb, Direction.UP, 1, 1, 0, a,
-                                    ResourceLocation.parse("forge:textures/white.png"));
+                            MyRenderer.drawSolidBox(
+                                    evt.getPoseStack(),
+                                    vertexConsumerEntityTranslucent,
+                                    aabb,
+                                    Direction.UP,
+                                    1,
+                                    1,
+                                    0,
+                                    a,
+                                    ResourceLocation.parse("forge:textures/white.png")
+                            );
                         } else {
-                            MyRenderer.drawBlockFace(evt.getPoseStack(), Direction.UP, ap, 1, 1, 0, a);
+                            MyRenderer.drawBlockFace(evt.getPoseStack(), vertexConsumerEntityTranslucent, Direction.UP, ap, 1, 1, 0, a);
                         }
                     }
 
@@ -1052,6 +1094,7 @@ public class UnitClientEvents {
             }
         }
         sendUnitCommandManual(UnitAction.DISCARD, oldUnitIds);
+        markSelectedUnitsChanged();
     }
 
     public static void syncUnitAnimation(UnitAnimationAction animAction, boolean startAnimation, int entityId, int targetId,

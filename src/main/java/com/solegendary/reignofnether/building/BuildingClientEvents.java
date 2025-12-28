@@ -17,6 +17,7 @@ import com.solegendary.reignofnether.building.buildings.villagers.Castle;
 import com.solegendary.reignofnether.building.buildings.villagers.Library;
 import com.solegendary.reignofnether.building.buildings.villagers.TownCentre;
 import com.solegendary.reignofnether.building.custombuilding.CustomBuilding;
+import com.solegendary.reignofnether.building.production.ActiveProduction;
 import com.solegendary.reignofnether.cursor.CursorClientEvents;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientEvents;
 import com.solegendary.reignofnether.gamerules.GameruleClient;
@@ -27,7 +28,6 @@ import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
 import com.solegendary.reignofnether.player.PlayerColors;
 import com.solegendary.reignofnether.research.ResearchClient;
 import com.solegendary.reignofnether.sandbox.SandboxClientEvents;
-import com.solegendary.reignofnether.sandbox.SandboxServerboundPacket;
 import com.solegendary.reignofnether.tutorial.TutorialClientEvents;
 import com.solegendary.reignofnether.unit.Relationship;
 import com.solegendary.reignofnether.unit.UnitAction;
@@ -40,6 +40,7 @@ import com.solegendary.reignofnether.util.MyRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.BeaconScreen;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.language.I18n;
@@ -70,7 +71,6 @@ import java.util.List;
 
 import static com.solegendary.reignofnether.hud.HudClientEvents.*;
 import static com.solegendary.reignofnether.unit.UnitClientEvents.getSelectedUnits;
-
 public class BuildingClientEvents {
 
     static final Minecraft MC = Minecraft.getInstance();
@@ -91,7 +91,7 @@ public class BuildingClientEvents {
 
     // clientside buildings used for tracking position (for cursor selection)
     private static final ArrayList<BuildingPlacement> buildings = new ArrayList<>();
-
+    private static final ArrayList<GarrisonableBuilding>  garrisonableBuildings = new ArrayList<>();
     private static final ArrayList<BuildingPlacement> selectedBuildings = new ArrayList<>();
     private static Building buildingToPlace = null;
     private static Building lastBuildingToPlace = null;
@@ -105,6 +105,8 @@ public class BuildingClientEvents {
     private static long lastLeftClickTime = 0; // to track double clicks
     private static final long DOUBLE_CLICK_TIME_MS = 500;
 
+    public static boolean isBuilt = false;
+
     // minimum % of blocks below a building that need to be supported by a solid block for it to be placeable
     // 1 means you can't have any gaps at all, 0 means you can place buildings in mid-air
     private static final float MIN_SUPPORTED_BLOCKS_PERCENT = 0.6f;
@@ -116,6 +118,7 @@ public class BuildingClientEvents {
     private static final float MIN_BRIDGE_LIQUID_BLOCKS_PERCENT = 0.20f; // at least 20% of covered blocks must be
     // liquid
     private static final float MAX_BRIDGE_LIQUID_BLOCKS_PERCENT = 0.95f; // at least 5% of covered blocks must be solid
+
 
     // can only be one preselected building as you can't box-select them like units
     public static BuildingPlacement getPreselectedBuilding() {
@@ -132,6 +135,10 @@ public class BuildingClientEvents {
 
     public static List<BuildingPlacement> getBuildings() {
         return buildings;
+    }
+
+    public static List<GarrisonableBuilding> getGarrisonableBuildings() {
+        return garrisonableBuildings;
     }
 
     public static void clearSelectedBuildings() {
@@ -166,20 +173,17 @@ public class BuildingClientEvents {
         if (hudSelectedPlacement == null || MC.player == null)
             return;
         BuildingPlacement idlestBuilding = null;
-
-        List<BuildingPlacement> sameNameBuildings = selectedBuildings.stream().filter(
-                b -> b.getBuilding().equals(hudSelectedPlacement.getBuilding()) && b.isBuilt && b.ownerName.equals(MC.player.getName().getString())
-        ).toList();
-
         float prodTicksLeftMax = Float.MAX_VALUE;
-        for (BuildingPlacement building : sameNameBuildings) {
-            if (building instanceof ProductionPlacement prodB) {
-                Float prodTicksLeft = prodB.productionQueue.stream().map(p -> p.ticksLeft).reduce(0F, Float::sum);
-                if (prodTicksLeft < prodTicksLeftMax) {
-                    prodTicksLeftMax = prodTicksLeft;
-                    idlestBuilding = building;
-                }
+        for (BuildingPlacement building : selectedBuildings) {
+            if (!(building.getBuilding().equals(hudSelectedPlacement.getBuilding()) && building.isBuilt && building.ownerName.equals(MC.player.getName().getString()))) continue;
+            if (!(building instanceof ProductionPlacement prodB)) continue;
+            float prodTicksLeft = 0f;
+            for (ActiveProduction production : prodB.productionQueue) {
+                prodTicksLeft += production.ticksLeft;
             }
+            if (prodTicksLeft >= prodTicksLeftMax) continue;
+            prodTicksLeftMax = prodTicksLeft;
+            idlestBuilding = building;
         }
         if (idlestBuilding != null)
             hudSelectedPlacement = idlestBuilding;
@@ -249,7 +253,8 @@ public class BuildingClientEvents {
         int maxX = -999999;
         int maxY = -999999;
         int maxZ = -999999;
-
+        ResourceLocation rl = ResourceLocation.parse("forge:textures/white.png");
+        var vertexConsumer = MC.renderBuffers().bufferSource().getBuffer(RenderType.entityTranslucent(rl));
         for (BuildingBlock block : blocksToDraw) {
             if (buildingToPlace != null && isBuildingToPlaceABridge()
                 && MC.level != null && AbstractBridge.shouldCullBlock(originPos.offset(0, 1, 0), block, MC.level)) {
@@ -330,10 +335,9 @@ public class BuildingClientEvents {
         if (minY < 0) {
             minY -= 1;
         }
-        ResourceLocation rl = ResourceLocation.parse("forge:textures/white.png");
         AABB aabb = new AABB(minX, minY, minZ, maxX, minY, maxZ);
         MyRenderer.drawLineBox(matrix, aabb, r, g, 0, 0.5f);
-        MyRenderer.drawSolidBox(matrix, aabb, Direction.UP, r, g, 0, 0.5f, rl);
+        MyRenderer.drawSolidBox(matrix, vertexConsumer, aabb, Direction.UP, r, g, 0, 0.5f, rl);
         AABB aabb2 = new AABB(minX, -64, minZ, maxX, minY, maxZ);
         MyRenderer.drawLineBox(matrix, aabb2, r, g, 0, 0.25f);
     }
@@ -550,8 +554,8 @@ public class BuildingClientEvents {
         int minZ = 999999;
         int maxX = -999999;
         int maxZ = -999999;
-
-        for (BlockPos bp : blocksToDraw.stream().map(BuildingBlock::getBlockPos).toList()) {
+        for (BuildingBlock block : blocksToDraw) {
+            var bp = block.getBlockPos();
             if (bp.getX() < minX) {
                 minX = bp.getX();
             }
@@ -659,6 +663,10 @@ public class BuildingClientEvents {
         }
 
         // draw rally points and lines
+        ResourceLocation rl = ResourceLocation.parse("forge:textures/white.png");
+        var vertexConsumerEntityTranslucent = MC.renderBuffers().bufferSource().getBuffer(RenderType.entityTranslucent(rl));
+        var vertexConsumerNoDepthLine = MC.renderBuffers().bufferSource().getBuffer(MyRenderer.LINES_NO_DEPTH_TEST);
+        var vertexConsumerLine = MC.renderBuffers().bufferSource().getBuffer(RenderType.LINES);
         for (BuildingPlacement selBuilding : selectedBuildings) {
             if (selBuilding instanceof ProductionPlacement selProdBuilding) {
                 float a = MiscUtil.getOscillatingFloat(0.25f, 0.75f);
@@ -666,29 +674,29 @@ public class BuildingClientEvents {
                 if (!selProdBuilding.getRallyPoints().isEmpty() && MC.level != null) {
                     Vec3 lastPos = Vec3.atBottomCenterOf(selProdBuilding.centrePos.above());
                     for (BlockPos bp : selProdBuilding.getRallyPoints()) {
-                        MyRenderer.drawLine(evt.getPoseStack(), lastPos, Vec3.atBottomCenterOf(bp.above()), 0, 1, 0, a);
+                        MyRenderer.drawLine(evt.getPoseStack(), vertexConsumerLine, lastPos, Vec3.atBottomCenterOf(bp.above()), 0, 1, 0, a);
                         if (MC.level.getBlockState(bp.offset(0,1,0)).getBlock() instanceof SnowLayerBlock) {
                             AABB aabb = new AABB(bp);
                             aabb = aabb.setMaxY(aabb.maxY + 0.13f);
-                            MyRenderer.drawSolidBox(evt.getPoseStack(), aabb, Direction.UP, 0, 1, 0, a,
+                            MyRenderer.drawSolidBox(evt.getPoseStack(), vertexConsumerEntityTranslucent, aabb, Direction.UP, 0, 1, 0, a,
                                     ResourceLocation.fromNamespaceAndPath("forge", "textures/white.png"));
                         } else {
-                            MyRenderer.drawBlockFace(evt.getPoseStack(), Direction.UP, bp, 0, 1, 0, a);
+                            MyRenderer.drawBlockFace(evt.getPoseStack(), vertexConsumerEntityTranslucent, Direction.UP, bp, 0, 1, 0, a);
                         }
                         lastPos = Vec3.atBottomCenterOf(bp.above());
                     }
                 } else if (selProdBuilding.getRallyPointEntity() != null) {
                     LivingEntity le = selProdBuilding.getRallyPointEntity();
-                    MyRenderer.drawLine(evt.getPoseStack(), new Vec3(selBuilding.centrePos.getX(),
+                    MyRenderer.drawLine(evt.getPoseStack(), vertexConsumerLine, new Vec3(selBuilding.centrePos.getX(),
                         selBuilding.centrePos.getY(),
                         selBuilding.centrePos.getZ()
                     ), new Vec3(le.getX(), le.getEyeY(), le.getZ()), 0, 1, 0, a);
-                    MyRenderer.drawLineBoxOutlineOnly(evt.getPoseStack(), le.getBoundingBox(), 0, 1.0f, 0, a, false);
+                    MyRenderer.drawLineBoxOutlineOnly(evt.getPoseStack(), vertexConsumerNoDepthLine, le.getBoundingBox(), 0, 1.0f, 0, a, false);
                 }
             }
             if (selBuilding instanceof PortalPlacement portal && portal.hasDestination()) {
                 float a = MiscUtil.getOscillatingFloat(0.25f, 0.75f);
-                MyRenderer.drawLine(evt.getPoseStack(), selBuilding.centrePos, portal.destination, 0, 1, 0, a);
+                MyRenderer.drawLine(evt.getPoseStack(), vertexConsumerLine, selBuilding.centrePos, portal.destination, 0, 1, 0, a);
             }
         }
 
@@ -765,13 +773,16 @@ public class BuildingClientEvents {
                     if (builderEntity instanceof WorkerUnit) {
                         builderIds.add(builderEntity.getId());
                     }
-
+                var ids = new int[builderIds.size()];
+                for (int i = 0; i < ids.length; i++) {
+                    ids[i] = builderIds.get(i);
+                }
                 if (Keybindings.shiftMod.isDown()) {
                     BuildingServerboundPacket.placeAndQueueBuilding(building,
                         isBuildingToPlaceABridge() && bridgePlaceState == 2 ? pos.offset(-5, 0, -5) : pos,
                         buildingRotation,
                         hudSelectedEntity instanceof Unit unit ? unit.getOwnerName() : MC.player.getName().getString(),
-                        builderIds.stream().mapToInt(i -> i).toArray(),
+                        ids,
                         isBridgeDiagonal()
                     );
 
@@ -803,14 +814,19 @@ public class BuildingClientEvents {
                         else if (SandboxClientEvents.relationship == Relationship.HOSTILE)
                             ownerName = "Enemy";
                     }
+                    var builderArray = new int[builderIds.size()];
+                    for (int i = 0; i < builderIds.size(); i++) {
+                        builderArray[i] = builderIds.get(i);
+                    }
                     BuildingServerboundPacket.placeBuilding(buildingToPlace,
                         isBuildingToPlaceABridge() && bridgePlaceState == 2 ? pos.offset(-5, 0, -5) : pos,
                         buildingRotation,
                         hudSelectedEntity instanceof Unit unit ? unit.getOwnerName() : ownerName,
-                        builderIds.stream().mapToInt(i -> i).toArray(),
+                        builderArray,
                         isBridgeDiagonal()
                     );
                     setBuildingToPlace(null);
+                    isBuilt = true;
 
                     if (hasSelectedWorkers) {
                         for (LivingEntity entity : getSelectedUnits()) {
@@ -1060,7 +1076,9 @@ public class BuildingClientEvents {
                 }
             }
             buildings.add(newBuilding);
-
+            if (newBuilding instanceof GarrisonableBuilding garrison) {
+                garrisonableBuildings.add(garrison);
+            }
             if (FogOfWarClientEvents.isEnabled()) {
                 newBuilding.freezeChunks(MC.player.getName().getString(), forPlayerLoggingIn);
             }

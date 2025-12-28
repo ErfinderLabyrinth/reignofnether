@@ -61,7 +61,6 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 public class BuildingServerEvents {
 
@@ -77,11 +76,16 @@ public class BuildingServerEvents {
 
     // buildings that currently exist serverside
     private static final ArrayList<BuildingPlacement> buildings = new ArrayList<>();
+    private static final ArrayList<GarrisonableBuilding>  garrisonableBuildings = new ArrayList<>();
 
     public static final ArrayList<NetherZone> netherZones = new ArrayList<>();
 
     public static ArrayList<BuildingPlacement> getBuildings() {
         return buildings;
+    }
+
+    public static List<GarrisonableBuilding> getGarrisonableBuildings() {
+        return garrisonableBuildings;
     }
 
     public static final Random random = new Random();
@@ -260,17 +264,27 @@ public class BuildingServerEvents {
             ownerName,
             isDiagonalBridge
         );
-        boolean originTaken = buildings.stream().anyMatch(b -> b.originPos.equals(pos));
-
-        if (newBuilding != null && !originTaken && (!isOverlappingAnyOtherBuilding(newBuilding) || SandboxServer.isAnyoneASandboxPlayer())) {
+        boolean buildingExists = false;
+        for (BuildingPlacement placement : buildings) {
+            if (placement.originPos.equals(pos)) {
+                buildingExists = true;
+                break;
+            }
+        }
+        if (newBuilding != null && !buildingExists) {
             // Handle special building (Iron Golem)
             if (newBuilding instanceof IronGolemPlacement) {
                 int currentPop = UnitServerEvents.getCurrentPopulation(serverLevel, ownerName);
                 int popSupply = BuildingServerEvents.getTotalPopulationSupply(ownerName);
 
-                boolean canAffordPop = ResourcesServerEvents.resourcesList.stream()
-                    .anyMatch(r -> r.ownerName.equals(ownerName)
-                        && (currentPop + ResourceCosts.IRON_GOLEM.population) <= popSupply);
+                boolean canAffordPop = false;
+                for (Resources resources : ResourcesServerEvents.resourcesList) {
+                    if (resources.ownerName.equals(ownerName)
+                         && (currentPop + ResourceCosts.IRON_GOLEM.population) <= popSupply) {
+                        canAffordPop = true;
+                        break;
+                    }
+                }
 
                 if (!canAffordPop) {
                     ResourcesClientboundPacket.warnInsufficientPopulation(ownerName);
@@ -284,6 +298,9 @@ public class BuildingServerEvents {
                     BuildingUtils.clearBuildingArea(newBuilding);
                 }
                 buildings.add(newBuilding);
+                if (newBuilding instanceof GarrisonableBuilding garrisonableBuilding) {
+                    garrisonableBuildings.add(garrisonableBuilding);
+                }
                 newBuilding.forceChunk(true);
                 int minY = BuildingUtils.getMinCorner(newBuilding.blocks).getY();
 
@@ -292,10 +309,12 @@ public class BuildingServerEvents {
                         if (block.getBlockPos().getY() == minY && !block.getBlockState().isAir())
                             placeScaffoldingUnder(block, newBuilding);
 
-                newBuilding.blocks.stream()
-                    .filter(block -> block.getBlockPos().getY() <= minY + (newBuilding.getBuilding().foundationYLayers - 1)
-                        && newBuilding.getBuilding().startingBlockTypes.contains(block.getBlockState().getBlock()))
-                    .forEach(newBuilding::addToBlockPlaceQueue);
+                for (BuildingBlock block : newBuilding.blocks) {
+                    if (block.getBlockPos().getY() <= minY + (newBuilding.getBuilding().foundationYLayers - 1)
+                        && newBuilding.getBuilding().startingBlockTypes.contains(block.getBlockState().getBlock())) {
+                        newBuilding.addToBlockPlaceQueue(block);
+                    }
+                }
 
                 BuildingClientboundPacket.placeBuilding(pos,
                     building,
@@ -320,13 +339,14 @@ public class BuildingServerEvents {
 
                 assignBuilderUnits(builderUnitIds, queue, newBuilding);
 
-                UnitServerEvents.getAllUnits()
-                        .stream()
-                        .filter(entity -> entity instanceof Unit unit && unit.getOwnerName().equals(ownerName) &&
-                                newBuilding.isPosInsideBuilding(entity.getOnPos().above().above()) &&
-                                (unit.getMoveGoal().getMoveTarget() == null ||
-                                newBuilding.isPosInsideBuilding(unit.getMoveGoal().getMoveTarget())))
-                        .forEach(entity -> moveNonBuildersAwayFromBuildingFoundations(entity, builderUnitIds, newBuilding));
+                for (LivingEntity entity : UnitServerEvents.getAllUnits()) {
+                    if (entity instanceof Unit unit && unit.getOwnerName().equals(ownerName) &&
+                        newBuilding.isPosInsideBuilding(entity.getOnPos().above().above()) &&
+                        (unit.getMoveGoal().getMoveTarget() == null ||
+                         newBuilding.isPosInsideBuilding(unit.getMoveGoal().getMoveTarget()))) {
+                        moveNonBuildersAwayFromBuildingFoundations(entity, builderUnitIds, newBuilding);
+                    }
+                }
 
             } else if (!PlayerServerEvents.isBot(ownerName)) {
                 warnInsufficientResources(newBuilding);
@@ -400,7 +420,14 @@ public class BuildingServerEvents {
     private static void moveNonBuildersAwayFromBuildingFoundations(
         LivingEntity entity, int[] builderUnitIds, BuildingPlacement newBuilding
     ) {
-        if (Arrays.stream(builderUnitIds).noneMatch(id -> id == entity.getId())) {
+        boolean b = true;
+        for (int id : builderUnitIds) {
+            if (id == entity.getId()) {
+                b = false;
+                break;
+            }
+        }
+        if (b) {
             UnitServerEvents.addActionItem(((Unit) entity).getOwnerName(),
                 UnitAction.MOVE,
                 -1,
@@ -565,7 +592,12 @@ public class BuildingServerEvents {
                 BuildingClientboundPacket.syncBuilding(building.originPos, building.getBlocksPlaced(), building.ownerName);
         }
         // need to remove from the list first as destroy() will read it to check defeats
-        List<BuildingPlacement> buildingsToDestroy = buildings.stream().filter(BuildingPlacement::shouldBeDestroyed).toList();
+        List<BuildingPlacement> buildingsToDestroy = new ArrayList<>();
+        for (BuildingPlacement buildingPlacement : buildings) {
+            if (buildingPlacement.shouldBeDestroyed()) {
+                buildingsToDestroy.add(buildingPlacement);
+            }
+        }
         buildings.removeIf(b -> {
             if (b.shouldBeDestroyed()) {
                 if (b instanceof NetherConvertingBuilding ncb && ncb.getMaxNetherRange() > 0 && ncb.getNetherZone() != null) {
@@ -617,7 +649,7 @@ public class BuildingServerEvents {
             ghastUnit = gUnit;
         }
 
-        if (exp.getExploder() == null && exp.getExploder() == null && ghastUnit == null) {
+        if (exp.getExploder() == null && ghastUnit == null) {
             evt.getAffectedEntities().clear();
         }
 
@@ -643,18 +675,18 @@ public class BuildingServerEvents {
                 }
             }
             for (BuildingPlacement building : affectedBuildings) {
-                int atkDmg = 0;
+                float atkDmg = 0;
                 if (ghastUnit != null) {
-                    atkDmg = (int) ghastUnit.getUnitAttackDamage();
+                    atkDmg = ghastUnit.getUnitAttackDamage();
                     building.lastAttacker = ghastUnit;
                 } else if (creeperUnit != null) {
-                    atkDmg = (int) creeperUnit.getUnitAttackDamage();
+                    atkDmg = creeperUnit.getUnitAttackDamage();
                     if (creeperUnit.isPowered()) {
                         atkDmg *= CreeperUnit.CHARGED_DAMAGE_MULT;
                     }
                     building.lastAttacker = creeperUnit;
                 } else if (pillagerUnit != null) {
-                    atkDmg = (int) pillagerUnit.getUnitAttackDamage() / 2;
+                    atkDmg = pillagerUnit.getUnitAttackDamage() / 2;
                     building.lastAttacker = pillagerUnit;
                 } else if (exp.getExploder() instanceof PrimedTnt) {
                     atkDmg = TNT_BUILDING_BASE_DAMAGE;
@@ -664,14 +696,14 @@ public class BuildingServerEvents {
                     // all explosion damage will directly hit all occupants at an average of 1/4 rate
                     if (building instanceof GarrisonableBuilding garr && garr.getCapacity() > 0) {
                         for (LivingEntity le : garr.getOccupants())
-                            le.hurt(exp.getDamageSource(), (random.nextInt(atkDmg + 1)) / 2f);
+                            le.hurt(exp.getDamageSource(), (random.nextFloat(atkDmg + 1)) / 2f);
                     }
 
                     if (building instanceof BridgePlacement) {
                         atkDmg /= 2;
                     }
 
-                    building.destroyRandomBlocks(atkDmg);
+                    building.destroyRandomBlocks((int) atkDmg);
                 }
 
             }

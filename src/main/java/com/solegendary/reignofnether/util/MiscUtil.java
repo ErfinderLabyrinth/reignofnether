@@ -194,7 +194,11 @@ public class MiscUtil {
     }
 
     public static boolean listContainsObjectValue(List<Object> objs, String obj){
-        return objs.stream().anyMatch(o -> o.equals(obj));
+        for (Object o : objs) {
+            if (!o.equals(obj)) continue;
+            return true;
+        }
+        return false;
     }
 
     public static boolean isLeftClickDown(Minecraft MC) {
@@ -261,30 +265,44 @@ public class MiscUtil {
         return retBps;
     }
 
+    public static HashMap<Integer, LivingEntity> findClosestAttackableEntityCacheMap = new HashMap<>();
+
     public static LivingEntity findClosestAttackableEntity(Mob unitMob, float range, ServerLevel level) {
         Vector3d unitPosition = new Vector3d(unitMob.position().x, unitMob.position().y, unitMob.position().z);
-        List<LivingEntity> nearbyEntities = MiscUtil.getEntitiesWithinRange(unitPosition, range, LivingEntity.class, level);
-
-        double closestDist = range;
-        LivingEntity closestTarget = null;
+        var pos = new Vec3(unitPosition.x, unitPosition.y, unitPosition.z);
         boolean neutralAggro = unitMob.level().getGameRules().getRule(GameRuleRegistrar.NEUTRAL_AGGRO).get();
-
-        for (LivingEntity tle : nearbyEntities) {
-            if (isIdleOrMoveAttackable(unitMob, tle, neutralAggro) && hasLineOfSightForAttacks(unitMob, tle)) {
-                double dist = unitMob.position().distanceTo(tle.position());
-                if (dist < closestDist) {
-                    closestDist = dist;
-                    closestTarget = tle;
-                }
+        AABB aabb = new AABB(
+                unitPosition.x - range,
+                unitPosition.y - range,
+                unitPosition.z - range,
+                unitPosition.x + range,
+                unitPosition.y + range,
+                unitPosition.z + range
+        );
+        var entities = level.getEntitiesOfClass(LivingEntity.class, aabb);
+        var key = unitMob.hashCode() + entities.hashCode();
+        if (findClosestAttackableEntityCacheMap.containsKey(key)) {
+            return findClosestAttackableEntityCacheMap.get(key);
+        }
+        entities.sort(Comparator.comparingDouble(
+                it -> it.position().distanceTo(pos)
+        ));
+        for (LivingEntity entity : entities) {
+            if (!(entity.position().distanceTo(new Vec3(unitPosition.x, unitPosition.y, unitPosition.z)) <= range) ||
+                !entity.level().getWorldBorder().isWithinBounds(entity.blockPosition())) continue;
+            if (isIdleOrMoveAttackable(unitMob, entity, neutralAggro) && hasLineOfSightForAttacks(unitMob, entity)) {
+                findClosestAttackableEntityCacheMap.put(key, entity);
+                return entity;
             }
         }
-        return closestTarget;
+        findClosestAttackableEntityCacheMap.put(key, null);
+        return null;
     }
 
     // does not cover explicit attack commands
     private static boolean isIdleOrMoveAttackable(Mob unitMob, LivingEntity targetEntity, boolean neutralAggro) {
         Relationship rs = Relationship.NEUTRAL;
-        if (unitMob instanceof Unit unit) {
+        if (unitMob instanceof Unit) {
             rs = UnitServerEvents.getUnitToEntityRelationship((Unit) unitMob, targetEntity);
 
             // don't aggro against blood moon enemies as a ghast so that buildings don't get friendly fired
@@ -385,6 +403,7 @@ public class MiscUtil {
                 pos.y + range,
                 pos.z + range
         );
+
         if (level != null) {
             List<T> entities = level.getEntitiesOfClass(entityType, aabb);
             List<T> entitiesInRange = new ArrayList<>();

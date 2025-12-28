@@ -119,13 +119,6 @@ public class BaseSpawnerMixin {
                     }
                 }
 
-                List<Unit> nearbyUnits = MiscUtil.getEntitiesWithinRange(new Vector3d(pPos.getX(), pPos.getY(), pPos.getZ()),
-                                ACTIVATION_RANGE, Mob.class, pServerLevel)
-                        .stream()
-                        .filter(mob -> mob instanceof Unit unit)
-                        .map(mob -> (Unit) mob)
-                        .toList();
-
                 for (int i = 0; i < SPAWN_COUNT; i++) {
 
                     Optional<EntityType<?>> optional = EntityType.by(compoundtag);
@@ -168,18 +161,20 @@ public class BaseSpawnerMixin {
                                 return;
                             }
 
-                            List<Unit> nearbyNeutralUnitsOfType = nearbyUnits
-                                    .stream()
-                                    .filter(u -> u.getOwnerName().isBlank() && entity.getName().equals(((Entity) u).getName()))
-                                    .toList();
+                            var nearbyNeutralUnitsOfTypeSum = 0;
+                            var isHaveNearbyNonNeutralUnit = false;
 
-                            List<Unit> nearbyNonNeutralUnits = nearbyUnits
-                                    .stream()
-                                    .filter(u -> !u.getOwnerName().isBlank())
-                                    .toList();
+                            for (Mob mob : MiscUtil.getEntitiesWithinRange(new Vector3d(pPos.getX(), pPos.getY(), pPos.getZ()),
+                                    ACTIVATION_RANGE, Mob.class, pServerLevel)) {
+                                if (!(mob instanceof Unit unit)) continue;
+                                if (!unit.getOwnerName().isBlank() || !entity.getName().equals(((Entity) unit).getName())) continue;
+                                nearbyNeutralUnitsOfTypeSum++;
+                                if (unit.getOwnerName().isBlank()) continue;
+                                isHaveNearbyNonNeutralUnit = true;
+                            }
 
-                            if (nearbyNeutralUnitsOfType.size() >= reignofnether$getMaxNearbyNeutralUnits(entity, nearbySameTypeSpawners) ||
-                                    !nearbyNonNeutralUnits.isEmpty()) {
+                            if (nearbyNeutralUnitsOfTypeSum >= reignofnether$getMaxNearbyNeutralUnits(entity, nearbySameTypeSpawners) ||
+                                    !isHaveNearbyNonNeutralUnit) {
                                 this.delay(pServerLevel, pPos);
                                 return;
                             }
