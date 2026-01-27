@@ -102,7 +102,7 @@
     "abilities.reignofnether.evoker_fangs_line": "Evoker Fangs (Line)",
     "abilities.reignofnether.evoker_fangs_line.tooltip1": "\uE006  %d  \uE004  %ds  \uE005  ",
     "abilities.reignofnether.evoker_fangs_line.tooltip2": "Have this evoker summon a long line of snapping",
-    "abilities.reignofnether.evoker_fangs_line.tooltip3": "fangs around the caster when attacking.",
+    "abilities.reignofnether.evoker_fangs_line.tooltip3": "fangs away from itself when attacking.",
     "abilities.reignofnether.sonic_boom": "Sonic Boom",
     "abilities.reignofnether.sonic_boom.error1": "Must target a unit or building.",
     "abilities.reignofnether.sonic_boom.tooltip1": "\uE006  %d  \uE004  %ds  \uE005  ",
@@ -353,7 +353,7 @@
     "abilities.reignofnether.protective_enchantment.rank3": "Rank 3: %d max charges, %d cooldown",
     "abilities.reignofnether.march_of_progress": "March of Progress (Ultimate)",
     "abilities.reignofnether.march_of_progress.already_active": "March of Progress is already active",
-    "abilities.reignofnether.march_of_progress.stats": "\uE004  %ds   \uE005  %d",
+    "abilities.reignofnether.march_of_progress.stats": "\uE004  %ds   \uE005  %d   \uE008  %d per second",
     "abilities.reignofnether.march_of_progress.tooltip1": "Toggle an aura that doubles the effect of all enchantments.",
     "abilities.reignofnether.march_of_progress.tooltip2": "The aura drains %d mana per second while active.",
 
@@ -1499,5 +1499,20 @@
 
     "alliances.reignofnether.tooltip.toggle_observer_player_displays": "Observer Menu (Z)",
     "alliances.reignofnether.tooltip.toggle_diplomacy_player_displays": "Diplomacy Menu (Z)",
-    "alliances.reignofnether.tooltip.toggle_shared_unit_control": "Toggle whether allies can control your units"
+    "alliances.reignofnether.tooltip.toggle_shared_unit_control": "Toggle whether allies can control your units",
+
+    "effect.reignofnether.stun": "Stun",
+    "effect.reignofnether.freeze": "Freeze",
+    "effect.reignofnether.uncontrollable": "Uncontrollable",
+    "effect.reignofnether.zombie_infected": "Zombie Infected",
+    "effect.reignofnether.minor_speed": "Minor Speed",
+    "effect.reignofnether.minor_slowdown": "Minor Slowdown",
+    "effect.reignofnether.damage_taken_increase": "Damage Taken Increase",
+    "effect.reignofnether.intense_fire": "Intense Fire",
+    "effect.reignofnether.attack_slowdown": "Attack Slowdown",
+    "effect.reignofnether.temporary_efficiency": "Temporary Efficiency",
+    "effect.reignofnether.bloodlust": "Bloodlust",
+    "effect.reignofnether.frost_damage": "Frost Damage",
+    "effect.reignofnether.enchantment_amplifier": "Enchantment Amplifier",
+    "effect.reignofnether.disarm": "Disarm"
 }

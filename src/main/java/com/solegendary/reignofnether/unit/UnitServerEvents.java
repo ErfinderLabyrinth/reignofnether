@@ -491,7 +491,7 @@ public class UnitServerEvents {
 
             if (drownedInfected) {
                 if (evt.getEntity() instanceof GruntUnit || evt.getEntity() instanceof BruteUnit
-                        || evt.getEntity() instanceof HeadhunterUnit) {
+                        || evt.getEntity() instanceof HeadhunterUnit || evt.getEntity() instanceof MarauderUnit) {
                     entityType = EntityRegistrar.ZOMBIE_PIGLIN_UNIT.get();
                 } else if (evt.getEntity() instanceof HoglinUnit) {
                     entityType = EntityRegistrar.ZOGLIN_UNIT.get();
@@ -925,7 +925,7 @@ public class UnitServerEvents {
             int breachLevel = le.getMainHandItem().getEnchantmentLevel(EnchantmentRegistrar.BREACHING.get());
             MobEffectInstance existingDmgIncrease = evt.getEntity().getEffect(MobEffectRegistrar.DAMAGE_TAKEN_INCREASE.get());
             if (breachLevel > 0) {
-                int amp = existingDmgIncrease != null ? (breachLevel * 2) + existingDmgIncrease.getAmplifier() : (breachLevel * 2);
+                int amp = existingDmgIncrease != null ? (breachLevel * 2) + existingDmgIncrease.getAmplifier() : Math.max(0, (breachLevel * 2) - 1);
                 evt.getEntity().addEffect(new MobEffectInstance(MobEffectRegistrar.DAMAGE_TAKEN_INCREASE.get(), 100, amp));
             }
         }
@@ -937,6 +937,16 @@ public class UnitServerEvents {
         }
         if (evt.getSource().getEntity() instanceof EvokerFangs fangs && fangs.getOwner() instanceof EvokerUnit evokerUnit) {
             int zealLevel = evokerUnit.getMainHandItem().getEnchantmentLevel(EnchantmentRegistrar.ZEAL.get());
+            if (zealLevel > 0) {
+                evt.setAmount(evt.getAmount() + zealLevel);
+            }
+        }
+        // not sure why, but sometimes the evokerUnit itself is the source of damage, and when that happens its damage
+        // is doubled since its unitAttackDamage is doubled (as line fangs overlapping often deal 2x dmg)
+        if (evt.getSource().getEntity() instanceof EvokerUnit evokerUnit) {
+            int zealLevel = evokerUnit.getMainHandItem().getEnchantmentLevel(EnchantmentRegistrar.ZEAL.get());
+            if (evokerUnit.isUsingLineFangs)
+                evt.setAmount(evt.getAmount() / 2);
             if (zealLevel > 0) {
                 evt.setAmount(evt.getAmount() + zealLevel);
             }

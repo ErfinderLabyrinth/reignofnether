@@ -595,9 +595,9 @@ public class WretchedWraithUnit extends Monster implements Unit, AttackerUnit, H
     }
 
     private void freezeRandomNearbyEnemy() {
-        ArrayList<Mob> mobs = new ArrayList<>(MiscUtil.getEntitiesWithinRange(position(), Blizzard.RADIUS, Mob.class, level()));
+        ArrayList<LivingEntity> mobs = new ArrayList<>(MiscUtil.getEntitiesWithinRange(position(), Blizzard.RADIUS, LivingEntity.class, level()));
         Collections.shuffle(mobs);
-        for (Mob mob : mobs) {
+        for (LivingEntity mob : mobs) {
             Relationship rs = UnitServerEvents.getUnitToEntityRelationship(this, mob);
             if (rs != Relationship.OWNED && rs != Relationship.FRIENDLY &&
                 mob.onGround() && !(mob instanceof WretchedWraithUnit) &&

@@ -127,7 +127,7 @@ public class VindicatorUnit extends Vindicator implements Unit, AttackerUnit {
     public boolean getAggressiveWhenIdle() {return aggressiveWhenIdle && !isVehicle();}
     public float getAttackRange() {return attackRange;}
     public float getMovementSpeed() {return movementSpeed;}
-    public float getUnitAttackDamage() {return attackDamage + (hasSharpnessEnchant() ? 2 : 0);}
+    public float getUnitAttackDamage() {return attackDamage + getSharpnessLevel();}
     public float getUnitMaxHealth() {return maxHealth;}
 
     @Nullable
@@ -274,9 +274,9 @@ public class VindicatorUnit extends Vindicator implements Unit, AttackerUnit {
         return itemStack.getAllEnchantments().containsKey(EnchantmentRegistrar.MAIMING.get());
     }
 
-    public boolean hasSharpnessEnchant() {
+    public int getSharpnessLevel() {
         ItemStack itemStack = this.getItemBySlot(EquipmentSlot.MAINHAND);
-        return itemStack.getAllEnchantments().containsKey(Enchantments.SHARPNESS);
+        return itemStack.getEnchantmentLevel(Enchantments.SHARPNESS);
     }
 
     public Enchantment getEnchant() {
@@ -311,10 +311,6 @@ public class VindicatorUnit extends Vindicator implements Unit, AttackerUnit {
 
     @Override
     public boolean hasBonusDamage() {
-        return hasSharpnessEnchant();
+        return getSharpnessLevel() > 0;
     }
-
-
-
-
 }

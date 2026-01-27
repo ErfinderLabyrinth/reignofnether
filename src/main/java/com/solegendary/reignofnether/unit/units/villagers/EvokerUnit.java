@@ -40,8 +40,7 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.monster.Evoker;
 import net.minecraft.world.entity.monster.Vex;
 import net.minecraft.world.entity.projectile.EvokerFangs;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
@@ -247,6 +246,14 @@ public class EvokerUnit extends Evoker implements Unit, AttackerUnit, RangedAtta
                 }
             }
         }
+    }
+
+    @Override
+    public boolean wantsToPickUp(ItemStack itemStack) {
+        if (itemStack.getItem().canEquip(itemStack, EquipmentSlot.MAINHAND, this))
+            return false;
+        else
+            return super.wantsToPickUp(itemStack);
     }
 
     @Override

@@ -281,7 +281,11 @@ public interface AttackerUnit {
             return 999999;
         }
         MobEffectInstance attackSlowdown = ((LivingEntity) (this)).getEffect(MobEffectRegistrar.ATTACK_SLOWDOWN.get());
-        return attackSlowdown == null ? 1 : 1 + ((attackSlowdown.getAmplifier() + 1) * 0.05f);
+        int attackSlowdownAmp = attackSlowdown != null ? attackSlowdown.getAmplifier() + 1 : 0;
+
+        MobEffectInstance bloodlust = ((LivingEntity) (this)).getEffect(MobEffectRegistrar.BLOODLUST.get());
+
+        return (1 + (attackSlowdownAmp * 0.05f)) / (bloodlust != null ? 1.6f : 1.0f);
     }
 
     public default float getBuildingDamageMultiplier() {

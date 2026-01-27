@@ -1,5 +1,5 @@
 
-1.20.1-1.3.0-beta-1
+1.20.1-1.3.0-beta-2
 
 [✔] Done and tested
 [🟡] Partially done and/or needs testing
@@ -22,23 +22,30 @@ Bugfixes
 [❌] Fixed sculk catalysts not spreading any sculk
     - Seems to be intermittent, changes when relogging?
 
+
+[✔] Fixed the Enchanter's Breach enchantment on Vindicators causing 5% more armour reduction than intended
+[✔] Fixed the Enchanter's ultimate not affecting Vindicators and Militia attack damage
+[✔] Fixed dedicated server crash upon building a Town Centre
+[✔] Fixed some Enchanter and Wraith tooltips
+[✔] Fixed Militia enchantments not saving on reload
+[✔] Fixed Militia not saving their old villager profession on reload
+[✔] Evokers can no longer pick up and equip weapons (this was preventing them casting spells)
+[✔] Fixed Evokers dealing way higher than expected damage with line fangs
+[✔] Marauders can now be zombified by drowned (it becomes a regular zombie piglin)
+
+
 Quality of Life
 ---------------
-[✔] General performance improvements on both server and client, thanks @NightFish!
-[🟡] Units and buildings no longer have their allegiances changed when exiting sandbox
+[✔] Freeze and Stun effects now affect players (causes immobility and inability to attack)
+[✔] Bloodlust can now affect any mob or player if applied with commands (higher amplifiers have no effect)
 
-
-[❌] Add tooltips for 2nd hero to all hero prod items
 
 [❌] Add rotation to /rtsapi placebuilding
 
+
+
 Balance
 -------
-[✔] Ghasts can no longer attack while over void or structure void blocks
-[✔] Potion clouds created by witches no longer have their size reduced over time or when a mob stands in it
-[✔] Headhunters no longer require a bastion to be trained
-[✔] Bastion cost raised from (150 wood, 100 ore) to (175 wood, 150 ore)
-[✔] The Piglin Merchant's food now heals 20% more health
 
 Languages
 ---------

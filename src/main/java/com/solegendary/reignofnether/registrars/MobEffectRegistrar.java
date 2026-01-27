@@ -18,16 +18,21 @@ public class MobEffectRegistrar {
 
     public static final DeferredRegister<MobEffect> MOB_EFFECTS = DeferredRegister.create(ForgeRegistries.MOB_EFFECTS, ReignOfNether.MOD_ID);
 
-    // prevents any actions or movement from happening
-    public static final RegistryObject<MobEffect> STUN = MOB_EFFECTS.register("stun",  () -> new InstantenousMobEffect(MobEffectCategory.HARMFUL, 0xFFFFFF));
+    // Prevents any actions or movement from happening
+    public static final RegistryObject<MobEffect> STUN = MOB_EFFECTS.register("stun",  () -> new InstantenousMobEffect(MobEffectCategory.HARMFUL, 0xFFFFFF)
+            .addAttributeModifier(Attributes.MOVEMENT_SPEED, "3fd2b186-9aab-4018-88a9-c150d2f6862c", -1.0f, AttributeModifier.Operation.MULTIPLY_TOTAL)
+            .addAttributeModifier(Attributes.ATTACK_SPEED, "126163a9-2ae8-4aff-96f2-2b15c9c0fb55", -1.0f, AttributeModifier.Operation.MULTIPLY_TOTAL));
 
-    // similar to STUN but also prevents the mob from being knocked back and causes heavy damage over time
-    public static final RegistryObject<MobEffect> FREEZE = MOB_EFFECTS.register("freeze",  () -> new InstantenousMobEffect(MobEffectCategory.HARMFUL, 0x000000));
+    // Similar to STUN but also prevents the mob from being knocked back or pushed
+    public static final RegistryObject<MobEffect> FREEZE = MOB_EFFECTS.register("freeze",  () -> new InstantenousMobEffect(MobEffectCategory.HARMFUL, 0x000000)
+            .addAttributeModifier(Attributes.MOVEMENT_SPEED, "aa19485b-837c-4cd5-91f3-440e05d60ba0", -1.0f, AttributeModifier.Operation.MULTIPLY_TOTAL)
+            .addAttributeModifier(Attributes.ATTACK_SPEED, "de7be626-0f4e-4954-9c11-ec5539d40dd7", -1.0f, AttributeModifier.Operation.MULTIPLY_TOTAL));
 
-    // prevents players from issuing any new commands
+    // Prevents players from issuing any new commands
     // usually used in conjunction with a force-attack command for a taunt effect, or a move command for a fear effect
     public static final RegistryObject<MobEffect> UNCONTROLLABLE = MOB_EFFECTS.register("uncontrollable", () -> new InstantenousMobEffect(MobEffectCategory.HARMFUL, 0xFF0000));
 
+    // Causes a mob to turn into a zombie villager, drowned, zombie piglin or zoglin upon death depending on the unit type
     public static final RegistryObject<MobEffect> ZOMBIE_INFECTED = MOB_EFFECTS.register("zombie_infected", () -> new InstantenousMobEffect(MobEffectCategory.HARMFUL, 0x000000));
 
     public static final RegistryObject<MobEffect> MINOR_MOVEMENT_SPEED = MOB_EFFECTS.register("minor_speed", () -> new InstantenousMobEffect(MobEffectCategory.BENEFICIAL, 3402751)
@@ -36,24 +41,30 @@ public class MobEffectRegistrar {
     public static final RegistryObject<MobEffect> MINOR_MOVEMENT_SLOWDOWN = MOB_EFFECTS.register("minor_slowdown", () -> new InstantenousMobEffect(MobEffectCategory.HARMFUL, 3402751)
             .addAttributeModifier(Attributes.MOVEMENT_SPEED, "eb256076-43e6-470e-a907-434a389da860", -0.05, AttributeModifier.Operation.MULTIPLY_BASE));
 
+    // Increases damage taken by units, and can cause negative armour (does not affect players)
+    // The LUCK modifier is just a placeholder
     public static final RegistryObject<MobEffect> DAMAGE_TAKEN_INCREASE = MOB_EFFECTS.register("damage_taken_increase", () -> new InstantenousMobEffect(MobEffectCategory.HARMFUL, 3402751)
             .addAttributeModifier(Attributes.LUCK, "e0772108-0408-4fa3-ad55-f90f5595d610", -0.05, AttributeModifier.Operation.ADDITION));
 
+    // Causes a unit to take fire damage at 2x tick rate, and explodes if it dies
     public static final RegistryObject<MobEffect> INTENSE_FIRE = MOB_EFFECTS.register("intense_fire", () -> new InstantenousMobEffect(MobEffectCategory.HARMFUL, 0xFC6203)
-            .addAttributeModifier(Attributes.MOVEMENT_SPEED, "06d218a6-4328-4df1-8263-5dfc23f0c65c", -0.20, AttributeModifier.Operation.MULTIPLY_BASE));
+            .addAttributeModifier(Attributes.MOVEMENT_SPEED, "06d218a6-4328-4df1-8263-5dfc23f0c65c", -0.20, AttributeModifier.Operation.MULTIPLY_TOTAL));
 
     public static final RegistryObject<MobEffect> ATTACK_SLOWDOWN = MOB_EFFECTS.register("attack_slowdown", () -> new InstantenousMobEffect(MobEffectCategory.HARMFUL, 3402751)
             .addAttributeModifier(Attributes.ATTACK_SPEED, "95086ec9-c6cc-41b4-a2ce-9b5cf28011e4", -0.05, AttributeModifier.Operation.MULTIPLY_BASE));
 
-    // used to give workers temporary efficiency enchantments
+    // Used to give workers temporary efficiency effects (faster gathering and build speed)
     public static final RegistryObject<MobEffect> TEMPORARY_EFFICIENCY = MOB_EFFECTS.register("temporary_efficiency", () -> new InstantenousMobEffect(MobEffectCategory.BENEFICIAL, 3402751)
             .addAttributeModifier(Attributes.LUCK, "a417cf34-dc4e-4047-8e14-89eece60c2f8", 0.05, AttributeModifier.Operation.MULTIPLY_BASE));
 
     public static final RegistryObject<MobEffect> BLOODLUST = MOB_EFFECTS.register("bloodlust", () -> new InstantenousMobEffect(MobEffectCategory.BENEFICIAL, 0xFF0000)
-            .addAttributeModifier(Attributes.MOVEMENT_SPEED, "b9da3d7f-da19-4860-9daa-328be5911517", 0.20, AttributeModifier.Operation.MULTIPLY_BASE));
+            .addAttributeModifier(Attributes.MOVEMENT_SPEED, "b9da3d7f-da19-4860-9daa-328be5911517", 0.20, AttributeModifier.Operation.MULTIPLY_BASE)
+            .addAttributeModifier(Attributes.ATTACK_SPEED, "52f887cb-3048-44fc-b176-98314b5467bd", 0.60, AttributeModifier.Operation.MULTIPLY_TOTAL));
 
+    // Causes a unit to take 1dmg/s per layer of Wraith snow they're standing on
     public static final RegistryObject<MobEffect> FROST_DAMAGE = MOB_EFFECTS.register("frost_damage", () -> new InstantenousMobEffect(MobEffectCategory.HARMFUL, 3402751));
 
+    // Doubles the effect of all unit enchantments (does not affect players)
     public static final RegistryObject<MobEffect> ENCHANTMENT_AMPLIFIER = MOB_EFFECTS.register("enchantment_amplifier", () -> new InstantenousMobEffect(MobEffectCategory.BENEFICIAL, 0x000000));
 
     public static final RegistryObject<MobEffect> DISARM = MOB_EFFECTS.register("disarm", () -> new InstantenousMobEffect(MobEffectCategory.HARMFUL, 3402751)

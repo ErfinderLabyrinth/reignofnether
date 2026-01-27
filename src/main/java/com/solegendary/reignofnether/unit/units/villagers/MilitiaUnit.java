@@ -147,9 +147,9 @@ public class MilitiaUnit extends Vindicator implements Unit, AttackerUnit, Range
     public float getAttackRange() {return isUsingBow() ? attackRange : 2;}
     public float getUnitAttackDamage() {
         if (isUsingBow()) {
-            return rangedAttackDamage + (bowEnchanted ? 1 : 0);
+            return rangedAttackDamage + getPowerLevel();
         } else {
-            return attackDamage + (swordEnchanted ? 1 : 0);
+            return attackDamage + getSharpnessLevel();
         }
     }
     public BlockPos getAttackMoveTarget() { return attackMoveTarget; }
@@ -322,12 +322,36 @@ public class MilitiaUnit extends Vindicator implements Unit, AttackerUnit, Range
     @Override
     public void addAdditionalSaveData(@NotNull CompoundTag pCompound) {
         super.addAdditionalSaveData(pCompound);
+        pCompound.putInt("farmerExp", this.farmerExp);
+        pCompound.putInt("lumberjackExp", this.lumberjackExp);
+        pCompound.putInt("minerExp", this.minerExp);
+        pCompound.putInt("masonExp", this.masonExp);
+        pCompound.putInt("hunterExp", this.hunterExp);
+        pCompound.putBoolean("isVeteran", this.isVeteran);
+        pCompound.putBoolean("swordEnchanted", this.swordEnchanted);
+        pCompound.putBoolean("bowEnchanted", this.bowEnchanted);
         this.addUnitSaveData(pCompound);
     }
 
     @Override
     public void readAdditionalSaveData(@NotNull CompoundTag pCompound) {
         super.readAdditionalSaveData(pCompound);
+        if (pCompound.contains("farmerExp"))
+            this.farmerExp = pCompound.getInt("farmerExp");
+        if (pCompound.contains("lumberjackExp"))
+            this.lumberjackExp = pCompound.getInt("lumberjackExp");
+        if (pCompound.contains("minerExp"))
+            this.minerExp = pCompound.getInt("minerExp");
+        if (pCompound.contains("masonExp"))
+            this.masonExp = pCompound.getInt("masonExp");
+        if (pCompound.contains("hunterExp"))
+            this.hunterExp = pCompound.getInt("hunterExp");
+        if (pCompound.contains("isVeteran"))
+            this.isVeteran = pCompound.getBoolean("isVeteran");
+        if (pCompound.contains("swordEnchanted"))
+            this.swordEnchanted = pCompound.getBoolean("swordEnchanted");
+        if (pCompound.contains("bowEnchanted"))
+            this.bowEnchanted = pCompound.getBoolean("bowEnchanted");
         this.readUnitSaveData(pCompound);
     }
 
@@ -451,9 +475,19 @@ public class MilitiaUnit extends Vindicator implements Unit, AttackerUnit, Range
         VILLAGER_DATA = SynchedEntityData.defineId(Villager.class, EntityDataSerializers.VILLAGER_DATA);
     }
 
+    public int getSharpnessLevel() {
+        ItemStack itemStack = this.getItemBySlot(EquipmentSlot.MAINHAND);
+        return itemStack.getEnchantmentLevel(Enchantments.SHARPNESS);
+    }
+
+    public int getPowerLevel() {
+        ItemStack itemStack = this.getItemBySlot(EquipmentSlot.MAINHAND);
+        return itemStack.getEnchantmentLevel(Enchantments.POWER_ARROWS);
+    }
+
     @Override
     public boolean hasBonusDamage() {
-        return (isUsingBow() && bowEnchanted) ||
-                (!isUsingBow() && swordEnchanted);
+        return (isUsingBow() && getPowerLevel() > 0) ||
+                (!isUsingBow() && getSharpnessLevel() > 0);
     }
 }

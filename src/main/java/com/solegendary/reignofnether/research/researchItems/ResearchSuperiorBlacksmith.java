@@ -21,7 +21,7 @@ import java.util.List;
 
 public class ResearchSuperiorBlacksmith extends ProductionItem {
 
-    public static final String itemName = "Leather Armor";
+    public static final String itemName = "Superior Blacksmith";
     public static final ResourceCost cost = ResourceCosts.RESEARCH_SUPERIOR_BLACKSMITH;
 
 

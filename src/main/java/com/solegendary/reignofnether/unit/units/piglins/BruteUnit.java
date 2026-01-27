@@ -135,12 +135,7 @@ public class BruteUnit extends PiglinBrute implements Unit, AttackerUnit {
     @Nullable
     public ResourceCost getCost() {return ResourceCosts.BRUTE;}
     public boolean getWillRetaliate() {return willRetaliate;}
-    public float getAttackCooldown() {
-        int cd = (int) (20 / (attacksPerSecond));
-        if (hasEffectWithDuration(MobEffectRegistrar.BLOODLUST.get()))
-            cd *= (1 / BLOODLUST_ATTACK_SPEED_MULTIPLIER);
-        return (int) (cd * getAttackCooldownMultiplier());
-    }
+    public float getAttackCooldown() {return ((20 / attacksPerSecond) * getAttackCooldownMultiplier());}
     public float getAttacksPerSecond() {return 20f / getAttackCooldown();}
     public float getBaseAttacksPerSecond() {return attacksPerSecond;}
     public float getAggroRange() {return aggroRange;}

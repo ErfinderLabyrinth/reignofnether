@@ -157,12 +157,7 @@ public class HoglinUnit extends Hoglin implements Unit, AttackerUnit, Convertabl
 
     // endregion
 
-    public float getAttackCooldown() {
-        int cd = (int) (20 / (attacksPerSecond));
-        if (hasEffectWithDuration(MobEffectRegistrar.BLOODLUST.get()))
-            cd *= (1 / BLOODLUST_ATTACK_SPEED_MULTIPLIER);
-        return (int) (cd * getAttackCooldownMultiplier());
-    }
+    public float getAttackCooldown() {return ((20 / attacksPerSecond) * getAttackCooldownMultiplier());}
 
     final static public float attackDamage = 6.0f;
     final static public float attacksPerSecond = 0.45f;
