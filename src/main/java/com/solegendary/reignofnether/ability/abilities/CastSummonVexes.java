@@ -75,8 +75,9 @@ public class CastSummonVexes extends Ability {
     @Override
     public void setCooldown(float cooldown, Unit unit) {
         EvokerUnit evokerUnit = (EvokerUnit) unit;
-        if (evokerUnit.hasVigorEnchant())
-            cooldown *= VigorEnchantment.CD_MULTIPLIER;
+        int vigorLevel = evokerUnit.getVigorLevel();
+        if (vigorLevel > 0)
+            cooldown *= Math.pow(VigorEnchantment.CD_MULTIPLIER, vigorLevel);
         super.setCooldown(cooldown, unit);
     }
 
@@ -84,10 +85,13 @@ public class CastSummonVexes extends Ability {
     @Override
     public void setToMaxCooldown(Unit unit) {
         EvokerUnit evokerUnit = (EvokerUnit) unit;
-        if (evokerUnit.hasVigorEnchant())
-            setCooldown((int) (cooldownMax * VigorEnchantment.CD_MULTIPLIER), unit);
-        else
-            setCooldown(cooldownMax, unit);
+
+        float cd = cooldownMax;
+        int vigorLevel = evokerUnit.getVigorLevel();
+        if (vigorLevel > 0)
+            cd *= Math.pow(VigorEnchantment.CD_MULTIPLIER, vigorLevel);
+
+        setCooldown(cd, unit);
     }
 
     @Override

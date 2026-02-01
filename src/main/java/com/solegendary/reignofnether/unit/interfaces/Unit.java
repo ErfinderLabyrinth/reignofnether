@@ -746,6 +746,9 @@ public interface Unit {
                 }
             }
         }
+        if (((LivingEntity) this).hasEffect(MobEffectRegistrar.TEMPORARY_EFFICIENCY.get())) {
+            icons.add(PassiveIcons.EFFICIENCY);
+        }
         if (hasAnyEnchants() && entity.hasEffect(MobEffectRegistrar.ENCHANTMENT_AMPLIFIER.get())) {
             icons.add(PassiveIcons.ENCHANTMENT_AMPLIFIER);
         }

@@ -9,6 +9,7 @@ import com.solegendary.reignofnether.resources.ResourcesServerEvents;
 import com.solegendary.reignofnether.unit.UnitAction;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -85,6 +86,7 @@ public abstract class EquipAbility extends Ability {
 
     @Override
     public void use(Level level, BuildingPlacement buildingUsing, LivingEntity te) {
+        BlockPos centreBottom = new BlockPos(buildingUsing.centrePos.getX(), buildingUsing.minCorner.getY(), buildingUsing.centrePos.getZ());
 
         if (!level.isClientSide() &&
             te instanceof Unit unit &&
@@ -92,7 +94,7 @@ public abstract class EquipAbility extends Ability {
             isCorrectUnit(te) &&
             !hasSameItem(te) &&
             canAfford(buildingUsing) &&
-            te.distanceToSqr(Vec3.atCenterOf(buildingUsing.centrePos)) < RANGE * RANGE) {
+            te.distanceToSqr(Vec3.atCenterOf(centreBottom)) < RANGE * RANGE) {
 
             doEquip(te);
             ResourcesServerEvents.addSubtractResources(new Resources(buildingUsing.ownerName, -cost.food, -cost.wood, -cost.ore));
@@ -102,7 +104,7 @@ public abstract class EquipAbility extends Ability {
         } else if (level.isClientSide()) {
             if (!(te instanceof Unit unit && unit.getOwnerName().equals(buildingUsing.ownerName))) {
                 HudClientEvents.showTemporaryMessage(I18n.get("ability.reignofnether.equip.error1"));
-            } else if (te.distanceToSqr(Vec3.atCenterOf(buildingUsing.centrePos)) >= RANGE * RANGE) {
+            } else if (te.distanceToSqr(Vec3.atCenterOf(centreBottom)) >= RANGE * RANGE) {
                 HudClientEvents.showTemporaryMessage(I18n.get("ability.reignofnether.equip.error2"));
             } else if (!isCorrectUnit(te)) {
                 HudClientEvents.showTemporaryMessage(I18n.get("ability.reignofnether.equip.error3"));

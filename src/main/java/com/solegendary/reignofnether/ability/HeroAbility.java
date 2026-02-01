@@ -124,8 +124,8 @@ public abstract class HeroAbility extends Ability {
         Button menuButton = new Button("Rank up abilities",
             14,
             hero.isRankUpMenuOpen() ?
-                ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/hud/cross.png") :
-                ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/hud/tick.png"),
+                ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/hud/cross2.png") :
+                ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/hud/level_up.png"),
             Keybindings.keyU,
             () -> false,
             () -> allSkillsLearnt(hero) || !PlayerClientEvents.isRTSPlayer(),

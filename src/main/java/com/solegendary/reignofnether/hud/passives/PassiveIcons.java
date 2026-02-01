@@ -170,7 +170,7 @@ public class PassiveIcons {
             SHARPNESS,
             VIGOR,
             ZEAL,
-            EFFICIENCY,
+            //EFFICIENCY,
             FORTIFYING,
             POWER,
             PIERCING,

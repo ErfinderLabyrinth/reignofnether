@@ -43,8 +43,8 @@ public class InfernalPortal extends ProductionBuilding {
 
         this.productions.add(ProductionItems.PIGLIN_MERCHANT, Keybindings.keyQ);
         this.productions.add(ProductionItems.PIGLIN_MERCHANT_REVIVE, Keybindings.keyQ);
-        this.productions.add(ProductionItems.WILDFIRE, Keybindings.keyW);
-        this.productions.add(ProductionItems.WILDFIRE_REVIVE, Keybindings.keyW);
+        //this.productions.add(ProductionItems.WILDFIRE, Keybindings.keyW);
+        //this.productions.add(ProductionItems.WILDFIRE_REVIVE, Keybindings.keyW);
     }
 
     public Faction getFaction() {return Faction.PIGLINS;}

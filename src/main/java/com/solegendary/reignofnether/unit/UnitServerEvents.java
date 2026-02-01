@@ -425,12 +425,12 @@ public class UnitServerEvents {
     @SubscribeEvent
     public static void onLivingDeath(LivingDeathEvent evt) {
         // Convert nearby blocks arond a death into something that is sculk convertible
-        // supposed to add to sculk_spreadable.json tag under the data/minecraft/tags/blocks but doesn't work for
-        // some reason
+        // supposed to add to sculk_spreadable.json tag under the data/minecraft/tags/blocks
+        // but doesn't work for some reason
         MinecraftServer server = evt.getEntity().level().getServer();
         if (server != null) {
             server.tell(new TickTask(
-                server.getTickCount() + 2,
+                server.getTickCount() + 1,
                 () -> {
                     for (BuildingPlacement building : BuildingServerEvents.getBuildings()) {
                         if (building instanceof SculkCatalystPlacement sc && evt.getEntity().distanceToSqr(Vec3.atCenterOf(sc.centrePos))
@@ -850,26 +850,14 @@ public class UnitServerEvents {
         }
 
         // ensure projectiles from units do the damage of the unit, not the item
-        if (evt.getSource().getEntity() instanceof AttackerUnit attackerUnit) {
+        if (evt.getSource().is(DamageTypeTags.IS_PROJECTILE) &&
+                evt.getSource().getEntity() instanceof AttackerUnit attackerUnit) {
             float dmg = attackerUnit.getUnitAttackDamage();
-
             if (evt.getEntity() instanceof Unit unit) {
-                if (evt.getSource().is(DamageTypeTags.IS_PROJECTILE)) {
-                    dmg *= (1 - unit.getUnitPhysicalArmorPercentage());
-                    dmg *= (1 - unit.getUnitRangedArmorPercentage());
-                    dmg *= (1 - unit.getUnitResistPercentage());
-                } else if (
-                    !evt.getSource().is(DamageTypeTags.WITCH_RESISTANT_TO) &&
-                    !evt.getSource().is(DamageTypeTags.IS_FIRE) &&
-                    !evt.getSource().is(DamageTypeTags.BYPASSES_SHIELD) &&
-                    !evt.getSource().is(DamageTypeTags.BYPASSES_ARMOR) &&
-                    !evt.getSource().is(DamageTypeTags.BYPASSES_RESISTANCE)
-                ) {
-                    dmg *= (1 - unit.getUnitPhysicalArmorPercentage());
-                    dmg *= (1 - unit.getUnitResistPercentage());
-                }
+                dmg *= (1 - unit.getUnitPhysicalArmorPercentage());
+                dmg *= (1 - unit.getUnitRangedArmorPercentage());
+                dmg *= (1 - unit.getUnitResistPercentage());
             }
-
             evt.setAmount(dmg);
         }
 
@@ -937,16 +925,6 @@ public class UnitServerEvents {
         }
         if (evt.getSource().getEntity() instanceof EvokerFangs fangs && fangs.getOwner() instanceof EvokerUnit evokerUnit) {
             int zealLevel = evokerUnit.getMainHandItem().getEnchantmentLevel(EnchantmentRegistrar.ZEAL.get());
-            if (zealLevel > 0) {
-                evt.setAmount(evt.getAmount() + zealLevel);
-            }
-        }
-        // not sure why, but sometimes the evokerUnit itself is the source of damage, and when that happens its damage
-        // is doubled since its unitAttackDamage is doubled (as line fangs overlapping often deal 2x dmg)
-        if (evt.getSource().getEntity() instanceof EvokerUnit evokerUnit) {
-            int zealLevel = evokerUnit.getMainHandItem().getEnchantmentLevel(EnchantmentRegistrar.ZEAL.get());
-            if (evokerUnit.isUsingLineFangs)
-                evt.setAmount(evt.getAmount() / 2);
             if (zealLevel > 0) {
                 evt.setAmount(evt.getAmount() + zealLevel);
             }

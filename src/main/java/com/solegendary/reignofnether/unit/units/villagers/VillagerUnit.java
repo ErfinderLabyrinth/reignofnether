@@ -567,7 +567,8 @@ public class VillagerUnit extends Vindicator implements Unit, WorkerUnit, Attack
 
     @Override
     public void setItemSlot(EquipmentSlot pSlot, ItemStack pStack) {
-        if (pSlot == EquipmentSlot.MAINHAND && this.hasEffectWithDuration(MobEffectRegistrar.TEMPORARY_EFFICIENCY.get())) {
+        if (pStack.getItem() != Items.AIR && pSlot == EquipmentSlot.MAINHAND &&
+            this.hasEffectWithDuration(MobEffectRegistrar.TEMPORARY_EFFICIENCY.get())) {
             pStack.enchant(Enchantments.BLOCK_EFFICIENCY, 1);
         }
         super.setItemSlot(pSlot, pStack);

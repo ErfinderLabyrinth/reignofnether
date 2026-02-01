@@ -1,8 +1,11 @@
 package com.solegendary.reignofnether.building.buildings.placements;
 
 import com.solegendary.reignofnether.ability.EnchantAbility;
+import com.solegendary.reignofnether.ability.EquipAbility;
 import com.solegendary.reignofnether.building.Building;
 import com.solegendary.reignofnether.building.BuildingBlock;
+import com.solegendary.reignofnether.building.RangeIndicator;
+import com.solegendary.reignofnether.time.TimeClientEvents;
 import com.solegendary.reignofnether.util.MiscUtil;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
@@ -12,9 +15,11 @@ import net.minecraft.world.level.block.Rotation;
 import org.joml.Vector3d;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-public class LibraryPlacement extends ProductionPlacement {
+public class LibraryPlacement extends ProductionPlacement implements RangeIndicator {
     public EnchantAbility autoCastEnchant = null;
     public LibraryPlacement(Building building, Level level, BlockPos originPos, Rotation rotation, String ownerName, ArrayList<BuildingBlock> blocks, boolean isCapitol) {
         super(building, level, originPos, rotation, ownerName, blocks, isCapitol);
@@ -23,6 +28,12 @@ public class LibraryPlacement extends ProductionPlacement {
     @Override
     public String getUpgradedName() {
         return I18n.get("buildings.villagers.reignofnether.library.upgraded");
+    }
+
+    @Override
+    public void onBuilt() {
+        super.onBuilt();
+        updateBorderBps();
     }
 
     @Override
@@ -53,5 +64,28 @@ public class LibraryPlacement extends ProductionPlacement {
                 autoCastEnchant.use(tickLevel, this, mobs.get(0));
             }
         }
+        if (tickLevel.isClientSide && tickAgeAfterBuilt > 0 && tickAgeAfterBuilt % 100 == 0)
+            updateBorderBps();
+    }
+
+    private final Set<BlockPos> borderBps = new HashSet<>();
+
+    @Override
+    public void updateBorderBps() {
+        if (!level.isClientSide())
+            return;
+        this.borderBps.clear();
+        this.borderBps.addAll(MiscUtil.getRangeIndicatorCircleBlocks(centrePos,
+                EnchantAbility.RANGE - TimeClientEvents.VISIBLE_BORDER_ADJ, level));
+    }
+
+    @Override
+    public Set<BlockPos> getBorderBps() {
+        return borderBps;
+    }
+
+    @Override
+    public boolean showOnlyWhenSelected() {
+        return true;
     }
 }

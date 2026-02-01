@@ -269,9 +269,9 @@ public class VindicatorUnit extends Vindicator implements Unit, AttackerUnit {
         return !itemStack.getAllEnchantments().isEmpty();
     }
 
-    public boolean hasMaimingEnchant() {
+    public int getMaimingLevel() {
         ItemStack itemStack = this.getItemBySlot(EquipmentSlot.MAINHAND);
-        return itemStack.getAllEnchantments().containsKey(EnchantmentRegistrar.MAIMING.get());
+        return itemStack.getEnchantmentLevel(EnchantmentRegistrar.MAIMING.get());
     }
 
     public int getSharpnessLevel() {
@@ -292,8 +292,9 @@ public class VindicatorUnit extends Vindicator implements Unit, AttackerUnit {
     @Override
     public boolean doHurtTarget(@NotNull Entity pEntity) {
         boolean hurt = super.doHurtTarget(pEntity);
-        if (hurt && hasMaimingEnchant() && pEntity instanceof LivingEntity le)
-            le.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, MaimingEnchantment.SLOWNESS_DURATION, 1));
+        int maimingLevel = getMaimingLevel();
+        if (hurt && maimingLevel > 0 && pEntity instanceof LivingEntity le)
+            le.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, MaimingEnchantment.SLOWNESS_DURATION, maimingLevel));
         return hurt;
     }
 

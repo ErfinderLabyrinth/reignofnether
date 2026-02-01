@@ -15,11 +15,14 @@ import com.solegendary.reignofnether.unit.UnitAction;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Items;
 
 import java.util.List;
+
+import static com.solegendary.reignofnether.util.MiscUtil.fcs;
 
 public class EquipLeatherChestplate extends EquipAbility {
 
@@ -49,10 +52,12 @@ public class EquipLeatherChestplate extends EquipAbility {
                         blacksmith.autoCastEquip = this;
                 },
                 List.of(
-                        net.minecraft.util.FormattedCharSequence.forward(I18n.get("ability.reignofnether.equip.leather_chestplate"), Style.EMPTY.withBold(true)),
+                        fcs(I18n.get("ability.reignofnether.equip.leather_chestplate"), Style.EMPTY.withBold(true)),
                         ResourceCosts.getFormattedCost(cost),
-                        net.minecraft.util.FormattedCharSequence.forward("", Style.EMPTY),
-                        net.minecraft.util.FormattedCharSequence.forward(I18n.get("ability.reignofnether.equip.leather_chestplate.tooltip1"), Style.EMPTY)
+                        fcs("", Style.EMPTY),
+                        fcs(I18n.get("ability.reignofnether.equip.leather_chestplate.tooltip1"), Style.EMPTY),
+                        fcs("", Style.EMPTY),
+                        fcs(I18n.get("abilities.reignofnether.autocast"), Style.EMPTY)
                 ),
                 this,
                 placement

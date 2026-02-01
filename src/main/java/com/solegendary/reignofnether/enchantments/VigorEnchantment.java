@@ -6,7 +6,7 @@ import net.minecraft.world.item.enchantment.EnchantmentCategory;
 
 public class VigorEnchantment extends Enchantment {
 
-    public static final float CD_MULTIPLIER = 0.70f;
+    public static final float CD_MULTIPLIER = 0.75f;
 
     public VigorEnchantment() {
         super(

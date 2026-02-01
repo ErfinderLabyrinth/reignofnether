@@ -253,7 +253,6 @@ public class PillagerUnit extends Pillager implements Unit, AttackerUnit, Ranged
     protected void registerGoals() {
         initialiseGoals();
         this.goalSelector.addGoal(2, usePortalGoal);
-
         this.goalSelector.addGoal(1, new FloatGoal(this));
         this.goalSelector.addGoal(2, attackGoal);
         this.goalSelector.addGoal(2, returnResourcesGoal);
@@ -266,18 +265,11 @@ public class PillagerUnit extends Pillager implements Unit, AttackerUnit, Ranged
 
     @Override
     public void setupEquipmentAndUpgradesServer() {
-        if (hasAnyEnchant())
+        if (!getMainHandItem().getAllEnchantments().isEmpty())
             return;
 
         ItemStack cbowStack = new ItemStack(Items.CROSSBOW);
-        //if (ResearchServerEvents.playerHasResearch(this.getOwnerName(), ResearchPillagerCrossbows.itemName))
-        //    cbowStack.enchant(Enchantments.MULTISHOT, 1);
         this.setItemSlot(EquipmentSlot.MAINHAND, cbowStack);
-    }
-
-    public boolean hasAnyEnchant() {
-        ItemStack itemStack = this.getItemBySlot(EquipmentSlot.MAINHAND);
-        return !itemStack.getAllEnchantments().isEmpty();
     }
 
     public Enchantment getEnchant() {

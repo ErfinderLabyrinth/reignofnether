@@ -45,6 +45,7 @@ import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.monster.Vindicator;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
@@ -532,7 +533,8 @@ public class EnchanterUnit extends Vindicator implements AttackerUnit, HeroUnit,
     public void enchantCivilian(LivingEntity entity) {
         if (level().isClientSide) return;
 
-        entity.getMainHandItem().enchant(Enchantments.BLOCK_EFFICIENCY, 1);
+        if (entity.getMainHandItem().getItem() != Items.AIR)
+            entity.getMainHandItem().enchant(Enchantments.BLOCK_EFFICIENCY, 1);
         entity.addEffect(new MobEffectInstance(MobEffectRegistrar.TEMPORARY_EFFICIENCY.get(), CivilEnchantment.DURATION_SECONDS * 20));
         playEnchantSound();
     }

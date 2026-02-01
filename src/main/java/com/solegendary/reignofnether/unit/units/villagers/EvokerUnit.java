@@ -137,7 +137,7 @@ public class EvokerUnit extends Evoker implements Unit, AttackerUnit, RangedAtta
     // combat stats
     public boolean getWillRetaliate() {return willRetaliate;}
     public float getAttackCooldown() {
-        return (int) ((20 * (hasVigorEnchant() ? VigorEnchantment.CD_MULTIPLIER : 1) / attacksPerSecond)
+        return (int) ((20 * (Math.pow(VigorEnchantment.CD_MULTIPLIER, getVigorLevel())) / attacksPerSecond)
                 * getAttackCooldownMultiplier());
     }
     public float getAttacksPerSecond() {return 20f / (getAttackCooldown() + 25);}
@@ -455,9 +455,9 @@ public class EvokerUnit extends Evoker implements Unit, AttackerUnit, RangedAtta
         return !itemStack.getAllEnchantments().isEmpty();
     }
 
-    public boolean hasVigorEnchant() {
+    public int getVigorLevel() {
         ItemStack itemStack = this.getItemBySlot(EquipmentSlot.MAINHAND);
-        return itemStack.getAllEnchantments().containsKey(EnchantmentRegistrar.VIGOR.get());
+        return itemStack.getEnchantmentLevel(EnchantmentRegistrar.VIGOR.get());
     }
 
     public Enchantment getEnchant() {

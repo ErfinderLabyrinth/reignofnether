@@ -18,7 +18,7 @@ public class EnchantmentUtil {
 
     static {
         level2Enchants.put(Enchantments.SHARPNESS, Items.IRON_AXE);
-        level2Enchants.put(Enchantments.QUICK_CHARGE, Items.BOW);
+        level2Enchants.put(Enchantments.QUICK_CHARGE, Items.CROSSBOW);
     }
 
     public static int getRegularEnchantLevel(Enchantment enchantment, ItemStack itemStack) {

@@ -985,9 +985,26 @@ public class BuildingPlacement {
             if (level.isLoaded(bp)) {
                 level.setBlockAndUpdate(bp, bs);
                 if (bNbt != null) {
-                    BlockEntity be = BlockEntity.loadStatic(bp, bs, bNbt);
-                    if (be != null)
-                        level.setBlockEntity(be);
+                    if (bs.getBlock() == Blocks.SCULK_CATALYST) {
+                        BlockEntity be = level.getBlockEntity(bp);
+                        if (be != null) {
+                            CompoundTag safeTag = bNbt.copy();
+                            safeTag.remove("vibration");
+                            safeTag.remove("listener");
+                            safeTag.remove("vibration_data");
+                            safeTag.remove("VibrationSystem");
+                            safeTag.remove("event_delay");
+                            safeTag.remove("event_distance");
+                            safeTag.remove("selector");
+                            safeTag.remove("source");
+                            be.load(safeTag);
+                            be.setChanged();
+                        }
+                    } else {
+                        BlockEntity be = BlockEntity.loadStatic(bp, bs, bNbt);
+                        if (be != null)
+                            level.setBlockEntity(be);
+                    }
                 }
                 // avoid creating a bubble column block
                 if (bs.getFluidState().is(FluidTags.WATER)) {

@@ -1,5 +1,5 @@
 
-1.20.1-1.3.0-beta-2
+1.20.1-1.3.0-beta-4
 
 [✔] Done and tested
 [🟡] Partially done and/or needs testing
@@ -19,30 +19,14 @@ Wildfire
 
 Bugfixes
 --------
-[❌] Fixed sculk catalysts not spreading any sculk
-    - Seems to be intermittent, changes when relogging?
-
-
-[✔] Fixed the Enchanter's Breach enchantment on Vindicators causing 5% more armour reduction than intended
-[✔] Fixed the Enchanter's ultimate not affecting Vindicators and Militia attack damage
-[✔] Fixed dedicated server crash upon building a Town Centre
-[✔] Fixed some Enchanter and Wraith tooltips
-[✔] Fixed Militia enchantments not saving on reload
-[✔] Fixed Militia not saving their old villager profession on reload
-[✔] Evokers can no longer pick up and equip weapons (this was preventing them casting spells)
-[✔] Fixed Evokers dealing way higher than expected damage with line fangs
-[✔] Marauders can now be zombified by drowned (it becomes a regular zombie piglin)
-
+[✔] Fixed marauders doing only regular damage on flail hits
+[✔] Fixed blood moon creating too many mob spawns
+[✔] Removed the Wildfire from Infernal portals (it's not done yet!)
 
 Quality of Life
 ---------------
-[✔] Freeze and Stun effects now affect players (causes immobility and inability to attack)
-[✔] Bloodlust can now affect any mob or player if applied with commands (higher amplifiers have no effect)
-
-
-[❌] Add rotation to /rtsapi placebuilding
-
-
+[✔] Added rotation arguments (0,90,180,270) to /rtsapi-place-building
+[✔] Removed the "Coming Soon" label from the new heroes
 
 Balance
 -------
