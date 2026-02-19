@@ -26,6 +26,8 @@ import com.solegendary.reignofnether.unit.interfaces.HeroUnit;
 import com.solegendary.reignofnether.unit.interfaces.KeyframeAnimated;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.modelling.animations.EnchanterAnimations;
+import com.solegendary.reignofnether.unit.modelling.renderers.EnchanterRenderer;
+import com.solegendary.reignofnether.unit.modelling.renderers.RoyalGuardRenderer;
 import com.solegendary.reignofnether.util.MiscUtil;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import net.minecraft.client.animation.AnimationDefinition;
@@ -45,6 +47,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Vindicator;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -52,6 +55,7 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import oshi.util.tuples.Pair;
@@ -305,6 +309,10 @@ public class EnchanterUnit extends Vindicator implements AttackerUnit, HeroUnit,
         updateAbilityButtons();
         setStatsForLevel();
     }
+
+    // prevent vanilla logic for picking up items
+    @Override
+    protected void pickUpItem(ItemEntity pItemEntity) { }
 
     @Override
     public float getDamageAfterMagicAbsorb(DamageSource pSource, float pDamage) {
@@ -609,5 +617,12 @@ public class EnchanterUnit extends Vindicator implements AttackerUnit, HeroUnit,
                 SoundClientboundPacket.playSoundAtPos(SoundAction.BEACON_DEACTIVATE, blockPosition(), 1.5f);
             }
         }
+    }
+
+    @Override
+    public AABB getInflatedSelectionBox() {
+        AABB aabb = this.getBoundingBox().inflate(0.15f, 0, 0.15f);
+        aabb.setMaxY(aabb.maxY + 0.4875f);
+        return aabb;
     }
 }

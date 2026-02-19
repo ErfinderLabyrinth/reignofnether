@@ -307,10 +307,17 @@ public class PlayerServerEvents {
             ResearchServerEvents.syncResearch(playerName);
             ResearchServerEvents.syncCheats(playerName);
         }
+
+        boolean inOrthoviewList = false;
         for (ServerPlayer orthoviewPlayer : orthoviewPlayers) {
-            if (orthoviewPlayer.getId() != evt.getEntity().getId()) continue;
-            orthoviewPlayers.add((ServerPlayer) evt.getEntity());
+            if (orthoviewPlayer.getId() == evt.getEntity().getId())  {
+                inOrthoviewList = true;
+                break;
+            }
         }
+        if (!inOrthoviewList)
+            orthoviewPlayers.add((ServerPlayer) evt.getEntity());
+
         if (!TutorialServerEvents.isEnabled()) {
             if (!isRTSPlayer(serverPlayer.getId())) {
                 serverPlayer.sendSystemMessage(Component.translatable("tutorial.reignofnether.welcome")
@@ -837,7 +844,7 @@ public class PlayerServerEvents {
             // Remove the defeated player from the list
             rtsPlayers.removeIf(rtsPlayer -> {
                 if (rtsPlayer.name.equals(playerName)) {
-                    sendMessageToAllPlayers("server.reignofnether.is_defeated", true);
+                    sendMessageToAllPlayers("server.reignofnether.is_defeated", true, playerName, reason);
                     sendMessageToAllPlayers("server.reignofnether.players_remaining", false, (rtsPlayers.size() - 1));
 
                     postGameRtsPlayers.add(rtsPlayer);

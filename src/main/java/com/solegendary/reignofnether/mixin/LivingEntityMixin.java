@@ -6,6 +6,10 @@ import com.solegendary.reignofnether.resources.ResourceSources;
 import com.solegendary.reignofnether.survival.SurvivalServerEvents;
 import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
+import com.solegendary.reignofnether.unit.interfaces.WorkerUnit;
+import com.solegendary.reignofnether.unit.units.villagers.MilitiaUnit;
+import com.solegendary.reignofnether.unit.units.villagers.VillagerUnit;
+import com.solegendary.reignofnether.unit.units.villagers.VillagerUnitProfession;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
@@ -122,23 +126,37 @@ public abstract class LivingEntityMixin extends Entity {
             cancellable = true
     )
     protected void actuallyHurt(DamageSource pDamageSource, float pDamageAmount, CallbackInfo ci) {
+
+
         // ensure projectiles from units do the damage of the unit, not the item,
         // and that armour and anti-armour effects are considered through absorption
         if ((pDamageSource.is(DamageTypeTags.IS_PROJECTILE) ||
-            !pDamageSource.is(DamageTypeTags.WITCH_RESISTANT_TO) &&
+            (!pDamageSource.is(DamageTypeTags.WITCH_RESISTANT_TO) &&
             !pDamageSource.is(DamageTypeTags.BYPASSES_SHIELD) &&
             !pDamageSource.is(DamageTypeTags.BYPASSES_ARMOR) &&
             !pDamageSource.is(DamageTypeTags.BYPASSES_RESISTANCE) &&
-            pDamageSource.is(DamageTypes.MOB_ATTACK)) &&
-            pDamageSource.getEntity() instanceof AttackerUnit attackerUnit &&
-            !ResourceSources.isHuntableAnimal((LivingEntity) (Object) this)) {
+            pDamageSource.is(DamageTypes.MOB_ATTACK))) &&
+            pDamageSource.getEntity() instanceof AttackerUnit attackerUnit) {
 
             ci.cancel();
 
+            boolean isHuntableAnimal = ResourceSources.isHuntableAnimal((LivingEntity) (Object) this);
+
             float dmg = attackerUnit.getUnitAttackDamage();
             boolean isMelee = pDamageSource.is(DamageTypes.MOB_ATTACK) && !pDamageSource.is(DamageTypeTags.IS_PROJECTILE);
-            if (isMelee)
+            if (isMelee && !(pDamageSource.getEntity() instanceof WorkerUnit))
                 dmg += AttackerUnit.getWeaponDamageModifier(attackerUnit);
+
+            if (isHuntableAnimal) {
+                if (pDamageSource.getEntity() instanceof MilitiaUnit)
+                    dmg = 1f;
+                else if (pDamageSource.getEntity() instanceof VillagerUnit vUnit &&
+                        vUnit.getUnitProfession() == VillagerUnitProfession.HUNTER) {
+                    dmg = vUnit.isVeteran() ? 2f : 1.5f;
+                } else if (!(pDamageSource.getEntity() instanceof WorkerUnit)) {
+                    dmg *= 0.5f;
+                }
+            }
 
             if (this instanceof Unit unit) {
                 dmg *= (1 - unit.getUnitPhysicalArmorPercentage());

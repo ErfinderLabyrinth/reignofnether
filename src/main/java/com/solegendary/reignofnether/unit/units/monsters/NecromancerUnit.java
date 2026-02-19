@@ -46,6 +46,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Skeleton;
 import net.minecraft.world.item.ItemStack;
@@ -308,6 +309,10 @@ public class NecromancerUnit extends Skeleton implements Unit, AttackerUnit, Ran
         updateAbilityButtons();
         setStatsForLevel();
     }
+
+    // prevent vanilla logic for picking up items
+    @Override
+    protected void pickUpItem(ItemEntity pItemEntity) { }
 
     @Override
     public float getDamageAfterMagicAbsorb(DamageSource pSource, float pDamage) {

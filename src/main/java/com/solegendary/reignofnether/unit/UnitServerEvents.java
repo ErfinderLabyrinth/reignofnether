@@ -849,24 +849,6 @@ public class UnitServerEvents {
                 evt.setAmount(evt.getAmount() / 2);
         }
 
-        if (ResourceSources.isHuntableAnimal(evt.getEntity()) && (
-            evt.getSource().getEntity() instanceof MilitiaUnit
-        )) {
-            evt.setAmount(1);
-            return;
-        }
-
-        if (ResourceSources.isHuntableAnimal(evt.getEntity()) && (
-            evt.getSource().getEntity() instanceof VillagerUnit vUnit &&
-            vUnit.getUnitProfession() == VillagerUnitProfession.HUNTER
-        )) {
-            if (vUnit.isVeteran())
-                evt.setAmount(2);
-            else
-                evt.setAmount(1.5f);
-            return;
-        }
-
         if (evt.getEntity() instanceof Unit && (
             evt.getSource() == evt.getEntity().damageSources().sweetBerryBush() || evt.getSource() == evt.getEntity().damageSources().cactus()
         )) {

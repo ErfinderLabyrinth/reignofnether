@@ -12,6 +12,7 @@ import com.solegendary.reignofnether.unit.interfaces.WorkerUnit;
 import com.solegendary.reignofnether.unit.units.villagers.VillagerUnit;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -144,5 +145,21 @@ public class FarmPlacement extends BuildingPlacement {
         }
         if (!level.isClientSide() && tickAge % TICK_CROPS_INTERVAL == 0)
             tickCrops();
+    }
+
+    @Override
+    public void destroy(ServerLevel serverLevel) {
+        super.destroy(serverLevel);
+        for (int x = minCorner.getX(); x <= maxCorner.getX(); x++) {
+            for (int y = minCorner.getY(); y <= maxCorner.getY(); y++) {
+                for (int z = minCorner.getZ(); z <= maxCorner.getZ(); z++) {
+                    BlockPos bp = new BlockPos(x,y,z);
+                    BlockState bs = serverLevel.getBlockState(bp);
+                    Block block = bs.getBlock();
+                    if (bs.getTags().toList().contains(BlockTags.CROPS) || block == Blocks.MELON || block == Blocks.PUMPKIN)
+                        serverLevel.destroyBlock(bp, false);
+                }
+            }
+        }
     }
 }

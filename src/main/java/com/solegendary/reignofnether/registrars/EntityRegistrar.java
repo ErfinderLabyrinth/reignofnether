@@ -233,15 +233,15 @@ public class EntityRegistrar {
 
     public static final RegistryObject<EntityType<RoyalGuardUnit>> ROYAL_GUARD_UNIT = ENTITIES.register("royal_guard_unit",
             () -> EntityType.Builder.of(RoyalGuardUnit::new, MobCategory.CREATURE)
-                    .sized(EntityType.VINDICATOR.getWidth() * RoyalGuardRenderer.SCALE_MULT,
-                            EntityType.VINDICATOR.getHeight() * RoyalGuardRenderer.SCALE_MULT)
+                    .sized(EntityType.VINDICATOR.getWidth(),
+                            EntityType.VINDICATOR.getHeight())
                     .clientTrackingRange(UNIT_CLIENT_TRACKING_RANGE)
                     .build(ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "royal_guard_unit").toString()));
 
     public static final RegistryObject<EntityType<EnchanterUnit>> ENCHANTER_UNIT = ENTITIES.register("enchanter_unit",
             () -> EntityType.Builder.of(EnchanterUnit::new, MobCategory.CREATURE)
-                    .sized(EntityType.VINDICATOR.getWidth() * EnchanterRenderer.SCALE_MULT,
-                            EntityType.VINDICATOR.getHeight() * EnchanterRenderer.SCALE_MULT)
+                    .sized(EntityType.VINDICATOR.getWidth(),
+                            EntityType.VINDICATOR.getHeight())
                     .clientTrackingRange(UNIT_CLIENT_TRACKING_RANGE)
                     .build(ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "enchanter_unit").toString()));
 
