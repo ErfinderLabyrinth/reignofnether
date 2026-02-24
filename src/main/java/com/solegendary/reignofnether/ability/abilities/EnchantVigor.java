@@ -20,6 +20,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.BowItem;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.Enchantments;
 
 import java.util.List;
 
@@ -74,5 +75,14 @@ public class EnchantVigor extends EnchantAbility {
     @Override
     public boolean isCorrectUnitAndEquipment(LivingEntity entity) {
         return entity instanceof EvokerUnit && entity.getItemBySlot(equipmentSlot).getItem() instanceof BowItem;
+    }
+
+    @Override
+    public Enchantment getMutuallyExclusiveEnchant(LivingEntity entity) {
+        for (Enchantment enchantment : entity.getItemBySlot(equipmentSlot).getAllEnchantments().keySet()) {
+            if (enchantment == Enchantments.MULTISHOT || enchantment == getEnchantment())
+                return enchantment;
+        }
+        return null;
     }
 }

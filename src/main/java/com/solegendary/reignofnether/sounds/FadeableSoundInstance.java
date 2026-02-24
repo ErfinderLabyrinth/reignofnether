@@ -12,11 +12,11 @@ public class FadeableSoundInstance extends AbstractTickableSoundInstance {
 
     private boolean fadingIn;
     private boolean fadingOut = false;
-    private BlockPos pos;
     public final int id;
     private float volumeMult;
+    private int ticksLeft;
 
-    public FadeableSoundInstance(SoundEvent soundEvent, BlockPos pos, int id, boolean fadeIn, float volumeMult) {
+    public FadeableSoundInstance(SoundEvent soundEvent, BlockPos pos, int id, boolean fadeIn, float volumeMult, int tickDuration) {
         super(soundEvent, SoundSource.NEUTRAL, SoundInstance.createUnseededRandom());
         this.looping = true;
         this.delay = 0;
@@ -27,10 +27,16 @@ public class FadeableSoundInstance extends AbstractTickableSoundInstance {
         this.z = pos.getZ() + 0.5;
         this.id = id;
         this.volumeMult = volumeMult;
+        this.ticksLeft = tickDuration;
     }
 
     @Override
     public void tick() {
+        if (ticksLeft > 0) {
+            ticksLeft -= 1;
+            if (ticksLeft <= 0)
+                fadeOut();
+        }
         if (fadingIn) {
             if (volume < volumeMult)
                 volume += FADE_SPEED * volumeMult;

@@ -48,6 +48,9 @@ import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.util.Mth;
+import net.minecraft.world.damagesource.DamageSources;
+import net.minecraft.world.damagesource.DamageType;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -775,16 +778,18 @@ public class UnitServerEvents {
 
     private static boolean shouldIgnoreKnockback(LivingDamageEvent evt) {
         Entity projectile = evt.getSource().getDirectEntity();
-        Entity shooter = evt.getSource().getEntity();
+        Entity sourceEntity = evt.getSource().getEntity();
 
-        if (shooter instanceof HeadhunterUnit headhunterUnit && projectile instanceof ThrownTrident) {
+        if (sourceEntity instanceof HeadhunterUnit headhunterUnit && projectile instanceof ThrownTrident) {
             return !ResearchServerEvents.playerHasResearch(headhunterUnit.getOwnerName(),
                     ProductionItems.RESEARCH_HEAVY_TRIDENTS
             );
         }
-        if (shooter instanceof SlimeUnit slimeUnit && slimeUnit.isTiny())
+        if (sourceEntity instanceof WretchedWraithUnit)
             return true;
-        if (projectile instanceof Fireball && shooter instanceof BlazeUnit)
+        if (sourceEntity instanceof SlimeUnit slimeUnit && slimeUnit.isTiny())
+            return true;
+        if (projectile instanceof Fireball && sourceEntity instanceof BlazeUnit)
             return true;
         if (projectile instanceof AbstractArrow)
             return true;
@@ -792,7 +797,7 @@ public class UnitServerEvents {
             return true;
 
         return evt.getSource().is(DamageTypeTags.WITCH_RESISTANT_TO) && evt.getSource().isIndirect()
-            && (!(shooter instanceof EvokerUnit));
+            && (!(sourceEntity instanceof EvokerUnit));
     }
 
     public static Entity spawnMob(
@@ -927,11 +932,11 @@ public class UnitServerEvents {
             }
         }
 
-        if (evt.getEntity().hasEffect(MobEffectRegistrar.SCORCHING_FIRE.get()) && evt.getSource().is(DamageTypeTags.IS_FIRE)) {
-            evt.setAmount(evt.getAmount() * 2);
+        if (evt.getEntity().hasEffect(MobEffectRegistrar.SCORCHING_FIRE.get()) && evt.getSource().is(DamageTypes.ON_FIRE)) {
+            evt.setAmount(evt.getAmount() * 3);
         }
 
-        if (evt.getEntity().hasEffect(MobEffectRegistrar.SOULS_AFLAME.get()) && evt.getSource() == evt.getEntity().damageSources().onFire()) {
+        if (evt.getEntity().hasEffect(MobEffectRegistrar.SOULS_AFLAME.get()) && evt.getSource().is(DamageTypes.ON_FIRE)) {
             evt.setAmount(evt.getAmount() * 2);
         }
     }

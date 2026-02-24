@@ -6,6 +6,7 @@ import com.solegendary.reignofnether.building.buildings.monsters.SculkCatalyst;
 import com.solegendary.reignofnether.building.buildings.monsters.Stronghold;
 import com.solegendary.reignofnether.building.buildings.piglins.Fortress;
 import com.solegendary.reignofnether.building.buildings.placements.BeaconPlacement;
+import com.solegendary.reignofnether.building.buildings.placements.BridgePlacement;
 import com.solegendary.reignofnether.building.buildings.placements.SculkCatalystPlacement;
 import com.solegendary.reignofnether.building.buildings.shared.AbstractBridge;
 import com.solegendary.reignofnether.building.buildings.villagers.Castle;
@@ -257,6 +258,19 @@ public class BuildingUtils {
 
         for (BuildingPlacement building : buildings)
             if (building.isPosInsideBuilding(bp))
+                return true;
+        return false;
+    }
+
+    public static boolean isPosInsideAnyNonBridgeBuilding(boolean isClientSide, BlockPos bp) {
+        List<BuildingPlacement> buildings;
+        if (isClientSide)
+            buildings = BuildingClientEvents.getBuildings();
+        else
+            buildings = BuildingServerEvents.getBuildings();
+
+        for (BuildingPlacement building : buildings)
+            if (!(building instanceof BridgePlacement) && building.isPosInsideBuilding(bp))
                 return true;
         return false;
     }

@@ -163,7 +163,6 @@ public class MagmaCubeUnit extends SlimeUnit implements Unit, AttackerUnit {
             bps.add(bpOn.west().west().north());
         }
 
-        // Frostwalker effect provided in LivingEntityMixin, but it only happens on changing block positions on the ground
         for (BlockPos bp : bps) {
             BlockState bsOld = level().getBlockState(bp);
             if (MiscUtil.isSolidBlocking(level(), bp)) {

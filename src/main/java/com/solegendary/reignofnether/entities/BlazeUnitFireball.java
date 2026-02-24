@@ -50,15 +50,24 @@ public class BlazeUnitFireball extends SmallFireball {
             Block blockBelow = this.level().getBlockState(this.getOnPos().below()).getBlock();
             Block blockBelow2 = this.level().getBlockState(this.getOnPos().below().below()).getBlock();
 
-            if (List.of(Blocks.AIR, Blocks.TALL_GRASS, Blocks.GRASS, Blocks.CRIMSON_ROOTS).contains(blockBelow2)) {
+            List<Block> nonSolidBlocks = List.of(
+                    Blocks.AIR, Blocks.TALL_GRASS, Blocks.GRASS,
+                    Blocks.CRIMSON_ROOTS, Blocks.WARPED_ROOTS,
+                    Blocks.DEAD_BUSH, Blocks.SNOW,
+                    BlockRegistrar.WRAITH_SNOW_LAYER.get()
+            );
+            if (nonSolidBlocks.contains(blockBelow2)) {
+                meltSnow(this.getOnPos().below().below().below());
                 replacePathWithDirt(this.getOnPos().below().below().below());
                 this.level().setBlockAndUpdate(this.getOnPos().below().below(), fireState);
             }
-            if (List.of(Blocks.AIR, Blocks.TALL_GRASS, Blocks.GRASS, Blocks.CRIMSON_ROOTS).contains(blockBelow)) {
+            if (nonSolidBlocks.contains(blockBelow)) {
+                meltSnow(this.getOnPos().below().below());
                 replacePathWithDirt(this.getOnPos().below().below());
                 this.level().setBlockAndUpdate(this.getOnPos().below(), fireState);
             }
-            else if (List.of(Blocks.AIR, Blocks.TALL_GRASS, Blocks.GRASS, Blocks.CRIMSON_ROOTS).contains(block)) {
+            else if (nonSolidBlocks.contains(block)) {
+                meltSnow(this.getOnPos());
                 replacePathWithDirt(this.getOnPos());
                 this.level().setBlockAndUpdate(this.getOnPos(), fireState);
             }
@@ -67,6 +76,11 @@ public class BlazeUnitFireball extends SmallFireball {
             this.discard();
     }
 
+    private void meltSnow(BlockPos bp) {
+        if (this.level().getBlockState(bp).getBlock() == BlockRegistrar.WRAITH_SNOW_LAYER.get() ||
+            this.level().getBlockState(bp).getBlock() == Blocks.SNOW)
+            this.level().setBlockAndUpdate(bp, Blocks.AIR.defaultBlockState());
+    }
     private void replacePathWithDirt(BlockPos bp) {
         if (this.level().getBlockState(bp).getBlock() == Blocks.DIRT_PATH)
             this.level().setBlockAndUpdate(bp, Blocks.DIRT.defaultBlockState());

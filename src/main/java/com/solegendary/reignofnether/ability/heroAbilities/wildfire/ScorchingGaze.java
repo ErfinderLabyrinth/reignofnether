@@ -31,6 +31,9 @@ public class ScorchingGaze extends HeroAbility {
     public static final int DURATION_RANK_3 = 14;
     public int durationSeconds = DURATION_RANK_1;
 
+    public static final int MIN_MAGMA_DURATION = 200;
+    public static final int MAX_MAGMA_DURATION = 300;
+
     public ScorchingGaze() {
         super(3, 50, UnitAction.SCORCHING_GAZE, 30 * ResourceCost.TICKS_PER_SECOND, RANGE, 0, true);
     }

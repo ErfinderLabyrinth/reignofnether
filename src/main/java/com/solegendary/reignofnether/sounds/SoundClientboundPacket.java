@@ -18,6 +18,7 @@ public class SoundClientboundPacket {
     String playerName;
     float volume;
     int id;
+    int tickDuration;
 
     public static void playSoundAtPos(SoundAction soundAction, BlockPos bp) {
         PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(),
@@ -27,7 +28,7 @@ public class SoundClientboundPacket {
         PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(),
                 new SoundClientboundPacket(soundAction, bp, "", volume, -1));
     }
-    public static void playFadeableLoopingSoundAtPos(SoundAction soundAction, BlockPos bp, float volume, int id) {
+    public static void playFadeableLoopingSoundAtPos(SoundAction soundAction, BlockPos bp, float volume, int id, int tickDuration) {
         PacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(),
                 new SoundClientboundPacket(soundAction, bp, "", volume, id));
     }
@@ -58,6 +59,16 @@ public class SoundClientboundPacket {
         this.playerName = playerName;
         this.volume = volume;
         this.id = id;
+        this.tickDuration = -1;
+    }
+
+    public SoundClientboundPacket(SoundAction soundAction, BlockPos bp, String playerName, float volume, int id, int tickDuration) {
+        this.soundAction = soundAction;
+        this.bp = bp;
+        this.playerName = playerName;
+        this.volume = volume;
+        this.id = id;
+        this.tickDuration = tickDuration;
     }
 
     public SoundClientboundPacket(FriendlyByteBuf buffer) {
@@ -66,6 +77,7 @@ public class SoundClientboundPacket {
         this.playerName = buffer.readUtf();
         this.volume = buffer.readFloat();
         this.id = buffer.readInt();
+        this.tickDuration = buffer.readInt();
     }
 
     public void encode(FriendlyByteBuf buffer) {
@@ -74,6 +86,7 @@ public class SoundClientboundPacket {
         buffer.writeUtf(this.playerName);
         buffer.writeFloat(this.volume);
         buffer.writeInt(this.id);
+        buffer.writeInt(this.tickDuration);
     }
 
     // server-side packet-consuming functions
@@ -86,7 +99,7 @@ public class SoundClientboundPacket {
                         if (soundAction == SoundAction.STOP_SOUND) {
                             SoundClientEvents.stopSound(id);
                         } else if (id >= 0) {
-                            SoundClientEvents.playFadeableSoundAtPos(soundAction, bp, volume, id);
+                            SoundClientEvents.playFadeableSoundAtPos(soundAction, bp, volume, id, tickDuration);
                         }
                         else if (bp.equals(new BlockPos(0,0,0))) {
                             if (playerName.isBlank())

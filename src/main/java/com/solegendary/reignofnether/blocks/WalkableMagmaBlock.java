@@ -23,7 +23,6 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class WalkableMagmaBlock extends Block {
-    private static final int BUBBLE_COLUMN_CHECK_DELAY = 20;
     public static final int DAMAGE_DELAY = 20; // higher == damage less often
     public static final int DAMAGE = 3;
 
@@ -32,7 +31,7 @@ public class WalkableMagmaBlock extends Block {
     }
 
     public void stepOn(Level pLevel, BlockPos pPos, BlockState pState, Entity pEntity) {
-        boolean isPiglinFaction = pEntity instanceof Unit unit && unit.getFaction() == Faction.PIGLINS;
+        boolean isPiglinFaction = pEntity instanceof Unit unit && unit.getFaction() == Faction.PIGLINS && !pEntity.isOnFire();
         boolean isDamageTick = pEntity.tickCount % DAMAGE_DELAY == 0;
 
         if (!pEntity.isSteppingCarefully() &&

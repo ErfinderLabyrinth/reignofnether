@@ -188,6 +188,7 @@ public class SpiderUnit extends Spider implements Unit, AttackerUnit, Convertabl
 
     public SpiderUnit(EntityType<? extends Spider> entityType, Level level) {
         super(entityType, level);
+        this.setMaxUpStep(1.0F);
     }
 
     public boolean isWallClimbing() { return wallClimbing; }

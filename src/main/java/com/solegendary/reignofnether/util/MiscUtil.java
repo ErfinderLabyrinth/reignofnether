@@ -26,6 +26,7 @@ import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.units.monsters.BoggedUnit;
 import com.solegendary.reignofnether.unit.units.monsters.PhantomSummon;
 import com.solegendary.reignofnether.unit.units.piglins.GhastUnit;
+import com.solegendary.reignofnether.unit.units.piglins.WitherSkeletonUnit;
 import com.solegendary.reignofnether.unit.units.villagers.VillagerUnit;
 import com.solegendary.reignofnether.unit.units.villagers.VillagerUnitProfession;
 import net.minecraft.client.Minecraft;
@@ -330,6 +331,18 @@ public class MiscUtil {
             for (LivingEntity entity : entities) {
                 if (!(entity.position().distanceTo(new Vec3(unitPosition.x, unitPosition.y, unitPosition.z)) <= range) ||
                         !entity.level().getWorldBorder().isWithinBounds(entity.blockPosition()) || entity.hasEffect(MobEffects.POISON)) {
+                    continue;
+                }
+                if (isIdleOrMoveAttackable(unitMob, entity, neutralAggro) && hasLineOfSightForAttacks(unitMob, entity)) {
+                    return entity;
+                }
+            }
+        }
+        // prioritise withered enemies for wither skeletons
+        else if (unitMob instanceof WitherSkeletonUnit) {
+            for (LivingEntity entity : entities) {
+                if (!(entity.position().distanceTo(new Vec3(unitPosition.x, unitPosition.y, unitPosition.z)) <= range) ||
+                        !entity.level().getWorldBorder().isWithinBounds(entity.blockPosition()) || !entity.hasEffect(MobEffects.WITHER)) {
                     continue;
                 }
                 if (isIdleOrMoveAttackable(unitMob, entity, neutralAggro) && hasLineOfSightForAttacks(unitMob, entity)) {

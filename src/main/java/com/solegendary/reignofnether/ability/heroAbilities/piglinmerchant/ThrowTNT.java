@@ -30,7 +30,7 @@ import static com.solegendary.reignofnether.util.MiscUtil.fcsIcons;
 
 public class ThrowTNT extends HeroAbility {
 
-    public static final int RANGE = 12;
+    public static final int RANGE = 14;
     public float explosionPower = 2;
 
     // for some reason 0 and negative cooldown values cause this to stop working

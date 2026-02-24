@@ -10,6 +10,7 @@ import com.solegendary.reignofnether.building.buildings.neutral.NeutralTransport
 import com.solegendary.reignofnether.building.buildings.piglins.CentralPortal;
 import com.solegendary.reignofnether.building.buildings.piglins.PortalBasic;
 import com.solegendary.reignofnether.building.buildings.placements.BeaconPlacement;
+import com.solegendary.reignofnether.building.buildings.placements.BridgePlacement;
 import com.solegendary.reignofnether.building.buildings.placements.PortalPlacement;
 import com.solegendary.reignofnether.building.buildings.placements.ProductionPlacement;
 import com.solegendary.reignofnether.building.buildings.shared.AbstractBridge;
@@ -28,6 +29,9 @@ import com.solegendary.reignofnether.nether.NetherBlocks;
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
 import com.solegendary.reignofnether.player.PlayerColors;
 import com.solegendary.reignofnether.research.ResearchClient;
+import com.solegendary.reignofnether.resources.BlockUtils;
+import com.solegendary.reignofnether.resources.ResourceName;
+import com.solegendary.reignofnether.resources.ResourceSources;
 import com.solegendary.reignofnether.sandbox.SandboxClientEvents;
 import com.solegendary.reignofnether.tutorial.TutorialClientEvents;
 import com.solegendary.reignofnether.unit.Relationship;
@@ -123,8 +127,12 @@ public class BuildingClientEvents {
 
     // can only be one preselected building as you can't box-select them like units
     public static BuildingPlacement getPreselectedBuilding() {
+        BlockPos preSelBp = CursorClientEvents.getPreselectedBlockPos();
         for (BuildingPlacement building : buildings)
-            if (building.isPosInsideBuilding(CursorClientEvents.getPreselectedBlockPos())) {
+            if (building.isPosInsideBuilding(preSelBp)) {
+                if (building instanceof BridgePlacement && ResourceSources.getBlockResourceName(preSelBp, MC.level) != ResourceName.NONE) {
+                    return null;
+                }
                 return building;
             }
         return null;

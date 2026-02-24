@@ -95,9 +95,9 @@ public class SoundClientEvents {
         }
     }
 
-    public static void playFadeableSoundAtPos(SoundAction soundAction, BlockPos bp, float volume, int id) {
+    public static void playFadeableSoundAtPos(SoundAction soundAction, BlockPos bp, float volume, int id, int tickDuration) {
         SoundEvent soundEvent = SOUND_MAP.get(soundAction);
-        FadeableSoundInstance fsi = new FadeableSoundInstance(soundEvent, bp, id,true, volume);
+        FadeableSoundInstance fsi = new FadeableSoundInstance(soundEvent, bp, id,true, volume, tickDuration);
         MC.getSoundManager().play(fsi);
         activeFadeableSounds.add(fsi);
     }

@@ -30,6 +30,7 @@
         "WebBlockMixin",
         "WitchMixin",
         "fire.BaseFireBlockMixin",
+        "fire.CampfireBlockMixin",
         "fire.FireBlockMixin",
         "fire.MagmaBlockMixin",
         "fire.WalkNodeEvaluatorMixin",

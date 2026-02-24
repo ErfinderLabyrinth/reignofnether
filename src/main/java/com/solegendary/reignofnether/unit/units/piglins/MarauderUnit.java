@@ -12,6 +12,7 @@ import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.faction.Faction;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.registrars.MobEffectRegistrar;
+import com.solegendary.reignofnether.research.ResearchClient;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
@@ -139,7 +140,11 @@ public class MarauderUnit extends PiglinBrute implements Unit, AttackerUnit, Key
     public float getAggroRange() {return aggroRange;}
     public boolean getAggressiveWhenIdle() {return aggressiveWhenIdle && !isVehicle();}
     public float getAttackRange() {return attackRange;}
-    public float getUnitAttackDamage() {return isNextHitBig() ? attackDamage + bigHitDamageBonus : attackDamage;}
+    public float getUnitAttackDamage() {
+        if (useCleavingHitDamage) {
+            return cleavingHitDamage;
+        }
+        return isNextHitBig() ? bigHitDamage : attackDamage;}
     public BlockPos getAttackMoveTarget() { return attackMoveTarget; }
     public boolean canAttackBuildings() {return getAttackBuildingGoal() != null;}
     public Goal getAttackGoal() { return attackGoal; }
@@ -152,7 +157,8 @@ public class MarauderUnit extends PiglinBrute implements Unit, AttackerUnit, Key
     public float getAttackCooldown() {return ((20 / attacksPerSecond) * getAttackCooldownMultiplier());}
 
     final static public float attackDamage = 7.0f;
-    final static public float bigHitDamageBonus = 3.0f;
+    final static public float bigHitDamage = 10.0f;
+    final static public float cleavingHitDamage = 5f;
     final static public float attacksPerSecond = 0.4f;
     final static public float attackRange = 2; // only used by ranged units or melee building attackers
     final static public float aggroRange = 10;
@@ -167,6 +173,7 @@ public class MarauderUnit extends PiglinBrute implements Unit, AttackerUnit, Key
 
     private final int ATTACKS_TO_BIG_HIT_MAX = 2;
     public int attacksToNextBigHit = 2;
+    private boolean useCleavingHitDamage = false;
 
     private Abilities abilities = ABILITIES.clone();
     private final List<ItemStack> items = new ArrayList<>();
@@ -284,16 +291,15 @@ public class MarauderUnit extends PiglinBrute implements Unit, AttackerUnit, Key
         boolean result;
         if (isNextHitBig()) {
             this.getAttribute(Attributes.ATTACK_KNOCKBACK).addTransientModifier(new AttributeModifier("knockback", 1.5f, AttributeModifier.Operation.ADDITION));
-            this.getAttribute(Attributes.ATTACK_DAMAGE).addTransientModifier(new AttributeModifier("attackDamage", bigHitDamageBonus, AttributeModifier.Operation.ADDITION));
             result = super.doHurtTarget(pEntity);
             if (pEntity instanceof LivingEntity le) {
                 le.addEffect(new MobEffectInstance(MobEffectRegistrar.STUN.get(), 40));
             }
             this.getAttribute(Attributes.ATTACK_KNOCKBACK).removeModifiers();
-            this.getAttribute(Attributes.ATTACK_DAMAGE).removeModifiers();
             decrementAttacks();
 
             if (!level().isClientSide() && ResearchServerEvents.playerHasResearch(getOwnerName(), ProductionItems.RESEARCH_CLEAVING_FLAILS)) {
+                this.useCleavingHitDamage = true;
                 List<Mob> nearbyMobs = MiscUtil.getEntitiesWithinRange(new Vector3d(
                             pEntity.position().x,
                             pEntity.position().y,
@@ -305,13 +311,14 @@ public class MarauderUnit extends PiglinBrute implements Unit, AttackerUnit, Key
                 for (Mob mob : closestMobs) {
                     if (UnitServerEvents.getUnitToEntityRelationship(this, mob) != Relationship.FRIENDLY && mob.getId() != pEntity.getId()) {
                         super.doHurtTarget(mob);
-                        mob.addEffect(new MobEffectInstance(MobEffectRegistrar.STUN.get(), 30));
+                        mob.addEffect(new MobEffectInstance(MobEffectRegistrar.STUN.get(), 20));
                         extraHitsLeft -= 1;
                         if (extraHitsLeft <= 0) {
                             break;
                         }
                     }
                 }
+                this.useCleavingHitDamage = false;
             }
         } else {
             result = super.doHurtTarget(pEntity);

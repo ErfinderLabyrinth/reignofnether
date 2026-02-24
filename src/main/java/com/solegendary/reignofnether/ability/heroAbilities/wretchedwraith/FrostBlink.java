@@ -32,13 +32,13 @@ public class FrostBlink extends HeroAbility {
     public static final int RANGE_RANK_3 = 12;
 
     public static final int CD_RANK_1 = 20;
-    public static final int CD_RANK_2 = 16;
-    public static final int CD_RANK_3 = 12;
+    public static final int CD_RANK_2 = 15;
+    public static final int CD_RANK_3 = 10;
 
     public static final int RADIUS = 3;
 
     public FrostBlink() {
-        super(3, 40, UnitAction.FROSTBLINK, CD_RANK_1 * ResourceCost.TICKS_PER_SECOND, RANGE_RANK_1, RADIUS, false);
+        super(3, 30, UnitAction.FROSTBLINK, CD_RANK_1 * ResourceCost.TICKS_PER_SECOND, RANGE_RANK_1, RADIUS, false);
     }
 
     @Override

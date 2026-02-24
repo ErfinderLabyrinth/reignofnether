@@ -125,9 +125,9 @@ public class FancyFeast extends HeroAbility {
                 fcs(I18n.get("abilities.reignofnether.fancy_feast.tooltip1")),
                 fcs(I18n.get("abilities.reignofnether.fancy_feast.tooltip2", BASE_ITEMS, BONUS_ITEMS_PER_100_RESOURCES, MANA_REFUND_PER_100_RESOURCES)),
                 fcs(""),
-                fcs(I18n.get("abilities.reignofnether.fancy_feast.rank1"), getRank(hero) == 0),
-                fcs(I18n.get("abilities.reignofnether.fancy_feast.rank2"), getRank(hero) == 1),
-                fcs(I18n.get("abilities.reignofnether.fancy_feast.rank3"), getRank(hero) == 2)
+                fcs(I18n.get("abilities.reignofnether.fancy_feast.rank1", HEALTH_PER_BREAD), getRank(hero) == 0),
+                fcs(I18n.get("abilities.reignofnether.fancy_feast.rank2", HEALTH_PER_CHICKEN), getRank(hero) == 1),
+                fcs(I18n.get("abilities.reignofnether.fancy_feast.rank3", HEALTH_PER_BEEF), getRank(hero) == 2)
         );
     }
 

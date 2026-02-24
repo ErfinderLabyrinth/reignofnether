@@ -62,7 +62,8 @@ public class MoltenBombProjectile extends Fireball {
     }
 
     protected void detonate() {
-        this.level().explode(this, this.getX(), this.getY(), this.getZ(), 2, false, Level.ExplosionInteraction.NONE);
+        level().explode(null, null, null, this.getX(), this.getEyeY(), this.getZ(),
+                2.0f, false, Level.ExplosionInteraction.NONE);
 
         HashMap<BlockPos, Double> bpAndDists = new HashMap<>();
 
@@ -101,7 +102,9 @@ public class MoltenBombProjectile extends Fireball {
         }
         List<Mob> mobs = MiscUtil.getEntitiesWithinRange(position(), moltenBomb.radius, Mob.class, level());
         for (Mob mob : mobs) {
-            mob.hurt(damageSources().explosion(this.getOwner(), this), moltenBomb.damage);
+            if (mob.hurt(damageSources().explosion(this.getOwner(), this), moltenBomb.damage) && random.nextBoolean()) {
+                mob.setSecondsOnFire(5);
+            }
             if (this.getOwner() instanceof LivingEntity le && le.hasEffect(MobEffectRegistrar.SOULS_AFLAME.get())) {
                 mob.addEffect(new MobEffectInstance(MobEffectRegistrar.SOULS_AFLAME.get(), 120, 0, false, false));
             }

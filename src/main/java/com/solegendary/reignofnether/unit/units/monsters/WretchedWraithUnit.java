@@ -43,6 +43,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.CombatRules;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -337,7 +338,7 @@ public class WretchedWraithUnit extends Monster implements Unit, AttackerUnit, H
     public double getUnitPhysicalArmorPercentage() {
         double dmgAfterAbsorb = CombatRules.getDamageAfterAbsorb(
                 1,
-                getArmorValue() + (isBlizzardInProgress() ? 8 : 0),
+                getArmorValue() + (isBlizzardInProgress() ? 13 : 0),
                 (float)getAttributeValue(Attributes.ARMOR_TOUGHNESS));
         dmgAfterAbsorb += getDamageTakenIncrease();
         return Math.round((1 - dmgAfterAbsorb)/ 0.01d) * 0.01d;
@@ -357,7 +358,7 @@ public class WretchedWraithUnit extends Monster implements Unit, AttackerUnit, H
     @Override
     public float getDamageAfterMagicAbsorb(DamageSource pSource, float pDamage) {
         pDamage = super.getDamageAfterMagicAbsorb(pSource, pDamage);
-        if (pSource.is(DamageTypeTags.WITCH_RESISTANT_TO))
+        if (pSource.is(DamageTypeTags.WITCH_RESISTANT_TO) || pSource.is(DamageTypes.ON_FIRE))
             pDamage *= 0.7F;
         return pDamage;
     }
@@ -386,7 +387,8 @@ public class WretchedWraithUnit extends Monster implements Unit, AttackerUnit, H
                 .add(Attributes.MAX_HEALTH, WretchedWraithUnit.maxHealth)
                 .add(Attributes.FOLLOW_RANGE, Unit.getFollowRange())
                 .add(Attributes.ARMOR, WretchedWraithUnit.armorValue)
-                .add(Attributes.KNOCKBACK_RESISTANCE, 0.5f);
+                .add(Attributes.ATTACK_KNOCKBACK, 0f)
+                .add(Attributes.KNOCKBACK_RESISTANCE, 1.0f);
     }
 
     public void tick() {
@@ -712,7 +714,7 @@ public class WretchedWraithUnit extends Monster implements Unit, AttackerUnit, H
         blizzardTicksLeft = Blizzard.CHANNEL_DURATION;
         if (!level().isClientSide) {
             AbilityClientboundPacket.doAbility(getId(), UnitAction.BLIZZARD, blizzardTicksLeft);
-            SoundClientboundPacket.playFadeableLoopingSoundAtPos(SoundAction.WRETCHED_WRAITH_BLIZZARD, blockPosition(), 1.0f, getId());
+            SoundClientboundPacket.playFadeableLoopingSoundAtPos(SoundAction.WRETCHED_WRAITH_BLIZZARD, blockPosition(), 1.0f, getId(), Blizzard.CHANNEL_DURATION);
         }
     }
 
@@ -740,7 +742,7 @@ public class WretchedWraithUnit extends Monster implements Unit, AttackerUnit, H
 
     @Override
     public float getBonusMeleeRange() {
-        return 0.4f;
+        return 0.6f;
     }
 
     @Override

@@ -26,6 +26,7 @@ import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
@@ -183,7 +184,6 @@ public class SlimeUnit extends Slime implements Unit, AttackerUnit {
     public SlimeUnit(EntityType<? extends Slime> entityType, Level level) {
         super(entityType, level);
         this.moveControl = new SlimeUnitMoveControl(this);
-
         updateAbilityButtons();
     }
 
@@ -230,7 +230,7 @@ public class SlimeUnit extends Slime implements Unit, AttackerUnit {
     @Override
     public float getDamageAfterMagicAbsorb(DamageSource pSource, float pDamage) {
         pDamage = super.getDamageAfterMagicAbsorb(pSource, pDamage);
-        if (pSource.is(DamageTypeTags.WITCH_RESISTANT_TO))
+        if (pSource.is(DamageTypeTags.WITCH_RESISTANT_TO) || pSource.is(DamageTypes.ON_FIRE))
             pDamage *= 0.5F;
         return pDamage;
     }
