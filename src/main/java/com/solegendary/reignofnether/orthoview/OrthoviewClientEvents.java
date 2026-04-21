@@ -10,6 +10,7 @@ import com.solegendary.reignofnether.guiscreen.TopdownGui;
 import com.solegendary.reignofnether.guiscreen.TopdownGuiServerboundPacket;
 import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.hud.HudClientEvents;
+import com.solegendary.reignofnether.hud.TextInputClientEvents;
 import com.solegendary.reignofnether.keybinds.Keybindings;
 import com.solegendary.reignofnether.minimap.MinimapClientEvents;
 import com.solegendary.reignofnether.player.PlayerServerboundPacket;
@@ -575,7 +576,7 @@ public class OrthoviewClientEvents {
 
         float panKeyStep = 1.5f * (getZoom() / ZOOM_MAX);
 
-        if (!isCameraLocked() && !Keybindings.altMod.isDown()) {
+        if (!isCameraLocked() && !Keybindings.altMod.isDown() && !TextInputClientEvents.isAnyInputFocused()) {
             // pan camera with keys
             if (Keybindings.panPlusX.isDown()) {
                 panCam(getEdgeCamPanSensitivity(), 0, 0);

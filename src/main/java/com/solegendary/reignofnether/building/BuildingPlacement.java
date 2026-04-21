@@ -2,6 +2,7 @@ package com.solegendary.reignofnether.building;
 
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.ability.Ability;
+import com.solegendary.reignofnether.alliance.AlliancesServerEvents;
 import com.solegendary.reignofnether.api.ReignOfNetherRegistries;
 import com.solegendary.reignofnether.attackwarnings.AttackWarningClientboundPacket;
 import com.solegendary.reignofnether.building.addon.GarrisonableBuildingAddon;
@@ -1219,9 +1220,9 @@ public class BuildingPlacement {
         refreshBlocks();
     }
 
-    private void checkIfCaptured(ServerLevel serverLevel) {
+    protected boolean checkIfCaptured(ServerLevel serverLevel) {
         if (PlayerServerEvents.rtsPlayers.isEmpty())
-            return;
+            return false;
 
         List<Mob> nearbyUnits = MiscUtil.getEntitiesWithinRange(
                 new Vector3d(centrePos.getX(), minCorner.getY(), centrePos.getZ()),
@@ -1252,12 +1253,16 @@ public class BuildingPlacement {
                 }
             }
             if (highestPop > 0 && highestPopPlayer != null) {
+                boolean capturedByAlly = AlliancesServerEvents.isAllied(ownerName, highestPopPlayer);
                 ownerName = highestPopPlayer;
 
                 if (this instanceof BeaconPlacement beacon)
                     beacon.sendWarning("capture_warning");
+
+                return !capturedByAlly;
             }
         }
+        return false;
     }
 
     public String getUpgradedName() {

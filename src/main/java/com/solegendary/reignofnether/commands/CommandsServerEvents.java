@@ -22,7 +22,9 @@ import com.solegendary.reignofnether.research.ResearchServerEvents;
 import com.solegendary.reignofnether.resources.ResourceName;
 import com.solegendary.reignofnether.resources.Resources;
 import com.solegendary.reignofnether.resources.ResourcesServerEvents;
+import com.solegendary.reignofnether.rtsmap.RTSMapInfoServerEvents;
 import com.solegendary.reignofnether.sandbox.SandboxServer;
+import com.solegendary.reignofnether.startpos.StartPosServerEvents;
 import com.solegendary.reignofnether.unit.EnemySearchBehaviour;
 import com.solegendary.reignofnether.unit.UnitAction;
 import com.solegendary.reignofnether.unit.UnitActionItem;
@@ -340,9 +342,18 @@ public class CommandsServerEvents {
                         .then(Commands.argument("value", BoolArgumentType.bool())
                                 .executes(ctx -> setRTSCamera(
                                         ctx,
-                                        StringArgumentType.getString(ctx, "playerSelector"),
+                                        getPlayerName(EntityArgument.getPlayer(ctx, "playerSelector")),
                                         BoolArgumentType.getBool(ctx, "value")
                                 ))))
+        );
+
+        dispatcher.register(Commands.literal("rtsapi-set-starting-teams-mode")
+                .requires(source -> source.hasPermission(2))
+                .then(Commands.argument("mode", StringArgumentType.string())
+                        .executes(ctx -> setStartingTeamsMode(
+                                ctx,
+                                StringArgumentType.getString(ctx, "mode")
+                        )))
         );
     }
 
@@ -949,6 +960,27 @@ public class CommandsServerEvents {
         return !(bMax.getX() < min.getX() || bMin.getX() > max.getX()
             || bMax.getY() < min.getY() || bMin.getY() > max.getY()
             || bMax.getZ() < min.getZ() || bMin.getZ() > max.getZ());
+    }
+
+    private static int setStartingTeamsMode(
+            CommandContext<CommandSourceStack> ctx,
+            String mode
+    ) {
+        if (RTSMapInfoServerEvents.rtsMapInfo == null) {
+            ctx.getSource().sendFailure(Component.literal("No rtsMapInfo loaded"));
+            return 0;
+        }
+        if (!RTSMapInfoServerEvents.rtsMapInfo.supportsMode(mode)) {
+            ctx.getSource().sendFailure(Component.literal("Unknown mode '" + mode + "' - not present in this map's modes"));
+            return 0;
+        }
+        RTSMapInfoServerEvents.rtsMapInfo.setDefaultMode(mode);
+        ctx.getSource().sendSuccess(
+                () -> Component.literal("Set starting teams mode to '" + mode + "'"),
+                true
+        );
+        StartPosServerEvents.loadPositionsFromMapInfo();
+        return 1;
     }
 
     private static String formatPos(BlockPos pos) {

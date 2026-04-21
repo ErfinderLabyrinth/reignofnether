@@ -13,6 +13,7 @@ import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.hud.passives.EnchantmentIcon;
 import com.solegendary.reignofnether.hud.passives.PassiveIcons;
 import com.solegendary.reignofnether.keybinds.Keybindings;
+import com.solegendary.reignofnether.registrars.AttributeRegistrar;
 import com.solegendary.reignofnether.registrars.BlockRegistrar;
 import com.solegendary.reignofnether.registrars.EnchantmentRegistrar;
 import com.solegendary.reignofnether.registrars.MobEffectRegistrar;
@@ -51,6 +52,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
@@ -143,8 +145,19 @@ public interface Unit {
     SelectedTargetGoal<?> getTargetGoal();
     ReturnResourcesGoal getReturnResourcesGoal();
 
-    public float getMovementSpeed();
-    public float getUnitMaxHealth();
+    public default float getMovementSpeed() {
+        AttributeInstance attr = ((LivingEntity) this).getAttribute(Attributes.MOVEMENT_SPEED);
+        return (float) (attr != null ?  attr.getBaseValue() : Attributes.MOVEMENT_SPEED.getDefaultValue());
+    }
+    public default float getUnitMaxHealth() {
+        float bonus = 0;
+        if (this instanceof HeroUnit heroUnit) {
+            bonus = heroUnit.getHealthBonusPerLevel() * heroUnit.getHeroLevel();
+        }
+        AttributeInstance attr = ((LivingEntity) this).getAttribute(Attributes.MAX_HEALTH);
+        return (float) (attr != null ?  attr.getBaseValue() : Attributes.MAX_HEALTH.getDefaultValue()) + bonus;
+    }
+
     public ResourceCost getCost();
 
     LivingEntity getFollowTarget();
@@ -173,13 +186,14 @@ public interface Unit {
 
     // SOURCE: inherent unit stats and abilities
     default double getUnitRangedArmorPercentage() {
-        return 0;
+        AttributeInstance attr = ((LivingEntity) this).getAttribute(AttributeRegistrar.RANGED_DAMAGE_RESIST.get());
+        return (float) (attr != null ?  attr.getBaseValue() : AttributeRegistrar.RANGED_DAMAGE_RESIST.get().getDefaultValue());
     }
 
     // SOURCE: inherent unit stats and vanilla mechanics (like resistance)
     default double getUnitMagicArmorPercentage() {
-        Mob mob = (Mob) this;
-        return 1 - mob.getDamageAfterMagicAbsorb(mob.damageSources().magic(), 1);
+        AttributeInstance attr = ((LivingEntity) this).getAttribute(AttributeRegistrar.MAGIC_DAMAGE_RESIST.get());
+        return (float) (attr != null ?  attr.getBaseValue() : AttributeRegistrar.MAGIC_DAMAGE_RESIST.get().getDefaultValue());
     }
 
     // SOURCE: resistance mob effect
