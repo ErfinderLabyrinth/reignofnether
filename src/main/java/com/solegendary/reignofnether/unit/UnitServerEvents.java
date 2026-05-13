@@ -11,6 +11,7 @@ import com.solegendary.reignofnether.building.BuildingServerEvents;
 import com.solegendary.reignofnether.building.BuildingUtils;
 import com.solegendary.reignofnether.building.addon.GarrisonableBuildingAddon;
 import com.solegendary.reignofnether.building.buildings.monsters.SculkCatalyst;
+import com.solegendary.reignofnether.building.buildings.placements.GraveyardPlacement;
 import com.solegendary.reignofnether.building.buildings.placements.ProductionPlacement;
 import com.solegendary.reignofnether.building.buildings.placements.SculkCatalystPlacement;
 import com.solegendary.reignofnether.building.buildings.villagers.IronGolemBuilding;
@@ -181,6 +182,7 @@ public class UnitServerEvents {
     @SubscribeEvent
     public static void onServerStarted(ServerStartedEvent evt) {
         ServerLevel level = evt.getServer().getLevel(Level.OVERWORLD);
+        isServerStopping = false;
 
         if (level != null) {
             HeroUnitSaveData heroData = HeroUnitSaveData.getInstance(level);
@@ -236,7 +238,8 @@ public class UnitServerEvents {
             if (building.ownerName.equals(ownerName)) {
                 if (building instanceof ProductionPlacement prodPlacement) {
                     for (ActiveProduction prodItem : prodPlacement.productionQueue)
-                        currentPopulation += prodItem.item.getCost(false, ownerName).population;
+                        if (!(prodPlacement instanceof GraveyardPlacement gy) || gy.getUpgradeLevel() <= 0)
+                            currentPopulation += prodItem.item.getCost(false, ownerName).population;
                 } else if (building.getBuilding() instanceof IronGolemBuilding) {
                     currentPopulation += ResourceCosts.IRON_GOLEM.population;
                 }
@@ -597,9 +600,6 @@ public class UnitServerEvents {
                 }
             }
         }
-        if (evt.getEntity() instanceof WretchedWraithUnit wretchedWraithUnit) {
-            SoundClientboundPacket.stopSoundWithId(wretchedWraithUnit.getId());
-        }
     }
 
     // prevent onDropItem firing twice if the same animal is killed by two workers on the same tick
@@ -671,7 +671,8 @@ public class UnitServerEvents {
                             MobEffectRegistrar.SCORCHING_FIRE.get(),
                             MobEffectRegistrar.SOULS_AFLAME.get(),
                             MobEffectRegistrar.ANGRY.get(),
-                            MobEffectRegistrar.FEARFUL.get()
+                            MobEffectRegistrar.FEARFUL.get(),
+                            MobEffectRegistrar.PARTIALLY_POSSESSED.get()
                     )) {
                         MobEffectInstance mei = entity.getEffect(me);
                         if (mei != null)

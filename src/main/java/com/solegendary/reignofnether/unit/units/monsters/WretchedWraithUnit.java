@@ -72,6 +72,10 @@ public class WretchedWraithUnit extends Monster implements Unit, AttackerUnit, H
         )
     );
 
+    boolean needsStatSync = false;
+    @Override public boolean needsStatSync() { return needsStatSync; }
+    @Override public void setNeedsStatSync(boolean value) { needsStatSync = value; }
+
     @Override
     public Object2ObjectArrayMap<HeroAbility, Integer> getHeroAbilityRanks() {
         return heroAbilityRanks;
@@ -344,6 +348,14 @@ public class WretchedWraithUnit extends Monster implements Unit, AttackerUnit, H
         setStatsForLevel();
     }
 
+    @Override
+    public void kill() {
+        if (!level().isClientSide()) {
+            SoundClientboundPacket.stopSoundWithId(getId());
+        }
+        super.kill();
+    }
+
     // prevent vanilla logic for picking up items
     @Override
     protected void pickUpItem(ItemEntity pItemEntity) { }
@@ -455,6 +467,7 @@ public class WretchedWraithUnit extends Monster implements Unit, AttackerUnit, H
     public void readAdditionalSaveData(@NotNull CompoundTag pCompound) {
         super.readAdditionalSaveData(pCompound);
         this.readUnitSaveData(pCompound);
+        this.setNeedsStatSync(true);
     }
 
     @Override

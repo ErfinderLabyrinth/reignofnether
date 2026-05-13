@@ -2,20 +2,33 @@ package com.solegendary.reignofnether;
 
 import com.solegendary.reignofnether.building.Buildings;
 import com.solegendary.reignofnether.building.production.ProductionItems;
+import com.solegendary.reignofnether.commands.argument.BuildingArgument;
+import com.solegendary.reignofnether.commands.argument.options.BuildingSelectorOptions;
 import com.solegendary.reignofnether.config.ReignOfNetherCommonConfigs;
 import com.solegendary.reignofnether.faction.FactionRegistries;
-import com.solegendary.reignofnether.guiscreen.TopdownGui;
 import com.solegendary.reignofnether.mixin.DownloadPackSourceAccessor;
 import com.solegendary.reignofnether.network.S2CReset;
-import com.solegendary.reignofnether.registrars.*;
+import com.solegendary.reignofnether.registrars.AttributeRegistrar;
+import com.solegendary.reignofnether.registrars.BlockEntityRegistrar;
+import com.solegendary.reignofnether.registrars.BlockRegistrar;
+import com.solegendary.reignofnether.registrars.ClientEventRegistrar;
+import com.solegendary.reignofnether.registrars.CommandArgumentRegistrar;
+import com.solegendary.reignofnether.registrars.ContainerRegistrar;
+import com.solegendary.reignofnether.registrars.EnchantmentRegistrar;
+import com.solegendary.reignofnether.registrars.EntityRegistrar;
+import com.solegendary.reignofnether.registrars.GameRuleRegistrar;
+import com.solegendary.reignofnether.registrars.ItemRegistrar;
+import com.solegendary.reignofnether.registrars.MobEffectRegistrar;
+import com.solegendary.reignofnether.registrars.ParticleRegistrar;
+import com.solegendary.reignofnether.registrars.ServerEventRegistrar;
+import com.solegendary.reignofnether.registrars.SoundRegistrar;
 import com.solegendary.reignofnether.resources.ResourceCosts;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.GenericDirtMessageScreen;
-import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.multiplayer.ClientHandshakePacketListenerImpl;
 import net.minecraft.client.multiplayer.ServerData;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.commands.synchronization.ArgumentTypeInfos;
 import net.minecraft.network.Connection;
 import net.minecraft.network.ConnectionProtocol;
 import net.minecraft.network.chat.Component;
@@ -26,17 +39,20 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.IExtensionPoint.DisplayTest;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
-import net.minecraftforge.network.*;
+import net.minecraftforge.network.HandshakeHandler;
+import net.minecraftforge.network.HandshakeMessages;
+import net.minecraftforge.network.NetworkConstants;
+import net.minecraftforge.network.NetworkDirection;
+import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.network.NetworkHooks;
 import net.minecraftforge.network.simple.SimpleChannel;
 import net.minecraftforge.registries.GameData;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
@@ -54,7 +70,7 @@ import java.util.function.Supplier;
 public class ReignOfNether {
     public static final Logger LOGGER = LogManager.getLogger();
     public static final String MOD_ID = "reignofnether";
-    public static final String VERSION_STRING = "1.3.2e";
+    public static final String VERSION_STRING = "1.3.3";
 
     // Fields from ClientReset
     public static final Field handshakeField;
@@ -63,11 +79,11 @@ public class ReignOfNether {
     static final Marker RESETMARKER = MarkerManager.getMarker("RESETPACKET")
         .setParents(MarkerManager.getMarker("FMLNETWORK"));
     public static SimpleChannel handshakeChannel;
-
+    
     public ReignOfNether(FMLJavaModLoadingContext mlctx) {
         // Registering all components
         EnchantmentRegistrar.init(mlctx);
-
+        
         AttributeRegistrar.init(mlctx);
         ItemRegistrar.init(mlctx);
         EntityRegistrar.init(mlctx);
@@ -81,13 +97,15 @@ public class ReignOfNether {
         ProductionItems.init();
         MobEffectRegistrar.init(mlctx);
         ParticleRegistrar.init(mlctx);
-
+        CommandArgumentRegistrar.init(mlctx);
+        BuildingSelectorOptions.bootStrap();
+        
         final ClientEventRegistrar clientRegistrar = new ClientEventRegistrar();
         DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> clientRegistrar::registerClientEvents);
-
+        
         final ServerEventRegistrar serverRegistrar = new ServerEventRegistrar();
         DistExecutor.safeRunWhenOn(Dist.DEDICATED_SERVER, () -> serverRegistrar::registerServerEvents);
-
+        
         // Registering ClientReset's init
         IEventBus bus = mlctx.getModEventBus();
         bus.addListener(ReignOfNether::init);
@@ -101,7 +119,7 @@ public class ReignOfNether {
             () -> new DisplayTest(() -> NetworkConstants.IGNORESERVERONLY, (a, b) -> true)
         );
     }
-
+    
     @SubscribeEvent
     public static void init(FMLCommonSetupEvent event) {
         if (handshakeField == null) {
@@ -133,8 +151,11 @@ public class ReignOfNether {
             );
         }
         ResourceCosts.deferredLoadResourceCosts();
+        event.enqueueWork(() -> {
+            ArgumentTypeInfos.registerByClass(BuildingArgument.class, CommandArgumentRegistrar.BUILDING_ARG.get());
+        });
     }
-
+    
     public static void handleReset(
         HandshakeHandler handler,
         S2CReset msg,
@@ -142,19 +163,19 @@ public class ReignOfNether {
     ) {
         NetworkEvent.Context context = contextSupplier.get();
         Connection connection = context.getNetworkManager();
-
+        
         if (context.getDirection() != NetworkDirection.LOGIN_TO_CLIENT
             && context.getDirection() != NetworkDirection.PLAY_TO_CLIENT) {
             connection.disconnect(Component.literal("Illegal packet received, terminating connection"));
             throw new IllegalStateException("Invalid packet received, aborting connection");
         }
-
+        
         logger.info(RESETMARKER, "Received reset packet from server.");
-
+        
         if (!handleClear(context)) {
             return;
         }
-
+        
         NetworkHooks.registerClientLoginChannel(connection);
         connection.setProtocol(ConnectionProtocol.LOGIN);
         connection.setListener(new ClientHandshakePacketListenerImpl(
@@ -183,20 +204,20 @@ public class ReignOfNether {
         }
         logger.info(RESETMARKER, "Reset complete.");
     }
-
+    
     @OnlyIn(Dist.CLIENT)
     public static boolean handleClear(NetworkEvent.Context context) {
         CompletableFuture<Void> future = context.enqueueWork(() -> {
             logger.debug(RESETMARKER, "Clearing");
-
+            
             ServerData serverData = Minecraft.getInstance().getCurrentServer();
             Pack serverPack = ((DownloadPackSourceAccessor)Minecraft.getInstance().getDownloadedPackSource()).getServerPack();
-
+            
             if (Minecraft.getInstance().level == null) {
                 GameData.revertToFrozen();
             }
             ((DownloadPackSourceAccessor)Minecraft.getInstance().getDownloadedPackSource()).setServerPack(null);
-
+            
             Minecraft.getInstance()
                 .clearLevel(new GenericDirtMessageScreen(Component.translatable("connect.negotiating")));
             try {
@@ -207,11 +228,11 @@ public class ReignOfNether {
                 context.getNetworkManager().channel().pipeline().remove("forge:vanilla_filter");
             } catch (NoSuchElementException ignored) {
             }
-
+            
             ((DownloadPackSourceAccessor)Minecraft.getInstance().getDownloadedPackSource()).setServerPack(serverPack);
             //Minecraft.getInstance().setCurrentServer(serverData); TODO find out why, almost impossible to reproduce
         });
-
+        
         logger.debug(RESETMARKER, "Waiting for clear to complete");
         try {
             future.get();
@@ -223,7 +244,7 @@ public class ReignOfNether {
             return false;
         }
     }
-
+    
     private static Field fetchHandshakeChannel() {
         try {
             return ObfuscationReflectionHelper.findField(NetworkConstants.class, "handshakeChannel");
@@ -232,7 +253,7 @@ public class ReignOfNether {
             return null;
         }
     }
-
+    
     private static Constructor<?> fetchNetworkEventContext() {
         try {
             return ObfuscationReflectionHelper.findConstructor(
@@ -246,7 +267,7 @@ public class ReignOfNether {
             return null;
         }
     }
-
+    
     static {
         handshakeField = fetchHandshakeChannel();
         contextConstructor = fetchNetworkEventContext();

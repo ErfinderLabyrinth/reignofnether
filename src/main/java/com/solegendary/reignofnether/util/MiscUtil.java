@@ -6,6 +6,7 @@ import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.ability.heroAbilities.necromancer.BloodMoon;
 import com.solegendary.reignofnether.alliance.AlliancesClient;
 import com.solegendary.reignofnether.blocks.BlockClientEvents;
+import com.solegendary.reignofnether.blocks.WraithSnowLayerBlock;
 import com.solegendary.reignofnether.building.*;
 import com.solegendary.reignofnether.building.addon.GarrisonableBuildingAddon;
 import com.solegendary.reignofnether.building.buildings.shared.AbstractBridge;
@@ -17,6 +18,7 @@ import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
 import com.solegendary.reignofnether.registrars.EntityRegistrar;
 import com.solegendary.reignofnether.registrars.GameRuleRegistrar;
 import com.solegendary.reignofnether.blocks.NightCircleMode;
+import com.solegendary.reignofnether.registrars.MobEffectRegistrar;
 import com.solegendary.reignofnether.time.TimeClientEvents;
 import com.solegendary.reignofnether.unit.Checkpoint;
 import com.solegendary.reignofnether.unit.Relationship;
@@ -27,6 +29,7 @@ import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.units.monsters.BoggedUnit;
 import com.solegendary.reignofnether.unit.units.monsters.PhantomSummon;
+import com.solegendary.reignofnether.unit.units.monsters.WraithUnit;
 import com.solegendary.reignofnether.unit.units.piglins.GhastUnit;
 import com.solegendary.reignofnether.unit.units.piglins.WitherSkeletonUnit;
 import com.solegendary.reignofnether.unit.units.villagers.VillagerUnit;
@@ -65,6 +68,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LeavesBlock;
+import net.minecraft.world.level.block.SnowLayerBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.AABB;
@@ -97,7 +101,7 @@ public class MiscUtil {
     public static void shootFirework(Level level, Vec3 vec3) {
         CompoundTag explosion = new CompoundTag();
         int color = DYE_COLORS[level.random.nextInt(DYE_COLORS.length)];
-        explosion.put("Colors", new IntArrayTag(new int[]{ color }));
+        explosion.put("Colors", new IntArrayTag(new int[]{color}));
         explosion.putByte("Type", (byte) 0);
         ListTag explosions = new ListTag();
         explosions.add(explosion);
@@ -116,7 +120,7 @@ public class MiscUtil {
     public static void doRandomFireworkExplosion(Level level, Vec3 vec3) {
         CompoundTag explosion = new CompoundTag();
         int color = DYE_COLORS[level.random.nextInt(DYE_COLORS.length)];
-        explosion.put("Colors", new IntArrayTag(new int[]{ color }));
+        explosion.put("Colors", new IntArrayTag(new int[]{color}));
         byte type = (byte) level.random.nextInt(5);
         explosion.putByte("Type", type);
         ListTag explosions = new ListTag();
@@ -152,6 +156,7 @@ public class MiscUtil {
             unit.getCheckpoints().add(new Checkpoint(blockPos, green));
         }
     }
+
     public static void addUnitCheckpoint(Unit unit, int id, boolean green) {
         Level level = ((Entity) unit).level();
         if (level.isClientSide() && !Keybindings.shiftMod.isDown()) {
@@ -204,12 +209,12 @@ public class MiscUtil {
             bp = new BlockPos(blockPos.getX(), y, blockPos.getZ());
             bs = level.getBlockState(bp);
             y -= 1;
-        } while((bs.isAir() ||
+        } while ((bs.isAir() ||
                 BuildingUtils.isPosInsideAnyBuilding(level.isClientSide, bp) ||
                 bs.getBlock() == Blocks.LIGHT ||
                 bs.getBlock() == Blocks.STRUCTURE_VOID ||
                 (!isSolidBlocking(level, bp) &&
-                bs.getFluidState().isEmpty()) ||
+                        bs.getFluidState().isEmpty()) ||
                 bs.is(BlockTags.LEAVES) ||
                 bs.is(BlockTags.LOGS) || bs.is(BlockTags.PLANKS)) && y > -63);
         return new BlockPos(blockPos.getX(), y, blockPos.getZ());
@@ -226,20 +231,22 @@ public class MiscUtil {
                 break;
             }
             y -= 1;
-        } while((bs.isAir() ||
+        } while ((bs.isAir() ||
                 bs.getBlock() == Blocks.LIGHT ||
                 (!isSolidBlocking(level, bp) && bs.getFluidState().isEmpty()) ||
                 (ignoreLeaves && bs.is(BlockTags.LEAVES))) && y > -63);
         return new BlockPos(blockPos.getX(), y, blockPos.getZ());
     }
+
     public static BlockPos getHighestNonAirBlock(Level level, BlockPos blockPos, boolean ignoreLeaves) {
         return getHighestNonAirBlock(level, blockPos, ignoreLeaves, true);
     }
+
     public static BlockPos getHighestNonAirBlock(Level level, BlockPos blockPos) {
         return getHighestNonAirBlock(level, blockPos, false);
     }
 
-    public static boolean listContainsObjectValue(List<Object> objs, String obj){
+    public static boolean listContainsObjectValue(List<Object> objs, String obj) {
         for (Object o : objs) {
             if (!o.equals(obj)) continue;
             return true;
@@ -250,6 +257,7 @@ public class MiscUtil {
     public static boolean isLeftClickDown(Minecraft MC) {
         return GLFW.glfwGetMouseButton(MC.getWindow().getWindow(), GLFW.GLFW_MOUSE_BUTTON_1) == GLFW.GLFW_PRESS;
     }
+
     public static boolean isRightClickDown(Minecraft MC) {
         return GLFW.glfwGetMouseButton(MC.getWindow().getWindow(), GLFW.GLFW_MOUSE_BUTTON_2) == GLFW.GLFW_PRESS;
     }
@@ -257,7 +265,7 @@ public class MiscUtil {
     // converts a 2d screen position to a 3d world position while in ortho view
     public static Vector3d screenPosToWorldPos(Minecraft MC, int mouseX, int mouseY) {
         if (MC.player == null) {
-            return new Vector3d(0,0,0);
+            return new Vector3d(0, 0, 0);
         }
         int winWidth = MC.getWindow().getGuiScaledWidth();
         int winHeight = MC.getWindow().getGuiScaledHeight();
@@ -328,37 +336,34 @@ public class MiscUtil {
                 it -> it.position().distanceTo(pos)
         ));
 
-        // prioritise unpoisoned enemies for bogged
+        // Determine priority effect filter for specific unit types
+        Predicate<LivingEntity> priorityFilter = null;
         if (unitMob instanceof BoggedUnit) {
+            priorityFilter = e -> !e.hasEffect(MobEffects.POISON);
+        } else if (unitMob instanceof WraithUnit) {
+            priorityFilter = e -> !e.hasEffect(MobEffectRegistrar.FEARFUL.get());
+        } else if (unitMob instanceof WitherSkeletonUnit) {
+            priorityFilter = e -> e.hasEffect(MobEffects.WITHER);
+        }
+
+        Vec3 unitVec = new Vec3(unitPosition.x, unitPosition.y, unitPosition.z);
+
+        Predicate<LivingEntity> baseFilter = e ->
+                e.position().distanceTo(unitVec) <= range &&
+                e.level().getWorldBorder().isWithinBounds(e.blockPosition());
+
+        // Try priority pass first, then fall back to base filter
+        List<Predicate<LivingEntity>> passes = priorityFilter != null
+                ? List.of(baseFilter.and(priorityFilter), baseFilter)
+                : List.of(baseFilter);
+
+        for (Predicate<LivingEntity> filter : passes) {
             for (LivingEntity entity : entities) {
-                if (!(entity.position().distanceTo(new Vec3(unitPosition.x, unitPosition.y, unitPosition.z)) <= range) ||
-                        !entity.level().getWorldBorder().isWithinBounds(entity.blockPosition()) || entity.hasEffect(MobEffects.POISON)) {
-                    continue;
-                }
-                if (isIdleOrMoveAttackable(unitMob, entity, neutralAggro) && hasLineOfSightForAttacks(unitMob, entity)) {
+                if (filter.test(entity) &&
+                        isIdleOrMoveAttackable(unitMob, entity, neutralAggro) &&
+                        hasLineOfSightForAttacks(unitMob, entity)) {
                     return entity;
                 }
-            }
-        }
-        // prioritise withered enemies for wither skeletons
-        else if (unitMob instanceof WitherSkeletonUnit) {
-            for (LivingEntity entity : entities) {
-                if (!(entity.position().distanceTo(new Vec3(unitPosition.x, unitPosition.y, unitPosition.z)) <= range) ||
-                        !entity.level().getWorldBorder().isWithinBounds(entity.blockPosition()) || !entity.hasEffect(MobEffects.WITHER)) {
-                    continue;
-                }
-                if (isIdleOrMoveAttackable(unitMob, entity, neutralAggro) && hasLineOfSightForAttacks(unitMob, entity)) {
-                    return entity;
-                }
-            }
-        }
-        for (LivingEntity entity : entities) {
-            if (!(entity.position().distanceTo(new Vec3(unitPosition.x, unitPosition.y, unitPosition.z)) <= range) ||
-                !entity.level().getWorldBorder().isWithinBounds(entity.blockPosition())) {
-                continue;
-            }
-            if (isIdleOrMoveAttackable(unitMob, entity, neutralAggro) && hasLineOfSightForAttacks(unitMob, entity)) {
-                return entity;
             }
         }
         return null;
@@ -372,8 +377,8 @@ public class MiscUtil {
 
             // don't aggro against blood moon enemies as a ghast so that buildings don't get friendly fired
             if (targetEntity instanceof Unit targetUnit &&
-                targetUnit.getOwnerName().equals(BloodMoon.ENEMY_NAME) &&
-                unitMob instanceof GhastUnit)
+                    targetUnit.getOwnerName().equals(BloodMoon.ENEMY_NAME) &&
+                    unitMob instanceof GhastUnit)
                 return false;
         }
 
@@ -479,8 +484,7 @@ public class MiscUtil {
                     entitiesInRange.add((T) entity);
 
             return entitiesInRange;
-        }
-        else
+        } else
             return new ArrayList<>();
     }
 
@@ -490,7 +494,7 @@ public class MiscUtil {
     public static void drawDebugStrings(GuiGraphics guiGraphics, Font font, String[] strings) {
         int y = 200 - (strings.length * 10);
         for (String str : strings) {
-            guiGraphics.drawString(font, str, 0,y, 0xFFFFFF);
+            guiGraphics.drawString(font, str, 0, y, 0xFFFFFF);
             y += 10;
         }
     }
@@ -516,8 +520,7 @@ public class MiscUtil {
             red = Math.min(Math.round(red * mult), 0xFF);
             green = Math.min(Math.round(green * mult), 0xFF);
             blue = Math.min(Math.round(blue * mult), 0xFF);
-        }
-        else { // prevent colours going < 0
+        } else { // prevent colours going < 0
             red = Math.max(Math.round(red * mult), 0);
             green = Math.max(Math.round(green * mult), 0);
             blue = Math.max(Math.round(blue * mult), 0);
@@ -543,7 +546,7 @@ public class MiscUtil {
     public static float getOscillatingFloat(double min, double max, long timeOffset) {
         long ms = System.currentTimeMillis() + timeOffset;
         String msStr = String.valueOf(ms);
-        String last3Digits = msStr.substring(msStr.length()-3);
+        String last3Digits = msStr.substring(msStr.length() - 3);
         double msOsc = (Math.abs(Double.parseDouble(last3Digits) - 500) / 250) - 1; // +-1 along linear scale
         msOsc = (Math.asin(msOsc) / Math.PI) + 0.5d; // 0-1 along sin scale
         msOsc *= (max - min);
@@ -560,7 +563,7 @@ public class MiscUtil {
     // calcs from https://stackoverflow.com/questions/65897792/3d-vector-coordinates-from-x-and-y-rotation
     public static Vector3d getPlayerLookVector(Minecraft MC) {
         if (MC.player == null)
-            return new Vector3d(0,0,0);
+            return new Vector3d(0, 0, 0);
         float a = (float) Math.toRadians(MC.player.getYRot());
         float b = (float) Math.toRadians(MC.player.getXRot());
         return new Vector3d(-cos(b) * sin(a), -sin(b), cos(b) * cos(a));
@@ -618,7 +621,7 @@ public class MiscUtil {
     private static List<BlockPos> getHeightAdjustedBlockPoses(Level level, List<BlockPos> bps) {
         ArrayList<BlockPos> returnBps = new ArrayList<>();
         for (BlockPos bp : bps) {
-            for (int i = 0; i < 3 ; i++) {
+            for (int i = 0; i < 3; i++) {
                 int x = bp.getX();
                 int z = bp.getZ();
                 if (i == 1)
@@ -635,7 +638,7 @@ public class MiscUtil {
                     BlockPos bottomBp;
                     BlockState bs;
                     do {
-                        bottomBp = topBp.offset(0,-y,0);
+                        bottomBp = topBp.offset(0, -y, 0);
                         bs = level.getBlockState(bottomBp);
                         y += 1;
                     } while (y < 30 && (bs.getBlock() instanceof LeavesBlock || !bs.isSolid()));
@@ -673,7 +676,7 @@ public class MiscUtil {
             // skip rendering entirely if we are fully inside another circle
             if (BlockClientEvents.nightCircleMode == NightCircleMode.NO_OVERLAPS) {
                 for (Pair<BlockPos, Integer> os : overlapSources) {
-                    Vec2 centre1 = new Vec2(center.getX(),center.getZ());
+                    Vec2 centre1 = new Vec2(center.getX(), center.getZ());
                     Vec2 centre2 = new Vec2(os.getFirst().getX(), os.getFirst().getZ());
                     int overlapRange = os.getSecond();
                     if (!center.equals(os.getFirst()) && radius < overlapRange && centre1.distanceToSqr(centre2) < radius * radius)
@@ -839,11 +842,15 @@ public class MiscUtil {
     }
 
     public static void addParticleExplosion(SimpleParticleType particleType, int amount, Level level, Vec3 pos) {
+        addParticleExplosion(particleType, amount, level, pos, 0.2f);
+    }
+
+    public static void addParticleExplosion(SimpleParticleType particleType, int amount, Level level, Vec3 pos, double velocityScale) {
         RandomSource rand = RandomSource.create();
-        for(int j = 0; j < amount; ++j) {
-            double d0 = rand.nextGaussian() * 0.2;
-            double d1 = rand.nextGaussian() * 0.2;
-            double d2 = rand.nextGaussian() * 0.2;
+        for (int j = 0; j < amount; ++j) {
+            double d0 = rand.nextGaussian() * velocityScale;
+            double d1 = rand.nextGaussian() * velocityScale;
+            double d2 = rand.nextGaussian() * velocityScale;
             if (level.isClientSide()) {
                 level.addParticle(particleType, pos.x, pos.y, pos.z, d0, d1, d2);
             } else {
@@ -902,5 +909,14 @@ public class MiscUtil {
             case PIGLINS -> ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/mobheads/grunt.png");
             case NONE, NEUTRAL -> ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/mobheads/sheep.png");
         };
+    }
+
+    public static boolean isConnected() {
+        return Minecraft.getInstance().getConnection() != null;
+    }
+
+    public static boolean isSnowLayerBlock(Block block) {
+        return block instanceof WraithSnowLayerBlock ||
+                block instanceof SnowLayerBlock;
     }
 }

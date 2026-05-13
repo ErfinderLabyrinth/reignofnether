@@ -653,6 +653,11 @@ public interface Unit {
                     !((Unit) attackerUnit).hasLivingTarget() &&
                     !AttackerUnit.isAttackingBuilding(attackerUnit);
         }
+        boolean idleRangedAttacker = true;
+        if (this instanceof RangedAttackerUnit rangedAttackerUnit) {
+            idleRangedAttacker = rangedAttackerUnit.getRangedAttackGroundGoal() == null ||
+                                rangedAttackerUnit.getRangedAttackGroundGoal().getGroundTarget() == null;
+        }
         boolean idleWorker = true;
         if (this instanceof WorkerUnit)
             idleWorker = WorkerUnit.isIdle((WorkerUnit) this);
@@ -667,7 +672,8 @@ public interface Unit {
         return (this.getMoveGoal().getMoveTarget() == null || stationaryNearMoveTarget) &&
                 this.getFollowTarget() == null &&
                 idleAttacker &&
-                idleWorker;
+                idleWorker &&
+                idleRangedAttacker;
     }
 
     static Random RANDOM = new Random();

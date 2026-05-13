@@ -13,6 +13,7 @@ import com.solegendary.reignofnether.building.addon.RangeIndicatorAddon;
 import com.solegendary.reignofnether.building.buildings.shared.AbstractBridge;
 import com.solegendary.reignofnether.cursor.CursorClientEvents;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientEvents;
+import com.solegendary.reignofnether.unit.FormationDragMove;
 import com.solegendary.reignofnether.guiscreen.TopdownGui;
 import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.keybinds.Keybindings;
@@ -27,7 +28,9 @@ import com.solegendary.reignofnether.blocks.NightCircleMode;
 import com.solegendary.reignofnether.tutorial.TutorialClientEvents;
 import com.solegendary.reignofnether.tutorial.TutorialStage;
 import com.solegendary.reignofnether.unit.UnitAction;
+import com.solegendary.reignofnether.unit.UnitActionItem;
 import com.solegendary.reignofnether.unit.UnitClientEvents;
+import com.solegendary.reignofnether.unit.packets.UnitActionServerboundPacket;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.faction.Faction;
 import com.solegendary.reignofnether.util.ArrayUtil;
@@ -102,6 +105,8 @@ public class MinimapClientEvents {
 
     // rate-limit teleporting from dragging the minimap to prevent being kicked from packet spamming
     private static long lastDragTeleportTimestamp = System.currentTimeMillis();
+    private static BlockPos minimapDragStartBp = null;
+	public static boolean minimapRightClickDown = false;
 
     private static DynamicTexture mapTexture = new DynamicTexture(worldRadius * 2, worldRadius * 2, true);
     private static RenderType mapRenderType = RenderType.textSeeThrough(Minecraft.getInstance().textureManager.register(
@@ -997,7 +1002,6 @@ public class MinimapClientEvents {
             return;
         }
 
-        // when clicking on map move player there
         if (evt.getMouseButton() == GLFW.GLFW_MOUSE_BUTTON_1 &&
             !Keybindings.shiftMod.isDown() && !OrthoviewClientEvents.isCameraLocked() &&
             lastDragTeleportTimestamp < System.currentTimeMillis() - 100) {
@@ -1010,6 +1014,20 @@ public class MinimapClientEvents {
                     MC.player.getY(),
                     (double) moveTo.getZ()
                 );
+            }
+        }
+        else if (evt.getMouseButton() == GLFW.GLFW_MOUSE_BUTTON_2) {
+			if (!minimapRightClickDown || Keybindings.altMod.isDown() || UnitClientEvents.getSelectedUnits().isEmpty()) return;
+            BlockPos currentPos = getWorldPosOnMinimap((float) evt.getMouseX(), (float) evt.getMouseY(), false);
+            if (currentPos == null) return;
+
+            if (minimapDragStartBp == null) {
+                minimapDragStartBp = currentPos;
+                FormationDragMove.startDrag(currentPos);
+            }
+
+            if (FormationDragMove.isDragging()) {
+                FormationDragMove.updateDrag(currentPos, UnitClientEvents.getSelectedUnits().size(), MC.level);
             }
         }
     }
@@ -1046,27 +1064,65 @@ public class MinimapClientEvents {
                         MC.player.getY(),
                         (double) moveTo.getZ()
                     );
+            }
+            }
+        }
+		if (evt.getButton() == GLFW.GLFW_MOUSE_BUTTON_2) {
+			minimapRightClickDown = isPointInsideMinimap(evt.getMouseX(), evt.getMouseY());
+		}
+    }
+
+    @SubscribeEvent
+    public static void onMouseRelease(ScreenEvent.MouseButtonReleased.Post evt) {
+        if (!OrthoviewClientEvents.isEnabled() ||
+            OrthoviewClientEvents.isCameraLocked() ||
+            !(MC.screen instanceof TopdownGui)) {
+            return;
+        }
+
+        if (evt.getButton() == GLFW.GLFW_MOUSE_BUTTON_2) {
+            if (FormationDragMove.isDragging()) {
+                var pairs = FormationDragMove.endDrag(UnitClientEvents.getSelectedUnits());
+                for (var pair : pairs) {
+                    LivingEntity le = pair.getFirst();
+                    BlockPos targetBp = pair.getSecond();
+                    if (le instanceof Unit unit) {
+					int[] singleUnitId = new int[]{le.getId()};
+					boolean queueOrders = Keybindings.shiftMod.isDown();
+					if (!queueOrders) {
+						new UnitActionItem(
+							MC.player.getName().getString(),
+							UnitAction.MOVE, -1, singleUnitId,
+							targetBp,
+							new BlockPos(0, 0, 0)
+						).action(MC.level);
+					} else {
+						MiscUtil.addUnitCheckpoint(unit, targetBp, true);
+					}
+					PacketHandler.INSTANCE.sendToServer(new UnitActionServerboundPacket(
+						MC.player.getName().getString(),
+						UnitAction.MOVE, -1, singleUnitId,
+						targetBp,
+						new BlockPos(0, 0, 0),
+						queueOrders
+					));
+                }
+			}
+                minimapDragStartBp = null;
+            } else {
+                BlockPos moveTo = getWorldPosOnMinimap((float) evt.getMouseX(), (float) evt.getMouseY(), false);
+                if (moveTo == null) return;
+                if (Keybindings.altMod.isDown()) {
+                    addMapMarkerForSelfAndAllies((int) evt.getMouseX(), (int) evt.getMouseY());
+                    return;
+                }
+                if (!UnitClientEvents.getSelectedUnits().isEmpty()) {
+                    var ids = UnitClientEvents.getSelectedUnits();
+                    var idArray = ArrayUtil.livingEntityListToIdArray(ids);
+                    UnitClientEvents.sendUnitCommandManual(UnitAction.MOVE, -1, idArray, moveTo);
                 }
             }
-        } else if (evt.getButton() == GLFW.GLFW_MOUSE_BUTTON_2) {
-            BlockPos moveTo = getWorldPosOnMinimap((float) evt.getMouseX(), (float) evt.getMouseY(), false);
-            if (moveTo == null) {
-                return;
-            }
-            if (altDown) {
-                addMapMarkerForSelfAndAllies((int) evt.getMouseX(), (int) evt.getMouseY());
-                evt.setCanceled(true);
-                return;
-            }
-            if (!UnitClientEvents.getSelectedUnits().isEmpty()) {
-                var ids = UnitClientEvents.getSelectedUnits();
-                var idArray = ArrayUtil.livingEntityListToIdArray(ids);
-                UnitClientEvents.sendUnitCommandManual(UnitAction.MOVE,
-                    -1,
-                    idArray,
-                    moveTo
-                );
-            }
+		minimapRightClickDown = false;
         }
     }
 

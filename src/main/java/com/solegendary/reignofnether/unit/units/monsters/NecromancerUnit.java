@@ -75,6 +75,10 @@ public class NecromancerUnit extends Skeleton implements Unit, AttackerUnit, Ran
         )
     );
 
+    boolean needsStatSync = false;
+    @Override public boolean needsStatSync() { return needsStatSync; }
+    @Override public void setNeedsStatSync(boolean value) { needsStatSync = value; }
+
     @Override
     public Object2ObjectArrayMap<HeroAbility, Integer> getHeroAbilityRanks() {
         return heroAbilityRanks;
@@ -391,6 +395,7 @@ public class NecromancerUnit extends Skeleton implements Unit, AttackerUnit, Ran
     public void readAdditionalSaveData(@NotNull CompoundTag pCompound) {
         super.readAdditionalSaveData(pCompound);
         this.readUnitSaveData(pCompound);
+        this.setNeedsStatSync(true);
     }
 
     public RaiseDead getRaiseDead() {

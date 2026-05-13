@@ -10,6 +10,7 @@ import com.solegendary.reignofnether.unit.interfaces.RangedAttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.util.MiscUtil;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
 
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ import java.util.List;
 import java.util.Random;
 
 
-public class RangedAttackBuildingGoal<T extends net.minecraft.world.entity.Mob> extends Goal {
+public class RangedAttackBuildingGoal<T extends Mob> extends Goal {
     private final T mob;
     private BlockPos blockTarget = null;
     private UnitBowAttackGoal<?> bowAttackGoal = null;
@@ -117,9 +118,9 @@ public class RangedAttackBuildingGoal<T extends net.minecraft.world.entity.Mob> 
         if (buildingTarget != null && buildingTarget.getBlocksPlaced() <= 0) {
             stop();
         }
-        if (blockTarget != null) {
+        if (blockTarget != null && buildingTarget != null) {
             float tx = blockTarget.getX() + 0.5f;
-            float ty = blockTarget.getY() + 0.5f;
+            float ty = blockTarget.getY() + 1.0f;
             float tz = blockTarget.getZ() + 0.5f;
 
             this.mob.getLookControl().setLookAt(tx, ty, tz);

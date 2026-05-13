@@ -41,10 +41,17 @@ public interface HeroUnit extends Unit {
     float EXP_REQ_MULTIPLIER = 1.6f;
 
     static void tick(HeroUnit heroUnit) {
+        if (heroUnit.needsStatSync()) {
+            heroUnit.setStatsForLevel();
+            heroUnit.setNeedsStatSync(false);
+        }
         if (((LivingEntity) heroUnit).tickCount % 20 == 0) {
             heroUnit.setMana(heroUnit.getMana() + heroUnit.getManaRegenPerSecond());
         }
     }
+
+    public boolean needsStatSync();
+    public void setNeedsStatSync(boolean value);
 
     static ResourceCost getReviveCost(int heroLevel) {
         return ResourceCost.Unit(

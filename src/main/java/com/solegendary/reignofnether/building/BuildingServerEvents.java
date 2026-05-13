@@ -367,7 +367,7 @@ public class BuildingServerEvents {
                     ));
                 }
 
-                if ((SandboxServer.isAnyoneASandboxPlayer() && (ownerName.isEmpty() || ownerName.equals("Enemy"))) || fromCommand)
+                if (SandboxServer.isAnyoneASandboxPlayer() && (ownerName.isEmpty() || ownerName.equals("Enemy")))
                     newBuilding.selfBuilding = true;
 
                 assignBuilderUnits(builderUnitIds, queue, newBuilding);
@@ -676,12 +676,14 @@ public class BuildingServerEvents {
             saveNetherZones(serverLevel);
         }
 
-        for (BuildingPlacement bpl : getBuildings()) {
-            if (bpl instanceof GraveyardPlacement gy && gy.getUpgradeLevel() > 0 && gy.autoRelease) {
-                int currentPop = UnitServerEvents.getCurrentPopulation(gy.ownerName);
-                int popSupply = BuildingServerEvents.getTotalPopulationSupply(gy.ownerName);
-                if (popSupply > currentPop)
-                    gy.releaseNextUnit();
+        if (serverLevel.getServer().getTickCount() % 10 == 0) {
+            for (BuildingPlacement bpl : getBuildings()) {
+                if (bpl instanceof GraveyardPlacement gy && gy.getUpgradeLevel() > 0 && gy.autoRelease) {
+                    int currentPop = UnitServerEvents.getCurrentPopulation(gy.ownerName);
+                    int popSupply = BuildingServerEvents.getTotalPopulationSupply(gy.ownerName);
+                    if (popSupply > currentPop)
+                        gy.releaseNextUnit();
+                }
             }
         }
     }

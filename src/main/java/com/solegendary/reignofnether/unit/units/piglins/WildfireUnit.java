@@ -83,6 +83,10 @@ public class WildfireUnit extends Blaze implements Unit, AttackerUnit, RangedAtt
             )
     );
 
+    boolean needsStatSync = false;
+    @Override public boolean needsStatSync() { return needsStatSync; }
+    @Override public void setNeedsStatSync(boolean value) { needsStatSync = value; }
+
     @Override
     public Object2ObjectArrayMap<HeroAbility, Integer> getHeroAbilityRanks() {
         return heroAbilityRanks;
@@ -460,6 +464,7 @@ public class WildfireUnit extends Blaze implements Unit, AttackerUnit, RangedAtt
     public void readAdditionalSaveData(@NotNull CompoundTag pCompound) {
         super.readAdditionalSaveData(pCompound);
         this.readUnitSaveData(pCompound);
+        this.setNeedsStatSync(true);
     }
 
     @Override protected SoundEvent getAmbientSound() {

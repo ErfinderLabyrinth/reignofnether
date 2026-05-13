@@ -7,6 +7,7 @@ import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.units.piglins.GhastUnit;
 import com.solegendary.reignofnether.unit.units.villagers.PillagerUnit;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -81,7 +82,9 @@ public class UnitCrossbowAttackGoal<T extends Monster & RangedAttackMob & Crossb
     }
 
     private boolean isValidTarget() {
-        return (this.mob.getTarget() != null && this.mob.getTarget().isAlive()) || getBuildingTarget() != null;
+        return (this.mob.getTarget() != null && this.mob.getTarget().isAlive()) ||
+                getBuildingTarget() != null ||
+                getGroundTarget() != null;
     }
 
     public void stop() {
@@ -93,10 +96,18 @@ public class UnitCrossbowAttackGoal<T extends Monster & RangedAttackMob & Crossb
         windupTime = random.nextInt(0,6);
     }
 
-    private BuildingPlacement getBuildingTarget() {
+    public BuildingPlacement getBuildingTarget() {
         if (this.mob instanceof PillagerUnit pUnit &&
                 pUnit.getAttackBuildingGoal() instanceof RangedAttackBuildingGoal<?> rabg) {
             return rabg.getBuildingTarget();
+        }
+        return null;
+    }
+
+    private BlockPos getGroundTarget() {
+        if (this.mob instanceof PillagerUnit pUnit &&
+                pUnit.getRangedAttackGroundGoal() != null) {
+            return pUnit.getRangedAttackGroundGoal().getGroundTarget();
         }
         return null;
     }
@@ -129,8 +140,9 @@ public class UnitCrossbowAttackGoal<T extends Monster & RangedAttackMob & Crossb
     public void tick() {
         LivingEntity target = this.mob.getTarget();
         BuildingPlacement buildTarget = getBuildingTarget();
+        BlockPos groundTarget = buildTarget != null ? buildTarget.centrePos : getGroundTarget();
 
-        if ((target != null && target.isAlive()) || buildTarget != null) {
+        if ((target != null && target.isAlive()) || groundTarget != null) {
 
             BuildingPlacement garrPlacement = GarrisonableBuildingAddon.getGarrison((Unit) this.mob);
             BuildingPlacement targetGarrPlacement = null;
@@ -159,9 +171,14 @@ public class UnitCrossbowAttackGoal<T extends Monster & RangedAttackMob & Crossb
             if (target != null)
                 distToTarget = this.mob.distanceTo(target);
             else
-                distToTarget = Math.sqrt(this.mob.distanceToSqr(buildTarget.centrePos.getX(), buildTarget.centrePos.getY(), buildTarget.centrePos.getZ()));
+                distToTarget = Math.sqrt(this.mob.distanceToSqr(groundTarget.getX() + 0.5f, groundTarget.getY() + 1.0f, groundTarget.getZ() + 0.5f));
 
             float attackRange = ((AttackerUnit) this.mob).getAttackRange();
+            if (buildTarget != null) {
+                float avgBuildingWidth = ((buildTarget.centrePos.getX() - buildTarget.minCorner.getX()) +
+                                          (buildTarget.centrePos.getZ() - buildTarget.minCorner.getZ())) / 2f;
+                attackRange += Math.max(0, avgBuildingWidth - 1);
+            }
 
             if (isGarrisoned) {
                 attackRange = garr.getAttackRange();
@@ -180,7 +197,7 @@ public class UnitCrossbowAttackGoal<T extends Monster & RangedAttackMob & Crossb
                     if (target != null)
                         this.mob.getNavigation().moveTo(target, 1.0f);
                     else
-                        this.mob.getNavigation().moveTo(buildTarget.centrePos.getX(), buildTarget.centrePos.getY(), buildTarget.centrePos.getZ(), 1.0f);
+                        this.mob.getNavigation().moveTo(groundTarget.getX(), groundTarget.getY(), groundTarget.getZ(), 1.0f);
                 } else {
                     this.mob.getNavigation().stop();
                 }
@@ -189,7 +206,7 @@ public class UnitCrossbowAttackGoal<T extends Monster & RangedAttackMob & Crossb
             if (target != null)
                 this.mob.getLookControl().setLookAt(target, 30.0F, 30.0F);
             else
-                this.mob.getLookControl().setLookAt(buildTarget.centrePos.getX(), buildTarget.centrePos.getY(), buildTarget.centrePos.getZ(), 30.0F, 30.0F);
+                this.mob.getLookControl().setLookAt(groundTarget.getX(), groundTarget.getY(), groundTarget.getZ(), 30.0F, 30.0F);
 
             if (this.crossbowState == CHARGED) {
                 --this.attackCooldown;

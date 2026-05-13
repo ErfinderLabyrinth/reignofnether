@@ -3,6 +3,7 @@ package com.solegendary.reignofnether.mixin;
 import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
 import com.solegendary.reignofnether.registrars.BlockRegistrar;
 import com.solegendary.reignofnether.unit.UnitClientEvents;
+import com.solegendary.reignofnether.util.MiscUtil;
 import com.solegendary.reignofnether.util.MyMath;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.chunk.RenderChunkRegion;
@@ -40,7 +41,7 @@ public abstract class RenderChunkRegionMixin {
                 replacementBs = Blocks.RED_STAINED_GLASS.defaultBlockState();
             else if (block instanceof LeavesBlock)
                 replacementBs = Blocks.GREEN_STAINED_GLASS.defaultBlockState();
-            else if (block instanceof SnowLayerBlock && blockBelow instanceof LeavesBlock)
+            else if (MiscUtil.isSnowLayerBlock(block) && blockBelow instanceof LeavesBlock)
                 replacementBs = Blocks.AIR.defaultBlockState();
 
             if (replacementBs != null) {

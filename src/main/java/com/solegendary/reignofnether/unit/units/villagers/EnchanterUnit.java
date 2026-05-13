@@ -80,6 +80,10 @@ public class EnchanterUnit extends Vindicator implements AttackerUnit, HeroUnit,
         )
     );
 
+    boolean needsStatSync = false;
+    @Override public boolean needsStatSync() { return needsStatSync; }
+    @Override public void setNeedsStatSync(boolean value) { needsStatSync = value; }
+
     @Override
     public Object2ObjectArrayMap<HeroAbility, Integer> getHeroAbilityRanks() {
         return heroAbilityRanks;
@@ -471,6 +475,7 @@ public class EnchanterUnit extends Vindicator implements AttackerUnit, HeroUnit,
     public void readAdditionalSaveData(@NotNull CompoundTag pCompound) {
         super.readAdditionalSaveData(pCompound);
         this.readUnitSaveData(pCompound);
+        this.setNeedsStatSync(true);
     }
 
     public void initialiseGoals() {

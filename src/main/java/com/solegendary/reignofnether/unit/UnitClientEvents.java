@@ -9,6 +9,7 @@ import com.solegendary.reignofnether.building.BuildingPlacement;
 import com.solegendary.reignofnether.building.BuildingUtils;
 import com.solegendary.reignofnether.building.*;
 import com.solegendary.reignofnether.building.addon.GarrisonableBuildingAddon;
+import com.solegendary.reignofnether.building.buildings.placements.GraveyardPlacement;
 import com.solegendary.reignofnether.building.buildings.placements.ProductionPlacement;
 import com.solegendary.reignofnether.building.buildings.shared.AbstractBridge;
 import com.solegendary.reignofnether.building.buildings.shared.AbstractFarm;
@@ -28,6 +29,7 @@ import com.solegendary.reignofnether.orthoview.OrthoviewClientEvents;
 import com.solegendary.reignofnether.player.PlayerClientEvents;
 import com.solegendary.reignofnether.player.PlayerColors;
 import com.solegendary.reignofnether.player.PlayerServerboundPacket;
+import com.solegendary.reignofnether.registrars.MobEffectRegistrar;
 import com.solegendary.reignofnether.registrars.PacketHandler;
 import com.solegendary.reignofnether.research.ResearchClient;
 import com.solegendary.reignofnether.resources.ResourceCosts;
@@ -36,7 +38,7 @@ import com.solegendary.reignofnether.resources.ResourceSources;
 import com.solegendary.reignofnether.resources.Resources;
 import com.solegendary.reignofnether.sandbox.SandboxClientEvents;
 import com.solegendary.reignofnether.tutorial.TutorialClientEvents;
-import com.solegendary.reignofnether.unit.goals.MeleeAttackBuildingGoal;
+import com.solegendary.reignofnether.unit.goals.*;
 import com.solegendary.reignofnether.unit.interfaces.*;
 import com.solegendary.reignofnether.unit.packets.UnitActionServerboundPacket;
 import com.solegendary.reignofnether.unit.packets.UnitSyncServerboundPacket;
@@ -65,6 +67,8 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.goal.RangedAttackGoal;
+import net.minecraft.world.entity.ai.goal.RangedBowAttackGoal;
 import net.minecraft.world.entity.monster.Skeleton;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -156,6 +160,9 @@ public class UnitClientEvents {
         return allUnits;
     }
 
+    private static boolean rightClickMoveDeferred = false;
+    private static boolean rightClickActionTaken = false;
+
     public static void addPreselectedUnit(LivingEntity unit) {
         if (unit instanceof Player player && (player.isSpectator() || player.isCreative()))
             return;
@@ -213,7 +220,8 @@ public class UnitClientEvents {
                 if (building.ownerName.equals(playerName))
                     if (building instanceof ProductionPlacement prodBuilding) {
                         for (ActiveProduction prodItem : prodBuilding.productionQueue)
-                            currentPopulation += prodItem.item.getCost(true, playerName).population;
+                            if (!(prodBuilding instanceof GraveyardPlacement gy) || gy.getUpgradeLevel() <= 0)
+                                currentPopulation += prodItem.item.getCost(true, playerName).population;
                     } else if (building.getBuilding() instanceof IronGolemBuilding) {
                         currentPopulation += ResourceCosts.IRON_GOLEM.population;
                     }
@@ -362,6 +370,22 @@ public class UnitClientEvents {
     }
 
     private static void resolveMoveAction() {
+        if (CursorClientEvents.isRightDragCouldStart() && !selectedUnits.isEmpty()) {
+            rightClickMoveDeferred = true;
+            return;
+        }
+        doResolveMoveAction();
+    }
+
+    private static void resolveMoveActionDeferred() {
+        if (!selectedUnits.isEmpty()) {
+            rightClickMoveDeferred = true;
+            return;
+        }
+        doResolveMoveAction();
+    }
+
+    private static void doResolveMoveAction() {
         // follow friendly unit
         if (preselectedUnits.size() == 1 && !targetingSelf()) {
             if (hudSelectedEntity instanceof WitchUnit witchUnit) {
@@ -715,6 +739,9 @@ public class UnitClientEvents {
                 BuildingClientEvents.setBuildingToPlace(null);
                 return;
             }
+			if (MinimapClientEvents.isPointInsideMinimap(evt.getMouseX(), evt.getMouseY()))
+				return;
+rightClickActionTaken = false;
             if (!selectedUnits.isEmpty()) {
                 BuildingPlacement preSelBuilding = BuildingClientEvents.getPreselectedBuilding();
 
@@ -747,6 +774,7 @@ public class UnitClientEvents {
                      } else {
                          sendUnitCommand(UnitAction.ATTACK);
                      }
+rightClickActionTaken = true;
                 }
                 // right click -> attack unfriendly building
                 else if (hudSelectedEntity instanceof AttackerUnit &&
@@ -756,6 +784,7 @@ public class UnitClientEvents {
                         ((GameruleClient.neutralAggro && getPlayerToBuildingRelationship(preSelBuilding) == Relationship.NEUTRAL) ||
                         getPlayerToBuildingRelationship(preSelBuilding) == Relationship.HOSTILE)) {
                     sendUnitCommand(UnitAction.ATTACK_BUILDING);
+rightClickActionTaken = true;
                 }
                 // right click -> return resources
                 else if (hudSelectedEntity instanceof Unit unit &&
@@ -775,16 +804,122 @@ public class UnitClientEvents {
                     else if (BuildingUtils.isBuildingBuildable(true, preSelBuilding))
                         sendUnitCommand(UnitAction.BUILD_REPAIR);
                     else
-                        resolveMoveAction();
+                        resolveMoveActionDeferred();
                 }
                 // right click -> follow friendly unit or go to preselected blockPos
                 else
-                    resolveMoveAction();
+                    resolveMoveActionDeferred();
             }
         }
         // clear all cursor actions
         CursorClientEvents.setLeftClickAction(null);
         markSelectedUnitsChanged();
+    }
+
+    @SubscribeEvent
+    public static void onMouseDrag(ScreenEvent.MouseDragged.Pre evt) {
+        if (!OrthoviewClientEvents.isEnabled() || MC.level == null)
+            return;
+
+        if (Keybindings.altMod.isDown())
+            return;
+
+        if (!CursorClientEvents.isRightDragActive())
+            return;
+
+        // don't allow formation drag if an attack command was issued on right-click press
+        if (rightClickActionTaken)
+            return;
+
+        ArrayList<LivingEntity> selUnits = getSelectedUnits();
+        if (selUnits.isEmpty())
+            return;
+
+        BlockPos currentBp = CursorClientEvents.getPreselectedBlockPos();
+        ArrayList<LivingEntity> actionableUnits = new ArrayList<>();
+        for (LivingEntity unit : selUnits) {
+            if ((getPlayerToEntityRelationship(unit) == Relationship.OWNED ||
+                    NonUnitClientEvents.canControlAllMobs() ||
+                    AlliancesClient.canControlAlly(unit)) && unit instanceof Unit) {
+                actionableUnits.add(unit);
+            }
+        }
+
+        if (actionableUnits.isEmpty())
+            return;
+
+        if (!FormationDragMove.isDragging()) {
+            FormationDragMove.startDrag(CursorClientEvents.getRightClickStartBp());
+        }
+
+        FormationDragMove.updateDrag(currentBp, actionableUnits.size(), MC.level);
+    }
+
+    @SubscribeEvent
+    public static void onMouseRelease(ScreenEvent.MouseButtonReleased.Post evt) {
+        if (!OrthoviewClientEvents.isEnabled() || MC.level == null)
+            return;
+
+        if (evt.getButton() == GLFW.GLFW_MOUSE_BUTTON_2) {
+		if (MinimapClientEvents.minimapRightClickDown)
+			return;
+            if (Keybindings.altMod.isDown() && FormationDragMove.isDragging()) {
+                FormationDragMove.cancelDrag();
+            }
+            boolean wasFormationDrag = FormationDragMove.isDragging();
+            if (wasFormationDrag) {
+                ArrayList<LivingEntity> selUnits = getSelectedUnits();
+                ArrayList<LivingEntity> actionableUnits = new ArrayList<>();
+                for (LivingEntity unit : selUnits) {
+                    if ((getPlayerToEntityRelationship(unit) == Relationship.OWNED ||
+                            NonUnitClientEvents.canControlAllMobs() ||
+                            AlliancesClient.canControlAlly(unit)) && unit instanceof Unit) {
+                        actionableUnits.add(unit);
+                    }
+                }
+                resolveFormationMove(actionableUnits, Keybindings.shiftMod.isDown());
+            }
+            if (rightClickMoveDeferred) {
+                rightClickMoveDeferred = false;
+                if (!wasFormationDrag) {
+                    doResolveMoveAction();
+                }
+            }
+        }
+    }
+
+    private static void resolveFormationMove(ArrayList<LivingEntity> units, boolean queueOrders) {
+        if (MC.player == null || MC.level == null) return;
+
+        List<com.mojang.datafixers.util.Pair<LivingEntity, BlockPos>> pairs = FormationDragMove.endDrag(units);
+        String playerName = MC.player.getName().getString();
+
+        for (var pair : pairs) {
+            LivingEntity le = pair.getFirst();
+            BlockPos targetBp = pair.getSecond();
+            if (le instanceof Unit unit) {
+                int[] singleUnitId = new int[]{le.getId()};
+
+                if (!queueOrders) {
+                    new UnitActionItem(
+                        playerName,
+                        UnitAction.MOVE, -1, singleUnitId,
+                        targetBp,
+                        new BlockPos(0, 0, 0)
+                    ).action(MC.level);
+                } else {
+                    MiscUtil.addUnitCheckpoint(unit, targetBp, true);
+                }
+
+                PacketHandler.INSTANCE.sendToServer(new UnitActionServerboundPacket(
+                    playerName,
+                    UnitAction.MOVE, -1, singleUnitId,
+                    targetBp,
+                    new BlockPos(0, 0, 0),
+                    queueOrders
+                ));
+            }
+        }
     }
 
     public static RenderLevelStageEvent.Stage stage = AFTER_ENTITIES;
@@ -905,7 +1040,7 @@ public class UnitClientEvents {
                             lastPos = cp.getPos();
                         } else {
                             MyRenderer.drawLine(evt.getPoseStack(), vertexConsumerLine, lastPos, cp.getPos(), cp.isGreen ? 0 : 1, cp.isGreen ? 1 : 0, 0, a);
-                            if (MC.level.getBlockState(cp.bp.offset(0,1,0)).getBlock() instanceof SnowLayerBlock) {
+                            if (MiscUtil.isSnowLayerBlock(MC.level.getBlockState(cp.bp.offset(0,1,0)).getBlock())) {
                                 AABB aabb = new AABB(cp.bp);
                                 aabb = aabb.setMaxY(aabb.maxY + 0.13f);
                                 MyRenderer.drawSolidBox(
@@ -933,7 +1068,7 @@ public class UnitClientEvents {
                         Vec3 apVec3 = new Vec3(ap.getX() + 0.5f, ap.getY() + 1.0f, ap.getZ() + 0.5f);
                         MyRenderer.drawLine(evt.getPoseStack(), vertexConsumerLine, firstPos, apVec3, 1, 1, 0, a);
 
-                        if (MC.level.getBlockState(ap.offset(0,1,0)).getBlock() instanceof SnowLayerBlock) {
+                        if (MiscUtil.isSnowLayerBlock(MC.level.getBlockState(ap.offset(0,1,0)).getBlock())) {
                             AABB aabb = new AABB(ap);
                             aabb = aabb.setMaxY(aabb.maxY + 0.13f);
                             MyRenderer.drawSolidBox(
@@ -941,14 +1076,41 @@ public class UnitClientEvents {
                                     vertexConsumerEntityTranslucent,
                                     aabb,
                                     Direction.UP,
-                                    1,
-                                    1,
-                                    0,
-                                    a,
+                                    1, 1, 0, a,
                                     ResourceLocation.parse("forge:textures/white.png")
                             );
                         } else {
                             MyRenderer.drawBlockFace(evt.getPoseStack(), vertexConsumerEntityTranslucent, Direction.UP, ap, 1, 1, 0, a);
+                        }
+                    }
+
+                    // draw mounted units' target lines
+                    if (entity.isVehicle()) {
+                        BlockPos blockTarget = null;
+                        if (entity.getFirstPassenger() instanceof RangedAttackerUnit rau &&
+                            rau.getRangedAttackGroundGoal() != null &&
+                            rau.getRangedAttackGroundGoal().getGroundTarget() != null) {
+                            blockTarget = rau.getRangedAttackGroundGoal().getGroundTarget();
+                        }
+                        float a = MiscUtil.getOscillatingFloat(0.25f, 0.75f);
+
+                        if (blockTarget != null) {
+                            Vec3 btVec3 = new Vec3(blockTarget.getX() + 0.5f, blockTarget.getY() + 1.0f, blockTarget.getZ() + 0.5f);
+                            MyRenderer.drawLine(evt.getPoseStack(), vertexConsumerLine, firstPos, btVec3, 1, 0, 0, a);
+                            if (MiscUtil.isSnowLayerBlock(MC.level.getBlockState(blockTarget.offset(0,1,0)).getBlock())) {
+                                AABB aabb = new AABB(blockTarget);
+                                aabb = aabb.setMaxY(aabb.maxY + 0.13f);
+                                MyRenderer.drawSolidBox(
+                                        evt.getPoseStack(),
+                                        vertexConsumerEntityTranslucent,
+                                        aabb,
+                                        Direction.UP,
+                                        1, 0, 0, MiscUtil.getOscillatingFloat(0.25f, 0.75f),
+                                        ResourceLocation.parse("forge:textures/white.png")
+                                );
+                            }  else {
+                                MyRenderer.drawBlockFace(evt.getPoseStack(), vertexConsumerEntityTranslucent, Direction.UP, blockTarget, 1, 0, 0, a);
+                            }
                         }
                     }
 
@@ -963,6 +1125,36 @@ public class UnitClientEvents {
                      */
                 }
             }
+
+            if (FormationDragMove.isDragging()) {
+                VertexConsumer vertexConsumerLineFd = MC.renderBuffers().bufferSource().getBuffer(RenderType.LINES);
+                VertexConsumer vertexConsumerEntityTranslucentFd = MC.renderBuffers().bufferSource().getBuffer(RenderType.entityTranslucent(ResourceLocation.parse("forge:textures/white.png")));
+                float a = 0.5f;
+
+                Vec3 lineStart = FormationDragMove.getLineStart();
+                Vec3 lineEnd = FormationDragMove.getLineEnd();
+                MyRenderer.drawLine(evt.getPoseStack(), vertexConsumerLineFd, lineStart, lineEnd, 0, 1, 0, a);
+
+                for (BlockPos bp : FormationDragMove.getFormationTargets()) {
+                    if (MiscUtil.isSnowLayerBlock(MC.level.getBlockState(bp.offset(0, 1, 0)).getBlock())) {
+                        AABB aabb = new AABB(bp);
+                        aabb = aabb.setMaxY(aabb.maxY + 0.13f);
+                        MyRenderer.drawSolidBox(
+                                evt.getPoseStack(),
+                                vertexConsumerEntityTranslucentFd,
+                                aabb,
+                                Direction.UP,
+                                0,
+                                1,
+                                0,
+                                a,
+                                ResourceLocation.parse("forge:textures/white.png")
+                        );
+                    } else {
+                        MyRenderer.drawBlockFace(evt.getPoseStack(), vertexConsumerEntityTranslucentFd, Direction.UP, bp, 0, 1, 0, a);
+                    }
+                }
+            }
         }
     }
 
@@ -970,12 +1162,15 @@ public class UnitClientEvents {
     public static void onButtonPress(ScreenEvent.KeyPressed.Pre evt) {
         if (TextInputClientEvents.isAnyInputFocused())
             return;
-        if (evt.getKeyCode() == GLFW.GLFW_KEY_DELETE) {
+        if (evt.getKeyCode() == GLFW.GLFW_KEY_DELETE || (evt.getKeyCode() == GLFW.GLFW_KEY_D && Keybindings.altMod.isDown() && Keybindings.ctrlMod.isDown())) {
             boolean isSandboxPlayer = MC.player != null && SandboxClientEvents.isSandboxPlayer(MC.player.getName().getString());
             LivingEntity entity = hudSelectedEntity;
             if ((entity != null && getPlayerToEntityRelationship(entity) == Relationship.OWNED || isSandboxPlayer) &&
-                    !(entity instanceof CreeperUnit))
-                sendUnitCommand(UnitAction.DELETE);
+                    !(entity instanceof CreeperUnit)) {
+                if (entity != null && !entity.hasEffect(MobEffectRegistrar.PARTIALLY_POSSESSED.get())) {
+                    sendUnitCommand(UnitAction.DELETE);
+                }
+            }
         }
     }
 
