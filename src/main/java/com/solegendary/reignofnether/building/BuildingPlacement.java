@@ -264,6 +264,17 @@ public class BuildingPlacement {
         }
         updateButtons();
         initPlacedBlocks();
+
+        // offset ticks from other buildings of the same type so we can tell which ones were built first
+        List<BuildingPlacement> bpls;
+        if (level.isClientSide())
+            bpls = BuildingClientEvents.getBuildings();
+        else
+            bpls = BuildingServerEvents.getBuildings();
+
+        for (BuildingPlacement bpl : bpls)
+            if (bpl.getBuilding().isTypeOf(this.getBuilding()) && bpl != this && bpl.ownerName.equals(this.ownerName))
+                tickAge -= 1;
     }
 
     protected void setBlocks(ArrayList<BuildingBlock> blocks) {

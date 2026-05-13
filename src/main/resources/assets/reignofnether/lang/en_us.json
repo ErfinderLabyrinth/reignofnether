@@ -172,7 +172,7 @@
     "abilities.reignofnether.possess.tooltip1": "Channel to sacrifice the wraith to take permanent control of a non-hero unit.",
     "abilities.reignofnether.possess.tooltip2": "The possession is stopped if the wraith dies or is too far out of range",
     "abilities.reignofnether.possess.tooltip3": "Larger units require multiple wraiths and more time to possess.",
-    "abilities.reignofnether.possess.error": "Cannot only be used on non-hero enemies.",
+    "abilities.reignofnether.possess.error": "Can only be used on non-hero enemies.",
     "abilities.reignofnether.wither_cloud": "Wither Cloud",
     "abilities.reignofnether.wither_cloud.tooltip1": "Causes the Wither Skeleton to release a cloud",
     "abilities.reignofnether.wither_cloud.tooltip2": "of deadly wither around it for the next %d seconds.",

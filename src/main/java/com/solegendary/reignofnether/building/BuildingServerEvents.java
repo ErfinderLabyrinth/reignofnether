@@ -858,15 +858,4 @@ public class BuildingServerEvents {
         }
         return ((float) netherBlocksBelow / (float) blocksBelow) > MIN_NETHER_BLOCKS_PERCENT;
     }
-
-    // does the player own one of these buildings?
-    public static boolean playerHasFinishedBuilding(Building building, String playerName) {
-        for (BuildingPlacement bpl : buildings) {
-            if (bpl.getBuilding().isTypeOf(building) && bpl.isBuilt &&
-                    (bpl.ownerName.equals(playerName))) {
-                return true;
-            }
-        }
-        return false;
-    }
 }

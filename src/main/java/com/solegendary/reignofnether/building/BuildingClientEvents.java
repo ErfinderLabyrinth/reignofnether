@@ -1153,17 +1153,6 @@ public class BuildingClientEvents {
         return false;
     }
 
-    public static boolean playerHasFinishedBuilding(Building building, String playerName) {
-        for (BuildingPlacement bpl : buildings) {
-            if (bpl.getBuilding().isTypeOf(building) && bpl.isBuilt &&
-                    (bpl.ownerName.equals(playerName) ||
-                            allyHasFinishedBuilding(building))) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     // does the selected ally's unit own one of these buildings?
     public static boolean allyHasFinishedBuilding(Building building) {
         if (!AlliancesClient.canControlAlly(hudSelectedEntity))

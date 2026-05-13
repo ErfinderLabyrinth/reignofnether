@@ -21,6 +21,7 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -34,8 +35,6 @@ public class Mausoleum extends ProductionBuilding implements NightSourceAddon, R
     public final static ResourceCost cost = ResourceCosts.MAUSOLEUM;
     public final static int nightRange = 80;
     public final static int nightRangeReduced = 40;
-
-    private final Set<BlockPos> nightBorderBps = new HashSet<>();
 
     public Mausoleum() {
         super(structureName, cost, true);
@@ -99,12 +98,21 @@ public class Mausoleum extends ProductionBuilding implements NightSourceAddon, R
 
     @Override
     public int getRange(BuildingPlacement placement) {
-        int nRange = nightRange;
-        if ((placement.level.isClientSide() && BuildingClientEvents.playerHasFinishedBuilding(this, placement.ownerName)) ||
-                (!placement.level.isClientSide() && BuildingServerEvents.playerHasFinishedBuilding(this, placement.ownerName))) {
-            nRange = nightRangeReduced;
-        }
-        return /*//TODO fix bug that isBuiltServerside wont be set in some cases  placement.isBuiltServerside &&*/ placement.isBuilt ? nRange : 0;
+        List<BuildingPlacement> bpls;
+        if (placement.level.isClientSide())
+            bpls = BuildingClientEvents.getBuildings();
+        else
+            bpls = BuildingServerEvents.getBuildings();
+
+        int nRange = nightRangeReduced;
+        long oldestMausoleumAge = 0;
+        for (BuildingPlacement bpl : bpls)
+            if (bpl.ownerName.equals(placement.ownerName))
+                if (bpl.tickAge > oldestMausoleumAge)
+                    oldestMausoleumAge = bpl.tickAge;
+        if (placement.tickAge >= oldestMausoleumAge)
+            nRange = nightRange;
+        return placement.isBuilt ? nRange : 0;
     }
 
     @Override
