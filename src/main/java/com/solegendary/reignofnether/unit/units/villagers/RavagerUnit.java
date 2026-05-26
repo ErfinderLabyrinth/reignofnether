@@ -3,6 +3,7 @@ package com.solegendary.reignofnether.unit.units.villagers;
 import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.AttackGround;
+import com.solegendary.reignofnether.ability.abilities.CastSummonVexes;
 import com.solegendary.reignofnether.ability.abilities.Eject;
 import com.solegendary.reignofnether.ability.abilities.Roar;
 import com.solegendary.reignofnether.building.BuildingPlacement;
@@ -61,6 +62,7 @@ public class RavagerUnit extends Ravager implements Unit, AttackerUnit {
     static {
         ABILITIES.add(new Roar(), Keybindings.keyQ);
         ABILITIES.add(new Eject(), Keybindings.keyW);
+        ABILITIES.add(new CastSummonVexes(), Keybindings.keyE);
         ABILITIES.add(new AttackGround(PillagerUnit.attackRange), Keybindings.keyE);
     }
 

@@ -89,6 +89,7 @@ import javax.annotation.Nullable;
 import java.awt.*;
 import java.util.List;
 import java.util.*;
+import java.util.function.Predicate;
 
 import static com.solegendary.reignofnether.building.BuildingClientEvents.getPlayerToBuildingRelationship;
 import static com.solegendary.reignofnether.cursor.CursorClientEvents.getPreselectedBlockPos;
@@ -307,6 +308,10 @@ public class UnitClientEvents {
     }
 
     public static void sendUnitCommand(UnitAction action) {
+        sendUnitCommand(action, null);
+    }
+
+    public static void sendUnitCommand(UnitAction action, Predicate<LivingEntity> includeUnit) {
         BlockPos bp = getPreselectedBlockPos();
 
         if (action.name().toLowerCase().contains("startrts")) {
@@ -341,7 +346,8 @@ public class UnitClientEvents {
                 } else if (!NonUnitClientEvents.canControlAllMobs()) {
                     continue;
                 }
-                selUnits.add(livingEntity);
+                if (includeUnit == null || includeUnit.test(livingEntity))
+                    selUnits.add(livingEntity);
             }
             String playerName = MC.player.getName().getString();
 

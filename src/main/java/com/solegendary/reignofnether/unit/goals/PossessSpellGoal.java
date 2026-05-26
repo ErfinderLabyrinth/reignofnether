@@ -50,8 +50,10 @@ public class PossessSpellGoal extends GenericTargetedSpellGoal {
                 Unit.fullResetBehaviours(wraithUnit);
             } else {
                 doPossessParticles();
-                if (wraithUnit.tickCount % 10 == 0)
+                if (wraithUnit.tickCount % 10 == 0) {
                     targetEntity.addEffect(new MobEffectInstance(MobEffects.GLOWING, 15, 0, true, false));
+                    targetEntity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 15, 0, true, false));
+                }
             }
         }
     }

@@ -360,6 +360,14 @@ public class EntityRegistrar {
                     .updateInterval(10)
                     .build(ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "necromancer_projectile").toString()));
 
+    public static final RegistryObject<EntityType<WindcallerProjectile>> WINDCALLER_PROJECTILE = ENTITIES.register("windcaller_projectile",
+            () -> EntityType.Builder.<WindcallerProjectile>of(WindcallerProjectile::new, MobCategory.MISC)
+                    .fireImmune()
+                    .sized(0.5f, 0.5f)
+                    .clientTrackingRange(UNIT_CLIENT_TRACKING_RANGE)
+                    .updateInterval(10)
+                    .build(ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "windcaller_projectile").toString()));
+
     public static final RegistryObject<EntityType<WraithSnowball>> WRAITH_SNOWBALL = ENTITIES.register("wraith_snowball",
             () -> EntityType.Builder.of(WraithSnowball::new, MobCategory.MISC)
                     .fireImmune()

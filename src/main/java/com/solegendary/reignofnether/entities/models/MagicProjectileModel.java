@@ -20,14 +20,14 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public class NecromancerProjectileModel<T extends Entity> extends HierarchicalModel<T> {
+public class MagicProjectileModel<T extends Entity> extends HierarchicalModel<T> {
 
-    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "necromancer_projectile_layer"), "main");
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "magic_projectile_layer"), "main");
 
     private final ModelPart root;
     private final ModelPart main;
 
-    public NecromancerProjectileModel(ModelPart pRoot) {
+    public MagicProjectileModel(ModelPart pRoot) {
         this.root = pRoot;
         this.main = pRoot.getChild("main");
     }

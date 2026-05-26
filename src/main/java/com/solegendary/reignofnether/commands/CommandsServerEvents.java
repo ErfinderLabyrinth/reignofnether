@@ -343,7 +343,7 @@ public class CommandsServerEvents {
 			.then(Commands.argument("ownerSelector", EntityArgument.player())
 				.then(Commands.argument("reason", StringArgumentType.string())
 					.executes(ctx -> victoryPlayer(
-						StringArgumentType.getString(ctx, "ownerSelector"),
+						getPlayerName(EntityArgument.getPlayer(ctx, "ownerSelector")),
 						StringArgumentType.getString(ctx, "reason")
 					))))
 		);
@@ -359,7 +359,7 @@ public class CommandsServerEvents {
 			.then(Commands.argument("ownerSelector", EntityArgument.player())
 				.then(Commands.argument("reason", StringArgumentType.string())
 					.executes(ctx -> defeatPlayer(
-						StringArgumentType.getString(ctx, "ownerName"),
+						getPlayerName(EntityArgument.getPlayer(ctx, "ownerSelector")),
 						StringArgumentType.getString(ctx, "reason")
 					))))
 		);

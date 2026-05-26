@@ -16,6 +16,7 @@ import com.solegendary.reignofnether.unit.UnitAction;
 import com.solegendary.reignofnether.unit.UnitServerEvents;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
@@ -114,6 +115,10 @@ public class ProductionPlacement extends BuildingPlacement {
     }
 
     public Entity produceUnit(ServerLevel level, EntityType<? extends Unit> entityType, String ownerName, boolean spawnIndoors) {
+        return produceUnit(level, entityType, ownerName, spawnIndoors, new Vec3i(0,0,0));
+    }
+
+    public Entity produceUnit(ServerLevel level, EntityType<? extends Unit> entityType, String ownerName, boolean spawnIndoors, Vec3i spawnOffset) {
         ProductionBuilding building = (ProductionBuilding) getBuilding();
         LivingEntity rallyEntity = getRallyPointEntity();
         BlockPos spawnPoint;
@@ -128,6 +133,8 @@ public class ProductionPlacement extends BuildingPlacement {
             spawnPoint = getClosestGroundPos(rallyPointEntity.getOnPos(), (int) building.spawnRadiusOffset);
         else
             spawnPoint = getDefaultOutdoorSpawnPoint();
+
+        spawnPoint = spawnPoint.offset(spawnOffset);
 
         Entity entity = entityType.spawn(level, (CompoundTag) null,
                 null,

@@ -107,6 +107,24 @@ public class PassiveIcons {
                     fcs(I18n.get("hud.enchant.reignofnether.zeal.tooltip"))
             )
     );
+    public static final EnchantmentIcon GUST = new EnchantmentIcon(
+            EnchantmentRegistrar.GUST.get(),
+            EquipmentSlot.MAINHAND,
+            ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/icons/abilities/gust.png"),
+            List.of(
+                    fcs(I18n.get("hud.enchant.reignofnether.gust"), true),
+                    fcs(I18n.get("hud.enchant.reignofnether.gust.tooltip"))
+            )
+    );
+    public static final EnchantmentIcon PUNCH = new EnchantmentIcon(
+            Enchantments.PUNCH_ARROWS,
+            EquipmentSlot.MAINHAND,
+            getEnchantedItemStack(Items.BOW),
+            List.of(
+                    fcs(I18n.get("hud.enchant.reignofnether.punch"), true),
+                    fcs(I18n.get("hud.enchant.reignofnether.punch.tooltip"))
+            )
+    );
     public static final EnchantmentIcon PIERCING = new EnchantmentIcon(
             Enchantments.PIERCING,
             EquipmentSlot.MAINHAND,
@@ -170,7 +188,8 @@ public class PassiveIcons {
             SHARPNESS,
             VIGOR,
             ZEAL,
-            //EFFICIENCY,
+            GUST,
+            PUNCH,
             FORTIFYING,
             POWER,
             PIERCING,

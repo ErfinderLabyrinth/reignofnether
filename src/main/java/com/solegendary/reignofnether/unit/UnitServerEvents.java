@@ -19,6 +19,7 @@ import com.solegendary.reignofnether.building.production.ActiveProduction;
 import com.solegendary.reignofnether.building.production.ProductionItem;
 import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.entities.BlazeUnitFireball;
+import com.solegendary.reignofnether.entities.WindcallerProjectile;
 import com.solegendary.reignofnether.hero.HeroServerEvents;
 import com.solegendary.reignofnether.player.PlayerServerEvents;
 import com.solegendary.reignofnether.registrars.BlockRegistrar;
@@ -63,6 +64,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.Chicken;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.monster.Blaze;
 import net.minecraft.world.entity.monster.Vex;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.*;
@@ -674,7 +676,8 @@ public class UnitServerEvents {
                             MobEffectRegistrar.SOULS_AFLAME.get(),
                             MobEffectRegistrar.ANGRY.get(),
                             MobEffectRegistrar.FEARFUL.get(),
-                            MobEffectRegistrar.PARTIALLY_POSSESSED.get()
+                            MobEffectRegistrar.PARTIALLY_POSSESSED.get(),
+                            MobEffects.LEVITATION
                     )) {
                         MobEffectInstance mei = entity.getEffect(me);
                         if (mei != null)
@@ -805,11 +808,22 @@ public class UnitServerEvents {
             return true;
         if (projectile instanceof AbstractArrow)
             return true;
+        if (projectile instanceof WindcallerProjectile proj && !(proj.getOwner() instanceof WindcallerUnit windcallerUnit && windcallerUnit.getPunchLevel() > 0))
+            return true;
         if (projectile instanceof BlazeUnitFireball)
             return true;
 
         return evt.getSource().is(DamageTypeTags.WITCH_RESISTANT_TO) && evt.getSource().isIndirect()
-            && (!(sourceEntity instanceof EvokerUnit));
+                && (!(sourceEntity instanceof EvokerUnit));
+    }
+
+    private static boolean shouldIncreaseKnockback(LivingDamageEvent evt) {
+        Entity projectile = evt.getSource().getDirectEntity();
+
+        if (projectile instanceof WindcallerProjectile proj && proj.getOwner() instanceof WindcallerUnit windcallerUnit)
+            return windcallerUnit.getPunchLevel() > 1;
+
+        return false;
     }
 
     public static Entity spawnMob(
@@ -855,6 +869,9 @@ public class UnitServerEvents {
 
         if (shouldIgnoreKnockback(evt)) {
             knockbackIgnoreIds.add(evt.getEntity().getId());
+        }
+        if (shouldIncreaseKnockback(evt)) {
+            knockbackIncreaseIds.add(evt.getEntity().getId());
         }
 
         // halve friendly fire from your own/friendly creepers (but still cause knockback)
@@ -951,6 +968,10 @@ public class UnitServerEvents {
         if (evt.getEntity().hasEffect(MobEffectRegistrar.SOULS_AFLAME.get()) && evt.getSource().is(DamageTypes.ON_FIRE)) {
             evt.setAmount(evt.getAmount() * 2);
         }
+
+        if (evt.getEntity().hasEffect(MobEffectRegistrar.SOULS_AFLAME.get()) && evt.getSource().is(DamageTypes.ON_FIRE)) {
+            evt.setAmount(evt.getAmount() * 2);
+        }
     }
 
     @SubscribeEvent
@@ -1026,6 +1047,7 @@ public class UnitServerEvents {
     }
 
     public static ArrayList<Integer> knockbackIgnoreIds = new ArrayList<>();
+    public static ArrayList<Integer> knockbackIncreaseIds = new ArrayList<>();
 
     @SubscribeEvent
     public static void onLivingKnockBack(LivingKnockBackEvent evt) {
@@ -1039,6 +1061,9 @@ public class UnitServerEvents {
             evt.setCanceled(true);
         else if (knockbackIgnoreIds.removeIf(i -> i == evt.getEntity().getId()))
             evt.setCanceled(true);
+
+        if (!evt.isCanceled() && knockbackIncreaseIds.removeIf(i -> i == evt.getEntity().getId()))
+            evt.setStrength(evt.getStrength() * 2);
     }
 
     public static void debug1(BlockPos pos) {

@@ -22,6 +22,7 @@ public class GameRuleRegistrar {
     public static GameRules.Key<GameRules.BooleanValue> SCENARIO_MODE;
     public static GameRules.Key<GameRules.BooleanValue> COOP_MODE;
     public static GameRules.Key<GameRules.BooleanValue> DO_NETHER_CONVERSION;
+    public static GameRules.Key<GameRules.BooleanValue> BUILDINGS_OUTSIDE_BORDER;
 
     public static void init() {
         // do cut trees convert their logs into falling logs?
@@ -90,6 +91,10 @@ public class GameRuleRegistrar {
         );
         // all players are allied and cannot change alliances, normal victory is disabled and can only be achieved via commands
         DO_NETHER_CONVERSION = GameRules.register("doNetherConversion", GameRules.Category.UPDATES,
+                GameRules.BooleanValue.create(true)
+        );
+        // allow buildings outside the worldborder
+        BUILDINGS_OUTSIDE_BORDER = GameRules.register("buildingsOutsideBorder", GameRules.Category.MISC,
                 GameRules.BooleanValue.create(true)
         );
     }

@@ -160,6 +160,30 @@ public class SoundRegistrar {
             SOUND_EVENTS.register("piglin_merchant_loot_explosion", () ->
                     SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "piglin_merchant_loot_explosion")));
 
+    public static final RegistryObject<SoundEvent> WINDCALLER_HURT =
+            SOUND_EVENTS.register("windcaller_hurt", () ->
+                    SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "windcaller_hurt")));
+
+    public static final RegistryObject<SoundEvent> WINDCALLER_DEATH =
+            SOUND_EVENTS.register("windcaller_death", () ->
+                    SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "windcaller_death")));
+
+    public static final RegistryObject<SoundEvent> WINDCALLER_AMBIENT =
+            SOUND_EVENTS.register("windcaller_ambient", () ->
+                    SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "windcaller_ambient")));
+
+    public static final RegistryObject<SoundEvent> WINDCALLER_WIND_ATTACK =
+            SOUND_EVENTS.register("windcaller_wind_attack", () ->
+                    SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "windcaller_wind_attack")));
+
+    public static final RegistryObject<SoundEvent> WINDCALLER_LIFT =
+            SOUND_EVENTS.register("windcaller_lift", () ->
+                    SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "windcaller_lift")));
+
+    public static final RegistryObject<SoundEvent> WINDCALLER_YELL =
+            SOUND_EVENTS.register("windcaller_yell", () ->
+                    SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "windcaller_yell")));
+
     public static void init(FMLJavaModLoadingContext context) {
         SOUND_EVENTS.register(context.getModEventBus());
     }

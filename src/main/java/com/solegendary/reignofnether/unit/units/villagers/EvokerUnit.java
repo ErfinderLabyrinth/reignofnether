@@ -4,6 +4,7 @@ import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.AbilityClientboundPacket;
 import com.solegendary.reignofnether.ability.abilities.*;
+import com.solegendary.reignofnether.ability.heroAbilities.necromancer.RaiseDead;
 import com.solegendary.reignofnether.building.addon.GarrisonableBuildingAddon;
 import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.enchantments.VigorEnchantment;
@@ -63,6 +64,13 @@ public class EvokerUnit extends Evoker implements Unit, AttackerUnit, RangedAtta
         ABILITIES.add(new SetFangsCircle());
         ABILITIES.add(new CastSummonVexes(), Keybindings.keyE);
         ABILITIES.add(new MountRavager(), Keybindings.keyR);
+    }
+
+    public CastSummonVexes getSummonVexes() {
+        for (Ability ability : abilities.get())
+            if (ability instanceof CastSummonVexes)
+                return (CastSummonVexes) ability;
+        return null;
     }
 
     //region

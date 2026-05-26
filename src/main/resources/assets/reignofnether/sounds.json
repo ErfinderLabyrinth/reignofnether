@@ -186,6 +186,55 @@
     "piglin_merchant_loot_explosion": {
         "subtitle": "sounds.reignofnether.piglin_merchant_loot_explosion",
         "sounds": [ "reignofnether:piglin_merchant_loot_explosion" ]
+    },
+    "windcaller_death": {
+        "subtitle": "sounds.reignofnether.windcaller_death",
+        "sounds": [
+            "reignofnether:windcaller_death_01",
+            "reignofnether:windcaller_death_02",
+            "reignofnether:windcaller_death_03",
+            "reignofnether:windcaller_death_04"
+        ]
+    },
+    "windcaller_hurt": {
+        "subtitle": "sounds.reignofnether.windcaller_hurt",
+        "sounds": [
+            "reignofnether:windcaller_hurt_01",
+            "reignofnether:windcaller_hurt_02",
+            "reignofnether:windcaller_hurt_03",
+            "reignofnether:windcaller_hurt_04"
+        ]
+    },
+    "windcaller_ambient": {
+        "subtitle": "sounds.reignofnether.windcaller_ambient",
+        "sounds": [
+            "reignofnether:windcaller_ambient_01",
+            "reignofnether:windcaller_ambient_02",
+            "reignofnether:windcaller_ambient_03",
+            "reignofnether:windcaller_ambient_04"
+        ]
+    },
+    "windcaller_wind_attack": {
+        "subtitle": "sounds.reignofnether.windcaller_wind_attack",
+        "sounds": [
+            "reignofnether:windcaller_wind_attack_01"
+        ]
+    },
+    "windcaller_lift": {
+        "subtitle": "sounds.reignofnether.windcaller_lift",
+        "sounds": [
+            "reignofnether:windcaller_lift_01",
+            "reignofnether:windcaller_lift_02",
+            "reignofnether:windcaller_lift_03"
+        ]
+    },
+    "windcaller_yell": {
+        "subtitle": "sounds.reignofnether.windcaller_yell",
+        "sounds": [
+            "reignofnether:windcaller_yell_01",
+            "reignofnether:windcaller_yell_02",
+            "reignofnether:windcaller_yell_03"
+        ]
     }
 }
 

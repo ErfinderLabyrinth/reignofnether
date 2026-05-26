@@ -81,6 +81,7 @@ public class ProductionItems {
     public static final ResearchWaterPotions RESEARCH_WATER_POTIONS = register(ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "water_potions"), new ResearchWaterPotions());
     public static final ResearchHealingPotions RESEARCH_HEALING_POTIONS = register(ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "healing_potions"), new ResearchHealingPotions());
     public static final ResearchEvokerVexes RESEARCH_EVOKER_VEXES = register(ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "evoker_vexes"), new ResearchEvokerVexes());
+    public static final ResearchUpgradedWindcallers RESEARCH_UPGRADED_WINDCALLERS = register(ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "upgraded_windcallers"), new ResearchUpgradedWindcallers());
     public static final ResearchGolemSmithing RESEARCH_GOLEM_SMITHING = register(ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "golem_smithing"), new ResearchGolemSmithing());
     public static final ResearchSilverfish RESEARCH_SILVERFISH = register(ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "silverfish"), new ResearchSilverfish());
     public static final ResearchSculkAmplifiers RESEARCH_SCULK_AMPLIFIERS = register(ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "sculk_amplifiers"), new ResearchSculkAmplifiers());

@@ -60,14 +60,4 @@ public class EquipLeatherChestplate extends EquipAbility {
                 placement
         );
     }
-
-    @Override
-    public boolean isCorrectUnit(LivingEntity entity) {
-        return List.of(
-                EntityRegistrar.MILITIA_UNIT.get(),
-                EntityRegistrar.VINDICATOR_UNIT.get(),
-                EntityRegistrar.PILLAGER_UNIT.get(),
-                EntityRegistrar.EVOKER_UNIT.get()
-        ).contains(entity.getType());
-    }
 }

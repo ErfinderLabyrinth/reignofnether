@@ -34,6 +34,9 @@ import org.joml.Vector3d;
 
 import java.util.List;
 
+import static com.solegendary.reignofnether.util.MiscUtil.fcs;
+import static com.solegendary.reignofnether.util.MiscUtil.fcsIcons;
+
 public class PromoteIllager extends Ability {
 
     private static final int CD_MAX = 120 * ResourceCost.TICKS_PER_SECOND;
@@ -60,7 +63,8 @@ public class PromoteIllager extends Ability {
 
             for (Mob mob : nearbyMobs)
                 if (mob instanceof Unit unit && unit.getOwnerName().equals(captainUnit.getOwnerName()) &&
-                    !(mob instanceof RavagerUnit))
+                    !(mob instanceof RavagerUnit) &&
+                    !(mob instanceof WindcallerUnit windcallerUnit && windcallerUnit.isFlying()))
                     mob.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 2, 0));
         }
     }
@@ -81,22 +85,14 @@ public class PromoteIllager extends Ability {
             () -> CursorClientEvents.setLeftClickAction(UnitAction.PROMOTE_ILLAGER),
             null,
             List.of(
-                FormattedCharSequence.forward(I18n.get("abilities.reignofnether.promote_illager"),
-                    Style.EMPTY.withBold(true)
-                ),
-                FormattedCharSequence.forward(
-                    I18n.get("abilities.reignofnether.promote_illager.tooltip1", CD_MAX / 20) + RANGE,
-                    MyRenderer.iconStyle
-                ),
-                FormattedCharSequence.forward("", Style.EMPTY),
-                FormattedCharSequence.forward(I18n.get("abilities.reignofnether.promote_illager.tooltip2"),
-                    Style.EMPTY
-                ),
-                FormattedCharSequence.forward(I18n.get("abilities.reignofnether.promote_illager.tooltip3", BUFF_RANGE),
-                    Style.EMPTY
-                ),
-                FormattedCharSequence.forward("", Style.EMPTY),
-                FormattedCharSequence.forward(I18n.get("abilities.reignofnether.promote_illager.tooltip4"), Style.EMPTY)
+                fcs(I18n.get("abilities.reignofnether.promote_illager"), true),
+                fcsIcons(I18n.get("abilities.reignofnether.promote_illager.tooltip1", CD_MAX / 20) + RANGE),
+                fcs(""),
+                fcs(I18n.get("abilities.reignofnether.promote_illager.tooltip2")),
+                fcs(I18n.get("abilities.reignofnether.promote_illager.tooltip3", BUFF_RANGE)),
+                fcs(I18n.get("abilities.reignofnether.promote_illager.tooltip_no_effect")),
+                fcs(""),
+                fcs(I18n.get("abilities.reignofnether.promote_illager.tooltip4"))
             ),
             this,
             placement

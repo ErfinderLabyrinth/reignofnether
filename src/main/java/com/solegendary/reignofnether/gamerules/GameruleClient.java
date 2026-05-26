@@ -39,6 +39,7 @@ public class GameruleClient {
     public static boolean lockAlliances = false;
     public static boolean scenarioMode = false;
     public static boolean coopMode = false;
+    public static boolean buildingsOutsideBorder = false;
 
     public static boolean gamerulesMenuOpen = false;
 

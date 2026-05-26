@@ -6,7 +6,6 @@ import com.solegendary.reignofnether.ability.abilities.*;
 import com.solegendary.reignofnether.api.ReignOfNetherRegistries;
 import com.solegendary.reignofnether.blocks.BlockClientEvents;
 import com.solegendary.reignofnether.building.*;
-import com.solegendary.reignofnether.building.addon.GarrisonableBuildingAddon;
 import com.solegendary.reignofnether.building.addon.RangeIndicatorAddon;
 import com.solegendary.reignofnether.building.data.DataType;
 import com.solegendary.reignofnether.building.production.ProductionBuilding;
@@ -40,6 +39,7 @@ public class Library extends ProductionBuilding implements RangeIndicatorAddon {
     private static final EnchantSharpness ENCHANT_SHARPNESS = new EnchantSharpness();
     private static final EnchantMultishot ENCHANT_MULTISHOT = new EnchantMultishot();
     private static final EnchantVigor ENCHANT_VIGOR = new EnchantVigor();
+    private static final EnchantGust ENCHANT_GUST = new EnchantGust();
 
     public static final DataType<EnchantAbility> AUTO_CAST_ENCHANT = DataType.createRegistered(ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "auto_cast_enchant"), (tag, server) -> {
         int id = tag.getInt("autocast-id");
@@ -49,6 +49,7 @@ public class Library extends ProductionBuilding implements RangeIndicatorAddon {
             case 3: yield ENCHANT_SHARPNESS;
             case 4: yield ENCHANT_MULTISHOT;
             case 5: yield ENCHANT_VIGOR;
+            case 6: yield ENCHANT_GUST;
             default: yield null;
         };
     }, enchantAbility -> {
@@ -63,6 +64,8 @@ public class Library extends ProductionBuilding implements RangeIndicatorAddon {
             id = 4;
         if (enchantAbility instanceof EnchantVigor)
             id = 5;
+        if (enchantAbility instanceof EnchantGust)
+            id = 6;
         CompoundTag nbt = new CompoundTag();
         nbt.putInt("autocast-id", id);
         return nbt;
@@ -94,12 +97,11 @@ public class Library extends ProductionBuilding implements RangeIndicatorAddon {
         this.abilities.add(ENCHANT_SHARPNESS, Keybindings.keyE);
         this.abilities.add(ENCHANT_MULTISHOT, Keybindings.keyR);
         this.abilities.add(ENCHANT_VIGOR, Keybindings.keyT);
+        this.abilities.add(ENCHANT_GUST, Keybindings.keyY);
 
-        this.productions.add(ProductionItems.RESEARCH_LINGERING_POTIONS, Keybindings.keyY);
-        this.productions.add(ProductionItems.RESEARCH_HEALING_POTIONS, Keybindings.keyU);
-        this.productions.add(ProductionItems.RESEARCH_WATER_POTIONS, Keybindings.keyI);
-        this.productions.add(ProductionItems.RESEARCH_EVOKER_VEXES, Keybindings.keyO);
-        this.productions.add(ProductionItems.RESEARCH_GRAND_LIBRARY, Keybindings.keyP);
+        this.productions.add(ProductionItems.RESEARCH_EVOKER_VEXES, Keybindings.keyU);
+        this.productions.add(ProductionItems.RESEARCH_UPGRADED_WINDCALLERS, Keybindings.keyI);
+        this.productions.add(ProductionItems.RESEARCH_GRAND_LIBRARY, Keybindings.keyO);
 
         setActiveAddon(RangeIndicatorAddon.class, this, true);
     }
@@ -215,6 +217,6 @@ public class Library extends ProductionBuilding implements RangeIndicatorAddon {
 
     @Override
     public boolean showOnlyWhenSelected(BuildingPlacement placement) {
-        return false;
+        return true;
     }
 }

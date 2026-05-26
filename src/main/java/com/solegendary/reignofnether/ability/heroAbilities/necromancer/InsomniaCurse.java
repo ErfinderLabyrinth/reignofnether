@@ -26,7 +26,7 @@ import static com.solegendary.reignofnether.util.MiscUtil.fcsIcons;
 
 public class InsomniaCurse extends HeroAbility {
 
-    public static final int RANGE = 12;
+    public static final int RANGE = 15;
     public static final float PHANTOM_DAMAGE = 6;
     public static final float PHANTOM_DAMAGE_BONUS_PER_SOUL_RANK = 2f;
     public static final int PHANTOM_MAX_ATTACKS = 6;

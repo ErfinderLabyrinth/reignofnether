@@ -40,6 +40,8 @@ public class InfernalPortal extends ProductionBuilding implements NetherConverti
 
         this.startingBlockTypes.add(Blocks.NETHER_BRICKS);
 
+        this.buildTimeModifier = 1.2f;
+
         this.productions.add(ProductionItems.PIGLIN_MERCHANT, Keybindings.keyQ);
         this.productions.add(ProductionItems.PIGLIN_MERCHANT_REVIVE, Keybindings.keyQ);
         this.productions.add(ProductionItems.WILDFIRE, Keybindings.keyW);

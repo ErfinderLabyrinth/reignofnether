@@ -260,6 +260,7 @@ public class EnchanterUnit extends Vindicator implements AttackerUnit, HeroUnit,
 
     private static final double KNOCKBACK_RESISTANCE = 0.5d;
     private static final float AUTOCAST_ENCHANT_RANGE = 15;
+    private static final int ENCHANT_EXP = 40;
 
     // non-looping animations
     public AnimationDefinition activeAnimDef = null;
@@ -580,6 +581,9 @@ public class EnchanterUnit extends Vindicator implements AttackerUnit, HeroUnit,
             entity.getMainHandItem().enchant(Enchantments.BLOCK_EFFICIENCY, 1);
         entity.addEffect(new MobEffectInstance(MobEffectRegistrar.TEMPORARY_EFFICIENCY.get(), CivilEnchantment.DURATION_SECONDS * 20));
         playEnchantSound();
+
+        if (getHeroLevel() < HeroUnit.MAX_NEUTRAL_EXP_LEVEL)
+            addExperience(ENCHANT_EXP);
     }
 
     public void enchantMilitary(LivingEntity entity) {
@@ -595,6 +599,9 @@ public class EnchanterUnit extends Vindicator implements AttackerUnit, HeroUnit,
         }
         if (!level().isClientSide)
             playEnchantSound();
+
+        if (getHeroLevel() < HeroUnit.MAX_NEUTRAL_EXP_LEVEL)
+            addExperience(ENCHANT_EXP);
     }
 
     public void enchantArmour(LivingEntity entity) {
@@ -602,6 +609,9 @@ public class EnchanterUnit extends Vindicator implements AttackerUnit, HeroUnit,
 
         entity.getItemBySlot(EquipmentSlot.CHEST).enchant(EnchantmentRegistrar.FORTYIFYING.get(), 1);
         playEnchantSound();
+
+        if (getHeroLevel() < HeroUnit.MAX_NEUTRAL_EXP_LEVEL)
+            addExperience(ENCHANT_EXP);
     }
 
     public void toggleAura() {

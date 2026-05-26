@@ -4,6 +4,7 @@ import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.hud.AbilityButton;
+import com.solegendary.reignofnether.hud.HudClientEvents;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.research.ResearchClient;
 import com.solegendary.reignofnether.resources.ResourceCost;
@@ -16,10 +17,12 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 import static com.solegendary.reignofnether.unit.UnitClientEvents.sendUnitCommand;
 import static com.solegendary.reignofnether.util.MiscUtil.fcs;
@@ -41,6 +44,11 @@ public class ToggleShield extends Ability {
         );
     }
 
+    private final static Predicate<LivingEntity> TOGGLE_CHECK = le ->
+            HudClientEvents.hudSelectedEntity instanceof BruteUnit hudUnit &&
+            le instanceof BruteUnit unit &&
+            hudUnit.isHoldingUpShield() == unit.isHoldingUpShield();
+
     @Override
     public AbilityButton getButton(Keybinding hotkey, Unit unit) {
         if (!(unit instanceof BruteUnit bruteUnit))
@@ -53,7 +61,7 @@ public class ToggleShield extends Ability {
                 () -> !ResearchClient.hasResearch(ProductionItems.RESEARCH_BRUTE_SHIELDS) ||
                         bruteUnit.getItemBySlot(EquipmentSlot.OFFHAND).getItem() != Items.SHIELD,
                 () -> true,
-                () -> sendUnitCommand(UnitAction.TOGGLE_SHIELD_RAISE),
+                () -> sendUnitCommand(UnitAction.TOGGLE_SHIELD_RAISE, TOGGLE_CHECK),
                 null,
                 List.of(
                         fcs(I18n.get("abilities.reignofnether.shield_stance"), true),

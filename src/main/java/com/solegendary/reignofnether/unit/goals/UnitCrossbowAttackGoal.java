@@ -7,6 +7,7 @@ import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.units.piglins.GhastUnit;
 import com.solegendary.reignofnether.unit.units.villagers.PillagerUnit;
+import com.solegendary.reignofnether.unit.units.villagers.WindcallerUnit;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -44,7 +45,7 @@ public class UnitCrossbowAttackGoal<T extends Monster & RangedAttackMob & Crossb
     private int attackCooldownMax;
     private int windupTime = random.nextInt(0,6);
 
-    private static final int GARRISON_BONUS_RANGE_TO_GHASTS = 10;
+    private static final int GARRISON_BONUS_RANGE_TO_FLYING = 10;
 
     public UnitCrossbowAttackGoal(T mob, int attackCooldown) {
         this.mob = mob;
@@ -183,12 +184,14 @@ public class UnitCrossbowAttackGoal<T extends Monster & RangedAttackMob & Crossb
             if (isGarrisoned) {
                 attackRange = garr.getAttackRange();
                 if (target instanceof GhastUnit)
-                    attackRange += GARRISON_BONUS_RANGE_TO_GHASTS;
+                    attackRange += GARRISON_BONUS_RANGE_TO_FLYING;
             }
             else if (isTargetGarrisoned)
                 attackRange += targetGarr.getExternalAttackRangeBonus();
             else if (target instanceof GhastUnit ghastUnit)
                 attackRange += ghastUnit.getAttackerRangeBonus(this.mob);
+            else if (target instanceof WindcallerUnit windcallerUnit)
+                attackRange += windcallerUnit.getAttackerRangeBonus(this.mob);
 
             // dont consider garrison range here so the unit still moves towards the edge of the building
             if (!this.mob.isPassenger()) {

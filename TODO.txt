@@ -1,44 +1,63 @@
 
-1.20.1-1.3.3d
+1.20.1-1.3.4
 
 [✔] Done and tested
 [🟡] Partially done and/or needs testing
 [❌] Not done, including unmerged PRs
 
 
+[❌] Arrows knock away windcaller projectiles
 
 
 Windcaller
 ----------
-[❌] Very squishy and weak attack, but while walking, causes levitation on hit like breezes
-[❌] Toggle between flying and walking
-[❌] Spell castable only on ground
-    - Gale force (upgrade required): blows back units for 2s, the more windcallers used, the stronger and longer it lasts
-
+[✔] Very squishy and weak attack, but while walking, causes levitation on hit like shulkers
+[✔] Toggle between flying and walking
+[✔] Enchantment from library and enchanter
 
 Bugfixes
 --------
-[❌] Tridents summoned from commands no longer pierce all units
-
-[🟡] Piglin shields and spider climbing toggles are now saved between server restarts and chunk reloads
-[🟡] Fixed some scenario alliances not working again
-[🟡] Fixed /rts-victory not working with player selectors
+[✔] Reworked the shrine of prosperity to stop units getting stuck on the carpets
+[✔] Custom buildings no longer spawn animals randomly
+[✔] Fixed skeletons not moving correctly near water
+[✔] Wildfire Molten Bombs now aggro neutral units
+[✔] Fixed most ability sounds being audible across the map
+[✔] Ravager Artillery attack-ground markers are now reset when issuing an attack-move
 
 Quality of Life
 ---------------
-
-[🟡] /rts-reset and /rts-hard-reset can now be used from command blocks
-
 [❌] Review packets that can be modified to only send to some players for performance, TRACKING_ENTITY for updating units only for players who have it loaded clientside
-[❌] /rtsapi and /rts-reset commands now work from datapacks
-[❌] Add an @enemy and @owner argument to custom building commands
+[❌] Waypoint looping (by shift clicking back onto a previous waypoint it will automatically cycle the list once it reaches the end)
+[❌] Camera hotkeys (see starcraft example)
 
+[✔] Cobbled Deepslate now converts to Blackstone
+[✔] Possessed neutral units lose their anchors
+[✔] Friendly units stop attacking a neutral building that's been captured
+[✔] Added /gamerule buildingsOutsideBorder (default true)
+    - When enabled, buildings will not be auto-destroyed if they are outside the world border
 
 Balance
 -------
-[❌] Witches and all related upgrades have been moved into a new Witch Hut building
-    - Witch Huts cost (175 wood, 50 ore) and require a Barracks
+
+Villagers
+[✔] Witches and all related upgrades have been moved into a new Witch Hut building
+    - Witch Huts cost (200 wood, 50 ore) and require a Barracks
     - Arcane Tower cost changed from (200 wood, 100 ore) to (100 wood, 200 ore)
+[✔] Evokers no longer require a Library
+[✔] Evokers can now summon vexes while mounted on Ravagers
+[✔] The Enchanter now gains 40 exp for each enchantment cast
+    - For reference, level 1 -> 2 requires 320 exp
+
+Monsters
+[✔] The Wretched Wraith regen on snow increased to 0.5hp/s + 0.25hp per additional layer of snow
+[✔] Wraiths slow down enemies while channeling possession on them
+[✔] Necromancers now lead their shots against moving targets so they're much more accurate
+[✔] Necromancer phantom range increased from 12 to 15
+[✔] Mass Burials research increased in cost from (300 wood, 300 ore) to (400 wood, 400 ore)
+
+Piglins
+[✔] Infernal portals now build 20% slower (they were building faster than other factions' altars)
+[✔] Wildfire and blazes now take 1dmg/s in water (wildfires were taking 20dmg/s, blazes were immune)
 
 Languages
 ---------

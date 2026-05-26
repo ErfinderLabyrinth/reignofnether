@@ -122,7 +122,7 @@ public class BuildingClientEvents {
 
 
     // can only be one preselected building as you can't box-select them like units
-    public static BuildingPlacement getPreselectedBuilding() {
+    public static BuildingPlacement  getPreselectedBuilding() {
         BlockPos preSelBp = CursorClientEvents.getPreselectedBlockPos();
         for (BuildingPlacement building : buildings)
             if (building.isPosInsideBuilding(preSelBp)) {
@@ -156,7 +156,9 @@ public class BuildingClientEvents {
         if (!FogOfWarClientEvents.isBuildingInBrightChunk(building)) {
             return;
         }
-
+        if (!SandboxClientEvents.isSandboxPlayer() && building.isOutsideWorldBorder()) {
+            return;
+        }
         selectedBuildings.add(building);
         selectedBuildings.sort(Comparator.comparing(b -> {
             if (b.getBuilding() instanceof CustomBuilding) {
@@ -551,9 +553,10 @@ public class BuildingClientEvents {
     }
 
     private static boolean isBuildingPlacementWithinWorldBorder(BlockPos originPos) {
-        if (MC.level == null || buildingToPlace == null) {
+        if (MC.level == null || buildingToPlace == null)
             return false;
-        }
+        if (GameruleClient.buildingsOutsideBorder)
+            return true;
 
         int minX = 999999;
         int minZ = 999999;
@@ -640,6 +643,7 @@ public class BuildingClientEvents {
         for (BuildingPlacement building : buildings) {
 
             boolean isInBrightChunk = FogOfWarClientEvents.isBuildingInBrightChunk(building);
+            boolean inWorldBorderOrInSandbox = SandboxClientEvents.isSandboxPlayer() || !building.isOutsideWorldBorder();
 
             AABB aabb = new AABB(building.minCorner, building.maxCorner.offset(1, 1, 1));
 
@@ -648,7 +652,7 @@ public class BuildingClientEvents {
             float g = colorHex.getGreen() / 255.0f;
             float b = colorHex.getBlue() / 255.0f;
 
-            if (isInBrightChunk) {
+            if (isInBrightChunk && inWorldBorderOrInSandbox) {
                 if (selectedBuildings.contains(building)) {
                     MyRenderer.drawLineBox(evt.getPoseStack(), aabb, 1.0f, 1.0f, 1.0f, 1.0f);
                 } else if (building.equals(preselectedBuilding) && !HudClientEvents.isMouseOverAnyButtonOrHud()) {
@@ -663,8 +667,8 @@ public class BuildingClientEvents {
                     }
                 }
             }
-
-            MyRenderer.drawBoxBottom(evt.getPoseStack(), aabb, r, g, b, 0.5f);
+            if (inWorldBorderOrInSandbox)
+                MyRenderer.drawBoxBottom(evt.getPoseStack(), aabb, r, g, b, 0.5f);
         }
 
         // draw rally points and lines
@@ -964,6 +968,9 @@ public class BuildingClientEvents {
         if (evt.phase != TickEvent.Phase.END) {
             return;
         }
+
+        if (!SandboxClientEvents.isSandboxPlayer())
+            selectedBuildings.removeIf(BuildingPlacement::isOutsideWorldBorder);
 
         ticksToNextVisCheck -= 1;
         if (ticksToNextVisCheck <= 0) {

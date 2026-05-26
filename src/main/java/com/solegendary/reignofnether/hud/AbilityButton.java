@@ -11,6 +11,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.world.entity.LivingEntity;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -25,6 +26,7 @@ public class AbilityButton extends Button {
     public int extraLabelColour = 0xFFFFFF;
     @Nullable private Unit unit;
     @Nullable private BuildingPlacement placement;
+    public boolean isPassengerAbility = false;
 
     public AbilityButton(String name, ResourceLocation rl, Keybinding hotkey, Supplier<Boolean> isSelected,
                          Supplier<Boolean> isHidden, Supplier<Boolean> isEnabled, Runnable onLeftClick, Runnable onRightClick,
@@ -75,15 +77,15 @@ public class AbilityButton extends Button {
 
     @Override
     public void render(GuiGraphics guiGraphics, int x, int y, int mouseX, int mouseY) {
-        float cooldown;
+        float cooldown = 0f;
 
         if (this.ability != null && ability.cooldownMax > 0) {
             if (unit != null) {
                 cooldown = ability.getCooldown(unit);
-            }else {
+            } else if (placement != null) {
                 cooldown = ability.getCooldown(placement);
             }
-            this.greyPercent = 1.0f - (cooldown / (float) ability.cooldownMax);
+            this.greyPercent = 1.0f - (cooldown / ability.cooldownMax);
         }
         super.render(guiGraphics, x, y, mouseX, mouseY);
 

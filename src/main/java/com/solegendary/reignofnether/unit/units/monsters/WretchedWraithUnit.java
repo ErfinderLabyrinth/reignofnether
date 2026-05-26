@@ -435,8 +435,8 @@ public class WretchedWraithUnit extends Monster implements Unit, AttackerUnit, H
             snowToPlace = newSnowQueue;
             // heal while on wraith snow
             int layers = BlockUtils.getWraithSnowLayers(level().getBlockState(getOnPos().above()));
-            if (onGround() && layers > 0 && tickCount % (80 / layers) == 0) {
-                heal(1);
+            if (onGround() && layers > 0 && tickCount % 20 == 0) {
+                heal(0.25f + (layers * 0.25f));
             }
         }
         if (!level().isClientSide()) {

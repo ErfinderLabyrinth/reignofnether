@@ -331,9 +331,15 @@ public class WildfireUnit extends Blaze implements Unit, AttackerUnit, RangedAtt
 
     public WildfireUnit(EntityType<? extends Blaze> entityType, Level level) {
         super(entityType, level);
-
         updateAbilityButtons();
         setStatsForLevel();
+    }
+
+    @Override
+    public boolean hurt(DamageSource pSource, float pAmount) {
+        if (pSource.is(DamageTypes.DROWN) && tickCount % 20 != 0)
+            return false;
+        return super.hurt(pSource, pAmount);
     }
 
     @Override

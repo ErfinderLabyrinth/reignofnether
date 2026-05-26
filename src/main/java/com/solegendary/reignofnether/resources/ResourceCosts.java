@@ -131,6 +131,7 @@ public class ResourceCosts {
     public static final ResourceCost RESEARCH_HEALING_POTIONS = new ResourceCost(ID, "RESEARCH_HEALING_POTIONS");
     public static final ResourceCost RESEARCH_WATER_POTIONS = new ResourceCost(ID, "RESEARCH_WATER_POTIONS");
     public static final ResourceCost RESEARCH_EVOKER_VEXES = new ResourceCost(ID, "RESEARCH_EVOKER_VEXES");
+    public static final ResourceCost RESEARCH_UPGRADED_WINDCALLERS = new ResourceCost(ID, "RESEARCH_UPGRADED_WINDCALLERS");
     public static final ResourceCost RESEARCH_CASTLE_FLAG = new ResourceCost(ID, "RESEARCH_CASTLE_FLAG");
     public static final ResourceCost RESEARCH_GRAND_LIBRARY = new ResourceCost(ID, "RESEARCH_GRAND_LIBRARY");
     public static final ResourceCost RESEARCH_SILVERFISH = new ResourceCost(ID, "RESEARCH_SILVERFISH");
@@ -163,6 +164,7 @@ public class ResourceCosts {
     public static final ResourceCost ENCHANT_SHARPNESS = new ResourceCost(ID, "ENCHANT_SHARPNESS");
     public static final ResourceCost ENCHANT_MULTISHOT = new ResourceCost(ID, "ENCHANT_MULTISHOT");
     public static final ResourceCost ENCHANT_VIGOR = new ResourceCost(ID, "ENCHANT_VIGOR");
+    public static final ResourceCost ENCHANT_GUST = new ResourceCost(ID, "ENCHANT_GUST");
     public static final ResourceCost EQUIP_LEATHER_ARMOR = new ResourceCost(ID, "EQUIP_LEATHER_ARMOR");
     public static final ResourceCost EQUIP_CHAINMAIL_ARMOR = new ResourceCost(ID, "EQUIP_CHAINMAIL_ARMOR");
 
@@ -325,6 +327,7 @@ public class ResourceCosts {
         RESEARCH_WATER_POTIONS.bakeValues(ReignOfNetherCommonConfigs.ResearchCosts.RESEARCH_WATER_POTIONS);
         RESEARCH_HEALING_POTIONS.bakeValues(ReignOfNetherCommonConfigs.ResearchCosts.RESEARCH_HEALING_POTIONS);
         RESEARCH_EVOKER_VEXES.bakeValues(ReignOfNetherCommonConfigs.ResearchCosts.RESEARCH_EVOKER_VEXES);
+        RESEARCH_UPGRADED_WINDCALLERS.bakeValues(ReignOfNetherCommonConfigs.ResearchCosts.RESEARCH_UPGRADED_WINDCALLERS);
         RESEARCH_CASTLE_FLAG.bakeValues(ReignOfNetherCommonConfigs.ResearchCosts.RESEARCH_CASTLE_FLAG);
         RESEARCH_GRAND_LIBRARY.bakeValues(ReignOfNetherCommonConfigs.ResearchCosts.RESEARCH_GRAND_LIBRARY);
         RESEARCH_SILVERFISH.bakeValues(ReignOfNetherCommonConfigs.ResearchCosts.RESEARCH_SILVERFISH);
@@ -357,6 +360,7 @@ public class ResourceCosts {
         ENCHANT_SHARPNESS.bakeValues(ReignOfNetherCommonConfigs.AbilityCosts.ENCHANT_SHARPNESS);
         ENCHANT_MULTISHOT.bakeValues(ReignOfNetherCommonConfigs.AbilityCosts.ENCHANT_MULTISHOT);
         ENCHANT_VIGOR.bakeValues(ReignOfNetherCommonConfigs.AbilityCosts.ENCHANT_VIGOR);
+        ENCHANT_GUST.bakeValues(ReignOfNetherCommonConfigs.AbilityCosts.ENCHANT_GUST);
         EQUIP_LEATHER_ARMOR.bakeValues(ReignOfNetherCommonConfigs.AbilityCosts.EQUIP_LEATHER_ARMOR);
         EQUIP_CHAINMAIL_ARMOR.bakeValues(ReignOfNetherCommonConfigs.AbilityCosts.EQUIP_CHAINMAIL_ARMOR);
     }

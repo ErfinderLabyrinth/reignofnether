@@ -13,7 +13,7 @@ import com.solegendary.reignofnether.resources.ResourceCosts;
 import com.solegendary.reignofnether.unit.Checkpoint;
 import com.solegendary.reignofnether.unit.EnemySearchBehaviour;
 import com.solegendary.reignofnether.unit.UnitAnimationAction;
-import com.solegendary.reignofnether.unit.controls.GhastUnitMoveControl;
+import com.solegendary.reignofnether.unit.controls.FlyingUnitMoveControl;
 import com.solegendary.reignofnether.unit.goals.*;
 import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.RangedAttackerUnit;
@@ -200,7 +200,7 @@ public class GhastUnit extends Ghast implements Unit, AttackerUnit, RangedAttack
 
     public GhastUnit(EntityType<? extends Ghast> entityType, Level level) {
         super(entityType, level);
-        this.moveControl = new GhastUnitMoveControl(this);
+        this.moveControl = new FlyingUnitMoveControl(this);
 
         updateAbilityButtons();
     }

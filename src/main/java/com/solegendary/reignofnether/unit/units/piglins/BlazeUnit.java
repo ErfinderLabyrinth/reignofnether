@@ -33,6 +33,7 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -178,8 +179,14 @@ public class BlazeUnit extends Blaze implements Unit, AttackerUnit, RangedAttack
 
     public BlazeUnit(EntityType<? extends Blaze> entityType, Level level) {
         super(entityType, level);
-
         updateAbilityButtons();
+    }
+
+    @Override
+    public boolean hurt(DamageSource pSource, float pAmount) {
+        if (pSource.is(DamageTypes.DROWN) && tickCount % 20 != 0)
+            return false;
+        return super.hurt(pSource, pAmount);
     }
 
     @Override
@@ -252,11 +259,6 @@ public class BlazeUnit extends Blaze implements Unit, AttackerUnit, RangedAttack
     public void readAdditionalSaveData(@NotNull CompoundTag pCompound) {
         super.readAdditionalSaveData(pCompound);
         this.readUnitSaveData(pCompound);
-    }
-
-    @Override
-    public boolean isSensitiveToWater() {
-        return false;
     }
 
     public void initialiseGoals() {

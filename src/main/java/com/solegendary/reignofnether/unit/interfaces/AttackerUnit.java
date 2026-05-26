@@ -214,7 +214,7 @@ public interface AttackerUnit {
 
                 boolean isMeleeAttackedByFlyingOrGarrisoned = false;
                 if (lastDSEntity instanceof Unit unitDS &&
-                    (unitDS.getMoveGoal() instanceof FlyingMoveToTargetGoal ||
+                    (unitDS.isFlyingUnit() ||
                         GarrisonableBuildingAddon.getGarrison(unitDS) != null ||
                         unitDS instanceof PhantomSummon ||
                         unitDS instanceof Vex) &&
@@ -361,7 +361,7 @@ public interface AttackerUnit {
             if (!unit.getOwnerName().equals(buildingPlacement.ownerName) &&
                     !AlliancesServerEvents.isAllied(unit.getOwnerName(), buildingPlacement.ownerName) &&
                     !buildingPlacement.ownerName.isBlank() &&
-                    !buildingPlacement.getBuilding().invulnerable) {
+                    buildingPlacement.isAttackable()) {
                 eligibleTargets.add(buildingPlacement);
             }
         }

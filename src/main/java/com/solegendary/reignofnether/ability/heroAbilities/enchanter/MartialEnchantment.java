@@ -152,6 +152,8 @@ public class MartialEnchantment extends AbstractEnchantment {
             return Enchantments.PIERCING;
         if (unit instanceof EvokerUnit)
             return EnchantmentRegistrar.ZEAL.get();
+        if (unit instanceof WindcallerUnit)
+            return Enchantments.PUNCH_ARROWS;
         if (unit instanceof SkeletonUnit || unit instanceof StrayUnit || unit instanceof HeadhunterUnit)
             return Enchantments.POWER_ARROWS;
         if (unit instanceof BruteUnit || unit instanceof WitherSkeletonUnit)
@@ -171,7 +173,8 @@ public class MartialEnchantment extends AbstractEnchantment {
                 EntityRegistrar.BOGGED_UNIT.get(),
                 EntityRegistrar.WITHER_SKELETON_UNIT.get(),
                 EntityRegistrar.HEADHUNTER_UNIT.get(),
-                EntityRegistrar.BRUTE_UNIT.get()
+                EntityRegistrar.BRUTE_UNIT.get(),
+                EntityRegistrar.WINDCALLER_UNIT.get()
         );
     }
 

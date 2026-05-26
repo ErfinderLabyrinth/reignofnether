@@ -247,6 +247,7 @@ public class NetherBlocks {
         MAPPINGS.put(Blocks.BLACKSTONE,
             List.of(
                 Blocks.DEEPSLATE,
+                Blocks.COBBLED_DEEPSLATE,
                 Blocks.TUFF
             ));
         MAPPINGS.put(Blocks.SOUL_SAND,

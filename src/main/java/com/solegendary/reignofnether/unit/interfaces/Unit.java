@@ -837,4 +837,8 @@ public interface Unit {
                     .getType() == HitResult.Type.MISS;
         }
     }
+
+    default boolean isFlyingUnit() {
+        return getMoveGoal() instanceof FlyingMoveToTargetGoal;
+    }
 }

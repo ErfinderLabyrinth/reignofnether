@@ -13,6 +13,7 @@ import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -94,10 +95,20 @@ public class WindcallerModel<T extends Entity> extends KeyframeHierarchicalModel
 		return this.bone;
 	}
 
+	private float currentTilt = 0.0f;
+
 	@Override
 	public void setupAnim(Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
 		this.root().getAllParts().forEach(ModelPart::resetPose);
 		WindcallerUnit windcaller = ((WindcallerUnit) entity);
+
+		// Smoothly tilt the whole model forward when flying, more so while moving
+		float targetTilt = 0.0f;
+		if (windcaller.isFlying()) {
+			targetTilt = limbSwingAmount > 0.001f ? 0.2f : 0.1f;
+		}
+		currentTilt = Mth.lerp(0.025f, currentTilt, targetTilt);
+		this.bone.xRot += currentTilt;
 
 		if (windcaller.animateScale > 0 && windcaller.animateScaleReducing) {
 			windcaller.animateScale -= 0.02f;
@@ -113,7 +124,7 @@ public class WindcallerModel<T extends Entity> extends KeyframeHierarchicalModel
 		AttributeInstance ms = windcaller.getAttribute(Attributes.MOVEMENT_SPEED);
 		if (ms == null)
 			return;
-		float speed = (float) ms.getValue() * 10;
+		float speed = (float) ms.getValue() * 5;
 
 		// any once-off animation like attack or cast spell
 		if (windcaller.activeAnimDef != null && windcaller.activeAnimState != null && windcaller.animateTicks > 0) {
@@ -122,11 +133,17 @@ public class WindcallerModel<T extends Entity> extends KeyframeHierarchicalModel
 		// walk animation
 		else if (!entity.isInWaterOrBubble() && limbSwingAmount > 0.001f) {
 			restart(windcaller, windcaller.walkAnimState, ageInTicks);
-			animateWalk(WindcallerAnimations.WALK, limbSwing, limbSwingAmount, speed, speed);
+			if (windcaller.isFlying())
+				animateWalk(WindcallerAnimations.WALK_FLY, limbSwing, limbSwingAmount, speed * 1.5f, speed * 1.5f);
+			else
+				animateWalk(WindcallerAnimations.WALK, limbSwing, limbSwingAmount, speed, speed);
 		}
 		// idle animation
 		else {
-			restartThenAnimate(windcaller, windcaller.idleAnimState, WindcallerAnimations.IDLE, ageInTicks);
+			if (windcaller.isFlying())
+				restartThenAnimate(windcaller, windcaller.idleAnimState, WindcallerAnimations.FLY_IDLE, ageInTicks);
+			else
+				restartThenAnimate(windcaller, windcaller.idleAnimState, WindcallerAnimations.IDLE, ageInTicks);
 		}
 	}
 

@@ -261,6 +261,10 @@ public class UnitActionItem {
                     if (unit instanceof AttackerUnit attackerUnit) {
                         MiscUtil.addUnitCheckpoint(unit, preselectedBlockPos, false);
                         attackerUnit.setAttackMoveTarget(preselectedBlockPos);
+                        if (((LivingEntity) unit).getFirstPassenger() instanceof RangedAttackerUnit rau &&
+                            rau.getRangedAttackGroundGoal() != null) {
+                            rau.getRangedAttackGroundGoal().setGroundTarget(null);
+                        }
                     } else {
                         unit.setMoveTarget(preselectedBlockPos);
                     }

@@ -1,17 +1,21 @@
 package com.solegendary.reignofnether.unit.units.villagers;
 
 import com.solegendary.reignofnether.ReignOfNether;
+import com.solegendary.reignofnether.building.BuildingClientEvents;
+import com.solegendary.reignofnether.building.Buildings;
 import com.solegendary.reignofnether.building.buildings.placements.ProductionPlacement;
 import com.solegendary.reignofnether.building.production.ProductionItem;
+import com.solegendary.reignofnether.building.production.ProductionItems;
 import com.solegendary.reignofnether.building.production.StartProductionButton;
 import com.solegendary.reignofnether.building.production.StopProductionButton;
 import com.solegendary.reignofnether.hud.buttons.UnitSpawnButton;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.registrars.EntityRegistrar;
+import com.solegendary.reignofnether.research.ResearchServerEvents;
 import com.solegendary.reignofnether.resources.ResourceCost;
 import com.solegendary.reignofnether.resources.ResourceCosts;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.network.chat.Style;
+import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.FormattedCharSequence;
@@ -19,6 +23,8 @@ import net.minecraft.world.level.Level;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.solegendary.reignofnether.util.MiscUtil.fcs;
 
 public class WindcallerProd extends ProductionItem {
 
@@ -28,8 +34,16 @@ public class WindcallerProd extends ProductionItem {
     public WindcallerProd() {
         super(cost);
         this.onComplete = (Level level, ProductionPlacement placement) -> {
-            if (!level.isClientSide())
-                placement.produceUnit((ServerLevel) level, EntityRegistrar.WINDCALLER_UNIT.get(), placement.ownerName, true);
+            if (!level.isClientSide()) {
+                boolean hasResearch = ResearchServerEvents.playerHasResearch(placement.ownerName, ProductionItems.RESEARCH_UPGRADED_WINDCALLERS);
+                placement.produceUnit(
+                        (ServerLevel) level,
+                        EntityRegistrar.WINDCALLER_UNIT.get(),
+                        placement.ownerName,
+                        !hasResearch,
+                        hasResearch ? new Vec3i(0,10,0) : new Vec3i(0,0,0)
+                );
+            }
         };
     }
 
@@ -42,29 +56,31 @@ public class WindcallerProd extends ProductionItem {
                 itemName,
                 ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/mobheads/windcaller.png"),
                 List.of(
-                        FormattedCharSequence.forward(I18n.get("units.villagers.reignofnether.windcaller"), Style.EMPTY.withBold(true)),
-                        FormattedCharSequence.forward("", Style.EMPTY),
-                        FormattedCharSequence.forward(I18n.get("units.villagers.reignofnether.windcaller.tooltip1"), Style.EMPTY),
-                        FormattedCharSequence.forward(I18n.get("units.villagers.reignofnether.windcaller.tooltip2"), Style.EMPTY)
+                        fcs(I18n.get("units.villagers.reignofnether.windcaller"), true),
+                        fcs(""),
+                        fcs(I18n.get("units.villagers.reignofnether.windcaller.tooltip1")),
+                        fcs(I18n.get("units.villagers.reignofnether.windcaller.tooltip2"))
                 )
         );
     }
 
     public StartProductionButton getStartButton(ProductionPlacement prodBuilding, Keybinding hotkey) {
         List<FormattedCharSequence> tooltipLines = new ArrayList<>(List.of(
-                FormattedCharSequence.forward(I18n.get("units.villagers.reignofnether.windcaller"), Style.EMPTY.withBold(true)),
+                fcs(I18n.get("units.villagers.reignofnether.windcaller"), true),
                 ResourceCosts.getFormattedCost(cost),
                 ResourceCosts.getFormattedPopAndTime(cost),
-                FormattedCharSequence.forward("", Style.EMPTY),
-                FormattedCharSequence.forward(I18n.get("units.villagers.reignofnether.windcaller.tooltip1"), Style.EMPTY),
-                FormattedCharSequence.forward(I18n.get("units.villagers.reignofnether.windcaller.tooltip2"), Style.EMPTY)
+                fcs(""),
+                fcs(I18n.get("units.villagers.reignofnether.windcaller.tooltip1")),
+                fcs(I18n.get("units.villagers.reignofnether.windcaller.tooltip2")),
+                fcs(""),
+                fcs(I18n.get("units.villagers.reignofnether.windcaller.tooltip3"))
         ));
         return new StartProductionButton(
             WindcallerProd.itemName,
             ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/mobheads/windcaller.png"),
             hotkey,
             () -> false,
-            () -> true,
+            () -> BuildingClientEvents.hasFinishedBuilding(Buildings.LIBRARY),
             tooltipLines,
             this
         );

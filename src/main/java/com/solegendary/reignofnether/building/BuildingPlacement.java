@@ -27,6 +27,7 @@ import com.solegendary.reignofnether.fogofwar.FogOfWarClientboundPacket;
 import com.solegendary.reignofnether.fogofwar.FogOfWarServerEvents;
 import com.solegendary.reignofnether.fogofwar.FrozenChunk;
 import com.solegendary.reignofnether.fogofwar.FrozenChunkClientboundPacket;
+import com.solegendary.reignofnether.gamerules.GameruleClient;
 import com.solegendary.reignofnether.hud.AbilityButton;
 import com.solegendary.reignofnether.hud.Button;
 import com.solegendary.reignofnether.player.PlayerServerEvents;
@@ -34,6 +35,7 @@ import com.solegendary.reignofnether.player.RTSPlayer;
 import com.solegendary.reignofnether.player.RTSPlayerScoresEnum;
 import com.solegendary.reignofnether.registrars.BlockRegistrar;
 import com.solegendary.reignofnether.registrars.EntityRegistrar;
+import com.solegendary.reignofnether.registrars.GameRuleRegistrar;
 import com.solegendary.reignofnether.registrars.MobEffectRegistrar;
 import com.solegendary.reignofnether.research.ResearchServerEvents;
 import com.solegendary.reignofnether.research.researchItems.ResearchSilverfish;
@@ -48,6 +50,9 @@ import com.solegendary.reignofnether.tutorial.TutorialServerEvents;
 import com.solegendary.reignofnether.unit.UnitAction;
 import com.solegendary.reignofnether.unit.UnitServerEvents;
 import com.solegendary.reignofnether.unit.goals.BuildRepairGoal;
+import com.solegendary.reignofnether.unit.goals.MeleeAttackBuildingGoal;
+import com.solegendary.reignofnether.unit.goals.RangedAttackBuildingGoal;
+import com.solegendary.reignofnether.unit.interfaces.AttackerUnit;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.interfaces.WorkerUnit;
 import com.solegendary.reignofnether.unit.units.monsters.SilverfishUnit;
@@ -557,7 +562,7 @@ public class BuildingPlacement {
     public void destroyRandomBlocks(int amount) {
         if (getLevel().isClientSide())
             return;
-        if (building.invulnerable)
+        if (!isAttackable())
             return;
         var placedBlocks = new ArrayList<BuildingBlock>();
         for (BuildingBlock block : blocks) {
@@ -580,7 +585,7 @@ public class BuildingPlacement {
     }
 
     public boolean shouldBeDestroyed() {
-        if (!this.level.getWorldBorder().isWithinBounds(centrePos)) {
+        if (isIllegallyOutsideWorldBorder()) {
             return true;
         }
         if (this.level.isClientSide() && (FogOfWarClientEvents.isBuildingInBrightChunk(this) && isDestroyedServerside)) {
@@ -1240,6 +1245,18 @@ public class BuildingPlacement {
                 if (this instanceof BeaconPlacement beacon)
                     beacon.sendWarning("capture_warning");
 
+                for (LivingEntity le : UnitServerEvents.getAllUnits()) {
+                    if (le instanceof AttackerUnit attackerUnit &&
+                        le instanceof Unit unit &&
+                            AlliancesServerEvents.isAlliedOrOwned(ownerName, unit.getOwnerName())) {
+                        if (attackerUnit.getAttackBuildingGoal() instanceof MeleeAttackBuildingGoal mabg &&
+                                mabg.getBuildingTarget() == this)
+                            mabg.stopAttacking();
+                        else if (attackerUnit.getAttackBuildingGoal() instanceof RangedAttackBuildingGoal<?> rabg &&
+                                rabg.getBuildingTarget() == this)
+                            rabg.stop();
+                    }
+                }
                 return !capturedByAlly;
             }
         }
@@ -1324,5 +1341,23 @@ public class BuildingPlacement {
 
     public long getTickAgeAfterBuilt() {
         return tickAgeAfterBuilt;
+    }
+
+    public boolean isIllegallyOutsideWorldBorder() {
+        boolean outsideBorder = isOutsideWorldBorder();
+        if (this.level.isClientSide()) {
+            return outsideBorder && !GameruleClient.buildingsOutsideBorder;
+        } else if (level.getServer() != null) {
+            return outsideBorder && !level.getServer().getGameRules().getRule(GameRuleRegistrar.BUILDINGS_OUTSIDE_BORDER).get();
+        }
+        return false;
+    }
+
+    public boolean isOutsideWorldBorder() {
+        return !this.level.getWorldBorder().isWithinBounds(centrePos);
+    }
+
+    public boolean isAttackable() {
+        return !isOutsideWorldBorder() && !building.invulnerable;
     }
 }

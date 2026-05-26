@@ -3,17 +3,19 @@ package com.solegendary.reignofnether.ability.abilities;
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.hud.AbilityButton;
+import com.solegendary.reignofnether.hud.HudClientEvents;
 import com.solegendary.reignofnether.keybinds.Keybinding;
 import com.solegendary.reignofnether.unit.UnitAction;
 import com.solegendary.reignofnether.unit.interfaces.Unit;
 import com.solegendary.reignofnether.unit.units.monsters.SpiderUnit;
-import com.solegendary.reignofnether.unit.units.piglins.BruteUnit;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 import static com.solegendary.reignofnether.unit.UnitClientEvents.sendUnitCommand;
 import static com.solegendary.reignofnether.util.MiscUtil.fcs;
@@ -31,6 +33,11 @@ public class ToggleSpiderClimbing extends Ability {
         );
     }
 
+    private final static Predicate<LivingEntity> TOGGLE_CHECK = le ->
+            HudClientEvents.hudSelectedEntity instanceof SpiderUnit hudUnit &&
+            le instanceof SpiderUnit unit &&
+            hudUnit.isWallClimbing() == unit.isWallClimbing();
+
     @Override
     public AbilityButton getButton(Keybinding hotkey, Unit unit) {
         if (!(unit instanceof SpiderUnit spiderUnit))
@@ -45,7 +52,7 @@ public class ToggleSpiderClimbing extends Ability {
                 () -> false,
                 () -> false,
                 () -> true,
-                () -> sendUnitCommand(UnitAction.TOGGLE_SPIDER_CLIMBING),
+                () -> sendUnitCommand(UnitAction.TOGGLE_SPIDER_CLIMBING, TOGGLE_CHECK),
                 null,
                 List.of(
                         spiderUnit.isWallClimbing() ?

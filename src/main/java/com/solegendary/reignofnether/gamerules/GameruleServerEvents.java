@@ -111,6 +111,12 @@ public class GameruleServerEvents {
                 boolean value = (boolean) args.get("value").getResult();
                 GameruleClientboundPacket.setCoopMode(value);
             }
+        } else if (nodes.get(1).getNode().getName().equals("buildingsOutsideBorder")) {
+            Map<String, ParsedArgument<CommandSourceStack, ?>> args = evt.getParseResults().getContext().getArguments();
+            if (args.containsKey("value")) {
+                boolean value = (boolean) args.get("value").getResult();
+                GameruleClientboundPacket.setBuildingsOutsideBorder(value);
+            }
         }
     }
 
@@ -150,6 +156,8 @@ public class GameruleServerEvents {
             GameruleClientboundPacket.setScenarioMode(scenarioMode);
             boolean coopMode = server.getGameRules().getRule(GameRuleRegistrar.COOP_MODE).get();
             GameruleClientboundPacket.setCoopMode(coopMode);
+            boolean buildingsOutsideBorder = server.getGameRules().getRule(GameRuleRegistrar.BUILDINGS_OUTSIDE_BORDER).get();
+            GameruleClientboundPacket.setBuildingsOutsideBorder(buildingsOutsideBorder);
         }
     }
 }

@@ -14,6 +14,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -102,6 +103,7 @@ public class MoltenBombProjectile extends Fireball {
         }
         List<Mob> mobs = MiscUtil.getEntitiesWithinRange(position(), moltenBomb.radius, Mob.class, level());
         for (Mob mob : mobs) {
+            mob.hurt(damageSources().mobProjectile(this, (LivingEntity) this.getOwner()), 0.5f);
             if (random.nextBoolean())
                 mob.setSecondsOnFire(5);
             if (this.getOwner() instanceof LivingEntity le && le.hasEffect(MobEffectRegistrar.SOULS_AFLAME.get())) {

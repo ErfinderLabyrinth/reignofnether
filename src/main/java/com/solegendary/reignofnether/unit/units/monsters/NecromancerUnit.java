@@ -56,6 +56,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import oshi.util.tuples.Pair;
 
@@ -487,10 +488,24 @@ public class NecromancerUnit extends Skeleton implements Unit, AttackerUnit, Ran
     // override to make inaccuracy 0
     @Override
     public void performUnitRangedAttack(LivingEntity pTarget, float velocity) {
+        if (pTarget == null)
+            return;
 
-        double x = pTarget.getX() - this.getX();
-        double y = pTarget.getY(0.5) - this.getY(0.5);
-        double z = pTarget.getZ() - this.getZ();
+        // Lead the shot by predicting where the target will be when the projectile arrives
+        Vec3 shooterPos = this.getEyePosition();
+        Vec3 targetPos = pTarget.getEyePosition().subtract(0,0.5,0);
+        Vec3 targetDelta = pTarget.getDeltaMovement();
+
+        if (pTarget.onGround())
+            targetDelta = targetDelta.multiply(1,0,1);
+
+        double distanceTicks = shooterPos.distanceTo(targetPos) * 1.5f;
+        Vec3 predictedPos = targetPos.add(targetDelta.multiply(distanceTicks * 1.5f, distanceTicks, distanceTicks * 1.5f));
+
+        double x = predictedPos.x() - shooterPos.x();
+        double y = predictedPos.y() - shooterPos.y();
+        double z = predictedPos.z() - shooterPos.z();
+
         NecromancerProjectile proj = new NecromancerProjectile(this.level(), this, x, y, z);
         proj.setPos(this.getEyePosition());
 

@@ -63,7 +63,7 @@ public class RangedAttackBuildingGoal<T extends Mob> extends Goal {
         if (blockPos != null) {
             if (this.mob.level().isClientSide()) {
                 BuildingPlacement b = BuildingUtils.findBuilding(this.mob.level().isClientSide(), blockPos);
-                if (b != null && !b.getBuilding().invulnerable) {
+                if (b != null && b.isAttackable()) {
                     this.buildingTarget = b;
                         MiscUtil.addUnitCheckpoint(((Unit) mob), new BlockPos(
                                         buildingTarget.centrePos.getX(),
@@ -75,7 +75,7 @@ public class RangedAttackBuildingGoal<T extends Mob> extends Goal {
             }
             else {
                 BuildingPlacement b = BuildingUtils.findBuilding(this.mob.level().isClientSide(), blockPos);
-                if (b != null && !b.getBuilding().invulnerable) {
+                if (b != null && b.isAttackable()) {
                     this.buildingTarget = b;
                     setNextBlockTarget();
                 }

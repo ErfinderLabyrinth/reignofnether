@@ -59,7 +59,7 @@ public class WitchHut extends ProductionBuilding {
                 ResourceLocation.fromNamespaceAndPath("minecraft", "textures/block/stripped_crimson_stem_top.png"),
                 hotkey,
                 () -> BuildingClientEvents.getBuildingToPlace() == Buildings.WITCH_HUT,
-                () -> !SandboxClientEvents.isSandboxPlayer() || TutorialClientEvents.isEnabled(),
+                TutorialClientEvents::isEnabled,
                 () -> BuildingClientEvents.hasFinishedBuilding(Buildings.BARRACKS) ||
                         ResearchClient.hasCheat("modifythephasevariance"),
                 List.of(
