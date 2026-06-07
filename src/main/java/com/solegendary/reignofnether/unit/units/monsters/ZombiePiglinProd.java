@@ -44,7 +44,7 @@ public class ZombiePiglinProd extends ProductionItem {
                 itemName,
                 ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/mobheads/zombie_piglin.png"),
                 List.of(
-                        FormattedCharSequence.forward(I18n.get("units.monsters.reignofnether.zombie_piglin"), Style.EMPTY.withBold(true))
+                        FormattedCharSequence.forward(I18n.get("entity.reignofnether.zombie_piglin_unit"), Style.EMPTY.withBold(true))
                 )
         );
     }

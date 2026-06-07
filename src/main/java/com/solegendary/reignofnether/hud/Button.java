@@ -127,7 +127,7 @@ public class Button {
     protected void renderHotkey(GuiGraphics guiGraphics, int x, int y) {
         // hotkey letter
         if (this.hotkey != null) {
-            String hotkeyStr = hotkey.buttonLabel;
+            String hotkeyStr = hotkey.getCurrentLabel();
             hotkeyStr = hotkeyStr.substring(0,Math.min(3, hotkeyStr.length()));
             guiGraphics.pose().translate(0,0,1);
             guiGraphics.drawCenteredString(MC.font,
@@ -151,18 +151,20 @@ public class Button {
 
         if (bgIconResource != null) {
             guiGraphics.pose().translate(0,0,1);
-            int iconX = frameResource != null ? x+4 + (7 - iconSize/2) : x + (7 - iconSize/2);
-            int iconY = frameResource != null ? y+4 + (7 - iconSize/2) : y + (7 - iconSize/2);
+            int iconX = x+4 + (7 - xyDiff - iconSize/2);
+            int iconY = y+4 + (7 - xyDiff - iconSize/2);
             if (stretchIconToBorders) {
                 iconX -= 1;
                 iconY -= 1;
             }
+            iconX += (DEFAULT_ICON_SIZE - imageSize) / 2;
+            iconY += (DEFAULT_ICON_SIZE - imageSize) / 2;
             MyRenderer.renderIcon(
                     guiGraphics,
                     bgIconResource,
                     iconX,
                     iconY,
-                    stretchIconToBorders ? iconSize + 2 : iconSize
+                    stretchIconToBorders ? imageSize + 2 : imageSize
             );
         }
         // item/unit icon
@@ -275,7 +277,7 @@ public class Button {
         if (!OrthoviewClientEvents.isEnabled() || !isEnabled.get())
             return;
 
-        if (hotkey != null && hotkey.key == key) {
+        if (hotkey != null && hotkey.getKey() == key) {
             if (MC.player != null)
                 MC.player.playSound(SoundEvents.UI_BUTTON_CLICK.get(), 0.2f, 1.0f);
             this.onLeftClick.run();

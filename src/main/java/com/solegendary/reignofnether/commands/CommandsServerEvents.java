@@ -471,6 +471,15 @@ public class CommandsServerEvents {
 					))))
 		);
 
+		dispatcher.register(Commands.literal("rtsapi-teams-mode")
+				.requires(source -> source.hasPermission(2))
+				.then(Commands.argument("mode", StringArgumentType.string())
+						.executes(ctx -> setStartingTeamsMode(
+								ctx,
+								StringArgumentType.getString(ctx, "mode")
+						)))
+		);
+
 		dispatcher.register(Commands.literal("rtsapi-set-starting-teams-mode")
 				.requires(source -> source.hasPermission(2))
 				.then(Commands.argument("mode", StringArgumentType.string())
@@ -1115,6 +1124,9 @@ public class CommandsServerEvents {
 			CommandContext<CommandSourceStack> ctx,
 			String mode
 	) {
+		if (StartPosServerEvents.isStartingGame()) {
+			return 0;
+		}
 		if (RTSMapInfoServerEvents.rtsMapInfo == null) {
 			ctx.getSource().sendFailure(Component.literal("No rtsMapInfo loaded"));
 			return 0;

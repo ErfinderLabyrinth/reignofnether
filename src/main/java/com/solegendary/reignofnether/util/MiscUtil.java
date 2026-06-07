@@ -37,6 +37,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.language.I18n;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -71,6 +72,7 @@ import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.SnowLayerBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
@@ -793,7 +795,15 @@ public class MiscUtil {
         return entity.getAbsorptionAmount();
     }
 
-    // eg. entity.reignofnether.zombie_unit -> zombie
+    // eg. Zombie -> entity.reignofnether.zombie
+    public static String getEntityIconName(Entity entity) {
+        return entity.getType().getDescriptionId()
+                .replace("entity.reignofnether.", "")
+                .replace("_unit", "")
+                .toLowerCase();
+    }
+
+    // eg. Zombie
     public static String getSimpleEntityName(Entity entity) {
         if (entity instanceof PhantomSummon)
             return "Phantom";
@@ -802,18 +812,10 @@ public class MiscUtil {
             if (entity.hasCustomName()) {
                 return entity.getType()
                         .getDescription()
-                        .getString()
-                        .replace(" ", "")
-                        .replace("entity.reignofnether.", "")
-                        .replace("_unit", "")
-                        .replace(".none", "");
+                        .getString();
             } else {
                 return entity.getName()
-                        .getString()
-                        .replace(" ", "")
-                        .replace("entity.reignofnether.", "")
-                        .replace("_unit", "")
-                        .replace(".none", "");
+                        .getString();
             }
         } else if (entity != null) {
             return entity.getName().getString().toLowerCase();
@@ -961,5 +963,39 @@ public class MiscUtil {
     public static boolean isSnowLayerBlock(Block block) {
         return block instanceof WraithSnowLayerBlock ||
                 block instanceof SnowLayerBlock;
+    }
+
+    public static String getColorName(int colorIdOrHex, boolean english) {
+        if (colorIdOrHex == MapColor.COLOR_MAGENTA.id || colorIdOrHex == 0xBD44B3)
+            return english ? "magenta" : I18n.get("color.reignofnether.magenta");
+        else if (colorIdOrHex == MapColor.COLOR_LIGHT_BLUE.id || colorIdOrHex == 0x3AAFD9)
+            return english ? "light_blue" : I18n.get("color.reignofnether.light_blue");
+        else if (colorIdOrHex == MapColor.COLOR_ORANGE.id || colorIdOrHex == 0xF07613)
+            return english ? "orange" : I18n.get("color.reignofnether.orange");
+        else if (colorIdOrHex == MapColor.COLOR_YELLOW.id || colorIdOrHex == 0xF8C627)
+            return english ? "yellow" : I18n.get("color.reignofnether.yellow");
+        else if (colorIdOrHex == MapColor.COLOR_LIGHT_GREEN.id || colorIdOrHex == 0x70B919)
+            return english ? "lime" : I18n.get("color.reignofnether.lime");
+        else if (colorIdOrHex == MapColor.COLOR_PINK.id || colorIdOrHex == 0xED8DAC)
+            return english ? "pink" : I18n.get("color.reignofnether.pink");
+        else if (colorIdOrHex == MapColor.COLOR_GRAY.id || colorIdOrHex == 0x3E4447)
+            return english ? "gray" : I18n.get("color.reignofnether.gray");
+        else if (colorIdOrHex == MapColor.COLOR_LIGHT_GRAY.id || colorIdOrHex == 0x8E8E86)
+            return english ? "light_gray" : I18n.get("color.reignofnether.light_gray");
+        else if (colorIdOrHex == MapColor.COLOR_CYAN.id || colorIdOrHex == 0x158991)
+            return english ? "cyan" : I18n.get("color.reignofnether.cyan");
+        else if (colorIdOrHex == MapColor.COLOR_PURPLE.id || colorIdOrHex == 0x792AAC)
+            return english ? "purple" : I18n.get("color.reignofnether.purple");
+        else if (colorIdOrHex == MapColor.COLOR_BLUE.id || colorIdOrHex == 0x35399D)
+            return english ? "blue" : I18n.get("color.reignofnether.blue");
+        else if (colorIdOrHex == MapColor.COLOR_BROWN.id || colorIdOrHex == 0x724728)
+            return english ? "brown" : I18n.get("color.reignofnether.brown");
+        else if (colorIdOrHex == MapColor.COLOR_GREEN.id || colorIdOrHex == 0x546D1B)
+            return english ? "green" : I18n.get("color.reignofnether.green");
+        else if (colorIdOrHex == MapColor.COLOR_RED.id || colorIdOrHex == 0xA12722)
+            return english ? "red" : I18n.get("color.reignofnether.red");
+        else if (colorIdOrHex == MapColor.COLOR_BLACK.id || colorIdOrHex == 0x141519)
+            return english ? "black" : I18n.get("color.reignofnether.black");
+        else return english ? "white" : I18n.get("color.reignofnether.white");
     }
 }

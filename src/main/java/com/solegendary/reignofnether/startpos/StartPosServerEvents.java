@@ -45,11 +45,53 @@ public class StartPosServerEvents {
     private static int cullTicksMax = 100;
     private static int cullTicks = 0;
 
+    public static boolean isStartingGame() {
+        return startingGame;
+    }
+
     public static void reset(ServerLevel serverLevel) {
         for (StartPos startPos : startPoses) {
             startPos.reset();
         }
         savePositions(serverLevel);
+    }
+
+    public static void setPlayerReady(String playerName, boolean ready) {
+        boolean shouldStartGame = true;
+        for (StartPos startPos : startPoses) {
+            if (startPos.playerName.equals(playerName))
+                startPos.ready = ready;
+            if (startPos.enabled && (!startPos.ready || startPos.playerName.isBlank()))
+                shouldStartGame = false;
+        }
+        if (shouldStartGame) {
+            startGameCountdown();
+        } else if (startingGame) {
+            cancelStartGameCountdown(false);
+        }
+        if (ready)
+            StartPosClientboundPacket.readyPlayer(playerName);
+        else
+            StartPosClientboundPacket.unreadyPlayer(playerName);
+    }
+
+    public static void setPosEnabled(BlockPos pos, boolean enable) {
+        if (startingGame)
+            return;
+        for (StartPos startPos : startPoses) {
+            if (startPos.pos.equals(pos)) {
+                startPos.enabled = enable;
+                if (!startPos.enabled) {
+                    startPos.playerName = "";
+                    startPos.ready = false;
+                    startPos.faction = Faction.NONE;
+                }
+            }
+        }
+        if (enable)
+            StartPosClientboundPacket.enablePos(pos);
+        else
+            StartPosClientboundPacket.disablePos(pos);
     }
 
     @SubscribeEvent
@@ -61,8 +103,8 @@ public class StartPosServerEvents {
             if (startPoses.size() < MAX_START_POSES) {
                 StartPos newStartPos = new StartPos(evt.getPos(),
                         rtsStartBlock.getMapColor(rtsStartBlock.defaultBlockState(),
-                        evt.getLevel(), evt.getPos(),
-                        rtsStartBlock.defaultMapColor()).col
+                            evt.getLevel(), evt.getPos(),
+                            rtsStartBlock.defaultMapColor()).id
                 );
                 startPoses.add(newStartPos);
                 StartPosClientboundPacket.addPos(newStartPos);
@@ -238,12 +280,17 @@ public class StartPosServerEvents {
 
     @SubscribeEvent
     public static void onPlayerLeave(PlayerEvent.PlayerLoggedOutEvent evt) {
+        boolean shouldStopCountdown = false;
         for (StartPos startPos : startPoses) {
             if (evt.getEntity() instanceof ServerPlayer player &&
                     startPos.playerName.equals(player.getName().getString())) {
                 StartPosClientboundPacket.unreservePos(startPos.pos);
                 startPos.reset();
+                shouldStopCountdown = true;
             }
+        }
+        if (shouldStopCountdown && startingGame) {
+            cancelStartGameCountdown(false);
         }
     }
 }

@@ -24,7 +24,14 @@ public class MoveToTargetBlockGoal extends Goal {
     @Nullable public BlockPos lastSelectedMoveTarget = null; // ignores unit formations, used for reducing move actions sent to server
 
     protected final int RECALC_COOLDOWN_MAX = 20;
-    protected void resetRecalcCooldown() { recalcCooldown = RECALC_COOLDOWN_MAX; }
+    protected static final int RECALC_COOLDOWN_CAP = 200; // ~10s cap for exponential backoff on stuck units
+    protected int currentRecalcCooldown = RECALC_COOLDOWN_MAX;
+    protected void resetRecalcCooldown() { recalcCooldown = currentRecalcCooldown; }
+    protected void backoffRecalcCooldown() {
+        currentRecalcCooldown = Math.min(currentRecalcCooldown * 2, RECALC_COOLDOWN_CAP);
+    }
+    protected void resetRecalcBackoff() { currentRecalcCooldown = RECALC_COOLDOWN_MAX; }
+    public boolean isInBackoff() { return currentRecalcCooldown > RECALC_COOLDOWN_MAX && moveTarget != null; }
     protected int recalcCooldown = 0; // limit start() used by canContinueToUse
 
     public MoveToTargetBlockGoal(Mob mob, boolean persistent, int reachRange) {
@@ -59,12 +66,14 @@ public class MoveToTargetBlockGoal extends Goal {
         // PathNavigation seems to have a max length so restart it if we haven't actually reached the target yet
         if (this.mob.getNavigation().isDone() && moveTarget != null &&
             this.mob.getOnPos().distSqr(moveTarget) > getMinDistToRecalculateSqr()) {
-            //BlockPos oldFinalNode = getFinalNodePos();
+            BlockPos oldFinalNode = getFinalNodePos();
             this.start();
-            //BlockPos newFinalNode = getFinalNodePos();
+            BlockPos newFinalNode = getFinalNodePos();
             // start() is very expensive, and it repeats every tick if the mob is stuck, eg. targeting over water
-            //if (oldFinalNode != null && oldFinalNode.equals(newFinalNode))
-            //    stopMoving();
+            if (oldFinalNode != null && oldFinalNode.equals(newFinalNode))
+                stopMoving();
+            else
+                backoffRecalcCooldown();
             resetRecalcCooldown();
             return true;
         }
@@ -89,15 +98,20 @@ public class MoveToTargetBlockGoal extends Goal {
                 Path shortPath = mob.getNavigation().createPath(moveTarget.getX(), moveTarget.getY(), moveTarget.getZ(), moveReachRange);
                 BlockPos shortFinalPos = getFinalNodePos(shortPath);
                 ai.setBaseValue(FOLLOW_RANGE_IMPROVED);
-                Path longPath = mob.getNavigation().createPath(moveTarget.getX(), moveTarget.getY(), moveTarget.getZ(), moveReachRange);
-                BlockPos longFinalPos = getFinalNodePos(longPath);
-                bestPath = longPath;
-                if (shortFinalPos != null && longFinalPos != null) {
-                    BlockPos moveTargetXZ = new BlockPos(moveTarget.getX(), 0, moveTarget.getZ());
-                    double shortXZDist = new BlockPos(shortFinalPos.getX(), 0, shortFinalPos.getZ()).distSqr(moveTargetXZ);
-                    double longXZDist = new BlockPos(longFinalPos.getX(), 0, longFinalPos.getZ()).distSqr(moveTargetXZ);
-                    if (shortXZDist < longXZDist)
-                        bestPath = shortPath;
+                if (shortFinalPos != null && shortFinalPos.equals(moveTarget)) {
+                    bestPath = shortPath;
+                } else {
+                    // use the shorter path if it has closer horizontal distance so armies can be force-moved over short rivers
+                    Path longPath = mob.getNavigation().createPath(moveTarget.getX(), moveTarget.getY(), moveTarget.getZ(), moveReachRange);
+                    BlockPos longFinalPos = getFinalNodePos(longPath);
+                    bestPath = longPath;
+                    if (shortFinalPos != null && longFinalPos != null) {
+                        BlockPos moveTargetXZ = new BlockPos(moveTarget.getX(), 0, moveTarget.getZ());
+                        double shortXZDist = new BlockPos(shortFinalPos.getX(), 0, shortFinalPos.getZ()).distSqr(moveTargetXZ);
+                        double longXZDist = new BlockPos(longFinalPos.getX(), 0, longFinalPos.getZ()).distSqr(moveTargetXZ);
+                        if (shortXZDist < longXZDist)
+                            bestPath = shortPath;
+                    }
                 }
             } else {
                 bestPath = mob.getNavigation().createPath(moveTarget.getX(), moveTarget.getY(), moveTarget.getZ(), moveReachRange);
@@ -113,6 +127,7 @@ public class MoveToTargetBlockGoal extends Goal {
             MiscUtil.addUnitCheckpoint((Unit) mob, bp, true);
         }
         this.moveTarget = bp;
+        resetRecalcBackoff();
 
         if (!this.mob.level().isClientSide())
             this.start();

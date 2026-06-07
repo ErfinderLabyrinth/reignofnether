@@ -1,5 +1,6 @@
 package com.solegendary.reignofnether.unit.units.villagers;
 
+import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.ability.Abilities;
 import com.solegendary.reignofnether.ability.Ability;
 import com.solegendary.reignofnether.ability.abilities.MountRavager;
@@ -54,7 +55,7 @@ import java.util.Optional;
 public class PillagerUnit extends Pillager implements Unit, AttackerUnit, RangedAttackerUnit {
     public static final Abilities ABILITIES = new Abilities();
     static {
-        ABILITIES.add(new MountRavager(), Keybindings.keyQ);
+        ABILITIES.add(new MountRavager(), Keybindings.abilitySlot1);
     }
 
     //region
@@ -345,7 +346,7 @@ public class PillagerUnit extends Pillager implements Unit, AttackerUnit, Ranged
                 }
             }
         } catch (NullPointerException e) {
-            System.out.println("Caught NullPointerException in shootCrossbowProjectile: " + e.getMessage());
+            ReignOfNether.LOGGER.error("Caught NullPointerException in shootCrossbowProjectile", e);
         }
         if (pTarget == null)
             return;

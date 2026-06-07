@@ -17,14 +17,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static com.solegendary.reignofnether.building.BuildingClientEvents.getPlayerToBuildingRelationship;
 import static com.solegendary.reignofnether.building.BuildingClientEvents.getSelectedBuildings;
@@ -51,7 +48,7 @@ public class ControlGroup {
     public ControlGroup() { }
 
     public int getKey() {
-        return keybinding != null ? keybinding.key : -1;
+        return keybinding != null ? keybinding.getKey() : -1;
     }
 
     public void clearAll() {
@@ -112,7 +109,7 @@ public class ControlGroup {
         // assign the icon resource (won't update if the front entity/building dies)
         if (newGroup) {
             if (hudSelectedEntity != null) {
-                String unitName = MiscUtil.getSimpleEntityName(hudSelectedEntity);
+                String unitName = MiscUtil.getEntityIconName(hudSelectedEntity);
                 iconRl = ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "textures/mobheads/" + unitName + ".png");
             } else if (hudSelectedPlacement != null) {
                 iconRl = hudSelectedPlacement.getBuilding().icon;

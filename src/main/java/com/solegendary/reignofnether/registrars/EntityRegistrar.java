@@ -91,11 +91,11 @@ public class EntityRegistrar {
                     .clientTrackingRange(UNIT_CLIENT_TRACKING_RANGE)
                     .build(ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "spider_unit").toString()));
 
-    public static final RegistryObject<EntityType<PoisonSpiderUnit>> POISON_SPIDER_UNIT = ENTITIES.register("cave_spider_unit",
+    public static final RegistryObject<EntityType<PoisonSpiderUnit>> POISON_SPIDER_UNIT = ENTITIES.register("poison_spider_unit",
             () -> EntityType.Builder.of(PoisonSpiderUnit::new, MobCategory.CREATURE)
                     .sized(EntityType.SPIDER.getWidth(), EntityType.SPIDER.getHeight())
                     .clientTrackingRange(UNIT_CLIENT_TRACKING_RANGE)
-                    .build(ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "cave_spider_unit").toString()));
+                    .build(ResourceLocation.fromNamespaceAndPath(ReignOfNether.MOD_ID, "poison_spider_unit").toString()));
 
     public static final RegistryObject<EntityType<WraithUnit>> WRAITH_UNIT = ENTITIES.register("wraith_unit",
             () -> EntityType.Builder.of(WraithUnit::new, MobCategory.CREATURE)
