@@ -210,6 +210,11 @@ public class HoglinUnit extends Hoglin implements Unit, AttackerUnit, Convertabl
                 } while(!(block instanceof LeavesBlock));
             }
         }
+
+        // for some reason, hoglins don't run this goal when mounted and so don't move beyond follow range
+        if (this.isVehicle())
+            if (this.getMoveGoal().canUse())
+                this.getMoveGoal().canContinueToUse();
     }
 
     @Override

@@ -71,10 +71,9 @@ public class MoveToTargetBlockGoal extends Goal {
             BlockPos newFinalNode = getFinalNodePos();
             // start() is very expensive, and it repeats every tick if the mob is stuck, eg. targeting over water
             if (oldFinalNode != null && oldFinalNode.equals(newFinalNode))
-                stopMoving();
-            else
                 backoffRecalcCooldown();
-            resetRecalcCooldown();
+            else
+                resetRecalcBackoff();
             return true;
         }
         else if (moveTarget == null)

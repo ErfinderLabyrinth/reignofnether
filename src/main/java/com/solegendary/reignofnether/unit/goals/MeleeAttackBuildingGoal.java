@@ -57,9 +57,9 @@ public class MeleeAttackBuildingGoal extends MoveToTargetBlockGoal {
                     this.start();
                     BlockPos newFinalNode = getFinalNodePos();
                     if (oldFinalNode != null && oldFinalNode.equals(newFinalNode)) {
-                        stopAttacking();
-                    } else {
                         currentMeleeRecalcCooldown = Math.min(currentMeleeRecalcCooldown * 2, MELEE_RECALC_COOLDOWN_CAP);
+                    } else {
+                        currentMeleeRecalcCooldown = RECALC_COOLDOWN_MAX;
                     }
                     recalcCooldown = currentMeleeRecalcCooldown;
                 }

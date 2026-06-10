@@ -160,10 +160,6 @@ public abstract class Building {
 
     }
 
-    public void onBlockBreak(ServerLevel level, BlockPos pos, boolean breakBlocks, BuildingPlacement placement) {
-
-    }
-
     public void destroy(ServerLevel serverLevel, BuildingPlacement placement) {
 
     }
