@@ -2,6 +2,7 @@ package com.solegendary.reignofnether.player;
 
 import com.solegendary.reignofnether.ReignOfNether;
 import com.solegendary.reignofnether.ability.HeroAbility;
+import com.solegendary.reignofnether.ability.TradeAction;
 import com.solegendary.reignofnether.alliance.AlliancesServerEvents;
 import com.solegendary.reignofnether.alliance.AllyCommand;
 import com.solegendary.reignofnether.building.*;
@@ -371,6 +372,8 @@ public class PlayerServerEvents {
         } else {
             PlayerClientboundPacket.disableStartRTS(playerName);
         }
+
+        updateMarketRates(playerName);
     }
 
     @SubscribeEvent
@@ -1244,6 +1247,28 @@ public class PlayerServerEvents {
             sendMessageToAllPlayers("server.reignofnether.sync_enabled");
         } else {
             sendMessageToAllPlayers("server.reignofnether.sync_disabled");
+        }
+    }
+
+    public static void updateMarketRates(String playerName) {
+        for (RTSPlayer rtsPlayer : rtsPlayers) {
+            if (rtsPlayer.name.equals(playerName)) {
+                for (TradeAction tradeAction : rtsPlayer.tradeRates.keySet()) {
+                    PlayerClientboundPacket.setMarketRate(tradeAction, rtsPlayer.name, rtsPlayer.tradeRates.get(tradeAction));
+                }
+                return;
+            }
+        }
+    }
+
+    public static void updateMarketRates(int playerId) {
+        for (RTSPlayer rtsPlayer : rtsPlayers) {
+            if (rtsPlayer.id == playerId) {
+                for (TradeAction tradeAction : rtsPlayer.tradeRates.keySet()) {
+                    PlayerClientboundPacket.setMarketRate(tradeAction, rtsPlayer.name, rtsPlayer.tradeRates.get(tradeAction));
+                }
+                return;
+            }
         }
     }
 }

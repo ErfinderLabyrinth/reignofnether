@@ -1,8 +1,11 @@
 package com.solegendary.reignofnether.player;
 
+import com.solegendary.reignofnether.ability.Ability;
+import com.solegendary.reignofnether.ability.TradeAction;
 import com.solegendary.reignofnether.alliance.AlliancesClient;
 import com.solegendary.reignofnether.building.BuildingClientEvents;
 import com.solegendary.reignofnether.building.BuildingPlacement;
+import com.solegendary.reignofnether.building.buildings.shared.AbstractMarket;
 import com.solegendary.reignofnether.building.custombuilding.CustomBuildingClientEvents;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientEvents;
 import com.solegendary.reignofnether.gamemode.ClientGameModeHelper;
@@ -67,6 +70,14 @@ public class PlayerClientEvents {
     }
 
     @Nullable
+    public static RTSPlayer getRTSPlayer() {
+        for (RTSPlayer rtsPlayer : rtsPlayers)
+            if (MC.player != null && rtsPlayer.name.equals(MC.player.getName().getString()))
+                return rtsPlayer;
+        return null;
+    }
+
+    @Nullable
     public static RTSPlayer getRTSPlayer(String playerName) {
         for (RTSPlayer rtsPlayer : rtsPlayers)
             if (rtsPlayer.name.equals(playerName))
@@ -126,6 +137,16 @@ public class PlayerClientEvents {
 
     public static String getPlayerName() {
         return MC.player != null ? MC.player.getName().getString() : "";
+    }
+
+    public static void setMarketRate(TradeAction tradeAction, String playerName, int rate) {
+        for (RTSPlayer rtsPlayer : rtsPlayers)
+            if (playerName.equals(rtsPlayer.name))
+                rtsPlayer.tradeRates.put(tradeAction, rate);
+
+        for (BuildingPlacement bpl : BuildingClientEvents.getBuildings())
+            if (bpl.getBuilding() instanceof AbstractMarket)
+                bpl.updateButtons();
     }
 
     @SubscribeEvent
@@ -234,6 +255,7 @@ public class PlayerClientEvents {
                     MC.getMusicManager().stopPlaying();
                     ResearchClient.removeAllCheats();
                 }
+                PlayerServerboundPacket.requestMarketRates();
             }
         }
     }
