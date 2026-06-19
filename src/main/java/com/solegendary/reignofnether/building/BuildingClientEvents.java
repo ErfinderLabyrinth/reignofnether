@@ -787,10 +787,16 @@ public class BuildingClientEvents {
                     ids[i] = builderIds.get(i);
                 }
                 if (Keybindings.shiftMod.isDown()) {
+                    String ownerName = MC.player.getName().getString();
+                    if (SandboxClientEvents.relationship == Relationship.NEUTRAL)
+                        ownerName = "";
+                    else if (SandboxClientEvents.relationship == Relationship.HOSTILE)
+                        ownerName = "Enemy";
+
                     BuildingServerboundPacket.placeAndQueueBuilding(building,
                         isBuildingToPlaceABridge() && bridgePlaceState == 2 ? pos.offset(-5, 0, -5) : pos,
                         buildingRotation,
-                        hudSelectedEntity instanceof Unit unit ? unit.getOwnerName() : MC.player.getName().getString(),
+                        hudSelectedEntity instanceof Unit unit ? unit.getOwnerName() : ownerName,
                         ids,
                         isBridgeDiagonal()
                     );
@@ -1068,7 +1074,7 @@ public class BuildingClientEvents {
         if (newBuilding != null && MC.player != null) {
             newBuilding.isBuilt = isBuilt;
 
-            if (isBuilt && forPlayerLoggingIn) {
+            if (isBuilt) {
                 newBuilding.highestBlockCountReached = newBuilding.getBlocksTotal();
             }
 
@@ -1118,12 +1124,13 @@ public class BuildingClientEvents {
         }
     }
 
-    public static void syncBuilding(BuildingPlacement serverBuilding, int blocksPlaced, String ownerName, int scenarioRoleIndex) {
+    public static void syncBuilding(BuildingPlacement serverBuilding, int blocksPlaced, double partialBlocksDestroyed, String ownerName, int scenarioRoleIndex) {
         for (BuildingPlacement building : buildings) {
             if (building.originPos.equals(serverBuilding.originPos)) {
                 building.setServerBlocksPlaced(blocksPlaced);
                 building.ownerName = ownerName;
                 building.scenarioRoleIndex = scenarioRoleIndex;
+                building.partialBlocksDestroyed = partialBlocksDestroyed;
             }
         }
     }

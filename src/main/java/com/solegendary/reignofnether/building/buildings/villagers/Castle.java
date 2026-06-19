@@ -63,6 +63,8 @@ public class Castle extends ProductionBuilding implements GarrisonableBuildingAd
         this.icon = ResourceLocation.fromNamespaceAndPath("minecraft", "textures/block/cobblestone.png");
 
         this.buildTimeModifier = 0.5f;
+        this.maxHealth = 800d;
+        this.maxHealthBonusPerUpgradeLevel = 50d;
 
         this.startingBlockTypes.add(Blocks.STONE_BRICKS);
         this.startingBlockTypes.add(Blocks.STONE_BRICK_WALL);

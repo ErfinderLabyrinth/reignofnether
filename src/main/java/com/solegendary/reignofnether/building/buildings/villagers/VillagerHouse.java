@@ -30,10 +30,13 @@ public class VillagerHouse extends Building {
         this.icon = ResourceLocation.fromNamespaceAndPath("minecraft", "textures/block/oak_log.png");
 
         this.buildTimeModifier = 0.8f;
+        this.maxHealth = 175d;
 
         this.startingBlockTypes.add(Blocks.SPRUCE_PLANKS);
         this.startingBlockTypes.add(Blocks.OAK_PLANKS);
         this.startingBlockTypes.add(Blocks.OAK_LOG);
+
+        this.maxHealth = 125;
     }
 
     public Faction getFaction() {return Faction.VILLAGERS;}

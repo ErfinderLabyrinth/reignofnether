@@ -631,7 +631,8 @@ public class PlayerServerEvents {
             for (BuildingPlacement building : BuildingServerEvents.getBuildings()) {
                 if (building.scenarioRoleIndex == roleIndex) {
                     building.ownerName = playerName;
-                    BuildingClientboundPacket.syncBuilding(building.originPos, building.getBlocksPlaced(), playerName, building.scenarioRoleIndex);
+                    BuildingClientboundPacket.syncBuilding(building.originPos, building.getBlocksPlaced(),
+                            building.partialBlocksDestroyed, playerName, building.scenarioRoleIndex);
                 }
             }
             for (LivingEntity le : UnitServerEvents.getAllUnits()) {
@@ -946,9 +947,20 @@ public class PlayerServerEvents {
     }
 
     public static void defeat(String playerName, String reason) {
-        ReignOfNether.LOGGER.info("[Player] defeat: playerName={}, reason={}", playerName, reason);
         if (SandboxServer.isSandboxPlayer(playerName))
             return;
+
+        boolean playerExists = false;
+        for (RTSPlayer rtsPlayer : rtsPlayers) {
+            if (rtsPlayer.name.equals(playerName)) {
+                playerExists = true;
+                break;
+            }
+        }
+        if (!playerExists)
+            return;
+
+        ReignOfNether.LOGGER.info("[Player] defeat: playerName={}, reason={}", playerName, reason);
 
         synchronized (rtsPlayers) {
             // Remove the defeated player from the list
@@ -1168,7 +1180,7 @@ public class PlayerServerEvents {
         for (BuildingPlacement bpl : BuildingServerEvents.getBuildings()) {
             ScenarioRole role = ScenarioUtils.getScenarioRole(false, bpl.scenarioRoleIndex);
             bpl.ownerName = role != null ? role.name : "";
-            BuildingClientEvents.syncBuilding(bpl, bpl.getBlocksPlaced(), bpl.ownerName, bpl.scenarioRoleIndex);
+            BuildingClientEvents.syncBuilding(bpl, bpl.getBlocksPlaced(), bpl.partialBlocksDestroyed, bpl.ownerName, bpl.scenarioRoleIndex);
         }
         serverLevel.getGameRules().getRule(GameRuleRegistrar.SCENARIO_MODE).set(true, serverLevel.getServer());
 

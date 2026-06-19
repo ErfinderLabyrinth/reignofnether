@@ -33,7 +33,7 @@ public class Mausoleum extends ProductionBuilding implements NightSourceAddon, R
     public final static String buildingName = "Mausoleum";
     public final static String structureName = "mausoleum";
     public final static ResourceCost cost = ResourceCosts.MAUSOLEUM;
-    public final static int nightRange = 80;
+    public final static int nightRange = 60;
     public final static int nightRangeReduced = 40;
 
     public Mausoleum() {
@@ -45,6 +45,7 @@ public class Mausoleum extends ProductionBuilding implements NightSourceAddon, R
 
         this.buildTimeModifier = 0.274f; // 60s total build time with 3 villagers
         this.canAcceptResources = true;
+        this.maxHealth = 460d;
 
         this.startingBlockTypes.add(Blocks.STONE);
         this.startingBlockTypes.add(Blocks.STONE_BRICK_STAIRS);
@@ -132,5 +133,10 @@ public class Mausoleum extends ProductionBuilding implements NightSourceAddon, R
     @Override
     public boolean showOnlyWhenSelected(BuildingPlacement placement) {
         return false;
+    }
+
+    @Override
+    public int getDefaultNightRange() {
+        return nightRangeReduced;
     }
 }

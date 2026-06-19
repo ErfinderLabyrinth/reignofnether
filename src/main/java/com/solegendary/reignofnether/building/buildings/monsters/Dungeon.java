@@ -45,9 +45,13 @@ public class Dungeon extends ProductionBuilding {
 
         this.startingBlockTypes.add(Blocks.DEEPSLATE_BRICK_STAIRS);
 
+        this.buildTimeModifier = 2.0f;
+
         this.explodeChance = 0.2f;
         this.productions.add(ProductionItems.CREEPER, Keybindings.abilitySlot1);
         this.productions.add(ProductionItems.WRAITH, Keybindings.abilitySlot2);
+
+        this.maxHealth = 120d;
     }
 
     public Faction getFaction() {return Faction.MONSTERS;}

@@ -71,7 +71,6 @@ public class Library extends ProductionBuilding implements RangeIndicatorAddon {
         return nbt;
     });
 
-
     public final static String buildingName = "Library";
     public final static String structureName = "library";
     public final static String upgradedStructureName = "library_grand";
@@ -91,6 +90,8 @@ public class Library extends ProductionBuilding implements RangeIndicatorAddon {
         this.startingBlockTypes.add(Blocks.SPRUCE_STAIRS);
 
         this.explodeChance = 0.2f;
+        this.maxHealth = 125d;
+        this.maxHealthBonusPerUpgradeLevel = 25d;
 
         this.abilities.add(ENCHANT_MAIMING, Keybindings.abilitySlot1);
         this.abilities.add(ENCHANT_QUICK_CHARGE, Keybindings.abilitySlot2);

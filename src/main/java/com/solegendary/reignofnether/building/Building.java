@@ -47,6 +47,18 @@ public abstract class Building {
 
     public ResourceCost cost;
     public boolean selfBuilding = false;
+    public double maxHealth = 0;
+    protected double maxHealthBonusPerUpgradeLevel = 0;
+
+    public final static double DEFAULT_HEALTH_PER_BLOCK = 2.0d;
+
+    public double getMaxHealth(BuildingPlacement placement) {
+        return maxHealth + (getUpgradeLevel(placement) * maxHealthBonusPerUpgradeLevel);
+    }
+
+    public boolean isUsingSetHealth(BuildingPlacement placement) {
+        return getMaxHealth(placement) > 0;
+    }
 
     // blocks types that are placed automatically when the building is placed
     // used to control size of initial foundations while keeping it symmetrical
@@ -69,7 +81,7 @@ public abstract class Building {
     }
 
     public float getMeleeDamageMult() {
-        return 0.2F;
+        return 0.25F; // this is 50% visually, as 1 block is 2hp by default
     }
 
     public ArrayList<BuildingBlock> getRelativeBlockData(LevelAccessor level) {

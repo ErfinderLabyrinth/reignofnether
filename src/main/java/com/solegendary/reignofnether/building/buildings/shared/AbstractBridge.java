@@ -14,10 +14,8 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.AirBlock;
 import net.minecraft.world.level.block.FenceBlock;
 import net.minecraft.world.level.block.Rotation;
-import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import static com.solegendary.reignofnether.building.BuildingUtils.getAbsoluteBlockData;
 
@@ -28,14 +26,11 @@ public abstract class AbstractBridge extends Building {
         tag.putBoolean("diagonal", diagonal);
         return tag;
     }, () -> false);
-    public final float MELEE_DAMAGE_MULTIPLIER = 0.05f;
 
     public AbstractBridge(ResourceCost cost) {
         super("", cost, false);
+        this.maxHealth = 350d;
     }
-
-    @Override
-    public float getMeleeDamageMult() { return MELEE_DAMAGE_MULTIPLIER; }
 
     public ArrayList<BuildingBlock> getRelativeBlockData(LevelAccessor level, boolean diagonal) {
         return BuildingBlockData.getBuildingBlocksFromNbt(diagonal ? getDiagonalStructureName() : getOrthogonalStructureName(), level);
