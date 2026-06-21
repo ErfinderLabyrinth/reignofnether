@@ -16,6 +16,7 @@ import com.solegendary.reignofnether.building.buildings.shared.AbstractStockpile
 import com.solegendary.reignofnether.building.custombuilding.CustomBuilding;
 import com.solegendary.reignofnether.building.data.DataStorage;
 import com.solegendary.reignofnether.building.production.ProductionItems;
+import com.solegendary.reignofnether.debug.RtsDebugClientEvents;
 import com.solegendary.reignofnether.faction.Faction;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientEvents;
 import com.solegendary.reignofnether.fogofwar.FogOfWarClientboundPacket;
@@ -39,7 +40,6 @@ import com.solegendary.reignofnether.sandbox.SandboxClientEvents;
 import com.solegendary.reignofnether.sandbox.SandboxServer;
 import com.solegendary.reignofnether.sounds.SoundClientEvents;
 import com.solegendary.reignofnether.survival.SurvivalServerEvents;
-import com.solegendary.reignofnether.tps.TPSClientEvents;
 import com.solegendary.reignofnether.tutorial.TutorialClientEvents;
 import com.solegendary.reignofnether.tutorial.TutorialServerEvents;
 import com.solegendary.reignofnether.unit.UnitAction;
@@ -852,7 +852,7 @@ public class BuildingPlacement {
             float cooldown = cooldownEntry.getValue();
             if (cooldown > 0 || getCharges(ability) < ability.maxCharges) {
                 if (level.isClientSide())
-                    cooldowns.put(ability, (float) (cooldown - (TPSClientEvents.getCappedTPS() / 20D)));
+                    cooldowns.put(ability, (float) (cooldown - (RtsDebugClientEvents.getCappedTPS() / 20D)));
                 else
                     cooldowns.put(ability, cooldown - 1);
 
@@ -995,8 +995,11 @@ public class BuildingPlacement {
             BuildingBlock nextBlock = blockPlaceQueue.get(0);
             BlockPos bp = nextBlock.getBlockPos();
             BlockState bs = nextBlock.getBlockState();
+            Block blockBelow = level.getBlockState(bp.below()).getBlock();
             CompoundTag bNbt = nextBlock.getBlockNbt();
             if (level.isLoaded(bp)) {
+                if (blockBelow == Blocks.FARMLAND || blockBelow == Blocks.DIRT_PATH)
+                    level.setBlockAndUpdate(bp.below(), Blocks.DIRT.defaultBlockState());
                 level.setBlockAndUpdate(bp, bs);
                 if (bNbt != null) {
                     if (bs.getBlock() == Blocks.SCULK_CATALYST) {

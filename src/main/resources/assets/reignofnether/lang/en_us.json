@@ -233,9 +233,9 @@
     "abilities.reignofnether.raise_dead.rank3": "Rank 3: Iron armour & Iron Sword",
     "abilities.reignofnether.insomnia_curse": "Curse of Insomnia",
     "abilities.reignofnether.insomnia_curse.stats": "\uE006  %d   \uE004  %ds   \uE005  %d   \uE008  %d",
-    "abilities.reignofnether.insomnia_curse.tooltip1": "Curses a unit or building to be hunted by a",
-    "abilities.reignofnether.insomnia_curse.tooltip2": "phantom with %d dmg + %d per Soul Siphon rank.",
-    "abilities.reignofnether.insomnia_curse.tooltip3": "Phantoms disappear after %d attacks.",
+    "abilities.reignofnether.insomnia_curse.tooltip1": "Curses a unit or building to be hunted by a phantom",
+    "abilities.reignofnether.insomnia_curse.tooltip2": "for 6 attacks with %d dmg + %d per Soul Siphon rank.",
+    "abilities.reignofnether.insomnia_curse.tooltip3": "Deals 30%% less damage to heroes.",
     "abilities.reignofnether.insomnia_curse.rank1": "Rank 1: Max 3 charges, 20s cooldown",
     "abilities.reignofnether.insomnia_curse.rank2": "Rank 2: Max 4 charges, 17s cooldown",
     "abilities.reignofnether.insomnia_curse.rank3": "Rank 3: Max 5 charges, 14s cooldown",
@@ -847,6 +847,9 @@
     "hud.reignofnether.building_full": "That building is full!",
     "hud.reignofnether.not_garrisonable": "That building is not garrisonable",
     "hud.reignofnether.no_destination": "That portal has no destination!",
+    "hud.reignofnether.block_pos": "BlockPos: %s",
+
+    "hud.buildings.reignofnether.sculk_catalyst.range": "%d/%d range",
 
     "hud.units.reignofnether.hero": "Hero",
     "hud.units.reignofnether.armoured": "Armoured",
@@ -899,7 +902,8 @@
     "hud.relationship.reignofnether.enemy": "Enemy",
     "hud.relationship.reignofnether.neutral": "Neutral",
 
-    "hud.hero.reignofnether.level": " (Lvl %d)",
+    "hud.hero.reignofnether.level": "Lvl %d",
+    "hud.hero.reignofnether.level.short": "Lv %d",
     "hud.hero.reignofnether.experience": "Experience: %d/%d",
     "hud.hero.reignofnether.experience_warning": "No exp from neutrals from lvl 5",
     "hud.hero.reignofnether.max_level": "Max Level!",
@@ -1759,9 +1763,18 @@
     "alliances.reignofnether.tooltip.disband_alliance": "Disband Alliance",
     "alliances.reignofnether.tooltip.goto_player": "Go to player",
 
+    "alliances.reignofnether.tooltip.status.enemy": "Enemy",
+    "alliances.reignofnether.tooltip.status.requested": "Requested",
+    "alliances.reignofnether.tooltip.status.accept": "Accept?",
+    "alliances.reignofnether.tooltip.status.allied": "Allied",
+    "alliances.reignofnether.tooltip.status.allied.plural": " (s)",
+
     "alliances.reignofnether.tooltip.toggle_observer_player_displays": "Observer Menu (Z)",
     "alliances.reignofnether.tooltip.toggle_diplomacy_player_displays": "Diplomacy Menu (Z)",
     "alliances.reignofnether.tooltip.toggle_shared_unit_control": "Toggle whether allies can control your units",
+    "alliances.reignofnether.tooltip.shared_unit_control": "Shared Control: ",
+    "alliances.reignofnether.tooltip.shared_unit_control.enable": "ON",
+    "alliances.reignofnether.tooltip.shared_unit_control.disable": "OFF",
 
     "effect.reignofnether.stun": "Stun",
     "effect.reignofnether.freeze": "Freeze",

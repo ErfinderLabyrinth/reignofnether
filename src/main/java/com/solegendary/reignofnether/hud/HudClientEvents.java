@@ -79,10 +79,7 @@ import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.item.BannerItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec2;
-import net.minecraftforge.client.event.RenderGuiOverlayEvent;
-import net.minecraftforge.client.event.RenderLivingEvent;
-import net.minecraftforge.client.event.RenderNameTagEvent;
-import net.minecraftforge.client.event.ScreenEvent;
+import net.minecraftforge.client.event.*;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.lwjgl.glfw.GLFW;
@@ -101,6 +98,8 @@ import static com.solegendary.reignofnether.hud.playerdisplay.PlayerDisplayClien
 public class HudClientEvents {
 
     private static final Minecraft MC = Minecraft.getInstance();
+
+    public static boolean enabled = true;
 
     private static String tempMsg = "";
     private static int tempMsgTicksLeft = 0;
@@ -269,8 +268,17 @@ public class HudClientEvents {
     }
 
     @SubscribeEvent
+    // can't use ScreenEvent.KeyboardKeyPressedEvent as that only happens when a screen is up
+    public static void onInput(InputEvent.Key evt) {
+        if (OrthoviewClientEvents.isEnabled() && evt.getAction() == GLFW.GLFW_PRESS) {
+            if (evt.getKey() == Keybindings.getFnum(1).getKey())
+                enabled = !enabled;
+        }
+    }
+
+    @SubscribeEvent
     public static void onDrawScreen(ScreenEvent.Render.Post evt) {
-        if (!OrthoviewClientEvents.isEnabled() || !(evt.getScreen() instanceof TopdownGui)) {
+        if (!OrthoviewClientEvents.isEnabled() || !(evt.getScreen() instanceof TopdownGui) || !enabled) {
             return;
         }
         if (MC.level == null) {
@@ -485,7 +493,7 @@ public class HudClientEvents {
                     }
                     evt.getGuiGraphics().drawString(
                         MC.font,
-                        Math.round(100 - (percentageDoneInv * 100f)) + "% " + productionButtons.get(0).name,
+                        Math.round(100 - (percentageDoneInv * 100f)) + "% " + productionButtons.get(0).name,  // TODO: translatable
                         blitX + iconFrameSize + 5,
                         blitY + 2,
                         colour
@@ -2151,7 +2159,7 @@ public class HudClientEvents {
                 }
             }
             BlockPos bp = CursorClientEvents.getPreselectedBlockPos();
-            evt.getGuiGraphics().drawString(MC.font, "BlockPos: " + bp.toShortString(), 100, y, 0xFFFFFF);
+            evt.getGuiGraphics().drawString(MC.font, I18n.get("hud.reignofnether.block_pos", bp.toShortString()), 100, y, 0xFFFFFF);
             evt.getGuiGraphics().drawString(MC.font, MC.level.getBlockState(bp).getBlock().toString().replaceFirst("Block", ""), 100, y + 10, 0xFFFFFF);
         }
     }
