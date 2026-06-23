@@ -149,9 +149,39 @@ public final class PacketHandler {
                 .encoder(BuildingServerboundPacket::encode).decoder(BuildingServerboundPacket::new)
                 .consumerMainThread(BuildingServerboundPacket::handle).add();
 
-        INSTANCE.messageBuilder(BuildingClientboundPacket.class, index++, NetworkDirection.PLAY_TO_CLIENT)
-                .encoder(BuildingClientboundPacket::encode).decoder(BuildingClientboundPacket::new)
+        // Building Clientbound
+        INSTANCE.messageBuilder(BuildingClientboundPacket.PlaceBuilding.class, index++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(BuildingClientboundPacket::encode).decoder(BuildingClientboundPacket.PlaceBuilding::new)
                 .consumerMainThread(BuildingClientboundPacket::handle).add();
+
+        INSTANCE.messageBuilder(BuildingClientboundPacket.SyncBuilding.class, index++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(BuildingClientboundPacket::encode).decoder(BuildingClientboundPacket.SyncBuilding::new)
+                .consumerMainThread(BuildingClientboundPacket::handle).add();
+
+        INSTANCE.messageBuilder(BuildingClientboundPacket.StartProduction.class, index++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(BuildingClientboundPacket::encode).decoder(BuildingClientboundPacket.StartProduction::new)
+                .consumerMainThread(BuildingClientboundPacket::handle).add();
+
+        INSTANCE.messageBuilder(BuildingClientboundPacket.CancelProduction.class, index++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(BuildingClientboundPacket::encode).decoder(BuildingClientboundPacket.CancelProduction::new)
+                .consumerMainThread(BuildingClientboundPacket::handle).add();
+
+        INSTANCE.messageBuilder(BuildingClientboundPacket.ChangePortal.class, index++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(BuildingClientboundPacket::encode).decoder(BuildingClientboundPacket.ChangePortal::new)
+                .consumerMainThread(BuildingClientboundPacket::handle).add();
+
+        INSTANCE.messageBuilder(BuildingClientboundPacket.ClearQueue.class, index++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(BuildingClientboundPacket::encode).decoder(BuildingClientboundPacket.ClearQueue::new)
+                .consumerMainThread(BuildingClientboundPacket::handle).add();
+
+        INSTANCE.messageBuilder(BuildingClientboundPacket.CompleteProduction.class, index++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(BuildingClientboundPacket::encode).decoder(BuildingClientboundPacket.CompleteProduction::new)
+                .consumerMainThread(BuildingClientboundPacket::handle).add();
+
+        INSTANCE.messageBuilder(BuildingClientboundPacket.RemoveBuilding.class, index++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(BuildingClientboundPacket::encode).decoder(BuildingClientboundPacket.RemoveBuilding::new)
+                .consumerMainThread(BuildingClientboundPacket::handle).add();
+
 
         INSTANCE.messageBuilder(ResourcesClientboundPacket.class, index++, NetworkDirection.PLAY_TO_CLIENT)
                 .encoder(ResourcesClientboundPacket::encode).decoder(ResourcesClientboundPacket::new)
